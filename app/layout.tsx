@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     template: '%s | Bernstein',
   },
   description:
-    'Open-source orchestrator for parallel AI coding agents. Run Claude Code, Codex, Gemini CLI simultaneously with deterministic scheduling, quality gates, and cost tracking.',
+    'Open-source orchestrator for parallel AI coding agents. Run Claude Code, Codex, Gemini CLI simultaneously — deterministic scheduling, quality gates, cost tracking. 8,000+ monthly downloads.',
   keywords: [
     'multi-agent orchestration',
     'AI coding agents',
@@ -32,14 +32,14 @@ export const metadata: Metadata = {
     siteName: 'Bernstein',
     title: 'Bernstein \u2014 Multi-Agent Orchestration for CLI Coding Agents',
     description:
-      'Run multiple AI coding agents in parallel on your codebase. Deterministic scheduling. Quality gates. Any model. One command.',
-    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'Bernstein' }],
+      'Run multiple AI coding agents in parallel on your codebase. Deterministic scheduling. Quality gates. 21 adapters. One command.',
+    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'Bernstein — Multi-Agent Orchestration for CLI Coding Agents' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Bernstein \u2014 Multi-Agent Orchestration for CLI Coding Agents',
     description:
-      'Run multiple AI coding agents in parallel on your codebase. Deterministic scheduling. Quality gates. Any model. One command.',
+      'Run multiple AI coding agents in parallel on your codebase. Deterministic scheduling. Quality gates. 21 adapters. One command.',
     images: ['/api/og'],
   },
   icons: { icon: '/favicon.svg' },

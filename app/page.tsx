@@ -148,6 +148,57 @@ const ORG_JSON_LD = {
   ],
 };
 
+const WEBSITE_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Bernstein',
+  url: 'https://bernstein.run',
+  description: 'Open-source multi-agent orchestration for CLI coding agents',
+  publisher: { '@type': 'Organization', name: 'Bernstein' },
+};
+
+const SITELINKS_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: [
+    {
+      '@type': 'SiteNavigationElement',
+      position: 1,
+      name: 'Blog',
+      description: 'Engineering deep-dives, tutorials, and project updates',
+      url: 'https://bernstein.run/blog',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 2,
+      name: 'Documentation',
+      description: 'Installation, configuration, adapter guide, and API reference',
+      url: 'https://bernstein.readthedocs.io/',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 3,
+      name: 'Getting Started',
+      description: 'Your first multi-agent run in 5 minutes',
+      url: 'https://bernstein.run/blog/getting-started',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 4,
+      name: 'GitHub',
+      description: 'Source code, issues, and community contributions',
+      url: 'https://github.com/chernistry/bernstein',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 5,
+      name: 'PyPI',
+      description: 'Python package — install with pipx install bernstein',
+      url: 'https://pypi.org/project/bernstein/',
+    },
+  ],
+};
+
 export default function LandingPage() {
   return (
     <>
@@ -176,6 +227,14 @@ export default function LandingPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SITELINKS_JSON_LD) }}
       />
     </>
   );
