@@ -85,7 +85,7 @@ bernstein run plans/my-project.yaml
 
 3. **Short-lived agents**: Agents handle 1-3 tasks each, then exit. No long-running agent processes. Fresh context per task prevents hallucination drift.
 
-4. **Agent-agnostic**: Works with any CLI coding agent. Currently ships 29 adapters. Adding a new agent requires implementing a simple adapter interface.
+4. **Agent-agnostic**: Works with any CLI coding agent. Currently ships 21 adapters. Adding a new agent requires implementing a simple adapter interface.
 
 5. **Model-per-task routing**: A contextual bandit router learns which model works best for each task type and complexity level. Saves 50-60% vs uniformly using expensive models.
 
@@ -196,7 +196,7 @@ The system is organized into 22 sub-packages under \`src/bernstein/core/\`:
 
 ---
 
-## Supported Agents (29 Adapters)
+## Supported Agents (21 Adapters)
 
 | Agent | Description | Models |
 |-------|-------------|--------|
@@ -515,7 +515,7 @@ Bernstein assigns roles to agents based on task requirements:
 | Feature | Bernstein | CrewAI | AutoGen | LangGraph |
 |---------|-----------|--------|---------|-----------|
 | Orchestrator | Deterministic code | LLM-driven | LLM-driven | Graph + LLM |
-| CLI agent support | 29 adapters | No | No | No |
+| CLI agent support | 21 adapters | No | No | No |
 | Git isolation | Worktrees | No | No | No |
 | Quality gates | Built-in | No | No | Partial |
 | Cost tracking | Per-agent | No | No | No |
@@ -524,6 +524,22 @@ Bernstein assigns roles to agents based on task requirements:
 | Model routing | Contextual bandit | Manual | Manual | Manual |
 
 ---
+
+
+## Cloud Execution (Cloudflare)
+
+Bernstein can run agents on Cloudflare's edge network:
+
+- **Workers Runtime**: Execute agents on Cloudflare Workers
+- **Durable Workflows**: Map tasks to durable workflows with auto-retry and approval gates
+- **V8 Sandbox Isolation**: Secure agent code execution in isolated V8 isolates
+- **R2 Workspace Sync**: Upload/download workspace files during cloud execution
+- **Workers AI**: Use Cloudflare's AI models for task decomposition and planning
+- **D1 Analytics**: Serverless SQLite for usage tracking and billing
+- **Vectorize Cache**: Semantic caching for LLM responses with embedding similarity
+- **Browser Rendering**: Headless browser bridge for scraping and screenshots
+- **MCP Remote Transport**: Expose Bernstein as an MCP server over HTTP
+- **Cloud CLI**: \`bernstein cloud init/deploy/run/status/cost\` commands
 
 ## FAQ
 
@@ -534,7 +550,7 @@ Bernstein is an open-source multi-agent orchestration system that coordinates AI
 Bernstein's orchestrator is deterministic Python code — no LLM tokens are spent on coordination. It works with real CLI coding agents (not API-only models) and provides git worktree isolation, quality gates, and cost tracking out of the box.
 
 ### What agents does Bernstein support?
-Bernstein ships 29 adapters for popular coding agents including Claude Code, Codex CLI, Gemini CLI, Cursor, Aider, Amp, Ollama, and more. It also has a generic adapter for wrapping any CLI tool.
+Bernstein ships 21 adapters for popular coding agents including Claude Code, Codex CLI, Gemini CLI, Cursor, Aider, Amp, Ollama, and more. It also has a generic adapter for wrapping any CLI tool.
 
 ### How does task routing work?
 Bernstein uses a contextual bandit (epsilon-greedy) router that learns which model works best for each task type and complexity. Simple tasks go to cheaper models (Haiku, Flash), complex architecture tasks go to expensive models (Opus). This typically saves 50-60% compared to using expensive models for everything.

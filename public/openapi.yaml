@@ -1,0 +1,148 @@
+openapi: 3.0.3
+info:
+  title: Bernstein Task Server API
+  description: REST API for the Bernstein multi-agent orchestration system task server.
+  version: 1.7.0
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+  contact:
+    name: Alex Chernysh
+    url: https://github.com/chernistry/bernstein
+servers:
+  - url: http://127.0.0.1:8052
+    description: Local task server (default)
+paths:
+  /tasks:
+    post:
+      summary: Create a new task
+      operationId: createTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [goal]
+              properties:
+                goal:
+                  type: string
+                  description: Task goal description
+                role:
+                  type: string
+                  description: Agent role (e.g. backend, frontend, qa)
+                priority:
+                  type: integer
+                  minimum: 0
+                  maximum: 10
+                complexity:
+                  type: string
+                  enum: [trivial, simple, moderate, complex, epic]
+      responses:
+        '201':
+          description: Task created
+    get:
+      summary: List tasks by status
+      operationId: listTasks
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, assigned, done, failed]
+      responses:
+        '200':
+          description: Task list
+  /tasks/{id}/complete:
+    post:
+      summary: Mark task as completed
+      operationId: completeTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task completed
+  /tasks/{id}/fail:
+    post:
+      summary: Mark task as failed
+      operationId: failTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task failed
+  /tasks/{id}/progress:
+    post:
+      summary: Report task progress
+      operationId: reportProgress
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                files_changed:
+                  type: array
+                  items:
+                    type: string
+                tests_passing:
+                  type: boolean
+                errors:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Progress recorded
+  /bulletin:
+    post:
+      summary: Post a cross-agent finding or blocker
+      operationId: postBulletin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+                type:
+                  type: string
+                  enum: [finding, blocker, info]
+      responses:
+        '201':
+          description: Bulletin posted
+    get:
+      summary: Read recent bulletins
+      operationId: getBulletins
+      parameters:
+        - name: since
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Bulletin list
+  /status:
+    get:
+      summary: Dashboard summary
+      operationId: getStatus
+      responses:
+        '200':
+          description: System status

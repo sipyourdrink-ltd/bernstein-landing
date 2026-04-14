@@ -5,7 +5,7 @@
       "@type": "SoftwareApplication",
       "@id": "https://bernstein.run/#software",
       "name": "Bernstein",
-      "description": "Open-source multi-agent orchestration system for AI coding agents. Coordinates Claude Code, Codex, Gemini CLI, and 26 other agents to work in parallel using deterministic scheduling, git worktree isolation, and quality gates.",
+      "description": "Open-source multi-agent orchestration system for AI coding agents. Coordinates Claude Code, Codex, Gemini CLI, and 20 other agents to work in parallel using deterministic scheduling, git worktree isolation, and quality gates.",
       "url": "https://bernstein.run",
       "applicationCategory": "DeveloperApplication",
       "applicationSubCategory": "Multi-Agent Orchestration",
@@ -46,7 +46,7 @@
         "YAML plan files for repeatable workflows",
         "Self-evolution capability"
       ],
-      "screenshot": "https://bernstein.run/og-image.png",
+      "screenshot": "https://bernstein.run/api/og?title=Bernstein",
       "keywords": [
         "multi-agent orchestration",
         "AI coding agents",

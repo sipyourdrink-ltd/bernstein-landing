@@ -15,7 +15,7 @@ const SOFTWARE_APP_JSON_LD = {
   '@type': 'SoftwareApplication',
   name: 'Bernstein',
   description:
-    'Open-source multi-agent orchestration system for AI coding agents. Coordinates Claude Code, Codex, Gemini CLI, and 26 other agents to work in parallel using deterministic scheduling, git worktree isolation, and quality gates.',
+    'Open-source multi-agent orchestration system for AI coding agents. Coordinates Claude Code, Codex, Gemini CLI, and 20 other agents to work in parallel using deterministic scheduling, git worktree isolation, and quality gates.',
   url: 'https://bernstein.run',
   applicationCategory: 'DeveloperApplication',
   applicationSubCategory: 'Multi-Agent Orchestration',
@@ -39,7 +39,7 @@ const SOFTWARE_APP_JSON_LD = {
   downloadUrl: 'https://pypi.org/project/bernstein/',
   featureList: [
     'Deterministic scheduling',
-    '29 agent adapters',
+    '21 agent adapters',
     'Git worktree isolation',
     'Quality gates',
     'Cost-aware routing',
@@ -73,7 +73,7 @@ const FAQ_JSON_LD = {
       name: 'What AI coding agents does Bernstein support?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Bernstein supports 29 agents including Claude Code, Codex CLI, Gemini CLI, Cursor, Aider, Amp, Roo Code, Kiro, Qwen, Goose, Ollama, and more. It also has a generic adapter for wrapping any CLI tool.',
+        text: 'Bernstein supports 21 agents including Claude Code, Codex CLI, Gemini CLI, Cursor, Aider, Amp, Roo Code, Kiro, Qwen, Goose, Ollama, and more. It also has a generic adapter for wrapping any CLI tool.',
       },
     },
     {
