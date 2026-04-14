@@ -44,58 +44,65 @@ export function Compare() {
       </ScrollReveal>
       <ScrollReveal delay={200}>
         <div className="table-wrap">
-          <table className="compare-table">
+          <table className="compare-table" role="table" aria-label="Feature comparison between orchestration tools">
             <thead>
               <tr>
-                <th></th>
-                <th>Bernstein</th>
-                <th>CrewAI</th>
-                <th>AutoGen</th>
-                <th>LangGraph</th>
+                <th scope="col"></th>
+                <th scope="col">Bernstein</th>
+                <th scope="col">CrewAI</th>
+                <th scope="col">AutoGen</th>
+                <th scope="col">LangGraph</th>
               </tr>
             </thead>
             <tbody>
               <TableRowReveal delay={0}>
                 <td>Orchestrator</td>
                 <td>Deterministic code</td>
-                <td className="partial">LLM-driven</td>
-                <td className="partial">LLM-driven</td>
-                <td className="partial">Graph + LLM</td>
+                <td className="partial" aria-label="Partial: LLM-driven">~ LLM-driven</td>
+                <td className="partial" aria-label="Partial: LLM-driven">~ LLM-driven</td>
+                <td className="partial" aria-label="Partial: Graph + LLM">~ Graph + LLM</td>
               </TableRowReveal>
               <TableRowReveal delay={80}>
                 <td>CLI agent support</td>
-                <td><span className="check">29 adapters</span></td>
-                <td><span className="cross">No</span></td>
-                <td><span className="cross">No</span></td>
-                <td><span className="cross">No</span></td>
+                <td aria-label="Yes: 21 adapters"><span className="check">&#10003; 21 adapters</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
               </TableRowReveal>
               <TableRowReveal delay={160}>
                 <td>Git isolation</td>
-                <td><span className="check">Worktrees</span></td>
-                <td><span className="cross">No</span></td>
-                <td><span className="cross">No</span></td>
-                <td><span className="cross">No</span></td>
+                <td aria-label="Yes: Worktrees"><span className="check">&#10003; Worktrees</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
               </TableRowReveal>
               <TableRowReveal delay={240}>
                 <td>Quality gates</td>
-                <td><span className="check">Built-in</span></td>
-                <td><span className="cross">No</span></td>
-                <td><span className="cross">No</span></td>
-                <td className="partial">Partial</td>
+                <td aria-label="Yes: Built-in"><span className="check">&#10003; Built-in</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td className="partial" aria-label="Partial">~ Partial</td>
               </TableRowReveal>
               <TableRowReveal delay={320}>
                 <td>Cost tracking</td>
-                <td><span className="check">Per-agent</span></td>
-                <td><span className="cross">No</span></td>
-                <td><span className="cross">No</span></td>
-                <td><span className="cross">No</span></td>
+                <td aria-label="Yes: Per-agent"><span className="check">&#10003; Per-agent</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
               </TableRowReveal>
               <TableRowReveal delay={400}>
+                <td>Cloud execution</td>
+                <td aria-label="Yes: Cloudflare"><span className="check">&#10003; Cloudflare</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+              </TableRowReveal>
+              <TableRowReveal delay={480}>
                 <td>Self-evolution</td>
-                <td><span className="check">Built-in</span></td>
-                <td><span className="cross">No</span></td>
-                <td><span className="cross">No</span></td>
-                <td><span className="cross">No</span></td>
+                <td aria-label="Yes: Built-in"><span className="check">&#10003; Built-in</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td aria-label="No"><span className="cross">&#10007; No</span></td>
               </TableRowReveal>
             </tbody>
           </table>
