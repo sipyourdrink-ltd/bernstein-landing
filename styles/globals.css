@@ -10,7 +10,7 @@
   --border-subtle: oklch(0.28 0.006 255);
   --text: oklch(0.95 0.006 100);
   --text-secondary: oklch(0.75 0.01 255);
-  --text-muted: oklch(0.58 0.01 255);
+  --text-muted: oklch(0.62 0.01 255);
   --accent: oklch(0.55 0.028 252);
   --accent-hover: oklch(0.62 0.032 252);
   --accent-subtle: oklch(0.25 0.02 252);
@@ -544,6 +544,7 @@ header.nav-scrolled {
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
   color: var(--text);
+  min-width: 3ch;
 }
 .stat-label {
   font-size: 13px;
@@ -641,7 +642,7 @@ section[id] {
 }
 .step h3 {
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: var(--space-2);
   letter-spacing: -0.01em;
 }
@@ -790,7 +791,7 @@ section[id] {
 
 .feature h3 {
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: var(--space-2);
   letter-spacing: -0.01em;
 }
@@ -991,6 +992,7 @@ section[id] {
   font-weight: 600;
   letter-spacing: -0.025em;
   margin-bottom: var(--space-4);
+  text-wrap: balance;
 }
 .cta-section > p {
   color: var(--text-muted);
@@ -1326,6 +1328,12 @@ footer {
   scroll-margin-top: 80px;
 }
 
+.prose h2 a,
+.prose h3 a {
+  text-decoration: none;
+  color: inherit;
+}
+
 .prose p { margin-bottom: var(--space-5); }
 
 .prose a {
@@ -1443,3 +1451,46 @@ footer {
 .faq-item--open .faq-chevron { transform: rotate(180deg); }
 .faq-answer { padding: 0 var(--space-5) var(--space-5); color: var(--text-secondary); line-height: 1.7; }
 .faq-answer code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.9em; }
+
+/* Share buttons */
+.share-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+.share-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-right: var(--space-1);
+}
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-muted);
+  transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
+}
+.share-btn:hover {
+  color: var(--text);
+  border-color: var(--border);
+  background: var(--surface);
+}
+
+/* Hero share */
+.hero-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-4);
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: color 0.15s ease-out;
+}
+.hero-share:hover { color: var(--text); }

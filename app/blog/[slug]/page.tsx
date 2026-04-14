@@ -4,6 +4,7 @@ import { getPost, getSlugs } from '@/lib/mdx';
 import { buildBlogPostJsonLd, SITE_URL, AUTHOR } from '@/lib/seo';
 import { Nav } from '@/components/landing/Nav';
 import { Footer } from '@/components/landing/Footer';
+import { ShareButtons } from '@/components/blog/ShareButtons';
 
 type Props = { params: { slug: string } };
 
@@ -57,6 +58,7 @@ export default async function BlogPost({ params }: Props) {
             </time>
             <span>{post.readingMinutes} min read</span>
           </div>
+          <ShareButtons url={`https://bernstein.run/blog/${params.slug}`} title={post.fm.title} />
         </header>
         <div className="prose">{post.mdx}</div>
       </article>
