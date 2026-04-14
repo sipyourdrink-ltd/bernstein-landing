@@ -24,7 +24,7 @@ export function EmailCapture() {
   }
 
   return (
-    <div className="email-section">
+    <div className={`email-section${status === 'success' ? ' success' : ''}`}>
       <div className="email-inner">
         <p className="email-kicker">Something new is coming</p>
         <h2>Be the first to know</h2>
@@ -40,12 +40,19 @@ export function EmailCapture() {
           <button
             type="submit"
             disabled={status === 'submitting' || status === 'success'}
-            style={status === 'success' ? { background: '#16a34a' } : undefined}
+            className={status === 'success' ? 'email-btn-success' : undefined}
           >
-            {status === 'submitting' ? 'Submitting\u2026' : status === 'success' ? 'You\u2019re in \u2713' : 'Get early access'}
+            {status === 'submitting' ? (
+              <span className="email-spinner" aria-label="Submitting">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="spin">
+                  <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="2" opacity="0.3"/>
+                  <path d="M14 8a6 6 0 00-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </span>
+            ) : status === 'success' ? 'You\u2019re in \u2713' : 'Get early access'}
           </button>
         </form>
-        <p className="email-note">
+        <p className={`email-note${status === 'success' ? ' email-note-success' : ''}`}>
           {status === 'success'
             ? 'Check your inbox to confirm.'
             : status === 'error'
