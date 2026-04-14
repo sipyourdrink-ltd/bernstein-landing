@@ -4,7 +4,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 
 function formatNumber(value: number, format: 'k' | 'comma' | 'plain'): string {
   if (format === 'k') {
-    return (value / 1000).toFixed(1) + 'k';
+    return value >= 1000 ? (value / 1000).toFixed(1) + 'k' : String(value);
   }
   if (format === 'comma') {
     return value.toLocaleString('en-US');
@@ -71,24 +71,53 @@ function AnimatedNumber({ target, suffix = '', format = 'plain' }: AnimatedNumbe
   return <span ref={ref}>{display}</span>;
 }
 
-const stats = [
-  { target: 110, suffix: '+', format: 'plain' as const, label: 'GitHub stars' },
-  { target: 7700, suffix: '', format: 'k' as const, label: 'Monthly downloads' },
-  { target: 21, suffix: '', format: 'plain' as const, label: 'Agent adapters' },
-  { target: 2600, suffix: '+', format: 'comma' as const, label: 'Tests passing' },
-];
+const FALLBACK_DOWNLOADS = 8600;
 
 export function Stats() {
+  const [downloads, setDownloads] = useState(FALLBACK_DOWNLOADS);
+
+  useEffect(() => {
+    fetch('https://pypistats.org/api/packages/bernstein/recent')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data?.data?.last_month) {
+          setDownloads(data.data.last_month);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="stats">
-      {stats.map((s) => (
-        <div className="stat" key={s.label}>
-          <div className="stat-num">
-            <AnimatedNumber target={s.target} suffix={s.suffix} format={s.format} />
-          </div>
-          <div className="stat-label">{s.label}</div>
+      <div className="stat">
+        <div className="stat-num">
+          <AnimatedNumber target={110} suffix="+" />
         </div>
-      ))}
+        <div className="stat-label">GitHub stars</div>
+      </div>
+      <a
+        href="https://pypistats.org/packages/bernstein"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="stat stat-link"
+      >
+        <div className="stat-num">
+          <AnimatedNumber target={downloads} format="comma" />
+        </div>
+        <div className="stat-label">Monthly downloads</div>
+      </a>
+      <div className="stat">
+        <div className="stat-num">
+          <AnimatedNumber target={21} />
+        </div>
+        <div className="stat-label">Agent adapters</div>
+      </div>
+      <div className="stat">
+        <div className="stat-num">
+          <AnimatedNumber target={2600} suffix="+" format="comma" />
+        </div>
+        <div className="stat-label">Tests passing</div>
+      </div>
     </div>
   );
 }

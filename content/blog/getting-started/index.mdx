@@ -1,8 +1,8 @@
 ---
 title: "Getting Started: Your First Multi-Agent Run in 5 Minutes"
-description: "Install Bernstein, configure an agent, and run your first multi-agent coding session in under 5 minutes. Step-by-step tutorial."
+description: "Install Bernstein, configure Claude Code or any CLI agent, and run your first parallel multi-agent coding session in under 5 minutes. Step-by-step tutorial with examples."
 date: "2026-04-14"
-tags: ["tutorial", "getting-started", "guide"]
+tags: ["multi-agent orchestration tutorial", "AI coding agents setup", "Claude Code tutorial", "getting started", "Python CLI tools"]
 ---
 
 <Lead>
@@ -32,7 +32,7 @@ bernstein --version
 
 ## Step 2: Configure your agent
 
-Bernstein needs at least one CLI coding agent installed. The fastest setup uses Claude Code, but [21 agents are supported](/docs) including Codex, Gemini CLI, Aider, and more.
+Bernstein needs at least one CLI coding agent installed. The fastest setup uses Claude Code, but [21 agents are supported](https://bernstein.readthedocs.io/en/latest/ADAPTER_GUIDE/) including Codex, Gemini CLI, Aider, and more.
 
 Make sure Claude Code is installed and your API key is set:
 
@@ -112,7 +112,7 @@ Each agent's work is a separate commit, merged through Bernstein's merge queue. 
 bernstein run plans/my-project.yaml
 ```
 
-Plans let you define stages, dependencies, roles, and complexity per task. See the [plan file docs](/docs) for the full schema.
+Plans let you define stages, dependencies, roles, and complexity per task. See the [plan file docs](https://bernstein.readthedocs.io/en/latest/GETTING_STARTED/) for the full schema.
 
 **Use multiple agent types** by installing additional adapters:
 

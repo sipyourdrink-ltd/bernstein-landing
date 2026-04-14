@@ -552,6 +552,16 @@ header.nav-scrolled {
   font-weight: 500;
 }
 
+.stat-link {
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s ease-out;
+}
+.stat-link:hover .stat-num { color: var(--accent-hover); }
+.stat-link:hover .stat-label { color: var(--text-secondary);
+  font-weight: 500;
+}
+
 /* ---- SECTIONS ---- */
 section {
   padding: var(--space-11) var(--space-5);
