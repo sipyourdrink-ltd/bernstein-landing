@@ -39,53 +39,38 @@ export function buildBlogIndexJsonLd(posts: PostIndex[]) {
 export async function buildLlmsTxt(): Promise<string> {
   const posts = await getAllPosts();
   const postList = posts
-    .map((p) => `- [${p.fm.title}](${SITE_URL}/blog/${p.slug}) — ${p.fm.description}`)
+    .map((p) => `- [${p.fm.title}](${SITE_URL}/blog/${p.slug}): ${p.fm.description}`)
     .join('\n');
 
   return `# Bernstein
 
-> Orchestrate any AI coding agent. Any model. One command.
-> Full technical reference: ${SITE_URL}/llms-full.txt
-> RSS feed: ${SITE_URL}/rss.xml
-> Last updated: ${new Date().toISOString().split('T')[0]}
+> Open-source multi-agent orchestration system for AI coding agents. Decomposes goals into parallel tasks, routes to optimal models, verifies via quality gates, merges results. 21 adapters, Cloudflare cloud execution, deterministic Python scheduling. Apache 2.0.
 
-Bernstein is an open-source multi-agent orchestration system for AI coding agents. It takes a goal, decomposes it into tasks, assigns them to AI coding agents running in parallel, verifies output via quality gates, and merges results.
+## Docs
 
-## Key Facts
+- [Documentation](https://bernstein.readthedocs.io/): Full technical documentation
+- [Architecture](https://bernstein.readthedocs.io/en/latest/ARCHITECTURE/): System architecture and design
+- [Getting Started](https://bernstein.readthedocs.io/en/latest/GETTING_STARTED/): Installation and quickstart
+- [Adapter Guide](https://bernstein.readthedocs.io/en/latest/ADAPTER_GUIDE/): Supported agents and how to add your own
+- [API Reference](https://bernstein.readthedocs.io/en/latest/openapi-reference/): Task server REST API
+- [Cloudflare Guide](https://bernstein.readthedocs.io/en/latest/cloudflare-overview/): Cloud execution on Cloudflare Workers
+- [Configuration](https://bernstein.readthedocs.io/en/latest/CONFIG/): bernstein.yaml reference
 
-- **Type**: Multi-agent orchestrator for CLI coding agents
-- **License**: Apache 2.0
-- **Language**: Python 3.12+
-- **Install**: \`pipx install bernstein\`
-- **Author**: ${AUTHOR}
-- **Website**: ${SITE_URL}
-- **GitHub**: https://github.com/chernistry/bernstein
-- **PyPI**: https://pypi.org/project/bernstein/
-- **Documentation**: https://bernstein.readthedocs.io/
+## Resources
 
-## What It Does
+- [GitHub](https://github.com/chernistry/bernstein): Source code and issues
+- [PyPI](https://pypi.org/project/bernstein/): Python package
+- [npm](https://www.npmjs.com/package/bernstein-orchestrator): Node.js wrapper
+- [Full Technical Reference](${SITE_URL}/llms-full.txt): Comprehensive 500+ line reference for LLMs
+- [OpenAPI Spec](${SITE_URL}/openapi.yaml): REST API specification
+- [RSS Feed](${SITE_URL}/rss.xml): Blog updates
 
-1. Takes a goal in plain English
-2. Decomposes it into tasks with roles, priorities, and dependencies
-3. Spawns AI coding agents in isolated git worktrees
-4. Routes tasks to the right model (Opus for architecture, Sonnet for implementation, Haiku for tests)
-5. Runs quality gates (lint, type check, tests, security scan) on every result
-6. Merges verified work, retries failures with escalated models
+${posts.length > 0 ? `## Blog\n\n${postList}` : ''}
 
-## Supported Agents (21 adapters)
+## Optional
 
-Claude Code, Codex CLI, Gemini CLI, Cursor, Aider, Amp, Roo Code, Kiro, Qwen, Goose, Ollama, Cody, Continue, OpenCode, Tabby, Kilo, IaC, Cloudflare Agents, and more via a generic CLI adapter.
-
-${posts.length > 0 ? `## Blog Posts\n\n${postList}` : ''}
-
-## Cloud Execution
-
-Bernstein supports running agents on Cloudflare Workers with Durable Workflows, V8 sandbox isolation, R2 workspace sync, Workers AI routing, D1 analytics, and Vectorize semantic caching. Use \`bernstein cloud\` CLI to deploy and manage cloud runs.
-
-## Links
-
-- Documentation: https://bernstein.readthedocs.io/
-- GitHub Issues: https://github.com/chernistry/bernstein/issues
-- PyPI: https://pypi.org/project/bernstein/
+- [Changelog](https://bernstein.readthedocs.io/en/latest/CHANGELOG/): Version history
+- [Contributing](https://bernstein.readthedocs.io/en/latest/CONTRIBUTING/): How to contribute
+- [License](https://github.com/chernistry/bernstein/blob/main/LICENSE): Apache 2.0
 `;
 }

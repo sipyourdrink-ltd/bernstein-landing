@@ -48,6 +48,7 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
     types: {
       'application/rss+xml': '/rss.xml',
+      'text/markdown': '/llms.txt',
     },
   },
   other: {
@@ -56,6 +57,10 @@ export const metadata: Metadata = {
     'mobile-web-app-capable': 'yes',
     'msapplication-TileColor': '#131316',
     'format-detection': 'telephone=no',
+    'ai-content': 'https://bernstein.run/llms.txt',
+    'ai-content-full': 'https://bernstein.run/llms-full.txt',
+    'agent-card': 'https://bernstein.run/.well-known/agent-card.json',
+    'mcp-server': 'https://bernstein.run/.well-known/mcp/server-card.json',
   },
 };
 
