@@ -534,15 +534,34 @@ section {
 }
 
 .agent-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
   background: var(--surface);
   border: 1px solid var(--border-subtle);
+  border-left: 2px solid transparent;
   border-radius: var(--radius);
   padding: var(--space-4) var(--space-5);
-  transition: border-color 0.15s ease-out;
+  transition: border-color 0.15s ease-out, transform 0.15s ease-out, box-shadow 0.15s ease-out;
 }
-.agent-card:hover { border-color: var(--border); }
+.agent-card:hover {
+  border-color: var(--border);
+  border-left-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.agent-icon {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  line-height: 0;
+  margin-top: 1px;
+}
 
 .agent-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 2px;
@@ -550,6 +569,38 @@ section {
 .agent-models {
   font-size: 12px;
   color: var(--text-muted);
+}
+
+.agent-badge {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  padding: 1px 6px;
+  border-radius: 9999px;
+  line-height: 1.6;
+}
+
+.agent-count {
+  font-size: 14px;
+  color: var(--accent);
+  font-weight: 400;
+}
+
+.agents-more-wrap {
+  text-align: center;
+  margin-top: var(--space-5);
+}
+.agents-more {
+  font-size: 14px;
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.15s ease-out;
+}
+.agents-more:hover {
+  opacity: 0.8;
 }
 
 /* ---- FEATURES ---- */
@@ -816,12 +867,37 @@ footer a:hover { color: var(--text-secondary); }
 .hero { animation: slideUp 0.5s ease-out; }
 .stats { animation: fadeIn 0.5s ease-out 0.1s both; }
 
+
+/* ---- SCROLL REVEAL ---- */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.table-row-reveal {
+  opacity: 0;
+}
+.table-row-reveal.revealed {
+  animation: fadeSlideUp 0.4s ease-out forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  .scroll-reveal { opacity: 1; transform: none; transition: none; }
+  .table-row-reveal { opacity: 1; animation: none; }
   html { scroll-behavior: auto; }
 }
 
