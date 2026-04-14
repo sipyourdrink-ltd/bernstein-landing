@@ -34,7 +34,7 @@
       "softwareRequirements": "Python 3.12+, Git",
       "featureList": [
         "Deterministic scheduling (no LLM-based coordination)",
-        "29 agent adapters (Claude Code, Codex, Gemini CLI, etc.)",
+        "21 agent adapters (Claude Code, Codex, Gemini CLI, etc.)",
         "Git worktree isolation per agent",
         "Quality gates (lint, types, tests, security)",
         "Cost-aware contextual bandit routing",
@@ -122,7 +122,7 @@
           "name": "What AI coding agents does Bernstein support?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Bernstein supports 29 agents including Claude Code, Codex CLI, Gemini CLI, Cursor, Aider, Amp, Roo Code, Kiro, Qwen, Goose, Ollama, Cody, Continue, OpenCode, Tabby, and more. It also has a generic adapter for wrapping any CLI tool."
+            "text": "Bernstein supports 21 agents including Claude Code, Codex CLI, Gemini CLI, Cursor, Aider, Amp, Roo Code, Kiro, Qwen, Goose, Ollama, Cody, Continue, OpenCode, Tabby, and more. It also has a generic adapter for wrapping any CLI tool."
           }
         },
         {

@@ -1,8 +1,8 @@
 export function Features() {
   return (
-    <section id="features">
+    <section id="features" aria-labelledby="features-heading">
       <div className="section-header">
-        <h2>Built for production use</h2>
+        <h2 id="features-heading">Built for production use</h2>
         <p>Not a demo. A system you can run unsupervised.</p>
       </div>
       <div className="features-grid">

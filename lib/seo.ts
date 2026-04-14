@@ -45,6 +45,9 @@ export async function buildLlmsTxt(): Promise<string> {
   return `# Bernstein
 
 > Orchestrate any AI coding agent. Any model. One command.
+> Full technical reference: ${SITE_URL}/llms-full.txt
+> RSS feed: ${SITE_URL}/rss.xml
+> Last updated: ${new Date().toISOString().split('T')[0]}
 
 Bernstein is an open-source multi-agent orchestration system for AI coding agents. It takes a goal, decomposes it into tasks, assigns them to AI coding agents running in parallel, verifies output via quality gates, and merges results.
 
@@ -69,7 +72,7 @@ Bernstein is an open-source multi-agent orchestration system for AI coding agent
 5. Runs quality gates (lint, type check, tests, security scan) on every result
 6. Merges verified work, retries failures with escalated models
 
-## Supported Agents (29 adapters)
+## Supported Agents (21 adapters)
 
 Claude Code, Codex CLI, Gemini CLI, Cursor, Aider, Amp, Roo Code, Kiro, Qwen, Goose, Ollama, Cody, Continue, OpenCode, Tabby, Kilo, IaC, and more via a generic CLI adapter.
 

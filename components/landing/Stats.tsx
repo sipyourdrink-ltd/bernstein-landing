@@ -10,7 +10,7 @@ export function Stats() {
         <div className="stat-label">Monthly downloads</div>
       </div>
       <div className="stat">
-        <div className="stat-num">29</div>
+        <div className="stat-num">21</div>
         <div className="stat-label">Agent adapters</div>
       </div>
       <div className="stat">

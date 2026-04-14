@@ -26,7 +26,7 @@ export function Compare() {
             </tr>
             <tr>
               <td>CLI agent support</td>
-              <td><span className="check">29 adapters</span></td>
+              <td><span className="check">21 adapters</span></td>
               <td><span className="cross">No</span></td>
               <td><span className="cross">No</span></td>
               <td><span className="cross">No</span></td>
@@ -51,6 +51,13 @@ export function Compare() {
               <td><span className="cross">No</span></td>
               <td><span className="cross">No</span></td>
               <td><span className="cross">No</span></td>
+            </tr>
+            <tr>
+              <td>Cloud execution</td>
+              <td><span className="check">&#10003; Cloudflare</span></td>
+              <td><span className="cross">&#10007;</span></td>
+              <td><span className="cross">&#10007;</span></td>
+              <td><span className="cross">&#10007;</span></td>
             </tr>
             <tr>
               <td>Self-evolution</td>
