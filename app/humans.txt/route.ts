@@ -1,6 +1,31 @@
 export function GET() {
-  return new Response(
-    `/* TEAM */\nAuthor: Alex Chernysh\nSite: https://alexchernysh.com\nGitHub: https://github.com/chernistry\n\n/* SITE */\nFramework: Next.js 14\nLanguage: TypeScript\nCSS: Tailwind CSS + OKLCH\nHosting: OVH VPS + Caddy\nDomain: bernstein.run\n`,
-    { headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
-  );
+  const content = [
+    '/* TEAM */',
+    'Creator: Alex Chernysh',
+    'Site: https://alexchernysh.com',
+    'GitHub: https://github.com/chernistry',
+    'Location: Europe',
+    '',
+    '/* THANKS */',
+    'Bernstein orchestrates: Claude Code, Codex CLI, Gemini CLI, and 18 more agents',
+    '',
+    '/* SITE */',
+    'Standards: HTML5, CSS3, TypeScript',
+    'Framework: Next.js 14 (App Router)',
+    'Language: TypeScript, Python',
+    'Hosting: OVH VPS, Caddy, Docker',
+    'CDN: Cloudflare',
+    'Email: Kit (ConvertKit)',
+    'Design: OKLCH color space, Inter + JetBrains Mono',
+    'Build: Node.js 20, standalone Docker output',
+    'Last updated: 2026-04-14',
+    '',
+  ].join('\n');
+
+  return new Response(content, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=86400',
+    },
+  });
 }
