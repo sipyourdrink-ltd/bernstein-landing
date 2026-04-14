@@ -738,11 +738,34 @@
       <p class="email-kicker">Something new is coming</p>
       <h2>Be the first to know</h2>
       <p>We're building hosted orchestration and a cloud runtime. Early subscribers get first access, architecture deep-dives, and a voice in what ships next.</p>
-      <form class="email-form" action="https://app.kit.com/forms/9325480/subscriptions" method="post">
+      <form class="email-form" id="kit-form">
         <input type="email" name="email_address" placeholder="you@company.com" required aria-label="Email address">
         <button type="submit">Get early access</button>
       </form>
-      <p class="email-note">No spam. Unsubscribe anytime.</p>
+      <p class="email-note" id="email-note">No spam. Unsubscribe anytime.</p>
+      <script>
+        document.getElementById('kit-form').addEventListener('submit', function(e) {
+          e.preventDefault();
+          var btn = this.querySelector('button');
+          var note = document.getElementById('email-note');
+          btn.disabled = true;
+          btn.textContent = 'Submitting…';
+          fetch('https://app.kit.com/forms/9325480/subscriptions', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'email_address=' + encodeURIComponent(this.email_address.value),
+            mode: 'no-cors'
+          }).then(function() {
+            btn.textContent = 'You\'re in ✓';
+            btn.style.background = '#16a34a';
+            note.textContent = 'Check your inbox to confirm.';
+          }).catch(function() {
+            btn.textContent = 'Get early access';
+            btn.disabled = false;
+            note.textContent = 'Something went wrong. Try again.';
+          });
+        });
+      </script>
     </div>
   </div>
 
