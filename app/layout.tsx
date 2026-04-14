@@ -44,7 +44,12 @@ export const metadata: Metadata = {
   },
   icons: { icon: '/favicon.svg' },
   manifest: '/manifest.json',
-  alternates: { canonical: SITE_URL },
+  alternates: {
+    canonical: SITE_URL,
+    types: {
+      'application/rss+xml': '/rss.xml',
+    },
+  },
   other: {
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
@@ -57,6 +62,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <head>
+        <link rel="dns-prefetch" href="https://app.kit.com" />
+        <link rel="preconnect" href="https://app.kit.com" crossOrigin="anonymous" />
+      </head>
       <body>{children}</body>
     </html>
   );
