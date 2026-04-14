@@ -1,0 +1,110 @@
+---
+title: "Running AI Agents on Cloudflare: Workers, Workflows, and Durable Objects"
+description: "Bernstein v1.7.3 adds Cloudflare cloud execution — run coding agents on Workers, orchestrate with Durable Workflows, store artifacts in R2."
+date: "2026-04-14"
+tags: ["cloudflare", "cloud", "infrastructure"]
+---
+
+<Lead>
+Bernstein v1.7.3 ships with Cloudflare cloud execution. Agents can now run on Workers, multi-step tasks use Durable Workflows, artifacts go to R2, and state persists in D1. Here's the architecture and how to deploy.
+</Lead>
+
+## Why local-only limits adoption
+
+Running agents locally works for individual developers, but it has real constraints. Your laptop is the bottleneck: CPU, memory, and network all compete with your actual work. Long-running sessions drain battery. If you close your laptop, the session dies. And scaling beyond 4-5 concurrent agents on a MacBook starts hitting resource limits.
+
+Cloud execution solves this. Agents run on remote infrastructure while you monitor progress from a dashboard or TUI. Sessions survive disconnects. You can scale to 20+ concurrent agents without melting your machine.
+
+## The Cloudflare stack
+
+Cloudflare recently became [OpenAI's infrastructure partner for agent cloud computing](https://openai.com/index/cloudflare-openai-agent-cloud/) — the same infrastructure Bernstein agents can now run on. We chose Cloudflare's stack because it maps cleanly to orchestration primitives:
+
+**Workers** handle lightweight, stateless agent execution. Each agent task runs in an isolated Worker with its own environment. Workers cold-start in under 50ms, so spinning up a new agent is nearly instant.
+
+**Durable Workflows** orchestrate multi-step tasks. When an agent needs to clone a repo, run code, execute tests, and report results, the workflow ensures each step completes before the next begins — with automatic retries on failure. If a Worker crashes mid-task, the workflow resumes from the last completed step, not from scratch.
+
+**R2** stores artifacts. Agent outputs — diffs, test results, generated files — persist in R2 buckets. The orchestrator reads results from R2 when merging completed work back to the main branch.
+
+**D1** holds orchestration state. Task queues, agent assignments, cost metrics, and audit logs all live in D1. This replaces the local `.sdd/` file-based state with a durable database that survives restarts and supports concurrent access from multiple Workers.
+
+## Architecture overview
+
+```
+┌─────────────────────────────────────────────┐
+│  Your machine (or CI)                       │
+│  ┌───────────────────────────────────────┐  │
+│  │  bernstein cloud deploy               │  │
+│  │  bernstein cloud status               │  │
+│  └──────────────┬────────────────────────┘  │
+└─────────────────┼───────────────────────────┘
+                  │ HTTPS
+┌─────────────────┼───────────────────────────┐
+│  Cloudflare     ▼                           │
+│  ┌──────────────────────┐                   │
+│  │  Orchestrator Worker │◄── Durable Object │
+│  └──────┬───────────────┘    (state)        │
+│         │                                   │
+│    ┌────┼────┬────────┐                     │
+│    ▼    ▼    ▼        ▼                     │
+│  Agent Agent Agent  Agent   ◄── Workers     │
+│    │    │    │        │                      │
+│    └────┴────┴────────┘                     │
+│         │         │                         │
+│    ┌────┘    ┌────┘                         │
+│    ▼         ▼                              │
+│   R2       D1                               │
+│  (artifacts) (state)                        │
+└─────────────────────────────────────────────┘
+```
+
+The orchestrator itself runs as a Worker with a Durable Object for maintaining tick state. Agent Workers are spawned per-task and communicate results back through R2 and D1.
+
+## Deploying
+
+Prerequisites: a Cloudflare account with Workers, R2, and D1 enabled, and `wrangler` installed.
+
+```bash
+# Authenticate with Cloudflare
+wrangler login
+
+# Deploy the Bernstein cloud stack
+bernstein cloud deploy --project my-project
+
+# This creates:
+#   - Orchestrator Worker + Durable Object
+#   - R2 bucket: bernstein-my-project-artifacts
+#   - D1 database: bernstein-my-project-state
+#   - Workflow definitions for multi-step tasks
+```
+
+Once deployed, run tasks against the cloud backend:
+
+```bash
+# Run a goal on cloud infrastructure
+bernstein run --goal "Refactor auth module" --cloud
+
+# Monitor from your terminal
+bernstein cloud status
+
+# Or check the dashboard
+bernstein dashboard --cloud
+```
+
+Agent API keys (Anthropic, OpenAI, etc.) are stored as Worker secrets via `wrangler secret put`. They never leave the Cloudflare network.
+
+## Cost considerations
+
+Cloudflare Workers pricing is request-based, not instance-based. You pay for the compute your agents actually use, not for idle VMs. For a typical 50-task session:
+
+- Workers compute: ~$0.50-2.00
+- R2 storage: pennies (artifacts are small)
+- D1 reads/writes: pennies (state operations are lightweight)
+
+The cloud infrastructure cost is a small fraction of the LLM API costs that agents incur. The real savings come from not needing to keep your machine running and from being able to scale to more concurrent agents.
+
+## What's next
+
+We're working on scheduled runs (trigger a session from a cron or GitHub webhook), multi-region execution (run agents closer to the repos they're working on), and a hosted dashboard for monitoring cloud sessions without a local CLI.
+
+Try it: `pip install bernstein` and check the [getting started guide](/blog/getting-started).
+Source: [github.com/chernistry/bernstein](https://github.com/chernistry/bernstein)

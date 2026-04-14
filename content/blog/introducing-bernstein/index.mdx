@@ -1,0 +1,92 @@
+---
+title: "Introducing Bernstein: Multi-Agent Orchestration for CLI Coding Agents"
+description: "Bernstein v1.0 is out. An open-source orchestrator that coordinates multiple CLI coding agents with deterministic scheduling and git isolation."
+date: "2026-03-29"
+tags: ["announcement", "open-source", "orchestration"]
+---
+
+<Lead>
+Bernstein is an open-source orchestrator that runs multiple CLI coding agents in parallel — Claude Code, Codex, Gemini CLI, or any other — with deterministic scheduling, per-agent git worktrees, and cost-aware model routing. Today we're releasing v1.0.0.
+</Lead>
+
+## The single-agent ceiling
+
+A single AI coding agent can write a function, fix a bug, add a test. But real projects have dozens of tasks that could run concurrently: backend API, frontend components, tests, docs, CI config. You end up babysitting one agent at a time, or worse, running multiple agents that step on each other's files and produce merge conflicts.
+
+We hit this ceiling hard. I wrote about the 47-hour stress test that led to this release [on my personal blog](https://alexchernysh.com/blog/bernstein-multi-agent-orchestration). The short version: running 12 agents without orchestration produces chaos. Running 12 agents with orchestration produces a working codebase.
+
+## What makes Bernstein different
+
+**Deterministic scheduling, not LLM-based planning.** The orchestrator is pure Python code — no LLM in the scheduling loop. Tasks are decomposed from YAML plans or created via the API, then assigned based on role, priority, and dependency graphs. The scheduler is predictable and debuggable.
+
+**Any CLI agent.** Bernstein ships with 21 adapters: Claude Code, Codex, Gemini CLI, Aider, Cursor, Amp, Roo Code, Kiro, Qwen, Goose, and more. If your agent has a CLI, you can write an adapter in under 100 lines. Agents are treated as interchangeable workers, not special snowflakes.
+
+**Git isolation by default.** Each agent gets its own git worktree. No merge conflicts during execution. When an agent completes a task, Bernstein merges its worktree back through a merge queue. Failed tasks get rolled back cleanly.
+
+**File-based state.** All orchestration state lives in `.sdd/` files — YAML and JSON. No database server, no Redis, no external dependencies. You can inspect state with `cat`, debug with `grep`, and version it with `git`.
+
+**Short-lived agents.** Agents handle 1-3 tasks, then exit. Fresh context window every time. No token bloat, no confused agents trying to remember what they did 40 minutes ago.
+
+## Quick start
+
+Install Bernstein and run your first multi-agent session in under a minute:
+
+```bash
+pip install bernstein
+# or
+uv pip install bernstein
+```
+
+Set your preferred agent and run against a goal:
+
+```bash
+export ANTHROPIC_API_KEY=sk-...
+bernstein run --goal "Add input validation to the user registration endpoint"
+```
+
+Bernstein decomposes the goal, spawns agents, and shows progress in a terminal UI. Each agent works in its own worktree, and results merge back when tasks complete.
+
+For structured projects, define a plan:
+
+```yaml
+# plans/api-hardening.yaml
+stages:
+  - name: validation
+    steps:
+      - goal: "Add Pydantic models for all API request bodies"
+        role: backend
+        complexity: medium
+      - goal: "Add rate limiting middleware"
+        role: backend
+        complexity: low
+  - name: testing
+    depends_on: [validation]
+    steps:
+      - goal: "Write integration tests for all validation rules"
+        role: qa
+        complexity: medium
+```
+
+```bash
+bernstein run plans/api-hardening.yaml
+```
+
+## What's in v1.0.0
+
+- Orchestrator lifecycle with tick-based pipeline
+- Task store with retry, dead letter queue, and fair scheduling
+- Quality gates and CI monitoring
+- Cost tracking with budget enforcement
+- HMAC-signed audit logs
+- Task server API on port 8052
+- TUI dashboard
+
+The [full changelog](https://github.com/chernistry/bernstein/releases/tag/v1.0.0) has details. The [getting started guide](/blog/getting-started) walks through setup step by step.
+
+## What's next
+
+The roadmap includes cost-aware model routing (matching task complexity to the cheapest capable model), cloud execution (run agents on remote infrastructure), and protocol support for MCP and A2A. All developed in the open, all Apache 2.0.
+
+Install it: `pip install bernstein`
+Star it: [github.com/chernistry/bernstein](https://github.com/chernistry/bernstein)
+Read the docs: [bernstein.run/docs](/docs)

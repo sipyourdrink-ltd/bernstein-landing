@@ -1,0 +1,79 @@
+---
+title: "How Bernstein Routes Tasks to the Right Model (and Saves 50-60%)"
+description: "Bernstein's epsilon-greedy bandit router learns which model fits each task type, cutting agent costs by 50-60% without sacrificing quality."
+date: "2026-04-07"
+tags: ["architecture", "cost-optimization", "routing"]
+---
+
+<Lead>
+Not every coding task needs Opus. Bernstein's contextual bandit router learns which model handles each task type best, then routes accordingly. Early results show 50-60% cost savings compared to uniform model selection.
+</Lead>
+
+## The uniform selection problem
+
+Most multi-agent setups use the same model for everything. Every task — whether it's renaming a variable or designing an authentication system — gets routed to the same model at the same effort level. This is wasteful. A `docs` task that writes a docstring doesn't need the same model as a `security` task that implements credential scoping.
+
+The cost difference is real. At current API pricing, routing a simple task to Haiku instead of Opus costs roughly 30x less. Over a session with 40-60 tasks, that adds up fast.
+
+## How the router works
+
+Bernstein's routing pipeline has three layers:
+
+**Layer 1: Heuristic classification.** Every task has a `complexity` field (low, medium, high) and a `role` (backend, frontend, qa, security, etc.). The router uses a rule-based classifier to make an initial model/effort assignment. Low-complexity tasks default to Haiku or Sonnet with standard effort. High-complexity tasks get Opus with max effort.
+
+**Layer 2: Epsilon-greedy bandit.** This is where it gets interesting. The bandit maintains per-role reward estimates for each model. When a task arrives, it exploits the best-known model 80% of the time and explores alternatives 20% of the time. Rewards come from task outcomes: did the agent complete the task? Did tests pass? How many retries were needed?
+
+```python
+# Simplified selection logic
+candidates = ["sonnet", "opus"] if task.complexity == "high" else CASCADE
+selected = bandit.select(role=task.role, candidate_models=candidates)
+```
+
+The `CASCADE` list includes all available models from cheapest to most capable. For high-complexity tasks, the bandit only considers Sonnet and Opus — sending a hard architecture task to Haiku would waste the agent's time even if it's cheap.
+
+**Layer 3: Effectiveness seeding.** The bandit warms up using historical effectiveness data from the `.sdd/metrics/` directory. If a previous run showed that `backend` tasks succeed 95% of the time with Sonnet but only 70% with Haiku, the bandit starts with that prior. No cold-start problem after the first session.
+
+## What the router learns
+
+After a few sessions, clear patterns emerge:
+
+| Task type | Typical model | Why |
+|-----------|--------------|-----|
+| Docs, docstrings | Haiku | Templated output, low reasoning |
+| Test writing | Sonnet | Needs code understanding, not creativity |
+| Bug fixes | Sonnet | Pattern matching on error traces |
+| Refactoring | Sonnet/Opus | Depends on scope |
+| Architecture, security | Opus | Requires deep reasoning |
+
+These aren't hardcoded rules — they're learned from outcomes. If your codebase has unusually complex tests, the bandit will learn to route test tasks to a stronger model.
+
+## Configuration
+
+The bandit is enabled by default when a metrics directory exists. You can tune exploration rate and model cascade in your config:
+
+```yaml
+# .sdd/config.yaml
+routing:
+  bandit_epsilon: 0.2          # 20% exploration
+  cascade: [haiku, sonnet, opus]
+  min_samples_per_arm: 5       # explore each option at least 5 times
+```
+
+To disable bandit routing and use pure heuristics:
+
+```yaml
+routing:
+  bandit_enabled: false
+```
+
+## The numbers
+
+Across our internal runs (self-development sessions where Bernstein improves its own codebase), the bandit router reduced per-session costs by 53% compared to the baseline of Sonnet-for-everything. Task completion rates stayed within 2% — the cheaper models handle their assigned tasks just fine.
+
+The savings compound. A 10-agent session running 50 tasks might cost $15-20 with uniform Sonnet. With bandit routing, the same session runs $7-10. Over weeks of iterative development, that's the difference between a side project budget and a real expense.
+
+## Further reading
+
+- [Architecture overview](/docs) for how routing fits into the orchestration pipeline
+- [Getting started](/blog/getting-started) to try it yourself
+- [Source code](https://github.com/chernistry/bernstein/tree/main/src/bernstein/core/routing) for the full router implementation

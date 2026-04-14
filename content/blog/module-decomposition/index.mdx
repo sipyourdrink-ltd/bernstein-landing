@@ -1,0 +1,90 @@
+---
+title: "From 4,000 Lines to 200: Decomposing Bernstein's Core"
+description: "How 11 parallel agents decomposed a 4,198-line orchestrator into 15 focused sub-packages — using Bernstein to refactor itself."
+date: "2026-04-13"
+tags: ["architecture", "refactoring", "engineering"]
+---
+
+<Lead>
+Bernstein's orchestrator.py hit 4,198 lines. We used 11 parallel agents — orchestrated by Bernstein itself — to decompose it into 15 sub-packages, each under 400 lines. Here's how that worked and what we learned.
+</Lead>
+
+## How a file gets to 4,000 lines
+
+It happens gradually. The orchestrator started as a clean 300-line module that managed a tick loop: check for tasks, spawn agents, collect results. Then it grew. Cost tracking logic. Quality gates. Token monitoring. Git worktree management. Heartbeat detection. Idle agent recycling. Shutdown coordination.
+
+Each addition was small and reasonable. But after two months of active development, `orchestrator.py` was a 4,198-line monolith that imported 47 modules and had 23 public methods. The test file was 2,800 lines. IDE navigation was painful. Merge conflicts were constant because every feature touched the same file.
+
+The rule we now follow: if a module crosses 600 lines, it's time to decompose.
+
+## The plan
+
+We defined 15 target sub-packages, each responsible for one concern:
+
+| Sub-package | Responsibility | Lines (after) |
+|------------|---------------|---------------|
+| `orchestration/` | Lifecycle, tick pipeline | ~350 |
+| `agents/` | Spawner, discovery, heartbeat | ~380 |
+| `tasks/` | Task store, retry, scheduling | ~340 |
+| `quality/` | Quality gates, CI monitor | ~290 |
+| `cost/` | Cost tracking, budgets | ~310 |
+| `tokens/` | Token monitoring, intervention | ~250 |
+| `security/` | Audit logs, policy engine | ~270 |
+| `git/` | Worktree management, merge queue | ~280 |
+| `persistence/` | WAL, checkpointing | ~220 |
+| `planning/` | Plan loading, dependencies | ~200 |
+| `routing/` | Model selection, bandit | ~320 |
+| `communication/` | Bulletin board, messaging | ~180 |
+| `server/` | Task server, API | ~260 |
+| `config/` | Configuration, defaults | ~190 |
+| `observability/` | Metrics, tracing | ~240 |
+
+The decomposition needed to be backward-compatible. Existing code importing `from bernstein.core.orchestrator import Orchestrator` had to keep working.
+
+## 11 agents, 15 packages
+
+Here's the recursive part: we used Bernstein to execute the decomposition. A YAML plan defined 15 extraction stages with dependency edges (e.g., `tasks/` had to be extracted before `agents/` because the spawner depends on the task store).
+
+11 agents ran in parallel across independent sub-packages. Each agent:
+
+1. Extracted the relevant functions and classes from `orchestrator.py`
+2. Created the new sub-package with proper `__init__.py` exports
+3. Updated all internal imports
+4. Ran the sub-package's tests to verify nothing broke
+
+The whole decomposition took about 3 hours of wall time. A human doing this manually — carefully moving code, fixing imports, running tests after each change — would spend 2-3 days.
+
+## The re-export shim pattern
+
+Backward compatibility was the hardest constraint. We solved it with re-export shims. The original `orchestrator.py` became a thin file that imports from sub-packages and re-exports:
+
+```python
+# src/bernstein/core/orchestrator.py (after — ~200 lines, down from 4,198)
+"""Orchestrator shim — re-exports from sub-packages for backward compat."""
+
+from bernstein.core.orchestration.lifecycle import Orchestrator
+from bernstein.core.orchestration.tick import TickPipeline
+from bernstein.core.orchestration.manager import OrchestratorManager
+from bernstein.core.orchestration.shutdown import ShutdownCoordinator
+
+__all__ = ["Orchestrator", "TickPipeline", "OrchestratorManager", "ShutdownCoordinator"]
+```
+
+Every existing import path works unchanged. New code imports from the specific sub-package. Over time, the shims can be deprecated.
+
+## What we learned
+
+**Dependency graphs matter more than you think.** The extraction order was critical. Extracting `git/` before `tasks/` would have created circular imports because the merge queue references task completion callbacks. We had to map the dependency graph before writing the plan.
+
+**Tests are the safety net.** Each extraction step ran the full test suite. We caught 14 import errors, 3 circular dependencies, and 1 subtle bug where a function relied on module-level state that moved to a different file. Without tests, at least half of those would have shipped broken.
+
+**600 lines is a good limit.** After the decomposition, the largest sub-package is `agents/` at ~380 lines. Every module is small enough to read in one sitting, grep effectively, and test in isolation. When a new file starts approaching 600 lines, we split it proactively.
+
+**Orchestrators can orchestrate themselves.** There's something satisfying about using your own tool to refactor itself. The decomposition was one of our most complex multi-agent runs, and it validated that the parallel execution model works for real refactoring tasks, not just greenfield code generation.
+
+## The result
+
+Before: 1 file, 4,198 lines, 47 imports, constant merge conflicts.
+After: 15 sub-packages, ~280 lines average, clean dependency boundaries, agents can work on different packages without conflicts.
+
+The [full source](https://github.com/chernistry/bernstein/tree/main/src/bernstein/core) is on GitHub. The re-export shims are in the top-level files like `orchestrator.py`, `spawner.py`, and `task_lifecycle.py`.

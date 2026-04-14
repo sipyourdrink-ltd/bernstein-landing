@@ -1,0 +1,145 @@
+---
+title: "Getting Started: Your First Multi-Agent Run in 5 Minutes"
+description: "Install Bernstein, configure an agent, and run your first multi-agent coding session in under 5 minutes. Step-by-step tutorial."
+date: "2026-04-14"
+tags: ["tutorial", "getting-started", "guide"]
+---
+
+<Lead>
+This guide gets you from zero to a working multi-agent session in under 5 minutes. You'll install Bernstein, configure Claude Code as your agent, run a goal, and understand the output.
+</Lead>
+
+## Step 1: Install Bernstein
+
+Bernstein requires Python 3.12+. Install it with pip or uv:
+
+```bash
+pip install bernstein
+```
+
+Or if you use [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv pip install bernstein
+```
+
+Verify the installation:
+
+```bash
+bernstein --version
+# bernstein 1.7.3
+```
+
+## Step 2: Configure your agent
+
+Bernstein needs at least one CLI coding agent installed. The fastest setup uses Claude Code, but [21 agents are supported](/docs) including Codex, Gemini CLI, Aider, and more.
+
+Make sure Claude Code is installed and your API key is set:
+
+```bash
+# Install Claude Code if you haven't
+npm install -g @anthropic-ai/claude-code
+
+# Set your API key
+export ANTHROPIC_API_KEY=sk-ant-...
+```
+
+Bernstein auto-detects installed agents. Verify it finds yours:
+
+```bash
+bernstein agents
+# Available agents:
+#   claude (Claude Code) ✓
+```
+
+## Step 3: Run your first goal
+
+Navigate to any git repository and run a goal:
+
+```bash
+cd your-project
+bernstein run --goal "Add type hints to all functions in src/utils.py"
+```
+
+Bernstein will:
+
+1. **Decompose** the goal into concrete tasks
+2. **Assign** each task a role, priority, and model
+3. **Spawn** agents in isolated git worktrees
+4. **Monitor** progress via heartbeats and output parsing
+5. **Merge** completed work back to your branch
+
+## Step 4: Read the TUI
+
+The terminal UI shows live progress:
+
+```
+┌─ Bernstein v1.7.3 ─────────────────────────────────┐
+│ Goal: Add type hints to all functions in src/utils  │
+│ Tasks: 3 total │ 1 running │ 1 done │ 1 pending    │
+│ Agents: 2 active │ Cost: $0.12                      │
+├─────────────────────────────────────────────────────┤
+│ ✓ task-001  Analyze existing type usage    00:42    │
+│ ► task-002  Add type hints to helpers      01:15    │
+│ ○ task-003  Add type hints to validators   pending  │
+└─────────────────────────────────────────────────────┘
+```
+
+- **✓** = completed and merged
+- **►** = currently running
+- **○** = pending (waiting for dependencies or an available agent)
+
+Press `q` to stop gracefully (agents finish their current task) or `Ctrl+C` to force stop.
+
+## Step 5: Check the results
+
+When all tasks complete, check what changed:
+
+```bash
+git log --oneline -5
+# a1b2c3d Add type hints to validator functions
+# d4e5f6g Add type hints to helper functions
+# h7i8j9k Analyze existing type usage in src/utils.py
+```
+
+Each agent's work is a separate commit, merged through Bernstein's merge queue. If any task failed, its changes are rolled back and the failure is logged in `.sdd/dead_letter.json`.
+
+## What to try next
+
+**Run a YAML plan** for structured, multi-stage projects:
+
+```bash
+bernstein run plans/my-project.yaml
+```
+
+Plans let you define stages, dependencies, roles, and complexity per task. See the [plan file docs](/docs) for the full schema.
+
+**Use multiple agent types** by installing additional adapters:
+
+```bash
+# Bernstein will route tasks to the best available agent
+pip install codex-cli  # or install any supported agent
+bernstein agents       # see all detected agents
+```
+
+**Monitor costs** across sessions:
+
+```bash
+bernstein cost
+# Session total: $0.47
+# By model: haiku=$0.03, sonnet=$0.28, opus=$0.16
+```
+
+**Check the API** for programmatic access:
+
+```bash
+# Task server runs on port 8052 during sessions
+curl http://127.0.0.1:8052/status
+```
+
+## Further reading
+
+- [How Bernstein routes tasks to the right model](/blog/cost-aware-routing) — save 50-60% with the bandit router
+- [Running agents on Cloudflare](/blog/cloudflare-cloud-execution) — scale beyond your laptop
+- [GitHub repository](https://github.com/chernistry/bernstein) — source code, issues, and discussions
+- [PyPI package](https://pypi.org/project/bernstein/) — release history and downloads

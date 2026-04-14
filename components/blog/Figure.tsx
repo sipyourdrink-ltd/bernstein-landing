@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export function Figure({ src, alt, caption }: { src: string; alt: string; caption?: string }) {
   return (
     <figure style={{ marginBottom: 'var(--space-5)' }}>
