@@ -1166,6 +1166,8 @@ footer {
   .features-grid { grid-template-columns: 1fr; }
   .agents-grid { grid-template-columns: repeat(2, 1fr); }
   .stats { gap: var(--space-7); }
+  .stat + .stat::before { display: none; }
+  .stat + .stat { padding-left: 0; }
   .nav-links { display: none; }
   .mobile-menu-btn { display: flex; }
   .mobile-overlay { display: block; }
