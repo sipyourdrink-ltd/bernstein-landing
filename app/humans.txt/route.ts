@@ -2,6 +2,7 @@ export function GET() {
   const content = [
     '/* TEAM */',
     'Creator: Alex Chernysh',
+    'Contact: forte@bernstein.run',
     'Site: https://alexchernysh.com',
     'GitHub: https://github.com/chernistry',
     'Location: Europe',

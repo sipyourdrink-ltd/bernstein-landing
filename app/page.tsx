@@ -35,6 +35,7 @@ const SOFTWARE_APP_JSON_LD = {
     '@type': 'Person',
     name: 'Alex Chernysh',
     url: 'https://alexchernysh.com',
+    email: 'forte@bernstein.run',
   },
   codeRepository: 'https://github.com/chernistry/bernstein',
   downloadUrl: 'https://pypi.org/project/bernstein/',

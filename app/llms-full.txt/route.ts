@@ -581,7 +581,8 @@ Yes. Bernstein can run as an MCP (Model Context Protocol) server, exposing its o
 - PyPI: https://pypi.org/project/bernstein/
 - Documentation: https://bernstein.readthedocs.io/
 - Issues: https://github.com/chernistry/bernstein/issues
-- Author: https://alexchernysh.com`;
+- Author: https://alexchernysh.com
+- Contact: forte@bernstein.run`;
 
 export async function GET() {
   const posts = await getAllPosts();

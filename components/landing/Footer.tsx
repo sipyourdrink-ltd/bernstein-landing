@@ -22,14 +22,15 @@ export function Footer() {
             <a href="/sitemap.xml">Sitemap</a>
           </div>
           <div className="footer-col">
-            <h4>Legal</h4>
+            <h4>Contact</h4>
+            <a href="mailto:forte@bernstein.run">forte@bernstein.run</a>
             <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a>
             <a href="/.well-known/security.txt">Security</a>
             <a href="/humans.txt">Humans</a>
           </div>
         </div>
         <div className="footer-bottom">
-          <p>Made by <a href="https://alexchernysh.com">Alex Chernysh</a></p>
+          <p>Made by <a href="https://alexchernysh.com">Alex Chernysh</a> · <a href="mailto:forte@bernstein.run">forte@bernstein.run</a></p>
         </div>
       </div>
     </footer>
