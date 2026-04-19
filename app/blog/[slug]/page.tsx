@@ -58,8 +58,8 @@ export default async function BlogPost({ params }: Props) {
             </time>
             <span>{post.readingMinutes} min read</span>
           </div>
-          <ShareButtons url={`https://bernstein.run/blog/${params.slug}`} title={post.fm.title} />
         </header>
+        <ShareButtons url={`https://bernstein.run/blog/${params.slug}`} title={post.fm.title} />
         <div className="prose">{post.mdx}</div>
       </article>
       <Footer />
