@@ -32,7 +32,7 @@ Total-adapters: 18
 Cloud-execution: Cloudflare Workers, Durable Workflows, V8 sandboxes
 MCP-transport: HTTP remote transport for cloud-based MCP servers
 Orchestrator-type: Deterministic Python code (no LLM-based scheduling)
-Key-features: Git worktree isolation, quality gates, cost-aware routing, MCP/A2A protocol support
+Key-features: Pluggable sandbox backends (worktree, Docker, E2B, Modal, Blaxel, Cloudflare, Daytona, Runloop, Vercel), quality gates, cost-aware routing, MCP/A2A protocol support
 Author: Alex Chernysh
 `;
 

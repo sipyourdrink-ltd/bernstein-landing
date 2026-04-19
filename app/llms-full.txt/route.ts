@@ -160,8 +160,9 @@ The system is organized into 22 sub-packages under \`src/bernstein/core/\`:
 - A2A (Agent-to-Agent) protocol support
 - Protocol negotiation for multi-system interop
 
-#### Git (\`git/\`)
-- Git worktree management (one per agent)
+#### Git and Sandboxes (\`git/\`, \`sandbox/\`)
+- Git worktree management (one per agent, default backend)
+- Pluggable \`SandboxBackend\` protocol — git worktrees, Docker, E2B, Modal, Blaxel, Cloudflare, Daytona, Runloop, Vercel
 - Merge queue for ordering results
 - Branch creation and cleanup
 
@@ -516,7 +517,7 @@ Bernstein assigns roles to agents based on task requirements:
 |---------|-----------|--------|---------|-----------|
 | Orchestrator | Deterministic code | LLM-driven | LLM-driven | Graph + LLM |
 | CLI agent support | 18 adapters | No | No | No |
-| Git isolation | Worktrees | No | No | No |
+| Agent isolation | Worktrees or pluggable cloud sandbox | No | No | No |
 | Quality gates | Built-in | No | No | Partial |
 | Cost tracking | Per-agent | No | No | No |
 | Self-evolution | Built-in | No | No | No |
@@ -575,6 +576,9 @@ Yes. Bernstein can run as an MCP (Model Context Protocol) server, exposing its o
 
 ### Does Bernstein work with the OpenAI Agents SDK?
 Yes. The \`openai_agents\` adapter embeds OpenAI's Agents SDK v2 as a first-class runtime. Each task runs in an Agents SDK session against the Responses API, so you get OpenAI's tool-calling, handoffs, and guardrails inside Bernstein's orchestrator without shelling out to a CLI. Install with \`pip install "bernstein[openai-agents]"\`.
+
+### What sandbox backends does Bernstein support?
+Bernstein exposes a \`SandboxBackend\` protocol. The default backend is a git worktree on the local machine. You can swap in Docker, E2B, Modal, Blaxel, Cloudflare Workers sandboxes, Daytona, Runloop, or Vercel sandboxes by setting \`sandbox.backend\` in \`bernstein.yaml\` and installing the matching extra (for example \`pip install "bernstein[e2b]"\`). The orchestrator and adapters do not change.
 
 ---
 

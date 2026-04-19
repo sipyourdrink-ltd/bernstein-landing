@@ -35,6 +35,11 @@ const FAQ_ITEMS: FAQItem[] = [
       "Yes. Bernstein includes a Cloudflare Workers integration with Durable Workflows for long-running orchestration, V8 isolate sandboxes for agent execution, R2 storage for artifacts, and KV for state. You can also run it on any server with SSH access.",
   },
   {
+    question: "What sandbox backends does Bernstein support?",
+    answer:
+      "Bernstein abstracts agent isolation behind a SandboxBackend protocol. Out of the box it supports git worktrees (local), Docker containers, and hosted sandboxes from E2B, Modal, Blaxel, Cloudflare, Daytona, Runloop, and Vercel. Swap backends in bernstein.yaml; the orchestrator is unchanged.",
+  },
+  {
     question: "Is Bernstein free?",
     answer:
       "Yes. Bernstein is open-source under the Apache 2.0 license. You only pay for the AI model API usage of the agents themselves (e.g. your Anthropic or OpenAI API key).",

@@ -42,7 +42,7 @@ const SOFTWARE_APP_JSON_LD = {
   featureList: [
     'Deterministic scheduling',
     '18 agent adapters',
-    'Git worktree isolation',
+    'Pluggable sandbox backends (worktree, Docker, E2B, Modal, Blaxel, Cloudflare, Daytona, Runloop, Vercel)',
     'Quality gates',
     'Cost-aware routing',
     'MCP server mode',
@@ -92,6 +92,14 @@ const FAQ_JSON_LD = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Yes. Bernstein includes a Cloudflare Workers integration with Durable Workflows for long-running orchestration, V8 isolate sandboxes for agent execution, R2 storage for artifacts, and KV for state. You can also run it on any server with SSH access.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What sandbox backends does Bernstein support?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Bernstein abstracts agent isolation behind a SandboxBackend protocol. Out of the box it supports git worktrees (local), Docker containers, and hosted sandboxes from E2B, Modal, Blaxel, Cloudflare, Daytona, Runloop, and Vercel. Swap backends in bernstein.yaml; the orchestrator is unchanged.',
       },
     },
     {

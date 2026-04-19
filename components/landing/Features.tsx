@@ -53,8 +53,8 @@ export function Features() {
             <div className="feature-icon">
               <svg viewBox="0 0 24 24"><path d="M6 3v12"/><path d="M18 9a3 3 0 100-6 3 3 0 000 6z"/><path d="M6 21a3 3 0 100-6 3 3 0 000 6z"/><path d="M18 9c-3 0-6 1-6 5v1"/></svg>
             </div>
-            <h3>Git worktree isolation</h3>
-            <p>Each agent works in its own worktree. No merge conflicts between agents. Clean, linear commit history.</p>
+            <h3>Pluggable sandbox backends</h3>
+            <p>Run agents in git worktrees, Docker, E2B, Modal, Blaxel, Cloudflare, Daytona, Runloop, or Vercel sandboxes. One protocol, your choice of isolation.</p>
           </div>
         </ScrollReveal>
         <ScrollReveal delay={600}>

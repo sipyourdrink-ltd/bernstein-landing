@@ -35,7 +35,7 @@
       "featureList": [
         "Deterministic scheduling (no LLM-based coordination)",
         "18 agent adapters (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, etc.)",
-        "Git worktree isolation per agent",
+        "Pluggable sandbox backends (git worktree, Docker, E2B, Modal, Blaxel, Cloudflare, Daytona, Runloop, Vercel)",
         "Quality gates (lint, types, tests, security)",
         "Cost-aware contextual bandit routing",
         "Token monitoring with auto-intervention",

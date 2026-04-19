@@ -70,8 +70,8 @@ export function Compare() {
                 <td aria-label="No"><span className="cross">&#10007; No</span></td>
               </TableRowReveal>
               <TableRowReveal delay={160}>
-                <td>Git isolation</td>
-                <td aria-label="Yes: Worktrees"><span className="check">&#10003; Worktrees</span></td>
+                <td>Agent isolation</td>
+                <td aria-label="Yes: Worktrees or cloud sandbox"><span className="check">&#10003; Worktree / sandbox</span></td>
                 <td aria-label="No"><span className="cross">&#10007; No</span></td>
                 <td aria-label="No"><span className="cross">&#10007; No</span></td>
                 <td aria-label="No"><span className="cross">&#10007; No</span></td>
