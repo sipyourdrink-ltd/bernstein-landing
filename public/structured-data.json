@@ -53,6 +53,7 @@
         "Claude Code",
         "Codex",
         "Gemini CLI",
+        "OpenAI Agents SDK",
         "parallel agents",
         "deterministic scheduling",
         "quality gates",

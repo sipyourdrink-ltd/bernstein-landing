@@ -573,6 +573,9 @@ Yes. YAML plan files let you define stages with dependencies, and steps with rol
 ### Does Bernstein support MCP?
 Yes. Bernstein can run as an MCP (Model Context Protocol) server, exposing its orchestration capabilities as tools that other MCP-compatible systems can invoke.
 
+### Does Bernstein work with the OpenAI Agents SDK?
+Yes. The \`openai_agents\` adapter embeds OpenAI's Agents SDK v2 as a first-class runtime. Each task runs in an Agents SDK session against the Responses API, so you get OpenAI's tool-calling, handoffs, and guardrails inside Bernstein's orchestrator without shelling out to a CLI. Install with \`pip install "bernstein[openai-agents]"\`.
+
 ---
 
 ## Links

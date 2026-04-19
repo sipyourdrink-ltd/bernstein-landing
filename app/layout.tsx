@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     'multi-agent orchestration',
     'AI coding agents',
     'Claude Code orchestrator',
+    'OpenAI Agents SDK orchestrator',
     'parallel AI agents',
     'deterministic scheduling',
   ],
