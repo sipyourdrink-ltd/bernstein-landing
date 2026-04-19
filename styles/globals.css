@@ -122,6 +122,9 @@ a:hover { color: var(--accent-hover); }
 }
 
 /* ---- NAV ---- */
+/* Fully opaque so scrolled content never peeks through. The earlier
+   translucent-with-backdrop-blur variant kept letting the blog post header
+   (title + meta) read through the bar and overlap the body on scroll. */
 header {
   position: fixed;
   top: 0;
@@ -130,25 +133,16 @@ header {
   padding: 0 var(--space-5);
   height: 52px;
   background: var(--bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border-subtle);
-  transition: background 0.2s ease-out, border-color 0.2s ease-out;
-}
-/* Where backdrop-filter is supported, let a hint of translucency through */
-@supports (backdrop-filter: blur(16px)) or (-webkit-backdrop-filter: blur(16px)) {
-  header {
-    background: color-mix(in oklch, var(--bg) 92%, transparent);
-  }
-  header.nav-scrolled {
-    background: color-mix(in oklch, var(--bg) 96%, transparent);
-  }
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
 }
 header.nav-top {
   border-bottom-color: transparent;
+  box-shadow: none;
 }
 header.nav-scrolled {
   border-bottom-color: var(--border-subtle);
+  box-shadow: 0 1px 0 0 color-mix(in oklch, var(--bg) 50%, transparent);
 }
 
 .nav-inner {
