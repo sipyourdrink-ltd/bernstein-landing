@@ -516,14 +516,14 @@ Bernstein assigns roles to agents based on task requirements:
 
 | Feature | Bernstein | CrewAI | AutoGen | LangGraph |
 |---------|-----------|--------|---------|-----------|
-| Orchestrator | Deterministic code | LLM-driven | LLM-driven | Graph + LLM |
+| Orchestrator | Deterministic code | LLM-driven (+ code Flows) | LLM-driven | Graph + LLM |
 | CLI agent support | 18 adapters | No | No | No |
 | Agent isolation | Worktrees or pluggable cloud sandbox | No | No | No |
-| Quality gates | Built-in | No | No | Partial |
-| Cost tracking | Per-agent | No | No | No |
-| Self-evolution | Built-in | No | No | No |
-| File-based state | Yes (.sdd/) | No | No | Checkpoints |
-| Model routing | Contextual bandit | Manual | Manual | Manual |
+| Quality gates | Built-in | Guardrails + Pydantic output | Termination conditions | Conditional edges |
+| Cost tracking | Per-agent | \`usage_metrics\` | \`RequestUsage\` | Via LangSmith |
+| Self-evolution | Built-in (experimental) | No | No | No |
+| File-based state | Yes (.sdd/) | In-memory + SQLite checkpoint | In-memory | Checkpointer |
+| Model routing | Contextual bandit | Per-agent LLM | Per-agent \`model_client\` | Per-node (manual) |
 
 ---
 

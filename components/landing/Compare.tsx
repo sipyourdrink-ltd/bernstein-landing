@@ -58,7 +58,7 @@ export function Compare() {
               <TableRowReveal delay={0}>
                 <td>Orchestrator</td>
                 <td>Deterministic code</td>
-                <td className="partial" aria-label="Partial: LLM-driven">~ LLM-driven</td>
+                <td className="partial" aria-label="Partial: LLM-driven plus code Flows">~ LLM-driven</td>
                 <td className="partial" aria-label="Partial: LLM-driven">~ LLM-driven</td>
                 <td className="partial" aria-label="Partial: Graph + LLM">~ Graph + LLM</td>
               </TableRowReveal>
@@ -78,28 +78,28 @@ export function Compare() {
               </TableRowReveal>
               <TableRowReveal delay={240}>
                 <td>Quality gates</td>
-                <td aria-label="Yes: Built-in"><span className="check">&#10003; Built-in</span></td>
-                <td aria-label="No"><span className="cross">&#10007; No</span></td>
-                <td aria-label="No"><span className="cross">&#10007; No</span></td>
-                <td className="partial" aria-label="Partial">~ Partial</td>
+                <td aria-label="Yes: Built-in janitor with concrete signals"><span className="check">&#10003; Built-in</span></td>
+                <td className="partial" aria-label="Partial: guardrails plus Pydantic output">~ Guardrails</td>
+                <td className="partial" aria-label="Partial: termination conditions">~ Termination</td>
+                <td className="partial" aria-label="Partial: conditional edges">~ Conditional edges</td>
               </TableRowReveal>
               <TableRowReveal delay={320}>
                 <td>Cost tracking</td>
-                <td aria-label="Yes: Per-agent"><span className="check">&#10003; Per-agent</span></td>
-                <td aria-label="No"><span className="cross">&#10007; No</span></td>
-                <td aria-label="No"><span className="cross">&#10007; No</span></td>
-                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td aria-label="Yes: Per-agent, built-in"><span className="check">&#10003; Per-agent</span></td>
+                <td className="partial" aria-label="Partial: usage_metrics attribute">~ usage_metrics</td>
+                <td className="partial" aria-label="Partial: RequestUsage per message">~ RequestUsage</td>
+                <td className="partial" aria-label="Partial: via LangSmith tracer">~ Via LangSmith</td>
               </TableRowReveal>
               <TableRowReveal delay={400}>
                 <td>Cloud execution</td>
-                <td aria-label="Yes: Cloudflare"><span className="check">&#10003; Cloudflare</span></td>
+                <td aria-label="Yes: Cloudflare Workers"><span className="check">&#10003; Cloudflare</span></td>
+                <td className="partial" aria-label="Partial: CrewAI AMP">~ CrewAI AMP</td>
                 <td aria-label="No"><span className="cross">&#10007; No</span></td>
-                <td aria-label="No"><span className="cross">&#10007; No</span></td>
-                <td aria-label="No"><span className="cross">&#10007; No</span></td>
+                <td className="partial" aria-label="Partial: LangGraph Cloud">~ LangGraph Cloud</td>
               </TableRowReveal>
               <TableRowReveal delay={480}>
                 <td>Self-evolution</td>
-                <td aria-label="Yes: Built-in"><span className="check">&#10003; Built-in</span></td>
+                <td aria-label="Yes: Built-in, experimental"><span className="check">&#10003; Built-in</span></td>
                 <td aria-label="No"><span className="cross">&#10007; No</span></td>
                 <td aria-label="No"><span className="cross">&#10007; No</span></td>
                 <td aria-label="No"><span className="cross">&#10007; No</span></td>
