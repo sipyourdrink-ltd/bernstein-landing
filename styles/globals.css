@@ -1324,10 +1324,16 @@ footer {
   max-width: 720px;
   margin: 0 auto;
   padding: 120px var(--space-5) var(--space-11);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
 }
 
 .blog-post-header {
-  margin-bottom: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
 }
 
 .blog-post-header h1 {
@@ -1335,14 +1341,19 @@ footer {
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.2;
-  margin-bottom: var(--space-3);
+  margin: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .blog-post-meta {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-4);
   font-size: 14px;
   color: var(--text-muted);
+  margin: 0;
 }
 
 .blog-post-meta time {
@@ -1466,12 +1477,13 @@ footer {
 }
 
 .blog-back {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  width: fit-content;
   gap: 6px;
   font-size: 14px;
   color: var(--text-muted);
-  margin-bottom: var(--space-6);
+  margin: 0;
 }
 .blog-back:hover { color: var(--text-secondary); }
 
@@ -1503,9 +1515,10 @@ footer {
 /* Share buttons */
 .share-buttons {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
-  margin-top: var(--space-5);
+  margin: 0;
 }
 .share-label {
   font-size: 13px;
