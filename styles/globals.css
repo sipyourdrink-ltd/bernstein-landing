@@ -1096,10 +1096,13 @@ footer {
 .footer-badges a:hover {
   opacity: 1;
 }
+.footer-badges picture,
 .footer-badges img {
   display: block;
   max-width: 100%;
+  max-height: 54px;
   height: auto;
+  width: auto;
 }
 
 .footer-bottom {

@@ -30,13 +30,43 @@ export function Footer() {
           </div>
         </div>
         <div className="footer-badges">
-          <a href="https://codetrendy.com" target="_blank" rel="noopener noreferrer" aria-label="Listed on codetrendy.com">
-            <img
-              src="https://codetrendy.com/api/badge?style=classic"
-              alt="Listed on codetrendy.com"
-              height="54"
-              loading="lazy"
-            />
+          <a
+            href="https://codetrendy.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Listed on codetrendy.com"
+          >
+            <picture>
+              <source
+                media="(prefers-color-scheme: light)"
+                srcSet="https://codetrendy.com/api/badge?style=classic"
+              />
+              <img
+                src="https://codetrendy.com/api/badge?style=dark"
+                alt="Listed on codetrendy.com"
+                height="54"
+                loading="lazy"
+              />
+            </picture>
+          </a>
+          <a
+            href="https://www.saashub.com/bernstein?utm_source=badge&utm_campaign=badge&utm_content=bernstein&badge_variant=dark&badge_kind=approved"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Bernstein approved on SaaSHub"
+          >
+            <picture>
+              <source
+                media="(prefers-color-scheme: light)"
+                srcSet="https://cdn-b.saashub.com/img/badges/approved-neutral.png?v=1"
+              />
+              <img
+                src="https://cdn-b.saashub.com/img/badges/approved-dark.png?v=1"
+                alt="Bernstein approved on SaaSHub"
+                height="54"
+                loading="lazy"
+              />
+            </picture>
           </a>
         </div>
         <div className="footer-bottom">
