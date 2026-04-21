@@ -39,7 +39,7 @@ export function Compare() {
       <ScrollReveal>
         <div className="section-header">
           <h2 id="compare-heading">How it compares</h2>
-          <p>Different category, different architecture.</p>
+          <p>Against the LLM-orchestration frameworks below. For the closer category — other CLI-coding-agent orchestrators like <a href="https://github.com/ComposioHQ/agent-orchestrator">ComposioHQ/agent-orchestrator</a> and <a href="https://github.com/generalaction/emdash">emdash</a> — see the CLI-orchestrator matrix in the <a href="https://github.com/chernistry/bernstein#how-it-compares">repo README</a>. Short version: Python-native, MCP-server-first, widest adapter coverage.</p>
         </div>
       </ScrollReveal>
       <ScrollReveal delay={200}>

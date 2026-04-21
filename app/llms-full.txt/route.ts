@@ -514,6 +514,10 @@ Bernstein assigns roles to agents based on task requirements:
 
 ## How It Compares
 
+Two comparison axes. LLM-orchestration frameworks (CrewAI / AutoGen / LangGraph) orchestrate LLM calls. CLI-agent orchestrators (ComposioHQ/agent-orchestrator, emdash) are the closer category.
+
+### vs LLM-orchestration frameworks
+
 | Feature | Bernstein | CrewAI | AutoGen | LangGraph |
 |---------|-----------|--------|---------|-----------|
 | Orchestrator | Deterministic code | LLM-driven (+ code Flows) | LLM-driven | Graph + LLM |
@@ -524,6 +528,22 @@ Bernstein assigns roles to agents based on task requirements:
 | Self-evolution | Built-in (experimental) | No | No | No |
 | File-based state | Yes (.sdd/) | In-memory + SQLite checkpoint | In-memory | Checkpointer |
 | Model routing | Contextual bandit | Per-agent LLM | Per-agent \`model_client\` | Per-node (manual) |
+
+### vs CLI-agent orchestrators
+
+| Feature | Bernstein | ComposioHQ/agent-orchestrator | emdash |
+|---------|-----------|------------------------------|--------|
+| Shape | Python CLI + library + MCP server | TypeScript CLI + dashboard | Electron desktop app |
+| Primary language | Python | TypeScript | TypeScript |
+| Install | \`pipx install bernstein\` | \`npm install -g @aoagents/ao\` | .dmg / .msi / .AppImage |
+| Agent adapters | 18 | 3 (Claude Code, Codex, Aider) | 23 |
+| MCP server mode (exposes self) | Yes (stdio + HTTP/SSE) | No | No |
+| Coordinator | Deterministic Python scheduler | LLM-driven | Not documented |
+| HMAC-chained audit replay | Yes | No | No |
+| Autonomous CI-fix / PR flow | No | Yes | No |
+| License | Apache 2.0 | MIT | Apache 2.0 |
+
+Bernstein's wedge in the CLI-orchestrator category: Python-native primitive, MCP-server-first (exposes itself over MCP so any MCP client can invoke orchestration as tools), widest adapter coverage including Qwen / Ollama / Goose / OpenAI Agents SDK / Cloudflare Agents. Composio's \`@aoagents/ao\` is the right pick for TypeScript shops wanting autonomous CI-fix and a dashboard. emdash is the right pick for users wanting a downloadable desktop ADE.
 
 ---
 
