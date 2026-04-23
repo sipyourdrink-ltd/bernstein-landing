@@ -1,6 +1,7 @@
 'use client';
 
 import { ScrollReveal } from '@/components/ScrollReveal';
+import { HowItWorksDiagram } from './HowItWorksDiagram';
 
 interface Step {
   num: string;
@@ -50,15 +51,9 @@ export function HowItWorks() {
         ))}
       </div>
       <ScrollReveal delay={600}>
-        <pre className="how-diagram" aria-hidden="true">
-{`goal `}<span className="d-mute">{`──┐`}</span>{`
-       `}<span className="d-mute">{`├──▶  `}</span><span className="d-agent">agent-1 · sonnet</span>{`  `}<span className="d-mute">{`──▶  `}</span><span className="d-janitor">janitor</span>{` `}<span className="d-mute">{`──┐`}</span>{`
-       `}<span className="d-mute">{`├──▶  `}</span><span className="d-agent">agent-2 · codex  </span>{`  `}<span className="d-mute">{`──▶  `}</span><span className="d-janitor">janitor</span>{` `}<span className="d-mute">{`──┤`}</span>{`  `}<span className="d-ok">merge</span>{`
-       `}<span className="d-mute">{`├──▶  `}</span><span className="d-agent">agent-3 · haiku  </span>{`  `}<span className="d-mute">{`──▶  `}</span><span className="d-janitor">janitor</span>{` `}<span className="d-mute">{`──┤`}</span>{`  `}<span className="d-ok">main ✓</span>{`
-       `}<span className="d-mute">{`└──▶  `}</span><span className="d-agent">agent-4 · gemini </span>{`  `}<span className="d-mute">{`──▶  `}</span><span className="d-bad">fail   </span>{`  `}<span className="d-mute">{`──┘`}</span>{`
-                                     `}<span className="d-mute">│</span>{`
-               `}<span className="d-janitor">↺ retry w/ escalated model</span>{` `}<span className="d-mute">←</span>{` `}<span className="d-agent">bandit</span>
-        </pre>
+        <div className="how-diagram-wrap">
+          <HowItWorksDiagram />
+        </div>
       </ScrollReveal>
     </section>
   );
