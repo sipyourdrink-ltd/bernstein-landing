@@ -59,14 +59,14 @@ export async function Hero() {
       <HeroBackground />
       <div className="hero-copy">
         <h1>
-          Deterministic scheduling
+          AI coding agents,
           <br />
-          <span className="hero-h1-sub">for AI coding agents.</span>
+          <span className="hero-h1-sub">working together.</span>
         </h1>
         <p className="hero-sub">
-          Set one goal. Bernstein decomposes it, runs multiple agents in
-          parallel in isolated worktrees, verifies every diff with real
-          quality gates, and merges only what passes.
+          Tell it what you want built. It splits the work across several
+          AI agents (Claude Code, Codex, Gemini&nbsp;CLI, and 28 more),
+          runs the tests, and merges only the code that actually passes.
         </p>
         <div className="hero-actions">
           <a href="https://github.com/chernistry/bernstein" className="btn btn-primary">
@@ -76,9 +76,12 @@ export async function Hero() {
           <a href="https://bernstein.readthedocs.io/" className="btn btn-secondary">Documentation</a>
         </div>
         <div className="install-block">
-          <div className="install-code"><span className="prompt">$</span> <span className="cmd">pipx install bernstein</span><span className="cursor" /></div>
-          <CopyButton text="pipx install bernstein" />
+          <div className="install-code"><span className="prompt">$</span> <span className="cmd">curl -fsSL https://bernstein.run/install.sh | sh</span><span className="cursor" /></div>
+          <CopyButton text="curl -fsSL https://bernstein.run/install.sh | sh" />
         </div>
+        <p className="hero-install-alt">
+          Prefer a manual install? <code>pipx install bernstein</code> · Windows: <a href="https://bernstein.run/install.ps1">install.ps1</a>
+        </p>
         <p className="hero-proof">{proofLine}</p>
       </div>
       <div className="hero-visual">
