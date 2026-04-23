@@ -9,6 +9,11 @@ const NAV_LINKS = [
   { href: '/#compare', label: 'Compare' },
   { href: '/blog', label: 'Blog' },
   {
+    href: 'https://bernstein.readthedocs.io/',
+    label: 'Docs',
+    external: true,
+  },
+  {
     href: 'https://github.com/chernistry/bernstein',
     label: 'GitHub',
     external: true,

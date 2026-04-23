@@ -4,6 +4,7 @@ import { buildBlogIndexJsonLd, SITE_URL } from '@/lib/seo';
 import { Nav } from '@/components/landing/Nav';
 import { Footer } from '@/components/landing/Footer';
 import { BlogCard } from '@/components/blog/BlogCard';
+import { BlogList } from '@/components/blog/BlogList';
 
 export const metadata: Metadata = {
   title: 'Blog',
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 export default async function BlogIndex() {
   const posts = await getAllPosts();
   const jsonLd = buildBlogIndexJsonLd(posts);
+  const [featured, ...rest] = posts;
 
   return (
     <>
@@ -30,7 +32,10 @@ export default async function BlogIndex() {
         {posts.length === 0 ? (
           <p style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>No posts yet. Check back soon.</p>
         ) : (
-          posts.map((post) => <BlogCard key={post.slug} post={post} />)
+          <>
+            {featured && <BlogCard post={featured} featured />}
+            <BlogList posts={rest} />
+          </>
         )}
       </div>
       <Footer />

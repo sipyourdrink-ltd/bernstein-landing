@@ -87,18 +87,25 @@ a {
 }
 a:hover { color: var(--accent-hover); }
 
-/* Focus visible */
+/* Focus visible — double-ring approach so the outline stays visible on
+   --accent-subtle backgrounds (chips/FAQ items) where a flat accent ring
+   would otherwise blend into the surface. */
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  box-shadow: none;
+  outline: 2px solid var(--accent-hover);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--accent) 25%, transparent);
   border-radius: var(--radius);
 }
 
-.btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px color-mix(in oklch, var(--accent) 25%, transparent);
+.btn:focus-visible,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent-hover);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--accent) 30%, transparent);
 }
 
 /* ---- SKIP TO CONTENT ---- */
@@ -603,8 +610,9 @@ section[id] {
   margin-bottom: var(--space-2);
   text-wrap: balance;
 }
+/* X-03: bump body copy to --text-secondary for WCAG AA at 14px */
 .section-header p {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 15px;
   max-width: 480px;
 }
@@ -664,8 +672,9 @@ section[id] {
   margin-bottom: var(--space-2);
   letter-spacing: -0.01em;
 }
+/* X-03: bump body copy to --text-secondary for WCAG AA at 14px */
 .step p {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -824,8 +833,9 @@ section[id] {
   margin-bottom: var(--space-2);
   letter-spacing: -0.01em;
 }
+/* X-03: bump body copy to --text-secondary for WCAG AA at 14px */
 .feature p {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -1023,8 +1033,9 @@ section[id] {
   margin-bottom: var(--space-4);
   text-wrap: balance;
 }
+/* X-03: bump body copy to --text-secondary for WCAG AA at 14px */
 .cta-section > p {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 15px;
   margin-bottom: var(--space-7);
 }
@@ -1117,6 +1128,24 @@ footer {
 }
 .footer-bottom a:hover { color: var(--text); }
 
+/* X-07: utility class for the /llms.txt AI-crawler link.
+   Consumed by the Footer component so the link is small, unobtrusive, and
+   matches the mono-chrome treatment used by dates/eyebrows. Underline
+   appears only on hover to avoid fighting the surrounding footer links. */
+.ai-crawler-link {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease-out;
+}
+.ai-crawler-link:hover {
+  color: var(--text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* ---- BACK TO TOP ---- */
 .back-to-top {
   position: fixed;
@@ -1159,8 +1188,9 @@ footer {
   letter-spacing: -0.04em;
   margin-bottom: 16px;
 }
+/* X-03: bump body copy to --text-secondary for WCAG AA at 14px */
 .not-found p {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 15px;
   margin-bottom: 32px;
 }
@@ -1203,6 +1233,19 @@ footer {
 .scroll-reveal.revealed {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* X-01: reduce ScrollReveal density — when scroll-reveal wrappers are
+   nested inside grids (features, steps, agents, blog list), neutralise
+   their individual transitions so the grid animates as a single unit
+   with its parent reveal. Keeps section headers as the only overt reveal. */
+.features-grid > .scroll-reveal,
+.steps > .scroll-reveal,
+.agents-grid > .scroll-reveal {
+  opacity: 1;
+  transform: none;
+  transition: none;
+  transition-delay: 0ms !important;
 }
 
 @keyframes fadeSlideUp {
@@ -1308,8 +1351,9 @@ footer {
   margin-bottom: var(--space-2);
 }
 
+/* X-03: bump body copy to --text-secondary for WCAG AA at 14px */
 .blog-index > p {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 15px;
   margin-bottom: var(--space-8);
 }

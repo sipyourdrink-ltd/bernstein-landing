@@ -12,6 +12,7 @@ export function EmailCapture() {
     const email = new FormData(form).get('email_address') as string;
     setStatus('submitting');
     try {
+      {/* Kit's hosted forms endpoint does not send CORS headers, so we must use mode: 'no-cors'. The response is opaque — we cannot distinguish real success from a Kit-side rejection (invalid email, rate-limit, etc). Proxying through a same-origin API route would be required to return a real status. */}
       await fetch('https://app.kit.com/forms/9325480/subscriptions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -30,7 +31,7 @@ export function EmailCapture() {
         <div className="email-inner">
           <p className="email-kicker">Something new is coming</p>
           <h2>Be the first to know</h2>
-          <p>We&apos;re building hosted orchestration and a cloud runtime. Early subscribers get first access, architecture deep-dives, and a voice in what ships next.</p>
+          <p>Monthly newsletter &mdash; one engineering deep-dive per month. No spam, unsub any time.</p>
           <form className="email-form" onSubmit={handleSubmit}>
             <input
               type="email"

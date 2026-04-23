@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { ScrollReveal } from "@/components/ScrollReveal";
 
 interface FAQItem {
@@ -27,7 +27,7 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     question: "How does Bernstein differ from CrewAI or AutoGen?",
     answer:
-      "Bernstein\u2019s orchestrator is deterministic Python code \u2014 zero LLM tokens spent on coordination. It works with real CLI coding agents (not toy wrappers), provides git worktree isolation per agent, runs quality gates on every output, tracks costs, and uses an epsilon-greedy bandit to route tasks to the best model. CrewAI and AutoGen use LLM-driven coordination and don\u2019t support CLI agents.",
+      "Bernstein’s orchestrator is deterministic Python code — zero LLM tokens spent on coordination. It works with real CLI coding agents (not toy wrappers), provides git worktree isolation per agent, runs quality gates on every output, tracks costs, and uses an epsilon-greedy bandit to route tasks to the best model. CrewAI and AutoGen use LLM-driven coordination and don’t support CLI agents.",
   },
   {
     question: "Can Bernstein run agents in the cloud?",
@@ -57,7 +57,7 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Does Bernstein support MCP?",
     answer:
-      "Yes. Bernstein exposes an MCP (Model Context Protocol) server that lets any MCP-compatible client control orchestration \u2014 create tasks, check status, approve merges, and monitor costs through standard MCP tool calls.",
+      "Yes. Bernstein exposes an MCP (Model Context Protocol) server that lets any MCP-compatible client control orchestration — create tasks, check status, approve merges, and monitor costs through standard MCP tool calls.",
   },
   {
     question: "How does quality verification work?",
@@ -74,6 +74,55 @@ const FAQ_ITEMS: FAQItem[] = [
     answer:
       "Instead of loading every role prompt at startup, Bernstein ships skills as progressive-disclosure packs. Agents start with a short system prompt and pull extra context on demand through the load_skill MCP tool — only the skills a task actually needs are paid for in tokens. Skills are versioned bundles under templates/skills/ and can be added without shipping a release.",
   },
+];
+
+type GroupKey = "getting-started" | "capabilities" | "cloud-storage" | "licensing";
+
+const GROUP_LABELS: Record<GroupKey, string> = {
+  "getting-started": "Getting started",
+  capabilities: "Capabilities",
+  "cloud-storage": "Cloud & storage",
+  licensing: "Licensing",
+};
+
+// Maps a question (by its starts-with prefix) to its bucket.
+function groupFor(question: string): GroupKey {
+  if (question.startsWith("What is Bernstein")) return "getting-started";
+  if (question.startsWith("How do I install")) return "getting-started";
+  if (question.startsWith("What AI coding agents")) return "getting-started";
+  if (question.startsWith("Is Bernstein free")) return "licensing";
+  if (question.startsWith("Can Bernstein run agents in the cloud")) return "cloud-storage";
+  if (question.startsWith("What sandbox backends")) return "cloud-storage";
+  if (question.startsWith("Can I store .sdd/")) return "cloud-storage";
+  return "capabilities";
+}
+
+const GROUP_ORDER: GroupKey[] = [
+  "getting-started",
+  "capabilities",
+  "cloud-storage",
+  "licensing",
+];
+
+const SUPPORTED_AGENTS = [
+  "Claude Code",
+  "Codex CLI",
+  "Gemini CLI",
+  "OpenAI Agents SDK",
+  "Cursor",
+  "Aider",
+  "Amp",
+  "Kiro",
+  "Kilo",
+  "Qwen",
+  "Goose",
+  "Cody",
+  "Continue",
+  "OpenCode",
+  "Ollama",
+  "Cloudflare Agents",
+  "IaC",
+  "Generic",
 ];
 
 function ChevronDown() {
@@ -97,22 +146,76 @@ function ChevronDown() {
   );
 }
 
-function FAQAccordionItem({ item }: { item: FAQItem }) {
-  const [open, setOpen] = useState(false);
+function renderAnswer(item: FAQItem): ReactNode {
+  if (item.question.startsWith("How do I install")) {
+    return (
+      <>
+        <p>
+          Install with pipx (recommended), or use pip / uv. Homebrew support is
+          coming soon. Requires Python 3.12+ and at least one supported CLI
+          coding agent installed.
+        </p>
+        <pre className="faq-code-block" aria-label="Install commands">
+          <code>{`pipx install bernstein
+pip install bernstein
+uv pip install bernstein`}</code>
+        </pre>
+      </>
+    );
+  }
+
+  if (item.question.startsWith("What AI coding agents")) {
+    return (
+      <>
+        <p>
+          Bernstein ships 18 adapters covering the major CLI coding agents plus
+          a generic wrapper for any CLI tool:
+        </p>
+        <ul className="faq-pill-row" role="list">
+          {SUPPORTED_AGENTS.map((name) => (
+            <li key={name} className="faq-pill">
+              {name}
+            </li>
+          ))}
+        </ul>
+      </>
+    );
+  }
+
+  return <p>{item.answer}</p>;
+}
+
+interface AccordionItemProps {
+  item: FAQItem;
+  index: number;
+  open: boolean;
+  onToggle: (index: number) => void;
+}
+
+function FAQAccordionItem({ item, index, open, onToggle }: AccordionItemProps) {
+  const panelId = `faq-panel-${index}`;
+  const buttonId = `faq-button-${index}`;
 
   return (
     <div className={`faq-item${open ? " faq-item--open" : ""}`}>
       <button
+        id={buttonId}
         className="faq-question"
-        onClick={() => setOpen(!open)}
+        onClick={() => onToggle(index)}
         aria-expanded={open}
+        aria-controls={panelId}
       >
         <span>{item.question}</span>
         <ChevronDown />
       </button>
       {open && (
-        <div className="faq-answer">
-          <p>{item.answer}</p>
+        <div
+          id={panelId}
+          role="region"
+          aria-labelledby={buttonId}
+          className="faq-answer"
+        >
+          {renderAnswer(item)}
         </div>
       )}
     </div>
@@ -120,6 +223,19 @@ function FAQAccordionItem({ item }: { item: FAQItem }) {
 }
 
 export function FAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const handleToggle = (index: number) => {
+    setOpenIndex((current) => (current === index ? null : index));
+  };
+
+  // Group items while preserving original order inside each bucket.
+  const grouped = GROUP_ORDER.map((group) => ({
+    group,
+    items: FAQ_ITEMS.map((item, originalIndex) => ({ item, originalIndex }))
+      .filter(({ item }) => groupFor(item.question) === group),
+  })).filter(({ items }) => items.length > 0);
+
   return (
     <section className="faq" id="faq">
       <ScrollReveal>
@@ -130,13 +246,36 @@ export function FAQ() {
           </p>
         </div>
       </ScrollReveal>
-      <div className="faq-list">
-        {FAQ_ITEMS.map((item, i) => (
-          <ScrollReveal key={i} delay={i * 40}>
-            <FAQAccordionItem item={item} />
-          </ScrollReveal>
-        ))}
-      </div>
+      <ScrollReveal>
+        <div className="faq-toolbar">
+          <button
+            type="button"
+            className="faq-collapse-all"
+            onClick={() => setOpenIndex(null)}
+            disabled={openIndex === null}
+          >
+            Collapse all
+          </button>
+        </div>
+        <div className="faq-list">
+          {grouped.map(({ group, items }) => (
+            <div key={group} className="faq-group">
+              <h3 className="faq-group-eyebrow">{GROUP_LABELS[group]}</h3>
+              <div className="faq-group-items">
+                {items.map(({ item, originalIndex }) => (
+                  <FAQAccordionItem
+                    key={originalIndex}
+                    item={item}
+                    index={originalIndex}
+                    open={openIndex === originalIndex}
+                    onToggle={handleToggle}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </ScrollReveal>
     </section>
   );
 }

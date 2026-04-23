@@ -2,8 +2,15 @@
 
 import { ScrollReveal } from '@/components/ScrollReveal';
 
+interface Step {
+  num: string;
+  title: string;
+  desc: string;
+  chip?: string;
+}
+
 export function HowItWorks() {
-  const steps = [
+  const steps: Step[] = [
     {
       num: '01',
       title: 'Set a goal',
@@ -17,7 +24,8 @@ export function HowItWorks() {
     {
       num: '03',
       title: 'Verified and merged',
-      desc: 'Quality gates run lint, types, and tests on every result. Only verified work gets merged. Failed tasks retry with escalated models.',
+      desc: 'Quality gates run lint, types, and tests on every result. Only verified work gets merged.',
+      chip: '↻ Retry + escalate via bandit',
     },
   ];
 
@@ -29,17 +37,29 @@ export function HowItWorks() {
           <p>Three steps. No babysitting.</p>
         </div>
       </ScrollReveal>
-      <div className="steps">
+      <div className="steps steps-editorial">
         {steps.map((step, i) => (
           <ScrollReveal key={step.num} delay={200 + i * 100}>
             <div className="step">
-              <div className="step-num">{step.num}</div>
+              <div className="step-num step-num-editorial">{step.num}</div>
               <h3>{step.title}</h3>
               <p>{step.desc}</p>
+              {step.chip && <div className="step-chip">{step.chip}</div>}
             </div>
           </ScrollReveal>
         ))}
       </div>
+      <ScrollReveal delay={600}>
+        <pre className="how-diagram" aria-hidden="true">
+{`goal `}<span className="d-mute">{`──┐`}</span>{`
+       `}<span className="d-mute">{`├──▶  `}</span><span className="d-agent">agent-1 · sonnet</span>{`  `}<span className="d-mute">{`──▶  `}</span><span className="d-janitor">janitor</span>{` `}<span className="d-mute">{`──┐`}</span>{`
+       `}<span className="d-mute">{`├──▶  `}</span><span className="d-agent">agent-2 · codex  </span>{`  `}<span className="d-mute">{`──▶  `}</span><span className="d-janitor">janitor</span>{` `}<span className="d-mute">{`──┤`}</span>{`  `}<span className="d-ok">merge</span>{`
+       `}<span className="d-mute">{`├──▶  `}</span><span className="d-agent">agent-3 · haiku  </span>{`  `}<span className="d-mute">{`──▶  `}</span><span className="d-janitor">janitor</span>{` `}<span className="d-mute">{`──┤`}</span>{`  `}<span className="d-ok">main ✓</span>{`
+       `}<span className="d-mute">{`└──▶  `}</span><span className="d-agent">agent-4 · gemini </span>{`  `}<span className="d-mute">{`──▶  `}</span><span className="d-bad">fail   </span>{`  `}<span className="d-mute">{`──┘`}</span>{`
+                                     `}<span className="d-mute">│</span>{`
+               `}<span className="d-janitor">↺ retry w/ escalated model</span>{` `}<span className="d-mute">←</span>{` `}<span className="d-agent">bandit</span>
+        </pre>
+      </ScrollReveal>
     </section>
   );
 }

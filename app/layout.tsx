@@ -1,6 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import { inter, jetbrainsMono } from '@/lib/fonts';
 import '@/styles/globals.css';
+import '@/styles/ux-nav-hero.css';
+import '@/styles/ux-stats-how-email.css';
+import '@/styles/ux-agents-features-compare.css';
+import '@/styles/ux-faq-footer.css';
+import '@/styles/ux-blog.css';
 
 const SITE_URL = 'https://bernstein.run';
 

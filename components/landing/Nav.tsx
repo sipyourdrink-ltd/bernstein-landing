@@ -1,13 +1,29 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { MobileMenu } from './MobileMenu';
 
 const SECTION_IDS = ['how', 'agents', 'features', 'compare'] as const;
 
+function formatStars(stars: number): string {
+  if (stars >= 1000) {
+    const k = stars / 1000;
+    // 1 decimal, strip trailing .0
+    const fixed = k.toFixed(1);
+    return `${fixed.endsWith('.0') ? fixed.slice(0, -2) : fixed}k`;
+  }
+  return String(stars);
+}
+
 export function Nav() {
   const [active, setActive] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [stars, setStars] = useState<number | null>(null);
+  const pathname = usePathname();
+  const isHome = pathname === '/';
+
+  const sectionHref = (id: string) => (isHome ? `#${id}` : `/#${id}`);
 
   /* Scroll spy via IntersectionObserver */
   useEffect(() => {
@@ -42,6 +58,25 @@ export function Nav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  /* Fetch GitHub star count */
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/stats')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        if (typeof data.stars === 'number' && data.stars > 0) {
+          setStars(data.stars);
+        }
+      })
+      .catch(() => {
+        /* silent — leave button unchanged */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <>
       <a href="#main" className="skip-to-content">
@@ -55,30 +90,37 @@ export function Nav() {
           </a>
           <nav className="nav-links">
             <a
-              href="/#how"
+              href={sectionHref('how')}
               className={active === 'how' ? 'nav-active' : undefined}
             >
               How it works
             </a>
             <a
-              href="/#agents"
+              href={sectionHref('agents')}
               className={active === 'agents' ? 'nav-active' : undefined}
             >
               Agents
             </a>
             <a
-              href="/#features"
+              href={sectionHref('features')}
               className={active === 'features' ? 'nav-active' : undefined}
             >
               Features
             </a>
             <a
-              href="/#compare"
+              href={sectionHref('compare')}
               className={active === 'compare' ? 'nav-active' : undefined}
             >
               Compare
             </a>
             <a href="/blog">Blog</a>
+            <a
+              href="https://bernstein.readthedocs.io/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Docs
+            </a>
             <a
               href="https://github.com/chernistry/bernstein"
               className="nav-github"
@@ -86,7 +128,13 @@ export function Nav() {
               <svg viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
               </svg>
-              GitHub
+              <span>GitHub</span>
+              {stars !== null && stars > 0 ? (
+                <>
+                  <span className="nav-gh-divider" aria-hidden="true" />
+                  <span className="nav-gh-stars">{formatStars(stars)}</span>
+                </>
+              ) : null}
             </a>
           </nav>
           <MobileMenu />

@@ -1,0 +1,303 @@
+/* ============================================================
+   UX: Agents grid, Features pillars, Compare tabs
+   All tokens come from globals.css. No new colors/fonts here.
+   ============================================================ */
+
+/* ---------------- AGENTS GRID ---------------- */
+
+/* Filter chips */
+.agent-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  justify-content: center;
+}
+
+.agent-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s ease-out, color 0.15s ease-out, background 0.15s ease-out, transform 0.15s ease-out;
+}
+.agent-chip:hover {
+  color: var(--text);
+  border-color: var(--border);
+  background: var(--surface-hover);
+}
+.agent-chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.agent-chip-active {
+  color: var(--text);
+  border-color: var(--accent);
+  background: color-mix(in oklch, var(--accent) 18%, transparent);
+}
+.agent-chip-active:hover {
+  background: color-mix(in oklch, var(--accent) 22%, transparent);
+}
+
+.agent-chip-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.agent-chip-active .agent-chip-count {
+  color: var(--text-secondary);
+}
+
+/* Monogram badges replace line-art SVGs */
+.agent-monogram {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Reduce stagger: cap total at 300ms via container-level reveal.
+   The grid itself inherits the ScrollReveal wrapper animation; each
+   card is static. If a staggered fade is desired per card, we use
+   a lightweight fade keyed by style delay. */
+.agent-card-staggered {
+  animation: fadeInAgentCard 0.35s ease-out both;
+}
+
+@keyframes fadeInAgentCard {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-card-staggered { animation: none; opacity: 1; transform: none; }
+}
+
+/* ---------------- FEATURES: PILLARS ---------------- */
+.features-pillar {
+  margin-top: var(--space-8);
+}
+.features-pillar:first-of-type {
+  margin-top: var(--space-4);
+}
+
+.features-pillar-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.features-pillar-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.features-pillar-title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.features-pillar-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: minmax(0, auto);
+  gap: var(--space-4);
+  align-items: stretch;
+}
+
+/* Lead card in each pillar: slightly taller / weightier */
+.features-pillar-grid .feature-lead {
+  padding: var(--space-7);
+}
+.features-pillar-grid .feature-lead h3 {
+  font-size: 1.1rem;
+}
+
+/* Feature snippet (mono inline code) replaces generic icons */
+.feature-snippet {
+  display: inline-block;
+  align-self: flex-start;
+  max-width: 100%;
+  margin-bottom: var(--space-4);
+  padding: 4px 8px;
+  background: var(--code-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Experimental eyebrow next to feature title */
+.feature-eyebrow {
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--accent) 18%, transparent);
+  color: var(--accent-hover);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  line-height: 1.6;
+  vertical-align: middle;
+}
+
+/* Strengthened hover accent bar on feature cards */
+.feature:hover {
+  box-shadow: inset 0 2px 0 var(--accent-hover), var(--shadow-md);
+}
+.feature::before {
+  height: 3px;
+  background: var(--accent-hover);
+}
+
+/* ---------------- COMPARE: TABS ---------------- */
+.compare-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.compare-header-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.compare-verified {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.compare-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.compare-tab {
+  position: relative;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s ease-out, border-color 0.15s ease-out;
+  margin-bottom: -1px; /* overlap the bottom border */
+}
+.compare-tab:hover { color: var(--text); }
+.compare-tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+.compare-tab-active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+/* Tint Bernstein column (2nd col) — strengthens existing token */
+.compare-table thead th:nth-child(2) {
+  background: color-mix(in oklch, var(--accent) 15%, transparent);
+  color: var(--accent-hover);
+  font-weight: 600;
+}
+.compare-table tbody td:nth-child(2) {
+  background: color-mix(in oklch, var(--accent) 10%, transparent);
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* Row label + "only Bernstein" callout */
+.compare-row-label {
+  display: block;
+}
+.compare-only {
+  display: inline-block;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--green);
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+
+/* Mobile horizontal scroll cue: right-edge gradient */
+@media (max-width: 768px) {
+  .compare-scroll {
+    position: relative;
+  }
+  .compare-scroll::after {
+    content: '';
+    position: sticky;
+    top: 0;
+    right: 0;
+    margin-left: auto;
+    display: block;
+    width: 24px;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(to left, oklch(0 0 0 / 0.35), transparent);
+  }
+  /* Simpler fixed-position gradient via overlay */
+  .compare-scroll {
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 24px), transparent 100%);
+            mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 24px), transparent 100%);
+  }
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media (max-width: 1024px) {
+  .features-pillar-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .features-pillar-grid { grid-template-columns: 1fr; }
+  .features-pillar-grid .feature-lead { padding: var(--space-6); }
+  .agent-filters { justify-content: flex-start; }
+}

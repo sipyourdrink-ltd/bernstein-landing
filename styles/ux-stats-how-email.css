@@ -1,0 +1,126 @@
+/* =========================================================================
+   ux-stats-how-email.css
+   Scoped overrides for Stats, HowItWorks, EmailCapture.
+   Uses higher specificity (.stats.stats-improved, .steps.steps-editorial)
+   so the underlying globals.css rules remain untouched.
+   ========================================================================= */
+
+/* ---- STATS: drop dividers, add sub-lines ---- */
+.stats.stats-improved {
+  gap: var(--space-10);
+  align-items: flex-start;
+}
+
+.stats.stats-improved .stat + .stat {
+  padding-left: 0;
+}
+
+.stats.stats-improved .stat + .stat::before {
+  content: none;
+  display: none;
+  background: transparent;
+  width: 0;
+  height: 0;
+}
+
+.stats.stats-improved .stat-sub {
+  margin-top: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+}
+
+@media (min-width: 640px) {
+  .stats.stats-improved .stat-sub {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats.stats-improved {
+    gap: var(--space-6);
+  }
+}
+
+/* ---- HOW IT WORKS: editorial numerals ---- */
+.steps.steps-editorial .step-num.step-num-editorial {
+  display: block;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  color: var(--accent-hover);
+  font-family: var(--font-mono);
+  font-size: 44px;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-3);
+  padding: 0;
+}
+
+@media (min-width: 769px) {
+  .steps.steps-editorial .step-num.step-num-editorial {
+    font-size: 48px;
+  }
+}
+
+/* The globals .step::after connector was aligned to a 32px circle.
+   Shift it to line up with the new editorial numeral height. */
+@media (min-width: 769px) {
+  .steps.steps-editorial > div:not(:last-child) .step::after {
+    top: 56px;
+  }
+}
+
+/* ---- HOW IT WORKS: retry chip in step 3 ---- */
+.step-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-top: var(--space-3);
+  padding: 4px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  background: var(--surface-hover);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+  align-self: flex-start;
+}
+
+/* ---- HOW IT WORKS: ASCII mini-diagram ---- */
+.how-diagram {
+  display: block;
+  margin: var(--space-7) auto 0;
+  padding: var(--space-5) var(--space-5);
+  background: var(--code-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  overflow-x: auto;
+  white-space: pre;
+  max-width: 720px;
+  text-align: left;
+}
+
+@media (min-width: 640px) {
+  .how-diagram {
+    font-size: 12px;
+  }
+}
+
+.how-diagram .d-mute { color: var(--text-muted); }
+.how-diagram .d-agent { color: var(--accent-hover); }
+/* Janitor role: brief asks for amber, but the token palette has no amber
+   token. Using --text-secondary keeps it visually distinct from --accent-hover
+   agents and from --text-muted glyphs, without introducing a new color. */
+.how-diagram .d-janitor { color: var(--text); }
+.how-diagram .d-ok { color: var(--green); }
+.how-diagram .d-bad { color: var(--red); }

@@ -1,0 +1,202 @@
+/* =========================================================================
+   FAQ — grouping, toolbar, code block, pill row
+   ========================================================================= */
+
+.faq-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-4);
+}
+
+.faq-collapse-all {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease-out;
+}
+
+.faq-collapse-all:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.faq-collapse-all:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.faq-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.faq-group + .faq-group {
+  margin-top: var(--space-5);
+}
+
+.faq-group-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin: 0 0 var(--space-1);
+  padding-left: var(--space-2);
+}
+
+.faq-group-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Dense-answer formatting */
+.faq-answer p + .faq-code-block,
+.faq-answer p + .faq-pill-row {
+  margin-top: var(--space-3);
+}
+
+.faq-code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.faq-code-block code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  color: inherit;
+  white-space: pre;
+}
+
+.faq-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.faq-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: var(--surface);
+}
+
+/* =========================================================================
+   Footer — 4-column responsive grid, "As featured in" inline badges
+   ========================================================================= */
+
+.footer-links {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 480px) {
+  .footer-links {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .footer-links {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.footer-featured {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.footer-featured-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.footer-featured-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.footer-featured-badges a {
+  display: inline-flex;
+  opacity: 0.75;
+  transition: opacity 0.15s ease-out;
+  padding: 0;
+}
+
+.footer-featured-badges a:hover {
+  opacity: 1;
+}
+
+.footer-featured-badges picture,
+.footer-featured-badges img {
+  display: block;
+  max-height: 20px;
+  height: 20px;
+  width: auto;
+  max-width: 100%;
+}
+
+/* =========================================================================
+   Back-to-top — enter animation + safe-area
+   ========================================================================= */
+
+.back-to-top {
+  bottom: max(24px, env(safe-area-inset-bottom));
+  transform: translateY(4px);
+}
+
+.back-to-top-visible {
+  animation: back-to-top-reveal 200ms ease-out forwards;
+}
+
+@keyframes back-to-top-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back-to-top {
+    transform: none;
+  }
+  .back-to-top-visible {
+    animation: none;
+    opacity: 1;
+  }
+}

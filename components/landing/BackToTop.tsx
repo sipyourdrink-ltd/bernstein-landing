@@ -21,6 +21,8 @@ export function BackToTop() {
       className={`back-to-top${visible ? ' back-to-top-visible' : ''}`}
       onClick={scrollToTop}
       aria-label="Back to top"
+      aria-hidden={!visible}
+      tabIndex={visible ? 0 : -1}
     >
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M8 12V4" />

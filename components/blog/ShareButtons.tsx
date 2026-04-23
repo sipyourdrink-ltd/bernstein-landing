@@ -36,12 +36,19 @@ const SHARE_TARGETS = [
 interface Props {
   url: string;
   title: string;
+  variant?: 'compact' | 'large';
 }
 
-export function ShareButtons({ url, title }: Props) {
+export function ShareButtons({ url, title, variant = 'compact' }: Props) {
+  const className =
+    variant === 'large'
+      ? 'share-buttons share-buttons--large'
+      : 'share-buttons share-buttons--compact';
   return (
-    <div className="share-buttons">
-      <span className="share-label">Share</span>
+    <div className={className}>
+      <span className="share-label">
+        {variant === 'large' ? 'Share this post' : 'Share'}
+      </span>
       {SHARE_TARGETS.map((target) => (
         <a
           key={target.name}

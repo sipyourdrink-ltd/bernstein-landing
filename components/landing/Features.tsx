@@ -1,6 +1,130 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { ScrollReveal } from '@/components/ScrollReveal';
+
+interface FeatureItem {
+  title: string;
+  eyebrow?: string;
+  snippet: string;
+  body: ReactNode;
+}
+
+interface Pillar {
+  eyebrow: string;
+  title: string;
+  items: FeatureItem[];
+}
+
+const pillars: Pillar[] = [
+  {
+    eyebrow: 'Pillar 01',
+    title: 'Orchestrate',
+    items: [
+      {
+        title: 'Deterministic scheduling',
+        snippet: 'orchestrator: code',
+        body: (
+          <>The orchestrator is pure Python. Zero LLM tokens on coordination. Predictable, debuggable, fast.</>
+        ),
+      },
+      {
+        title: '18 adapters',
+        snippet: 'agents: [claude, codex, gemini, ...]',
+        body: (
+          <>Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Aider, Cloudflare Agents, and 12 more. Mix models in one run. Switch providers without changing config.</>
+        ),
+      },
+      {
+        title: 'Cost-aware routing',
+        snippet: 'router: bandit',
+        body: (
+          <>
+            Epsilon-greedy bandit learns which model works best per task type. Teams routinely report 30&ndash;50% cost reductions &mdash; see the{' '}
+            <a href="/blog/cost-aware-routing">cost-aware routing post</a>. Measure yours with{' '}
+            <code>bernstein cost</code>.
+          </>
+        ),
+      },
+      {
+        title: 'Progressive skill packs',
+        snippet: 'load_skill("writing-tests")',
+        body: (
+          <>Role prompts load on demand via the <code>load_skill</code> MCP tool. Agents start with a minimal system prompt, pull only the skills a task needs, and save tokens on every call.</>
+        ),
+      },
+    ],
+  },
+  {
+    eyebrow: 'Pillar 02',
+    title: 'Verify',
+    items: [
+      {
+        title: 'Quality gates',
+        snippet: 'gates: [lint, types, tests]',
+        body: (
+          <>Lint, type check, tests, security scan, architecture conformance. All run before merge. Failed work retries automatically.</>
+        ),
+      },
+      {
+        title: 'Auto-improvement loop',
+        eyebrow: 'experimental',
+        snippet: 'bernstein --evolve',
+        body: (
+          <>On the Bernstein repo itself, self-proposed PRs merged continuously via <code>--evolve</code>.</>
+        ),
+      },
+      {
+        title: 'Full observability',
+        snippet: 'metrics_port: 9464',
+        body: (
+          <>Per-agent cost tracking, token monitoring, quality trends, Prometheus metrics. Know what happened and what it cost.</>
+        ),
+      },
+      {
+        title: 'MCP remote',
+        snippet: 'mcp: { stdio, http }',
+        body: (
+          <>Expose Bernstein as an MCP server over HTTP. Connect from any MCP client, run orchestration remotely.</>
+        ),
+      },
+    ],
+  },
+  {
+    eyebrow: 'Pillar 03',
+    title: 'Run anywhere',
+    items: [
+      {
+        title: 'Pluggable sandboxes',
+        snippet: 'sandbox: e2b',
+        body: (
+          <>Run agents in git worktrees, Docker, E2B, Modal, Blaxel, Cloudflare, Daytona, Runloop, or Vercel sandboxes. One protocol, your choice of isolation.</>
+        ),
+      },
+      {
+        title: 'Cloudflare cloud execution',
+        snippet: 'sandbox: cloudflare',
+        body: (
+          <>Run agents on Cloudflare Workers with Durable Workflows, V8 sandbox isolation, R2 workspace sync, and Workers AI routing.</>
+        ),
+      },
+      {
+        title: 'Cloud artifact sinks',
+        snippet: 'storage: s3 | gcs | r2',
+        body: (
+          <>Buffer <code>.sdd/</code> state and per-task artifacts into S3, GCS, Azure Blob, or Cloudflare R2. Same local-file interface, durable off-box persistence.</>
+        ),
+      },
+      {
+        title: 'A2A protocol',
+        snippet: 'protocol: a2a',
+        body: (
+          <>Speak the Agent-to-Agent protocol natively. Publish an agent card, receive tasks, stream results &mdash; interoperate with any A2A-compliant system.</>
+        ),
+      },
+    ],
+  },
+];
 
 export function Features() {
   return (
@@ -11,107 +135,31 @@ export function Features() {
           <p>Not a demo. A system you can run unsupervised.</p>
         </div>
       </ScrollReveal>
-      <div className="features-grid">
-        <ScrollReveal delay={200}>
-          <div className="feature">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      {pillars.map((pillar, pIdx) => (
+        <ScrollReveal key={pillar.title} delay={150 + pIdx * 80}>
+          <section className="features-pillar" aria-labelledby={`pillar-${pIdx}`}>
+            <header className="features-pillar-header">
+              <span className="features-pillar-eyebrow">{pillar.eyebrow}</span>
+              <h3 id={`pillar-${pIdx}`} className="features-pillar-title">{pillar.title}</h3>
+            </header>
+            <div className="features-pillar-grid">
+              {pillar.items.map((item, i) => (
+                <div
+                  key={item.title}
+                  className={`feature${i === 0 ? ' feature-lead' : ''}`}
+                >
+                  <code className="feature-snippet">{item.snippet}</code>
+                  <h3>
+                    {item.title}
+                    {item.eyebrow && <span className="feature-eyebrow">{item.eyebrow}</span>}
+                  </h3>
+                  <p>{item.body}</p>
+                </div>
+              ))}
             </div>
-            <h3>Deterministic scheduling</h3>
-            <p>The orchestrator is pure Python. Zero LLM tokens on coordination. Predictable, debuggable, fast.</p>
-          </div>
+          </section>
         </ScrollReveal>
-        <ScrollReveal delay={280}>
-          <div className="feature">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
-            </div>
-            <h3>18 agent adapters</h3>
-            <p>Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Aider, Cloudflare Agents, and 12 more. Mix models in one run. Switch providers without changing config.</p>
-          </div>
-        </ScrollReveal>
-        <ScrollReveal delay={360}>
-          <div className="feature">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-            <h3>Quality gates</h3>
-            <p>Lint, type check, tests, security scan, architecture conformance. All run before merge. Failed work retries automatically.</p>
-          </div>
-        </ScrollReveal>
-        <ScrollReveal delay={440}>
-          <div className="feature">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-            </div>
-            <h3>Cost-aware routing</h3>
-            <p>Epsilon-greedy bandit learns which model works best per task type. In our own runs, spend dropped roughly in half. Measure yours with bernstein cost.</p>
-          </div>
-        </ScrollReveal>
-        <ScrollReveal delay={520}>
-          <div className="feature">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24"><path d="M6 3v12"/><path d="M18 9a3 3 0 100-6 3 3 0 000 6z"/><path d="M6 21a3 3 0 100-6 3 3 0 000 6z"/><path d="M18 9c-3 0-6 1-6 5v1"/></svg>
-            </div>
-            <h3>Pluggable sandbox backends</h3>
-            <p>Run agents in git worktrees, Docker, E2B, Modal, Blaxel, Cloudflare, Daytona, Runloop, or Vercel sandboxes. One protocol, your choice of isolation.</p>
-          </div>
-        </ScrollReveal>
-        <ScrollReveal delay={600}>
-          <div className="feature">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 9l-5 5-2-2-4 4"/></svg>
-            </div>
-            <h3>Full observability</h3>
-            <p>Per-agent cost tracking, token monitoring, quality trends, Prometheus metrics. Know what happened and what it cost.</p>
-          </div>
-        </ScrollReveal>
-        <ScrollReveal delay={640}>
-          <div className="feature">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-            </div>
-            <h3>Cloud artifact sinks</h3>
-            <p>Buffer .sdd/ state and per-task artifacts into S3, GCS, Azure Blob, or Cloudflare R2. Same local-file interface, durable off-box persistence.</p>
-          </div>
-        </ScrollReveal>
-        <ScrollReveal delay={680}>
-          <div className="feature">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24"><path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
-            </div>
-            <h3>Cloudflare cloud execution</h3>
-            <p>Run agents on Cloudflare Workers with Durable Workflows, V8 sandbox isolation, R2 workspace sync, and Workers AI routing.</p>
-          </div>
-        </ScrollReveal>
-        <ScrollReveal delay={760}>
-          <div className="feature">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/></svg>
-            </div>
-            <h3>MCP remote transport</h3>
-            <p>Expose Bernstein as an MCP server over HTTP. Connect from any MCP client, run orchestration remotely.</p>
-          </div>
-        </ScrollReveal>
-        <ScrollReveal delay={840}>
-          <div className="feature">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c-1.66 0-3-4.03-3-9s1.34-9 3-9m0 18c1.66 0 3-4.03 3-9s-1.34-9-3-9" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="M17 8l-1.5 2L17 12l-1.5 2" fill="none" stroke="currentColor" strokeWidth="1.2"/><path d="M7 8l1.5 2L7 12l1.5 2" fill="none" stroke="currentColor" strokeWidth="1.2"/></svg>
-            </div>
-            <h3>Self-evolution</h3>
-            <p>Analyzes quality metrics, cost trends, and failure patterns, then proposes and executes its own improvements. Ships upgrades to itself.</p>
-          </div>
-        </ScrollReveal>
-        <ScrollReveal delay={920}>
-          <div className="feature">
-            <div className="feature-icon">
-              <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/><path d="M18 14l4 4-4 4"/></svg>
-            </div>
-            <h3>Progressive skill packs</h3>
-            <p>Role prompts load on demand via the load_skill MCP tool. Agents start with a minimal system prompt, pull only the skills a task needs, and save tokens on every call.</p>
-          </div>
-        </ScrollReveal>
-      </div>
+      ))}
     </section>
   );
 }

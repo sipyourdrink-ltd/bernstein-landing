@@ -1,0 +1,187 @@
+/* =========================================================================
+   ux-nav-hero.css
+   Scoped styles for Nav + Hero UX improvements. All tokens come from
+   styles/globals.css. No new colors or fonts are introduced here.
+   ========================================================================= */
+
+:root {
+  /* Terminal agent colors — defined once and referenced below. */
+  --term-agent-1: oklch(0.78 0.1 260);
+  --term-agent-2: oklch(0.78 0.1 150);
+  --term-agent-3: oklch(0.82 0.12 60);
+  --term-agent-4: oklch(0.78 0.1 0);
+  --term-amber:   oklch(0.75 0.15 70);
+}
+
+/* ---------- N-01: GitHub star count in nav button ---------- */
+.nav-gh-divider {
+  display: inline-block;
+  width: 1px;
+  height: 12px;
+  background: var(--border-subtle);
+  margin: 0 2px;
+}
+.nav-gh-stars {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+}
+.nav-github:hover .nav-gh-stars {
+  color: var(--text-secondary);
+}
+
+/* ---------- H-01/H-02/H-03: Hero headline + split layout ---------- */
+.hero-h1-sub {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Secondary proof line under install block */
+.hero-proof {
+  margin-top: var(--space-4);
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+/* Split layout on ≥920px; stacked below */
+.hero-split {
+  /* Inherits .hero base from globals.css. Override max-width/text-align
+     only when the viewport actually has room for a split. */
+}
+
+.hero-copy {
+  /* default (stacked): centered like before */
+  text-align: center;
+}
+.hero-visual {
+  margin-top: var(--space-7);
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 920px) {
+  .hero-split {
+    max-width: 1160px;
+    text-align: left;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: center;
+  }
+  .hero-split .hero-copy {
+    text-align: left;
+  }
+  .hero-split .hero-sub {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .hero-split .hero-actions {
+    justify-content: flex-start;
+  }
+  .hero-split .install-block {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .hero-visual {
+    margin-top: 0;
+    justify-content: stretch;
+  }
+}
+
+/* ---------- H-02: Animated terminal ---------- */
+.hero-term {
+  width: 100%;
+  max-width: 540px;
+  background: var(--code-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.hero-term-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.hero-term-bar span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  display: inline-block;
+}
+
+.hero-term-body {
+  padding: 14px 16px 16px;
+  color: var(--text-secondary);
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.hero-term-line {
+  display: block;
+  opacity: 0;
+  animation: hero-term-in 0.28s ease-out forwards;
+}
+
+/* Stagger: 7 lines, ~6s total with a ~1s hold at the end */
+.hero-term-line-1 { animation-delay: 0.15s; }
+.hero-term-line-2 { animation-delay: 0.85s; }
+.hero-term-line-3 { animation-delay: 1.75s; }
+.hero-term-line-4 { animation-delay: 2.55s; }
+.hero-term-line-5 { animation-delay: 3.35s; }
+.hero-term-line-6 { animation-delay: 4.15s; }
+.hero-term-line-7 { animation-delay: 5.00s; }
+
+@keyframes hero-term-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Terminal color tokens applied to spans */
+.hero-term .tl-dim   { color: var(--text-muted); }
+.hero-term .tl-green { color: var(--green); }
+.hero-term .tl-amber { color: var(--term-amber); }
+.hero-term .tl-a1    { color: var(--term-agent-1); }
+.hero-term .tl-a2    { color: var(--term-agent-2); }
+.hero-term .tl-a3    { color: var(--term-agent-3); }
+.hero-term .tl-a4    { color: var(--term-agent-4); }
+
+/* Reduced motion: show all lines immediately, no animation */
+@media (prefers-reduced-motion: reduce) {
+  .hero-term-line {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+/* ---------- H-05: Install block narrow-screen stack ---------- */
+@media (max-width: 420px) {
+  .install-block {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+  .install-block .install-code {
+    white-space: normal;
+    word-break: break-all;
+    text-overflow: clip;
+    overflow: visible;
+  }
+  .install-block .copy-btn {
+    width: 100%;
+    text-align: center;
+  }
+}

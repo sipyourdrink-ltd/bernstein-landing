@@ -234,11 +234,11 @@ export default function LandingPage() {
         <Hero />
         <Stats />
         <HowItWorks />
-        <EmailCapture />
         <AgentsGrid />
         <Features />
         <Compare />
         <FAQ />
+        <EmailCapture />
       </main>
       <FooterCTA />
       <Footer />
