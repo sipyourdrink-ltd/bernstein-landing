@@ -200,3 +200,27 @@
     opacity: 1;
   }
 }
+
+/* ---------------- CTA ACTIONS ---------------- */
+/* GitHub button + Share link were colliding because both rendered
+   inline next to each other. Stack vertically with a clear gap so the
+   secondary share link sits under the primary CTA. */
+.cta-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.cta-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: color 0.15s ease-out;
+}
+.cta-share:hover {
+  color: var(--text);
+}
