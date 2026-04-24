@@ -5,7 +5,7 @@
       "@type": "SoftwareApplication",
       "@id": "https://bernstein.run/#software",
       "name": "Bernstein",
-      "description": "Open-source multi-agent orchestration system for AI coding agents. Coordinates Claude Code, Codex, Gemini CLI, and 15 other agents to work in parallel using deterministic scheduling, git worktree isolation, and quality gates.",
+      "description": "Open-source multi-agent orchestration system for AI coding agents. Coordinates Claude Code, Codex, Gemini CLI, and 28 other agents to work in parallel using deterministic scheduling, git worktree isolation, and quality gates.",
       "url": "https://bernstein.run",
       "applicationCategory": "DeveloperApplication",
       "applicationSubCategory": "Multi-Agent Orchestration",
@@ -25,7 +25,12 @@
         "@type": "Person",
         "@id": "https://bernstein.run/#author",
         "name": "Alex Chernysh",
-        "url": "https://alexchernysh.com"
+        "url": "https://alexchernysh.com",
+        "sameAs": [
+          "https://alexchernysh.com",
+          "https://github.com/chernistry",
+          "https://hireex.ai"
+        ]
       },
       "codeRepository": "https://github.com/chernistry/bernstein",
       "downloadUrl": "https://pypi.org/project/bernstein/",
@@ -34,7 +39,7 @@
       "softwareRequirements": "Python 3.12+, Git",
       "featureList": [
         "Deterministic scheduling (no LLM-based coordination)",
-        "18 agent adapters (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, etc.)",
+        "31 agent adapters (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, GitHub Copilot, Droid, Crush, Auggie, Cline, and more)",
         "Pluggable sandbox backends (git worktree, Docker, E2B, Modal, Blaxel, Cloudflare, Daytona, Runloop, Vercel)",
         "Cloud artifact sinks via BufferedSink (S3, GCS, Azure Blob, Cloudflare R2)",
         "Progressive-disclosure skill packs with load_skill MCP tool",
@@ -71,7 +76,9 @@
       "logo": "https://bernstein.run/favicon.svg",
       "sameAs": [
         "https://github.com/chernistry/bernstein",
-        "https://pypi.org/project/bernstein/"
+        "https://pypi.org/project/bernstein/",
+        "https://bernstein.readthedocs.io/",
+        "https://alexchernysh.com"
       ],
       "founder": {
         "@type": "Person",
@@ -125,7 +132,7 @@
           "name": "What AI coding agents does Bernstein support?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Bernstein supports 18 agents including Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, Cloudflare Agents, IaC, and a generic adapter for wrapping any CLI tool."
+            "text": "Bernstein supports 31 agents including Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, Cloudflare Agents, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral Vibe, Autohand, Forge, Hermes, and a generic adapter for wrapping any CLI tool."
           }
         },
         {

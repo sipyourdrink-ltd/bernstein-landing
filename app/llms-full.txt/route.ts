@@ -198,7 +198,7 @@ The system is organized into 22 sub-packages under \`src/bernstein/core/\`:
 
 ---
 
-## Supported Agents (18 Adapters)
+## Supported Agents (31 Adapters)
 
 | Agent | Description | Models |
 |-------|-------------|--------|
@@ -219,6 +219,19 @@ The system is organized into 22 sub-packages under \`src/bernstein/core/\`:
 | OpenCode | Open-source coding agent | Any OpenAI-compatible |
 | Cloudflare Agents | Workers + Workflows + Durable Objects | Workers AI |
 | IaC | Terraform/Pulumi agent | Various |
+| GitHub Copilot | GitHub Copilot CLI | OpenAI-backed |
+| Droid (Factory AI) | Factory AI Droid runtime | Various |
+| Crush (Charm) | Charm Crush CLI | Any OpenAI-compatible |
+| Auggie (Augment) | Augment Code agent | Augment models |
+| Kimi | Moonshot Kimi agent | Kimi models |
+| Rovo Dev (Atlassian) | Atlassian Rovo Dev CLI | Atlassian/OpenAI |
+| Cline | Cline autonomous agent | Any OpenAI-compatible |
+| Codebuff | Codebuff CLI | Various |
+| Pi | Pi coding agent | Various |
+| Mistral Vibe | Mistral Vibe CLI | Mistral models |
+| Autohand | Autohand agent runtime | Various |
+| Forge | Forge CLI | Various |
+| Hermes | Hermes CLI | Various |
 | Generic | Adapter for any CLI tool | Any |
 
 The generic adapter allows wrapping any CLI tool that accepts prompts and produces output.
@@ -616,8 +629,21 @@ Bernstein ships its role guidance (backend, frontend, QA, security, DevOps, arch
 - PyPI: https://pypi.org/project/bernstein/
 - Documentation: https://bernstein.readthedocs.io/
 - Issues: https://github.com/chernistry/bernstein/issues
-- Author: https://alexchernysh.com
-- Contact: forte@bernstein.run`;
+- Agent Card (A2A): https://bernstein.run/.well-known/agent-card.json
+- MCP Server Card: https://bernstein.run/.well-known/mcp/server-card.json
+- Contact: forte@bernstein.run
+
+## About the Author
+
+Bernstein is created and maintained by **Alex Chernysh**.
+
+- Homepage: https://alexchernysh.com
+- GitHub: https://github.com/chernistry
+- Email: forte@bernstein.run
+
+### Other projects by the same author
+
+- **HireEx** — AI-powered hiring platform. https://hireex.ai  ·  https://github.com/chernistry/hireex`;
 
 export async function GET() {
   const posts = await getAllPosts();

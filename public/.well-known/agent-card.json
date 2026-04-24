@@ -1,11 +1,19 @@
 {
   "name": "Bernstein",
-  "description": "Open-source multi-agent orchestration system for AI coding agents. Decomposes goals into tasks, spawns agents in parallel git worktrees, verifies output via quality gates, merges results.",
+  "description": "Open-source multi-agent orchestration system for AI coding agents. Decomposes goals into tasks, spawns 31 CLI agent adapters (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, GitHub Copilot, and more) in parallel git worktrees, verifies output via quality gates, merges results.",
   "provider": {
     "organization": "Bernstein",
-    "url": "https://bernstein.run"
+    "url": "https://bernstein.run",
+    "author": {
+      "name": "Alex Chernysh",
+      "url": "https://alexchernysh.com",
+      "github": "https://github.com/chernistry"
+    }
   },
   "version": "1.8.8",
+  "homepage": "https://bernstein.run",
+  "repository": "https://github.com/chernistry/bernstein",
+  "package": "https://pypi.org/project/bernstein/",
   "documentationUrl": "https://bernstein.readthedocs.io/",
   "capabilities": {
     "streaming": false,

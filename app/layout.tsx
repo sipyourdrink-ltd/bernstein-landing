@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: '%s | Bernstein',
   },
   description:
-    'Open-source orchestrator for parallel AI coding agents. Run Claude Code, Codex, Gemini CLI simultaneously. Deterministic scheduling, quality gates, cost tracking. 9,000+ monthly downloads.',
+    'Open-source orchestrator for parallel AI coding agents. Run Claude Code, Codex, Gemini CLI simultaneously. Deterministic scheduling, quality gates, cost tracking. 11k+ monthly downloads, 31 adapters.',
   keywords: [
     'multi-agent orchestration',
     'AI coding agents',
@@ -28,6 +28,9 @@ export const metadata: Metadata = {
     'OpenAI Agents SDK orchestrator',
     'parallel AI agents',
     'deterministic scheduling',
+    'A2A protocol',
+    'MCP server',
+    'Alex Chernysh',
   ],
   authors: [{ name: 'Alex Chernysh', url: 'https://alexchernysh.com' }],
   creator: 'Alex Chernysh',
@@ -76,6 +79,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="dns-prefetch" href="https://app.kit.com" />
         <link rel="preconnect" href="https://app.kit.com" crossOrigin="anonymous" />
+        {/* AIO: extended LLM reference alongside the primary llms.txt alternate */}
+        <link
+          rel="alternate"
+          type="text/markdown"
+          href="/llms-full.txt"
+          title="Bernstein — full technical reference for LLMs"
+        />
+        {/* Author identity — signals crawler/LLM graph connections */}
+        <link rel="author" href="https://alexchernysh.com" />
+        <link rel="me" href="https://alexchernysh.com" />
+        <link rel="me" href="https://github.com/chernistry" />
       </head>
       <body>{children}</body>
     </html>

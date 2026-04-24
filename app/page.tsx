@@ -16,7 +16,7 @@ const SOFTWARE_APP_JSON_LD = {
   '@type': 'SoftwareApplication',
   name: 'Bernstein',
   description:
-    'Open-source multi-agent orchestration system for AI coding agents. Coordinates Claude Code, Codex, Gemini CLI, and 15 other agents to work in parallel using deterministic scheduling, git worktree isolation, and quality gates.',
+    'Open-source multi-agent orchestration system for AI coding agents. Coordinates Claude Code, Codex, Gemini CLI, and 28 other agents to work in parallel using deterministic scheduling, git worktree isolation, and quality gates.',
   url: 'https://bernstein.run',
   applicationCategory: 'DeveloperApplication',
   applicationSubCategory: 'Multi-Agent Orchestration',
@@ -33,9 +33,15 @@ const SOFTWARE_APP_JSON_LD = {
   },
   author: {
     '@type': 'Person',
+    '@id': 'https://alexchernysh.com/#person',
     name: 'Alex Chernysh',
     url: 'https://alexchernysh.com',
     email: 'forte@bernstein.run',
+    sameAs: [
+      'https://alexchernysh.com',
+      'https://github.com/chernistry',
+      'https://hireex.ai',
+    ],
   },
   codeRepository: 'https://github.com/chernistry/bernstein',
   downloadUrl: 'https://pypi.org/project/bernstein/',
@@ -172,7 +178,20 @@ const ORG_JSON_LD = {
   sameAs: [
     'https://github.com/chernistry/bernstein',
     'https://pypi.org/project/bernstein/',
+    'https://bernstein.readthedocs.io/',
+    'https://alexchernysh.com',
   ],
+  founder: {
+    '@type': 'Person',
+    '@id': 'https://alexchernysh.com/#person',
+    name: 'Alex Chernysh',
+    url: 'https://alexchernysh.com',
+    sameAs: [
+      'https://alexchernysh.com',
+      'https://github.com/chernistry',
+      'https://hireex.ai',
+    ],
+  },
 };
 
 const WEBSITE_JSON_LD = {

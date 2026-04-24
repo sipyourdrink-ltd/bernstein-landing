@@ -38,7 +38,13 @@ Bernstein exposes an MCP server with tools: bernstein_run, bernstein_status, ber
 
 - License: Apache 2.0
 - Language: Python 3.12+
-- Adapters: 18 (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Cloudflare Agents, and 11 more)
+- Adapters: 31 (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Cloudflare Agents, GitHub Copilot, Droid, Crush, Auggie, Cline, and 19 more)
 - Cloud: Cloudflare Workers with Durable Workflows, V8 sandboxes, R2, D1, Vectorize
 - State: File-based (.sdd/), not in-memory
 - Orchestrator: Deterministic Python, zero LLM tokens on scheduling
+
+## Author
+
+- Alex Chernysh — https://alexchernysh.com
+- GitHub — https://github.com/chernistry
+- Related project: HireEx — https://hireex.ai  ·  https://github.com/chernistry/hireex

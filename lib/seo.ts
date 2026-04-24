@@ -44,7 +44,7 @@ export async function buildLlmsTxt(): Promise<string> {
 
   return `# Bernstein
 
-> Open-source multi-agent orchestration system for AI coding agents. Decomposes goals into parallel tasks, routes to optimal models, verifies via quality gates, merges results. 18 adapters, pluggable cloud sandboxes, cloud artifact sinks, progressive skill packs, Cloudflare cloud execution, deterministic Python scheduling. Apache 2.0.
+> Open-source multi-agent orchestration system for AI coding agents. Decomposes goals into parallel tasks, routes to optimal models, verifies via quality gates, merges results. 31 agent adapters, pluggable cloud sandboxes, cloud artifact sinks, progressive skill packs, Cloudflare cloud execution, deterministic Python scheduling. Apache 2.0. Built by Alex Chernysh.
 
 ## Docs
 
@@ -61,11 +61,22 @@ export async function buildLlmsTxt(): Promise<string> {
 - [GitHub](https://github.com/chernistry/bernstein): Source code and issues
 - [PyPI](https://pypi.org/project/bernstein/): Python package
 - [npm](https://www.npmjs.com/package/bernstein-orchestrator): Node.js wrapper
-- [Full Technical Reference](${SITE_URL}/llms-full.txt): Comprehensive 500+ line reference for LLMs
+- [Full Technical Reference](${SITE_URL}/llms-full.txt): Comprehensive 600+ line reference for LLMs
 - [OpenAPI Spec](${SITE_URL}/openapi.yaml): REST API specification
+- [Agent Card (A2A)](${SITE_URL}/.well-known/agent-card.json): A2A protocol manifest
+- [MCP Server Card](${SITE_URL}/.well-known/mcp/server-card.json): MCP server discovery card
 - [RSS Feed](${SITE_URL}/rss.xml): Blog updates
 
-${posts.length > 0 ? `## Blog\n\n${postList}` : ''}
+${posts.length > 0 ? `## Blog\n\n${postList}\n` : ''}
+## Author
+
+- [Alex Chernysh](https://alexchernysh.com): Author of Bernstein, homepage and portfolio
+- [Alex on GitHub](https://github.com/chernistry): Source of Bernstein and other open-source projects
+
+## Related Projects
+
+- [HireEx](https://hireex.ai): AI-powered hiring platform by the same author
+- [HireEx on GitHub](https://github.com/chernistry/hireex): Open-source components for HireEx
 
 ## Optional
 

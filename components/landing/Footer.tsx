@@ -75,9 +75,45 @@ export function Footer() {
             <a href="/.well-known/security.txt">Security</a>
             <a href="/humans.txt">Humans</a>
           </div>
+          <div className="footer-col">
+            <h4>By the author</h4>
+            <a
+              href="https://alexchernysh.com"
+              target="_blank"
+              rel="noopener me author"
+            >
+              alexchernysh.com
+            </a>
+            <a
+              href="https://github.com/chernistry"
+              target="_blank"
+              rel="noopener me author"
+            >
+              GitHub @chernistry
+            </a>
+            <a
+              href="https://hireex.ai"
+              target="_blank"
+              rel="noopener"
+              title="HireEx — AI hiring platform by Alex Chernysh"
+            >
+              HireEx
+            </a>
+          </div>
         </div>
         <div className="footer-bottom">
-          <p>Made by <a href="https://alexchernysh.com">Alex Chernysh</a> · <a href="mailto:forte@bernstein.run">forte@bernstein.run</a></p>
+          <p>
+            Made with care by{' '}
+            <a href="https://alexchernysh.com" rel="author">
+              Alex Chernysh
+            </a>
+            {' · '}
+            <a href="https://github.com/chernistry" rel="me">
+              github.com/chernistry
+            </a>
+            {' · '}
+            <a href="mailto:forte@bernstein.run">forte@bernstein.run</a>
+          </p>
         </div>
       </div>
     </footer>

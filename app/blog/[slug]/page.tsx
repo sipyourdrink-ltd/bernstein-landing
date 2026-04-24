@@ -101,6 +101,44 @@ export default async function BlogPost({ params }: Props) {
           <ShareButtons url={postUrl} title={post.fm.title} variant="compact" />
           <div className="prose">{post.mdx}</div>
           <ShareButtons url={postUrl} title={post.fm.title} variant="large" />
+          <aside
+            className="blog-author"
+            style={{
+              marginTop: '2.5rem',
+              padding: '1.25rem 1.5rem',
+              borderTop: '1px solid var(--border, rgba(255,255,255,0.08))',
+              fontSize: '0.95rem',
+              color: 'var(--text-muted, #9aa0a6)',
+              lineHeight: 1.6,
+            }}
+          >
+            <strong style={{ color: 'var(--text, #e6e6e6)' }}>About the author.</strong>{' '}
+            Written by{' '}
+            <a href="https://alexchernysh.com" rel="author noopener" target="_blank">
+              {AUTHOR}
+            </a>
+            , creator of{' '}
+            <a
+              href="https://github.com/chernistry/bernstein"
+              rel="noopener"
+              target="_blank"
+            >
+              Bernstein
+            </a>{' '}
+            and{' '}
+            <a href="https://hireex.ai" rel="noopener" target="_blank">
+              HireEx
+            </a>
+            . Find more on{' '}
+            <a
+              href="https://github.com/chernistry"
+              rel="me noopener"
+              target="_blank"
+            >
+              GitHub
+            </a>
+            .
+          </aside>
           {(prev || next) && (
             <nav className="blog-nextprev" aria-label="More posts">
               <div className="blog-nextprev-eyebrow-row">Read next</div>
