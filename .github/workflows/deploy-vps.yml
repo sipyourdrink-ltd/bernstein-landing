@@ -27,6 +27,23 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -p "${VPS_DEPLOY_PORT:-22}" -H "$VPS_DEPLOY_HOST" >> ~/.ssh/known_hosts
 
+      - name: Sync .env to VPS
+        shell: bash
+        env:
+          VPS_DEPLOY_HOST: ${{ secrets.VPS_DEPLOY_HOST }}
+          VPS_DEPLOY_PORT: ${{ secrets.VPS_DEPLOY_PORT }}
+          VPS_DEPLOY_USER: ${{ secrets.VPS_DEPLOY_USER }}
+          RESEND_API_KEY_BERNSTEIN: ${{ secrets.RESEND_API_KEY_BERNSTEIN }}
+        run: |
+          set -euo pipefail
+          # Pipe the .env content through SSH stdin so the secret never
+          # appears in the remote command-line / process list.
+          ssh -i ~/.ssh/id_ed25519 -p "${VPS_DEPLOY_PORT:-22}" \
+            "${VPS_DEPLOY_USER}@${VPS_DEPLOY_HOST}" \
+            "umask 077 && mkdir -p /srv/bernstein-landing/app && cat > /srv/bernstein-landing/app/.env" <<EOF
+RESEND_API_KEY_BERNSTEIN=${RESEND_API_KEY_BERNSTEIN}
+EOF
+
       - name: Deploy to VPS
         shell: bash
         env:
