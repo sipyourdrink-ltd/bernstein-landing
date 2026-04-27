@@ -74,6 +74,11 @@ const FAQ_ITEMS: FAQItem[] = [
     answer:
       "Instead of loading every role prompt at startup, Bernstein ships skills as progressive-disclosure packs. Agents start with a short system prompt and pull extra context on demand through the load_skill MCP tool — only the skills a task actually needs are paid for in tokens. Skills are versioned bundles under templates/skills/ and can be added without shipping a release.",
   },
+  {
+    question: "What's new in v1.9.0?",
+    answer:
+      "v1.9.0 ships four additions: `bernstein acp serve` — a native Agent Client Protocol bridge so Zed and other ACP editors can dispatch tasks and read gate results without leaving the editor. `bernstein autofix` — a daemon that watches Bernstein-opened PRs, reads CI failure logs, spawns an agent against the failing worktree, and pushes a fix commit automatically. `bernstein connect <provider>` — OS keychain-backed credential vault for GitHub, Linear, Jira, Slack, and Telegram; enter credentials once, every subsequent run reads from the keychain. `bernstein preview start` — spins up the project's dev server inside the active worktree and exposes it over a public HTTPS tunnel for review or webhook testing.",
+  },
 ];
 
 type GroupKey = "getting-started" | "capabilities" | "cloud-storage" | "licensing";

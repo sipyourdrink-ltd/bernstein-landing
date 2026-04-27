@@ -53,6 +53,22 @@ const pillars: Pillar[] = [
           <>Role prompts load on demand via the <code>load_skill</code> MCP tool. Agents start with a minimal system prompt, pull only the skills a task needs, and save tokens on every call.</>
         ),
       },
+      {
+        title: 'ACP bridge',
+        eyebrow: 'new in v1.9',
+        snippet: 'bernstein acp serve',
+        body: (
+          <>Native Agent Client Protocol bridge. Zed and any other ACP-compliant editor can dispatch tasks, stream agent output, and read quality-gate results without leaving the editor.</>
+        ),
+      },
+      {
+        title: 'Credential vault',
+        eyebrow: 'new in v1.9',
+        snippet: 'bernstein connect github',
+        body: (
+          <>OS keychain-backed credential store. <code>bernstein connect &lt;provider&gt;</code> handles OAuth or PAT entry once; every subsequent agent run reads from the keychain. Supports GitHub, Linear, Jira, Slack, and Telegram.</>
+        ),
+      },
     ],
   },
   {
@@ -88,6 +104,14 @@ const pillars: Pillar[] = [
           <>Expose Bernstein as an MCP server over HTTP. Connect from any MCP client, run orchestration remotely.</>
         ),
       },
+      {
+        title: 'CI autofix',
+        eyebrow: 'new in v1.9',
+        snippet: 'bernstein autofix',
+        body: (
+          <>Daemon that watches Bernstein-opened PRs. When CI fails, it reads the log, spawns an agent against the failing worktree, and pushes a fix commit. No manual intervention for the common lint-and-type-error class of failures.</>
+        ),
+      },
     ],
   },
   {
@@ -120,6 +144,14 @@ const pillars: Pillar[] = [
         snippet: 'protocol: a2a',
         body: (
           <>Speak the Agent-to-Agent protocol natively. Publish an agent card, receive tasks, stream results &mdash; interoperate with any A2A-compliant system.</>
+        ),
+      },
+      {
+        title: 'Preview server',
+        eyebrow: 'new in v1.9',
+        snippet: 'bernstein preview start',
+        body: (
+          <>Sandboxed dev-server with a public tunnel link. Spin up the project&apos;s dev server inside the active worktree and get a shareable HTTPS URL — useful for review or webhook testing without a staging environment.</>
         ),
       },
     ],

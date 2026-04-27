@@ -1,0 +1,66 @@
+---
+title: "Bernstein v1.9.0"
+description: "v1.9.0 ships four additions: an ACP bridge for editor-native task dispatch, a CI autofix daemon, an OS keychain credential vault, and a sandboxed preview server."
+date: "2026-04-26"
+tags: ["multi-agent orchestration", "release", "ACP", "CI", "credentials", "preview"]
+---
+
+<Lead>
+Four things in v1.9.0: an ACP bridge that lets Zed and other editors dispatch Bernstein tasks natively, a daemon that auto-repairs CI failures on open PRs, a keychain-backed credential store, and a sandboxed preview server with a public HTTPS URL.
+</Lead>
+
+## `bernstein acp serve`
+
+Bernstein now speaks the Agent Client Protocol natively. Start the bridge and any ACP-compliant editor — Zed today, others as they ship support — can dispatch tasks, stream agent output line-by-line, and read quality-gate results without leaving the editor. The bridge maps ACP tool calls to the existing task-server API, so everything that works over HTTP or MCP works over ACP too.
+
+```bash
+bernstein acp serve
+# ACP server listening on stdio
+```
+
+## `bernstein autofix`
+
+A daemon that watches Bernstein-opened pull requests. When CI fails, it pulls the failure log, identifies which agent worktree the PR came from, spawns a fresh agent against that worktree with the log as context, and pushes a fix commit if the agent resolves the failure. It handles the common case — lint errors, type errors, a broken import after a rename — without you touching a terminal.
+
+```bash
+bernstein autofix --watch
+# polling CI status for open PRs…
+```
+
+The daemon uses the same quality-gate runner as the main orchestrator, so it won't push a "fix" that introduces a different failure.
+
+## `bernstein connect <provider>`
+
+Credential management that doesn't require you to paste tokens into every config file. `bernstein connect` handles OAuth or PAT entry once per provider and stores the result in the OS keychain (macOS Keychain, GNOME Keyring, Windows Credential Manager). Every subsequent agent run reads from the keychain; nothing lands in `.env` or `bernstein.yaml`.
+
+```bash
+bernstein connect github   # OAuth flow → stored in keychain
+bernstein connect linear   # API key entry → stored in keychain
+bernstein connect jira
+bernstein connect slack
+bernstein connect telegram
+```
+
+`bernstein connect --list` shows what's stored. `bernstein connect --revoke github` removes one entry.
+
+## `bernstein preview start`
+
+Spin up the project's dev server inside the currently active worktree and get a shareable HTTPS URL immediately. Useful for review sessions, webhook testing, or showing a change to someone who doesn't have the repo checked out.
+
+```bash
+bernstein preview start
+# dev server started on :3000
+# -> https://random-name.trycloudflare.com
+```
+
+Bernstein infers the start command from `package.json` (`dev`, `start`), a `Makefile` (`make dev`), or falls back to a `bernstein.yaml` `preview.command` override. The tunnel uses the same provider cascade as `bernstein tunnel` — `cloudflared`, `bore`, `ngrok`, `tailscale`, first one found on PATH. `bernstein preview stop` tears down both the server and the tunnel cleanly.
+
+---
+
+Install or upgrade:
+
+```bash
+pipx install 'bernstein>=1.9.0'
+# or
+pip install --upgrade bernstein
+```
