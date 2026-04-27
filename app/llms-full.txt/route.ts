@@ -273,6 +273,10 @@ Show cost breakdown per agent, per model, per task.
 - \`bernstein reject-tool\` — reject a pending tool-call from the same three surfaces.
 - \`bernstein tunnel start <port>\` — wrap cloudflared / ngrok / bore / tailscale to expose a local service.
 - \`bernstein daemon install\` — install the orchestrator as a systemd (Linux) or launchd (macOS) unit for auto-start.
+- \`bernstein acp serve\` — native Agent Client Protocol bridge; Zed and other ACP editors can dispatch tasks and stream agent output without leaving the editor. (v1.9.0)
+- \`bernstein autofix\` — daemon that watches Bernstein-opened PRs, reads CI failure logs, spawns an agent against the failing worktree, and pushes a fix commit. (v1.9.0)
+- \`bernstein connect <provider>\` — OS keychain-backed credential vault; enter GitHub, Linear, Jira, Slack, or Telegram credentials once, every subsequent run reads from the keychain. (v1.9.0)
+- \`bernstein preview start\` — spin up the project's dev server inside the active worktree and expose it over a public HTTPS tunnel for review or webhook testing. (v1.9.0)
 
 ---
 

@@ -55,6 +55,10 @@ const SOFTWARE_APP_JSON_LD = {
     'Cost-aware routing',
     'MCP server mode',
     'A2A protocol support',
+    'ACP bridge (bernstein acp serve)',
+    'CI autofix daemon (bernstein autofix)',
+    'OS keychain credential vault (bernstein connect)',
+    'Sandboxed preview server (bernstein preview start)',
   ],
 };
 
@@ -172,6 +176,14 @@ const FAQ_JSON_LD = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Yes. `bernstein chat serve --platform=telegram` (also Discord/Slack) runs a bot that takes /run, /status, /approve, /reject, /switch, and /stop from your chat thread. `bernstein remote run <host> <path>` dispatches a run over SSH with ControlMaster socket reuse. `bernstein tunnel start <port>` wraps cloudflared / ngrok / bore / tailscale for exposing a local service. `bernstein daemon install` installs the orchestrator as a systemd or launchd unit for auto-start.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: "What's new in v1.9.0?",
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'v1.9.0 adds: `bernstein acp serve` — native Agent Client Protocol bridge for Zed and other ACP editors. `bernstein autofix` — daemon that auto-repairs failing CI on Bernstein-opened PRs. `bernstein connect <provider>` — OS keychain credential vault (GitHub, Linear, Jira, Slack, Telegram). `bernstein preview start` — sandboxed dev-server with a public HTTPS tunnel link.',
       },
     },
   ],
