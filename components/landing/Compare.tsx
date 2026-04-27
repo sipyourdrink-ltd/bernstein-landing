@@ -22,7 +22,7 @@ interface CompareTable {
   rows: CompareRow[];
 }
 
-const LAST_VERIFIED = 'verified 23 Apr 2026';
+const LAST_VERIFIED = 'verified 26 Apr 2026';
 
 // Single merged comparison. One table, one story: which tools are in the
 // market, and where each sits on the dimensions that matter when you pick
