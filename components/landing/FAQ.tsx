@@ -22,7 +22,12 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     question: "What AI coding agents does Bernstein support?",
     answer:
-      "Bernstein ships 31 adapters: Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Cody, Continue, OpenCode, Ollama, Cloudflare Agents, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral Vibe, Autohand, Forge, Hermes, and a Generic adapter that wraps any CLI tool.",
+      "Bernstein ships 31 adapters: Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Cody, Continue, OpenCode, Ollama, Cloudflare Agents, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral Vibe, Autohand, Forge, Hermes, and a Generic adapter that wraps any CLI tool. Plus two leaf-node delegation adapters — Composio (@aoagents/ao) and Ralphex (umputun/ralphex) — that wrap competing CLI orchestrators as if each were a single agent.",
+  },
+  {
+    question: "Can Bernstein orchestrate other orchestrators?",
+    answer:
+      "Yes — leaf-node delegation. Bernstein ships dedicated adapters for Composio's Agent Orchestrator (@aoagents/ao) and umputun/ralphex. Bernstein hands the wrapped tool a prompt or plan and observes only its final exit code, so sub-agent costs and quality gates inside the wrapped orchestrator stay invisible. Useful when you have an existing workflow built on those tools and want to drop it into one step of a larger Bernstein plan, rather than rewriting it natively.",
   },
   {
     question: "How does Bernstein differ from CrewAI or AutoGen?",
@@ -195,6 +200,15 @@ uv pip install bernstein`}</code>
               {name}
             </li>
           ))}
+        </ul>
+        <p style={{ marginTop: "0.75rem" }}>
+          Plus two leaf-node delegation adapters that wrap competing CLI
+          orchestrators as if each were a single agent — Bernstein delegates
+          to them instead of replacing them:
+        </p>
+        <ul className="faq-pill-row" role="list">
+          <li className="faq-pill">Composio</li>
+          <li className="faq-pill">Ralphex</li>
         </ul>
       </>
     );

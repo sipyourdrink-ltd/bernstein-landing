@@ -236,6 +236,15 @@ The system is organized into 22 sub-packages under \`src/bernstein/core/\`:
 
 The generic adapter allows wrapping any CLI tool that accepts prompts and produces output.
 
+### Orchestrator delegation adapters (leaf-node)
+
+A separate, smaller class of adapters that wrap **other CLI orchestrators** as if each were a single agent. Bernstein hands the wrapped tool a prompt or plan and only sees its final exit code — sub-agent costs and quality gates *inside* the wrapped orchestrator are not visible. Useful for migrating an existing workflow into one step of a larger Bernstein plan, rather than rewriting it natively.
+
+| Orchestrator | What it is | Models |
+| --- | --- | --- |
+| Composio | Composio Agent Orchestrator (\`@aoagents/ao\`) | Inherits from underlying agent plugin |
+| Ralphex | umputun/ralphex Go binary that walks a markdown plan over Claude Code | Anthropic |
+
 ---
 
 ## CLI Commands

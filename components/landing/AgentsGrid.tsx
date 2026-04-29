@@ -6,7 +6,7 @@ import { ScrollReveal } from '@/components/ScrollReveal';
 interface Agent {
   name: string;
   models: string;
-  category: 'CLI' | 'SDK' | 'Editor' | 'Cloud' | 'Local' | 'Infra' | 'Adapter';
+  category: 'CLI' | 'SDK' | 'Editor' | 'Cloud' | 'Local' | 'Infra' | 'Adapter' | 'Orchestrator';
   monogram: string;
   hue: number | null; // null = muted, no hue
 }
@@ -43,6 +43,8 @@ const agents: Agent[] = [
   { name: 'Forge', models: 'forgecode · any model', category: 'CLI', monogram: 'Fg', hue: 55 },
   { name: 'Hermes', models: 'Nous Research · Anthropic / OpenAI', category: 'CLI', monogram: 'He', hue: 295 },
   { name: 'Generic', models: 'Any OpenAI-compatible', category: 'Adapter', monogram: '·', hue: null },
+  { name: 'Composio', models: '@aoagents/ao · wrapped as a single agent', category: 'Orchestrator', monogram: 'Co', hue: 305 },
+  { name: 'Ralphex', models: 'umputun/ralphex · wrapped as a single agent', category: 'Orchestrator', monogram: 'Rx', hue: 5 },
 ];
 
 const CATEGORY_ORDER: Agent['category'][] = [
@@ -53,6 +55,7 @@ const CATEGORY_ORDER: Agent['category'][] = [
   'Local',
   'Infra',
   'Adapter',
+  'Orchestrator',
 ];
 
 function monogramStyle(hue: number | null): React.CSSProperties {
@@ -98,7 +101,10 @@ export function AgentsGrid() {
           <h2 id="agents-heading">
             Works with every major coding agent <span className="agent-count">31</span>
           </h2>
-          <p>Mix local models for boilerplate with cloud models for architecture. In the same run.</p>
+          <p>
+            Mix local models for boilerplate with cloud models for architecture. In the same run. Plus 2 leaf-node delegation adapters that wrap competing CLI orchestrators —{' '}
+            <a href="/blog/orchestrate-the-orchestrators">we orchestrate them too</a>.
+          </p>
         </div>
       </ScrollReveal>
       <ScrollReveal delay={100}>

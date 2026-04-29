@@ -87,7 +87,15 @@ const FAQ_JSON_LD = {
       name: 'What AI coding agents does Bernstein support?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Bernstein ships 31 adapters: Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Cody, Continue, OpenCode, Ollama, Cloudflare Agents, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral Vibe, Autohand, Forge, Hermes, and a Generic adapter that wraps any CLI tool.',
+        text: 'Bernstein ships 31 adapters: Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Cody, Continue, OpenCode, Ollama, Cloudflare Agents, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral Vibe, Autohand, Forge, Hermes, and a Generic adapter that wraps any CLI tool. Plus two leaf-node delegation adapters — Composio (@aoagents/ao) and Ralphex (umputun/ralphex) — that wrap competing CLI orchestrators as if each were a single agent.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can Bernstein orchestrate other orchestrators?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: "Yes — leaf-node delegation. Bernstein ships dedicated adapters for Composio's Agent Orchestrator (@aoagents/ao) and umputun/ralphex. Bernstein hands the wrapped tool a prompt or plan and observes only its final exit code, so sub-agent costs and quality gates inside the wrapped orchestrator stay invisible. Useful when you have an existing workflow built on those tools and want to drop it into one step of a larger Bernstein plan, rather than rewriting it natively.",
       },
     },
     {

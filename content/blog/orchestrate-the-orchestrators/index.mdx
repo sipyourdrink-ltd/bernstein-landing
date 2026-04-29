@@ -1,0 +1,88 @@
+---
+title: "We orchestrate the orchestrators now"
+description: "Bernstein ships dedicated adapters for Composio's @aoagents/ao and umputun/ralphex — wrapped as single agents. Leaf-node delegation, not deep meta-orchestration. The framing, the implementation, the cases where it's actually useful."
+date: "2026-04-29"
+tags: ["multi-agent orchestration", "adapters", "composio", "ralphex", "developer experience", "migration"]
+---
+
+<Lead>
+Bernstein's README has a comparison table where it sits next to a few other CLI orchestrators — Composio's `@aoagents/ao`, umputun/ralphex, emdash. We just shipped adapters for the first two so Bernstein can drive each of them as a single agent inside a larger plan. It is exactly as on-the-nose as it sounds.
+</Lead>
+
+## The shape of it
+
+Bernstein's adapter contract is small: implement `spawn(prompt, …) -> SpawnResult` and `name() -> str`. The base class handles process tracking, env isolation, timeout watchdogs, the worker-PID dance. Most of our 31 cooperating-agent adapters are 80–150 lines of glue between Bernstein's prompt format and a single CLI invocation.
+
+Two new adapters land in the same shape, but the thing they wrap is itself an orchestrator:
+
+```python
+# src/bernstein/adapters/composio.py
+class ComposioAdapter(CLIAdapter):
+    """Spawn and monitor Composio Agent Orchestrator (`ao`) sessions.
+
+    This adapter wraps Composio's `@aoagents/ao` as a single Bernstein
+    agent. The wrapped orchestrator runs its own internal multi-agent
+    workflow inside a tmux session — Bernstein only observes the final
+    exit code and the captured log output.
+    """
+```
+
+`composio` invokes `ao spawn --prompt "<text>"` — Composio's documented non-interactive entry point. `ralphex` is a little weirder: its CLI takes a markdown plan file rather than a prompt string, so the adapter materialises the Bernstein prompt into `.sdd/runtime/<session>-plan.md` with the minimal `### Task 1` checkbox block ralphex requires, then runs `ralphex --no-color <plan-file>`. Both end the same way Bernstein expects: a process that exits, a log file, an exit code.
+
+## What we don't pretend to do
+
+The honest framing matters more than the code. **This is leaf-node delegation, not deep meta-orchestration.**
+
+Bernstein hands the wrapped tool a prompt or a plan and only sees one return value: did it exit zero. Sub-agent costs accumulated *inside* Composio. Per-step quality gates ralphex applied during its plan walk. Model routing decisions that the wrapped orchestrator made for its own internal stages. None of that crosses the boundary back into Bernstein's accounting layer.
+
+We could have papered over that. We didn't. The adapter docstrings, the new "Orchestrator delegation (leaf-node)" subsection in the README, the dedicated section in the adapter guide — all three say the same thing: cost transparency stops at the wrapper. The headline "31 adapters" claim stays unchanged. The two new adapters live in their own subsection because lumping them in with the cooperating-CLI count would be the kind of drift that makes engineering blog posts age badly.
+
+## When it's actually useful
+
+The marketing-meme reading is real but obvious. The non-meme use case is migration:
+
+You have a workflow built on ralphex. You like ralphex's plan walker. You don't want to rewrite it as a Bernstein plan, but you do want to wrap it in a larger flow — pre-stage that fetches issues from Linear, post-stage that runs Bernstein's quality gates, both around a `ralphex` step. Or: your team already runs `@aoagents/ao` for one part of your pipeline, and you want to drop a Bernstein-managed code review stage after it without retiring the existing tool.
+
+The adapter pattern is the right primitive for that. Each wrapped orchestrator becomes a single step in a Bernstein plan:
+
+```yaml
+stages:
+  - name: implement
+    steps:
+      - { title: "Run the existing ralphex flow", role: backend, cli: ralphex }
+  - name: review
+    steps:
+      - { title: "Independent code review", role: reviewer, cli: claude }
+```
+
+The first step's CLI is ralphex; the second is Claude Code. Bernstein switches adapters between steps the same way it switches between Codex and Gemini. (Per-step `cli:` lands in #964; the shape was already there.)
+
+## What's not in this release
+
+- **emdash.** Electron desktop app, no CLI. We can't wrap a window manager. The README's three-way comparison table keeps emdash as a competitor — we're not pretending to delegate to it.
+- **A dozen more orchestrator adapters.** This isn't an arms race. We wrapped the two we actually compare against in the README. If a third one shows up in the comparison table, we'll think about it.
+- **Sub-agent visibility.** The wrapped orchestrators run inside their own black box. We're not adding instrumentation to read their internal state, because the moment we do that the maintenance cost outpaces the marketing payoff.
+
+## How we shipped it
+
+Two parallel agents, each given the same template (`copilot.py` and `test_adapter_copilot.py`), each told to verify the actual CLI surface from the upstream README before writing the spawn command. They came back with adapters in ~120 LOC apiece, three tests each, lint-clean. The integration work — registry registration, README subsection, ADAPTER_GUIDE entry — landed serially after both adapters returned, so there were no merge conflicts on shared files.
+
+Total turnaround: roughly the time it takes to draft the README copy. The adapter pattern earned its keep.
+
+---
+
+Install:
+
+```bash
+pipx install 'bernstein>=1.10.0'
+npm install -g @aoagents/ao            # for the composio adapter
+go install github.com/umputun/ralphex/cmd/ralphex@latest   # for the ralphex adapter
+```
+
+Use:
+
+```bash
+bernstein run plans/migrate-via-ralphex.yaml --cli ralphex
+```
+
+Or the new per-step `cli:` field if your plan mixes orchestrators. The previous post on the [autofix daemon](/blog/autofix-daemon) covers another piece of the same release; this post covers the meme-flavoured one.

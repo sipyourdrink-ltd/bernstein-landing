@@ -33,6 +33,7 @@ Product-name: Bernstein
 Product-type: Multi-agent orchestrator for CLI coding agents
 Install-command: pipx install bernstein
 Supported-agents: Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, Cloudflare Agents, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral Vibe, Autohand, Forge, Hermes, Generic
+Delegated-orchestrators: Composio (@aoagents/ao), Ralphex (umputun/ralphex)
 Total-adapters: 31
 Cloud-execution: Cloudflare Workers, Durable Workflows, V8 sandboxes
 MCP-transport: HTTP remote transport for cloud-based MCP servers
