@@ -95,7 +95,7 @@ export function Footer() {
               href="https://hireex.ai"
               target="_blank"
               rel="noopener"
-              title="HireEx — AI hiring platform by Alex Chernysh"
+              title="HireEx — personal multi-agent AI workspace by Alex Chernysh"
             >
               HireEx
             </a>

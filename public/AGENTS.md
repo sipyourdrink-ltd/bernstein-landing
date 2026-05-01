@@ -47,4 +47,4 @@ Bernstein exposes an MCP server with tools: bernstein_run, bernstein_status, ber
 
 - Alex Chernysh — https://alexchernysh.com
 - GitHub — https://github.com/chernistry
-- Related project: HireEx — https://hireex.ai  ·  https://github.com/chernistry/hireex
+- Related project: HireEx — personal multi-agent AI workspace — https://hireex.ai

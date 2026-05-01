@@ -669,7 +669,7 @@ Bernstein is created and maintained by **Alex Chernysh**.
 
 ### Other projects by the same author
 
-- **HireEx** — AI-powered hiring platform. https://hireex.ai  ·  https://github.com/chernistry/hireex`;
+- **HireEx** — Personal multi-agent AI workspace; career intelligence is the first vertical artefact. https://hireex.ai`;
 
 export async function GET() {
   const posts = await getAllPosts();

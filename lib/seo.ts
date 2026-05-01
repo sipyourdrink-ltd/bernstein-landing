@@ -75,8 +75,7 @@ ${posts.length > 0 ? `## Blog\n\n${postList}\n` : ''}
 
 ## Related Projects
 
-- [HireEx](https://hireex.ai): AI-powered hiring platform by the same author
-- [HireEx on GitHub](https://github.com/chernistry/hireex): Open-source components for HireEx
+- [HireEx](https://hireex.ai): Personal multi-agent AI workspace by the same author — career intelligence is the first vertical artefact
 
 ## Optional
 

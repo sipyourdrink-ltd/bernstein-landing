@@ -42,7 +42,7 @@ Key-features: Pluggable sandbox backends (worktree, Docker, E2B, Modal, Blaxel, 
 Author: Alex Chernysh
 Author-homepage: https://alexchernysh.com
 Author-github: https://github.com/chernistry
-Related-project: HireEx (https://hireex.ai, https://github.com/chernistry/hireex)
+Related-project: HireEx — personal multi-agent AI workspace (https://hireex.ai)
 `;
 
 export function GET() {
