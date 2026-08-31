@@ -7,7 +7,7 @@
  *  - all required fields populated
  *  - no undefined leaks (every value either present or omitted)
  *
- * Mirrors the existing __tests__/json-ld-why-bernstein.test.ts
+ * Mirrors the existing tests/json-ld-why-bernstein.test.ts
  * style — node:test + assert/strict, no test framework deps.
  */
 import { test } from 'node:test';

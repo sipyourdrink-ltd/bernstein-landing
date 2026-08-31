@@ -13,7 +13,7 @@
  *     so the half-baked marker doesn't flash.
  *
  * The straddle-tolerance is the load-bearing property; covered by
- * `__tests__/AnswerStream.test.ts`.
+ * `tests/AnswerStream.test.ts`.
  */
 
 export type AnswerSegment =

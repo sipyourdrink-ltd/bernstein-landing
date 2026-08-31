@@ -94,7 +94,7 @@ that throws does it at build time and nowhere else.
 
 The copy has rules, and they are enforced by tests rather than by taste:
 lowercase headings, concrete nouns, no superlatives, and no claim that cannot be
-followed to a source. `__tests__/voice-banned-words.test.ts` fails on the words
+followed to a source. `tests/voice-banned-words.test.ts` fails on the words
 this project does not use. If a change reads like an advert, that test is
 usually already telling you so.
 

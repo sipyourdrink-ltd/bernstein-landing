@@ -36,7 +36,7 @@ step is expected; a failing one is not.
 ## Voice
 
 The copy is deliberately plain: lowercase headings, concrete nouns, no
-superlatives, no claim without a source. `__tests__/voice-banned-words.test.ts`
+superlatives, no claim without a source. `tests/voice-banned-words.test.ts`
 enforces the list of words the project does not use, so if a change reads like
 an advert the suite usually says so before a reviewer does.
 

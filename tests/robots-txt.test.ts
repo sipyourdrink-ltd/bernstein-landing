@@ -1,7 +1,7 @@
 /**
  * /robots.txt rendering tests.
  *
- * There was no test that rendered the file itself - `__tests__/ai-bots.test.ts`
+ * There was no test that rendered the file itself - `tests/ai-bots.test.ts`
  * pins the crawler list the route iterates, and `tests/ai-txt.test.ts` pins
  * the sibling descriptor, but the rendered robots.txt body was unasserted.
  * The content-signal declaration is the first thing in this file whose exact
