@@ -1,0 +1,91 @@
+name: ci
+
+# Install, lint, typecheck, unit tests, production build. The build step
+# is the one that matters most here: this site prerenders ~100 routes at
+# build time, so a page that throws only fails at `next build` - never in
+# `tsc`, and never in a unit test.
+#
+# Two jobs, on two Node majors, because they answer different questions.
+# The test suite is TypeScript executed directly, which needs the type
+# stripping added in Node 22.6. The production image is `node:20-alpine`,
+# so the build has to be proved on 20 - running it only on a newer major
+# would let a syntax or API change pass here and fail in the image.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # Cancel superseded runs only for PRs. A push-to-master run must not be
+  # cancelled by the next merge landing seconds later: a cancelled run
+  # shows grey, not red, so the earlier commit silently loses its check.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: lint · types · tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7
+        with:
+          # `npm test` runs the .ts suites through Node's own type
+          # stripping, which landed in 22.6. See the header note.
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Unit tests
+        run: npm test
+
+  build:
+    name: production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7
+        with:
+          # The major the Dockerfile ships. Keep the two in step.
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Build
+        # The retrieval index and the comparison dataset are supplied by
+        # the host and are absent here; `scripts/prebuild.mjs` announces
+        # each step it skips, so a genuinely missing step is visible in
+        # the log rather than silently absent.
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        # Nothing outbound from CI: `scripts/submit-indexnow.mjs` runs
+        # through `postbuild` and returns early under GITHUB_ACTIONS, so
+        # the search-engine ping stays a deploy step.

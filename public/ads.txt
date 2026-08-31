@@ -1,0 +1,5 @@
+# ads.txt for bernstein.run
+# https://iabtechlab.com/ads-txt/
+# Bernstein does not run programmatic advertising.
+# This file exists to prevent domain spoofing by ad-fraud scanners.
+placeholder.example.com, placeholder, DIRECT, placeholder

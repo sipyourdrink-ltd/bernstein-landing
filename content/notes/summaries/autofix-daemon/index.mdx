@@ -1,0 +1,48 @@
+---
+title: "A daemon that closes its own pull requests"
+description: "How the autofix daemon turns a red CI run on a Bernstein-opened PR into a fix commit, without becoming a footgun."
+date: "2026-04-27"
+url: "https://bernstein.run/blog/autofix-daemon"
+tags: ["summary", "CI", "autofix", "daemon"]
+source_post: "autofix-daemon"
+summary_modes:
+  quick:
+    title: "autofix daemon turns red CI into fix commits, with five safety rails"
+    items:
+      - "The daemon polls every 60s for Bernstein-opened PRs with red CI, classifies the failing log, and hands it to a fresh agent in the PR worktree."
+      - "Five non-optional rails (opt-in label, per-repo cost cap, three-attempt limit, force-push off, HMAC-chained audit log) keep the loop from running away."
+    whyItMatters: "Most autofix bots either skip safety rails or take so many that the loop never lands; this daemon ships both halves."
+  takeaways:
+    title: "Five operator-facing rules the autofix daemon enforces"
+    items:
+      - "PRs must carry the bernstein-autofix label to be visible to the daemon; removing it stops attempts immediately, no separate kill switch."
+      - "A per-repo cost cap (cost_cap_usd, default $5) is checked before every dispatch, so a misbehaving classifier cannot drain an account."
+      - "After three failed attempts against the same commit SHA, the daemon posts a summary comment, labels the PR needs-human, and stops; no retry-forever path exists."
+      - "FailingPRSource and DispatchHook are protocols, so operators can inject custom CI providers or custom dispatchers via the Python API."
+      - "Every dispatch decision is appended to .sdd/audit/ in an HMAC-chained JSONL that detects tampering and enables full reconstruction."
+    whyItMatters: "These are the rails an operator wants before letting a bot push to their main branch."
+  technical:
+    title: "autofix daemon internals: polling, classifier, attempt budget, audit chain"
+    items:
+      - "The daemon polls GitHub every poll_interval_seconds (default 60s) for PRs labelled bernstein-autofix with a failing check; it fetches the failing log via gh run view --log-failed, head-truncated to 64KB."
+      - "A keyword classifier buckets the failure as lint, type, test, dependency, build, or unknown; the bucket plus the truncated log become the agent prompt, so the agent does not re-run a full triage."
+      - "Each dispatch spawns a fresh agent in the PR worktree with a hard MAX_ATTEMPTS_PER_PUSH of 3; on success a fix commit is pushed on top of the branch (force-push is off by default), on failure the PR is labelled needs-human."
+      - "FailingPRSource and DispatchHook are protocols, so a non-GitHub CI provider plugs in by implementing two methods; the audit chain is HMAC-chained JSONL so tamper detection is cryptographic, not just append-only."
+    whyItMatters: "Every behaviour an operator might want to reason about (poll interval, cost cap, attempt limit, log truncation, audit format) is a named constant rather than buried logic."
+---
+
+## summary
+
+the autofix daemon polls every `poll_interval_seconds` (default 60s) for Bernstein-opened PRs with a red CI run. it fetches the failing log via `gh run view --log-failed` (head-truncated to 64KB), runs it through a keyword classifier that buckets the failure as `lint`, `type`, `test`, `dependency`, `build`, or `unknown`, and hands the truncated log to a fresh agent in the PR's worktree. if the agent succeeds, a fix commit is pushed on top of the branch; if it fails three times (`MAX_ATTEMPTS_PER_PUSH = 3`), the PR is labelled `needs-human` and the daemon stops touching it. five non-optional safety rails - a per-PR opt-in label, a per-repo cost cap (default $5), a hard attempt limit, force-push off by default, and an HMAC-chained audit log - keep the loop from becoming a runaway.
+
+## key takeaways
+
+- PRs must carry the `bernstein-autofix` label to be visible to the daemon; removing it stops attempts immediately.
+- per-repo cost cap (`cost_cap_usd`, default $5) is checked before every dispatch; a misbehaving classifier cannot drain an account.
+- after three failed attempts against the same commit SHA, the daemon posts a summary comment and labels the PR `needs-human` - no retry-forever path exists.
+- `FailingPRSource` and `DispatchHook` are protocols; v1.9.0 ships the rails-and-state half, and operators can inject custom hooks via the Python API today.
+- every dispatch decision is appended to `.sdd/audit/` in an HMAC-chained JSONL that detects tampering and enables full reconstruction after the fact.
+
+## when to read this
+
+for operators who want to automate repair of lint, type, and import errors on Bernstein-opened PRs without writing a custom CI bot or risking an unbounded retry loop.

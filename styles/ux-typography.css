@@ -1,0 +1,114 @@
+/* =========================================================================
+   ux-typography.css — display / body / mono rules + italic accent.
+   The italic-accented serif headline is the redesign's signature move.
+   ========================================================================= */
+
+/* Display headlines */
+.display,
+h1.display,
+h2.display,
+h3.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+/* Hero headline. Larger size, slightly tighter tracking. */
+.display-h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.display-h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.display-h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* The italic accent — applied to one "musical" verb per headline. */
+.italic-accent {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent);
+}
+
+/* Mono eyebrow — used for section kickers, metadata, monospaced labels. */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* Editorial body prose — lead paragraph in section intros. */
+.lede {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  line-height: 1.65;
+  color: var(--ink-soft);
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+
+.body-text {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  max-width: 64ch;
+  text-wrap: pretty;
+}
+
+/* Reset legacy heading styles inside the redesigned sections so they don't
+   clash with the editorial display family. The blog routes use their own
+   .blog-post / .prose hierarchy and stay untouched. */
+.section-header h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 3.6vw, 2.5rem);
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  margin-bottom: var(--space-3);
+  color: var(--ink);
+  text-wrap: balance;
+}
+.section-header p {
+  color: var(--ink-soft);
+  font-size: 15px;
+  max-width: 56ch;
+  line-height: 1.65;
+}
+
+/* Inline code — reads as etched on cream paper. */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--code-paper);
+  color: var(--ink);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--rule);
+}

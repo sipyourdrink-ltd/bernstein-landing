@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "comment": "Publication gate. Only entries listed here emit static pages and appear in the sitemap. Format: bare command name (the whole command page goes live) or 'command/*' to also emit every flag page for that command.",
+  "ready": [
+    "run",
+    "run/*",
+    "doctor",
+    "doctor/*",
+    "init",
+    "init/*",
+    "status",
+    "status/*",
+    "stop",
+    "stop/*"
+  ]
+}

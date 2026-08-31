@@ -1,0 +1,126 @@
+---
+title: "Shipping the orchestrator onto someone else's box"
+description: "On-prem deployment notes for Bernstein 1.10: cluster mTLS, signed lineage, air-gapped install, lethal-trifecta capability gate. Not an install guide."
+date: "2026-05-05"
+tags: ["multi-agent orchestration", "cluster", "enterprise", "audit-trail", "release"]
+schemaType: "TechArticle"
+techDependencies:
+  - "Bernstein 1.10+ cluster mode"
+  - "Local cluster CA and per-node certificates for mTLS"
+  - "Signed wheelhouse bundle for air-gapped install"
+  - "Prometheus metrics and lineage records for deployment review"
+---
+
+<Lead>
+This is the on-prem / regulated-deployment notes for 1.10 - mTLS cluster mode, signed lineage records, air-gapped install, a capability gate against the lethal-trifecta exfiltration class. If you're looking for "how to install it on my laptop," that's <a href="/blog/frictionless-install">the curl-pipe install post</a> instead. A laptop tool and an on-prem deployment have almost nothing in common: the first answers to the developer who started it, the second answers to a security architect, a compliance officer, a network team that hates outbound traffic, and a procurement reviewer with a checklist. The batch below is what it took to stop pretending those were the same thing.
+</Lead>
+
+*Editor's note, 2026-08-10: some commands, metric names, and schema fields in the original text drifted from what 1.10 actually shipped. They've been corrected against the shipped surface; the framing is otherwise as written on release day.*
+
+## the questions
+
+Put the orchestrator inside a regulated perimeter and the security review asks a fairly predictable sequence. How do nodes authenticate when the network isn't yours. How do we prove, six months later, which agent wrote which line. How do we install when the box has no outbound internet. What stops a clever prompt from chaining a database read into a public webhook.
+
+We had partial answers to all four. None were the answer you'd hand a security review without flinching. The five PRs that landed today close that gap by replacing "we sort of do that" with concrete, demonstrable behaviour. None of these are revolutionary on their own. The cumulative effect is a 1.10 build we're willing to put on a regulated box and walk through with an auditor.
+
+## cluster mode without ambient trust
+
+Cluster mode used to assume the network was safe. Acceptable for a developer machine talking to itself, unacceptable everywhere else. Worker-central traffic can now run over mTLS, with cert issuance done locally and pinned to the cluster's own CA. It's opt-in - plain-HTTP deployments keep working - and it authenticates the channel; the existing JWT bearer token still authorises each action.
+
+```bash
+bernstein cluster bootstrap-ca --server-san central.example.com
+# writes ca.crt, server.crt/.key, node.crt/.key to ~/.bernstein/cluster/
+# workers get ca.crt + node.crt + node.key, distributed out-of-band
+```
+
+The one-shot helper generates a private CA and issues the server and node certs from it, private keys chmod 0600 (PR #1019). Point `ClusterConfig.tls` at the files and set `verify_mode="required"`: a worker without a valid client cert is rejected at the TLS handshake, before any HTTP byte is read, and the chain has to terminate at the CA you configured. Rotation is a re-issue from the same CA plus a restart; rotating the CA itself means cross-signing old and new. If you already run a CA - step-ca, cert-manager, Vault - use that instead. The helper is for clusters that don't have one yet.
+
+Underneath, we replaced the in-process happy-path tests with a real two-process harness: central and worker as separate `subprocess.Popen` invocations, walked through six chaos scenarios - worker SIGKILL mid-task, central restart with in-flight claims, network partition, token expiry across a claim boundary, two workers racing for the same task, certificate revocation (PR #1020). Bugs the in-process harness silently swallowed - claim re-entry, token clock skew, an off-by-one in the partition healer - surface in seconds. CI runs the matrix on every push.
+
+Operators get a node-status gauge and four counters (`bernstein_cluster_nodes_total`, `bernstein_cluster_heartbeats_total`, `bernstein_cluster_task_steals_total`, `bernstein_cluster_scaling_decisions_total`, `bernstein_cluster_admission_failures_total`), label values bucketed against closed sets so a buggy worker can't blow up series cardinality, plus six audit event types covering node registration and departure, cordon and drain, task steals, and scaling decisions - on the same HMAC chain as everything else. Grafana dashboard JSON in `docs/observability/cluster-grafana.json` (PR #1021). Plain dashboard, accurate fields.
+
+For deployments that can't expose a port to the worker fleet, there's a tested pattern using Cloudflare Tunnel for the central edge plus Tailscale for the worker mesh. Documented end-to-end. A scheduled CI job stands up the topology in ephemeral containers and runs a smoke task through it (PR #1024). The pattern works without modifying firewall rules at the customer site, which is usually the difference between "scheduled for next quarter" and "deploy this week."
+
+What's still missing: MESH and HIERARCHICAL coordinator topologies are stubs. Multi-tenant isolation inside a single cluster - separate quotas, audit chains, model budgets per tenant - is deferred to 1.11. If you need either today, run one cluster per tenant. We're naming the limit out loud because pretending it isn't there is how trust evaporates on the second deployment.
+
+## lineage that survives a regulator
+
+Auditing a code change six months after the fact is a problem of information loss. By the time anyone asks "which agent wrote this," the prompt is gone, the cost ledger has rolled, the producing model version has been replaced. The new lineage subsystem keeps the answer.
+
+Every agent write emits a lineage record linking the output (file path, byte range, sha256) to its inputs (the files the agent read), producer (agent id, run id, tick), model, prompt SHA, cost, token count, wall-clock timestamp. Records chain via HMAC the same way the existing audit log does, so tampering with one record invalidates the chain past it.
+
+```bash
+bernstein lineage src/auth/middleware.py:74
+# Lineage trail for src/auth/middleware.py:74 (1 record)
+# producer:    backend-1   run r-2026-05-05   model claude-sonnet
+# prompt sha:  6f51a9c2e77b...
+# inputs:      src/auth/__init__.py, src/auth/jwt.py
+# tokens:      11,983      cost: $0.0214
+# reg. class:  policy_edit   customer sig: yes
+```
+
+Schema v2 adds two fields: a `regulatory_class` label and a detached customer-key signature. The class is operator-supplied - set per write, or pinned for the run via `tuning.lineage.regulatory_class_default`; the recommended vocabulary (`production_detection_rule`, `policy_edit`, `remediation_playbook`, `automated_response`, `posture_query`, `internal_research`) tracks the categories DORA and NIS2 evidence packages ask for. The signature is Ed25519 under a key the customer controls, verified independently of Bernstein's HMAC chain - an auditor with the public key and the WAL files needs nothing from us. Combination is what makes the evidence package mechanical to assemble: filter by `regulatory_class`, walk the chain, hand the bundle to the auditor.
+
+The janitor verifies the chain on every gate run. A tamper hit forwards to a configurable SIEM webhook with the broken record and the surrounding window. Default surface is loud. We'd rather wake an operator than miss a forged signature.
+
+What's still missing: the customer-key signing path uses ed25519 in software. FIPS-140 hardware keys are on the 1.11 roadmap. If FIPS-140 is a hard procurement requirement, you cannot ship today.
+
+## distribution without outbound internet
+
+The deployment shape this is built for: a box that cannot reach `pypi.org`, `github.com`, or any registry at all, where the install procedure is an engineer carrying encrypted media through a security checkpoint. Not a workflow you improvise on the day.
+
+`bernstein wheelhouse build` produces a self-contained wheelhouse directory: pinned wheels for the orchestrator and every transitive dependency, a `MANIFEST.json` with a sha256 per wheel, a detached signature per wheel plus one over the manifest - cosign or GPG. `bernstein verify` (long form: `bernstein wheelhouse verify`) checks the signatures and every per-file hash before `pip install` ever runs.
+
+```bash
+# on a connected build host
+bernstein wheelhouse build --version 1.10.0
+COSIGN_KEY=/secure/path/cosign.key \
+  bash scripts/sign_airgap_wheelhouse.sh dist/airgap-wheelhouse/1.10.0
+
+# on the offline box
+bernstein verify ./airgap-wheelhouse/1.10.0 --require-signatures
+pip install --no-index --find-links ./airgap-wheelhouse/1.10.0 bernstein
+bernstein doctor airgap
+```
+
+`bernstein run --profile airgap` flips the orchestrator into explicit egress-deny: any code path that opens an outbound socket to a destination outside the allow-list fails closed with an error naming the destination. `doctor airgap` is the pre-flight: eight self-checks - profile active, deny-all policy, socket guard installed, declared adapter endpoints actually blocked, MCP catalog off, memo store on local disk, audit chain intact, no external hostnames in runtime state - with a non-zero exit on any FAIL row and a `--json` form for the evidence package.
+
+This was the piece we expected to be smallest and that ate the most time. Deciding what counts as "egress" inside a complex Python process is a research project. Deciding what to do when a transitive dependency tries to phone home for telemetry is a policy question. We landed on "fail closed, name the caller, document the override" because every other choice creates a quiet failure mode.
+
+## a capability gate against the lethal trifecta
+
+The lethal trifecta - private data, untrusted input, external communication - is the prompt-injection escape hatch every multi-agent system eventually trips over. An agent that reads a customer's database, ingests a webhook body crafted by an attacker, and is allowed to call out to a public URL has, by construction, an exfil path. The mitigation in the literature is to refuse the chain, not the individual capabilities.
+
+Every tool, MCP surface, and adapter is tagged with the capabilities it carries - declarative YAML under `templates/capabilities/`, not heuristics:
+
+```yaml
+# templates/capabilities/surfaces.yaml
+tools:
+  - name: fs.read_secret
+    capabilities: [private_data]
+  - name: web.fetch
+    capabilities: [untrusted_input, external_comm]
+  - name: github.post_comment
+    capabilities: [external_comm]
+```
+
+At spawn, the orchestrator unions the tags of every tool the prospective agent has access to. If the union contains all three of `private_data`, `untrusted_input`, and `external_comm`, the spawn fails with a refusal naming the triggered capabilities and the tools that contributed to each. A tool absent from the registry counts as carrying all three - missing metadata fails closed, not open. There is no per-task bypass flag; enforcement mode (`security.lethal_trifecta_enforcement: enforce | warn | off`) is a config-level decision, and every evaluated chain lands in a per-spawn manifest under `.sdd/runtime/spawn_capabilities/`, with refusals on the HMAC audit chain. `bernstein audit capabilities` prints the live registry.
+
+The gate catches the architectural mistake - assembling a tool belt that shouldn't exist together - before any prompt runs. It cannot prevent a capable insider from manually wiring around it. The default failure mode is now refusal, which is the right default for a tool you don't fully control.
+
+## what this batch isn't
+
+A few things are honestly not done. MESH/HIERARCHICAL cluster topologies are stubs. FIPS-140 hardware keys for the lineage signer are on the 1.11 roadmap, not this release. Multi-tenant isolation inside a single cluster is deferred. The capability matrix covers the trifecta and nothing else; finer-grained gates like "no PII into models without a BAA" are next quarter's work. None of these block the deployment shape described here. All of them will matter eventually.
+
+This isn't a "version 2.0." It's the unglamorous list a procurement reviewer asks about before the technical evaluation has even started. Cluster auth, signed audit, offline install, capability isolation. Table stakes for getting the orchestrator dropped onto a regulated box instead of staying a thing that runs on someone's laptop.
+
+We picked the second option for two years because the first option is mostly paperwork. The batch shipped today is the paperwork.
+
+---
+
+If you got here from the README and want the codebase view, [GitHub](https://github.com/sipyourdrink-ltd/bernstein) is the canonical place. If the regulated-deployment angle is what you came for, [open an issue](https://github.com/sipyourdrink-ltd/bernstein/issues) describing the air-gap or compliance gap you're hitting; the next batch is shaped by what blocks real deployments.
+
+## related
+
+- [frictionless install](/blog/frictionless-install) covers the same install surface from the non-regulated angle.
+- [operator commands](/blog/operator-commands) walks through the day-to-day surfaces (status, dashboard, audit) you would call into once the box is up.

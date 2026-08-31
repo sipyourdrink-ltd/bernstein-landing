@@ -1,0 +1,350 @@
+/* ============================================================================
+   ux-tools.css — /tools/* free tool pages.
+   Reuses .cost-page chrome from ux-cost.css; adds .amd-* (agent-md-bench)
+   and .orch-* (orchestra picker) component scopes. Voice: lowercase,
+   one-fact-per-line, no marketing copy.
+   ============================================================================ */
+
+/* ----- agent-md-bench ----------------------------------------------------- */
+
+.amd-root {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin: 32px 0;
+}
+
+.amd-input-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.amd-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.amd-filename {
+  flex: 0 0 auto;
+  width: 240px;
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-paper);
+  color: var(--ink);
+}
+
+.amd-file {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.amd-drop {
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  background: var(--bg-paper);
+}
+
+.amd-textarea {
+  width: 100%;
+  min-height: 280px;
+  padding: 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--ink);
+  resize: vertical;
+}
+
+.amd-hint {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-muted, #666);
+  margin: 8px 0 0;
+}
+
+.amd-summary,
+.amd-budgets,
+.amd-findings {
+  background: var(--bg-paper);
+  padding: 16px 20px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.amd-summary h2,
+.amd-budgets h2,
+.amd-findings h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  margin: 0 0 12px;
+}
+
+.amd-counts {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink-muted, #666);
+  font-weight: normal;
+}
+
+.amd-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.amd-table th,
+.amd-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.amd-table th {
+  background: rgba(0, 0, 0, 0.03);
+  font-weight: 500;
+}
+
+.amd-empty {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #3a7d3a;
+  margin: 0;
+}
+
+.amd-finding-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.amd-finding {
+  padding: 10px 12px;
+  border-left: 3px solid #888;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.amd-error {
+  border-left-color: #a3271a;
+}
+
+.amd-warn {
+  border-left-color: #a36b00;
+}
+
+.amd-info {
+  border-left-color: #3a6ea3;
+}
+
+.amd-finding-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-muted, #666);
+}
+
+.amd-rule-id {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.amd-finding-msg {
+  margin: 6px 0 0;
+  font-family: var(--font-body, var(--font-mono));
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.amd-finding-docs {
+  margin: 4px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.amd-disclaimer {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-muted, #666);
+  margin-top: 8px;
+}
+
+/* ----- orchestra picker --------------------------------------------------- */
+
+.orch-root {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin: 32px 0;
+}
+
+.orch-progress {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink-muted, #666);
+}
+
+.orch-question {
+  background: var(--bg-paper);
+  padding: 24px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.orch-question h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 24px;
+  margin: 0 0 16px;
+}
+
+.orch-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.orch-option-button {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.orch-option-button:hover,
+.orch-option-button:focus {
+  border-color: var(--ink);
+  background: rgba(0, 0, 0, 0.04);
+  outline: none;
+}
+
+.orch-option-button.is-selected {
+  border-color: var(--ink);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.orch-controls {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.orch-controls button {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.orch-controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.orch-result {
+  background: var(--bg-paper);
+  padding: 24px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.orch-result h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28px;
+  margin: 0 0 12px;
+}
+
+.orch-result-pick {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.orch-runners {
+  margin: 16px 0;
+}
+
+.orch-runners h3 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+
+.orch-runners ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.orch-runners li {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.orch-bernstein-snippet {
+  margin-top: 16px;
+  background: #111;
+  color: #f4ecdc;
+  padding: 12px 14px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  overflow-x: auto;
+}
+
+.orch-table-wrap {
+  overflow-x: auto;
+  margin: 24px 0;
+}
+
+.orch-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.orch-table th,
+.orch-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.orch-table th {
+  background: rgba(0, 0, 0, 0.03);
+  font-weight: 500;
+}
+
+.orch-table .is-bernstein {
+  background: rgba(248, 200, 0, 0.08);
+}

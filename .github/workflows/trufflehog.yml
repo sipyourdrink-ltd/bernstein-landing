@@ -1,0 +1,48 @@
+name: trufflehog (secret scanning)
+
+# Scan commits and pull requests for credentials committed by accident.
+# This repository publishes a site that talks to third-party services;
+# a key pasted into a config example is the realistic failure, and it is
+# cheaper to catch it on the pull request than to rotate it afterwards.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    - cron: "23 6 * * 1"  # Weekly, Monday 06:23 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: trufflehog-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  trufflehog:
+    name: trufflehog scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          # Full history: the action diffs base..head, so a shallow clone
+          # would scan an empty range on most pull requests.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run trufflehog
+        uses: trufflesecurity/trufflehog@bcfcf73aaf4759d4dadc2783177c245a02792318  # v3.97.0
+        with:
+          # The pinned `uses:` SHA is a shell wrapper; it runs the image
+          # named by `version`, which defaults to `latest`. Left unpinned,
+          # a detector added upstream arrives on whichever pull request
+          # happens to be open and reads as that author's fault.
+          version: 3.97.0
+          extra_args: --results=verified

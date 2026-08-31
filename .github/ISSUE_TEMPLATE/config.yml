@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Bernstein itself (the orchestrator)
+    url: https://github.com/sipyourdrink-ltd/bernstein/issues
+    about: Bugs and features in the project this site documents. Issues about the software belong there, not here.
+  - name: Security report
+    url: https://github.com/sipyourdrink-ltd/bernstein-landing/security/advisories/new
+    about: Report a vulnerability privately.

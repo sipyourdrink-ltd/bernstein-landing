@@ -1,0 +1,45 @@
+name: stale
+
+# Close issues that have gone quiet, warmly and with a door left open.
+# An issue nobody can act on is worse than no issue: it makes the
+# backlog look busy and hides the ones that are real.
+
+on:
+  schedule:
+    - cron: "45 1 * * *"  # Daily, 01:45 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  stale:
+    name: mark and close stale
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Run stale
+        uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93  # v11
+        with:
+          days-before-stale: 60
+          days-before-close: 14
+          stale-issue-message: >-
+            No activity here for 60 days. Marking it stale; it closes in
+            14 days unless something new lands. A comment reopens the
+            clock, and reopening a closed one is always fine.
+          stale-pr-message: >-
+            No activity on this pull request for 60 days. Marking it
+            stale; it closes in 14 days. If it is still wanted, say so
+            and it stays.
+          close-issue-message: >-
+            Closing for inactivity. Not a judgment on the idea - comment
+            and it reopens.
+          close-pr-message: >-
+            Closing for inactivity. Push or comment and it reopens.
+          exempt-issue-labels: "pinned,security,roadmap,help wanted,good first issue"
+          exempt-pr-labels: "pinned,security"
+          exempt-all-milestones: true
+          ascending: true

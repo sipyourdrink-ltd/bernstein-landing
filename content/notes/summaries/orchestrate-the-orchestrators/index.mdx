@@ -1,0 +1,80 @@
+---
+title: We orchestrate the orchestrators now
+description: >-
+  Bernstein adapters for Composio's @aoagents/ao and umputun/ralphex. Leaf-node
+  delegation, not deep meta-orchestration.
+date: '2026-04-29'
+url: 'https://bernstein.run/blog/orchestrate-the-orchestrators'
+tags:
+  - summary
+  - multi-agent orchestration
+  - adapters
+source_post: orchestrate-the-orchestrators
+summary_modes:
+  quick:
+    title: bernstein now integrates composio and ralphex as leaf-node agents
+    items:
+      - >-
+        bernstein can delegate tasks to composio and ralphex as single-agent
+        steps in a larger plan.
+      - >-
+        each orchestrator runs in isolation with clear boundaries, preserving
+        cost and execution transparency.
+    whyItMatters: >-
+      this enables practical workflow migration without rewriting existing
+      automation logic.
+  takeaways:
+    title: bernstein adds leaf-node adapters for ao and ralphex
+    items:
+      - >-
+        bernstein now supports composio's ao and ralphex as single-agent steps
+        in its plans via dedicated adapters.
+      - >-
+        each adapter conforms to bernstein's minimal contract: spawn(prompt) and
+        name(), handling process and env isolation.
+      - >-
+        the integration does not expose internal telemetry, costs, or state from
+        the wrapped orchestrators to bernstein.
+      - >-
+        desktop-only tools without a cli cannot be wrapped, and no further
+        orchestrator adapters are planned at this time.
+    whyItMatters: >-
+      users can gradually migrate workflows without discarding existing tools or
+      losing operational visibility.
+  technical:
+    title: bernstein adds leaf-node adapters for ao and ralphex
+    items:
+      - >-
+        bernstein now supports composio's @aoagents/ao and umputun/ralphex
+        through dedicated adapters that implement the spawn(prompt, ...)
+        interface.
+      - >-
+        each adapter is approximately 120 lines of code and includes three
+        integration tests, following the established copilot.py template.
+      - >-
+        the ralphex adapter generates a markdown plan file at
+        .sdd/runtime/-plan.md to satisfy ralphex's input requirements before
+        execution.
+      - >-
+        orchestrator delegation is implemented as a leaf-node pattern, where
+        bernstein tracks only process exit codes and log outputs, not internal
+        sub-agent states.
+    whyItMatters: >-
+      this enables incremental adoption and workflow migration without
+      sacrificing transparency or control.
+---
+
+## summary
+
+bernstein 1.10.0 adds adapters for Composio's `@aoagents/ao` and umputun/ralphex, both of which are themselves orchestrators. the `ComposioAdapter` runs `ao spawn --prompt "<text>"`; the `RalphexAdapter` materialises a bernstein prompt into a minimal `### Task 1` checkbox plan file and passes it to `ralphex --no-color <plan-file>`. both adapters implement the same `spawn(prompt, …) -> SpawnResult` contract as any other bernstein adapter - about 80-150 lines of glue - and bernstein only sees one return value: exit code. sub-agent costs accumulated inside Composio, per-step gates applied inside ralphex's plan walker, and internal model routing are all opaque to bernstein's accounting. the post names this "leaf-node delegation" and explicitly distinguishes it from deep meta-orchestration. the primary real use case is migration: wrapping an existing ralphex or Composio workflow as a single step in a larger bernstein plan, for example to add a pre-stage pulling tickets from Linear or a post-stage running bernstein's quality gates.
+
+## key takeaways
+
+- both adapters are ~120 lines each with three contract tests apiece; they were built by two parallel bernstein agents from the same template in roughly the time it took to draft the README copy.
+- cost transparency stops at the wrapper boundary - bernstein does not see or account for sub-agent costs inside a wrapped orchestrator.
+- per-step `cli:` field (landing in PR #964) lets a single bernstein plan mix adapters, e.g. ralphex for one stage and Claude Code for the next.
+- a desktop-only tool with no CLI has no surface to wrap, so it gets no adapter.
+
+## when to read this
+
+for teams running existing ralphex or Composio workflows who want to wrap them as steps in a larger bernstein plan without rewriting the underlying tool.

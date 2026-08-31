@@ -1,0 +1,284 @@
+/* =========================================================================
+   ux-layout.css — container, section spacing, staff-line divider, nav.
+   Single 1080px content column. 8px-grid spacing only.
+   ========================================================================= */
+
+/* ---- Container helpers ---- */
+.container {
+  max-width: var(--container-w);
+  margin: 0 auto;
+  padding-left: var(--space-5);
+  padding-right: var(--space-5);
+}
+
+/* ---- Sections ---- */
+section {
+  padding: var(--space-9) var(--space-5);
+  max-width: var(--container-w);
+  margin: 0 auto;
+}
+section[id] {
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+
+.section-header { margin-bottom: var(--space-7); }
+
+/* ---- Staff-line divider ----
+   Five hairline rules stacked at musical-staff spacing. Reads as
+   "subtle separator" from far away, "musical staff" up close. No
+   labels, no animation. Used between every major section. */
+.staff-divider {
+  display: block;
+  width: 100%;
+  max-width: var(--container-w);
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-5);
+}
+.staff-divider svg {
+  display: block;
+  width: 100%;
+  height: 12px;
+}
+.staff-divider line { stroke: var(--rule); stroke-width: 1; }
+
+/* ---- Nav ----
+   Scoped to direct children of <body> so it ONLY pins the page <Nav /> bar.
+   Inner <header> elements (PipelineRail, ControlPlane, blog post/index) are
+   semantic section headers and must stay in normal document flow. */
+body > header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: var(--header-h);
+  background: color-mix(in oklch, var(--bg-paper) 92%, transparent);
+  backdrop-filter: saturate(140%) blur(8px);
+  -webkit-backdrop-filter: saturate(140%) blur(8px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease-out, background 0.2s ease-out;
+  padding: 0 var(--space-5);
+}
+body > header.nav-top { border-bottom-color: transparent; }
+body > header.nav-scrolled {
+  border-bottom-color: var(--rule);
+  background: color-mix(in oklch, var(--bg-paper) 96%, transparent);
+}
+
+.nav-inner {
+  max-width: var(--container-w);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.nav-logo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.nav-logo .run {
+  color: var(--ink-faint);
+  font-style: italic;
+  font-weight: 400;
+}
+.nav-logo:hover { color: var(--ink); }
+.nav-logo:hover .run { color: var(--accent); }
+
+.nav-links {
+  display: flex;
+  gap: var(--space-5);
+  align-items: center;
+}
+.nav-links a {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  position: relative;
+  padding-bottom: 2px;
+  transition: color 0.15s ease-out;
+}
+.nav-links a:hover { color: var(--ink); }
+
+.nav-links a.nav-active { color: var(--ink); }
+.nav-links a.nav-active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0; right: 0;
+  height: 1px;
+  background: var(--accent);
+}
+
+.nav-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--rule-strong);
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  transition: border-color 0.15s ease-out, color 0.15s ease-out, background 0.15s ease-out;
+}
+.nav-github:hover {
+  background: var(--bg-paper-2);
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.nav-github svg { width: 14px; height: 14px; fill: currentColor; }
+.nav-gh-divider {
+  display: inline-block;
+  width: 1px; height: 12px;
+  background: var(--rule-strong);
+  margin: 0 2px;
+}
+.nav-gh-stars {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+/* ---- Mobile quick-links strip ----
+   Always-visible thin row (≤768 px) sitting AS ITS OWN ROW above the logo
+   line so it owns the full viewport width and never collides with the
+   logo. Surfaces Blog / Docs / GitHub at 0 taps from the very top of the
+   page. Replaces the hamburger entirely — there's no drawer; these three
+   are the mobile primary nav. Hidden on desktop. No JS — server-rendered,
+   works with JS off. */
+.nav-mobile-strip { display: none; }
+.nav-mobile-strip a {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s ease-out;
+}
+.nav-mobile-strip a:hover { color: var(--ink); }
+.nav-mobile-strip a.nav-active { color: var(--ink); }
+.nav-mobile-strip a:not(:last-child)::after {
+  content: '·';
+  margin-left: var(--space-3);
+  color: var(--rule-strong);
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease-out, color 0.15s ease-out, border-color 0.15s ease-out;
+}
+.btn-primary {
+  background: var(--ink);
+  color: var(--bg-paper);
+  border-color: var(--ink);
+}
+.btn-primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-paper);
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--rule-strong);
+}
+.btn-secondary:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+/* ---- Back-to-top ---- */
+.back-to-top {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  z-index: 50;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-paper);
+  border: 1px solid var(--rule-strong);
+  color: var(--ink-soft);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-out, color 0.15s ease-out, border-color 0.15s ease-out;
+}
+.back-to-top:hover { color: var(--ink); border-color: var(--ink); }
+.back-to-top-visible { opacity: 1; pointer-events: auto; }
+
+/* ---- ScrollReveal ---- */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+}
+.scroll-reveal.revealed { opacity: 1; transform: translateY(0); }
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  section { padding: var(--space-8) var(--space-4); }
+  .nav-links { display: none; }
+
+  /* Header grows to two rows on mobile: strip on top, logo line below.
+     Re-point --header-h so every `padding-top: calc(var(--header-h)+...)`
+     in hero/blog/sections still clears the fixed bar correctly. */
+  :root { --header-h: 104px; }
+  body > header { height: var(--header-h); padding: 0 var(--space-4); }
+  .nav-inner { height: 60px; }
+
+  .nav-mobile-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    height: 44px;
+    border-bottom: 1px solid var(--rule);
+    /* Full-width row, independent of nav-inner. */
+    width: 100%;
+    margin: 0;
+    padding: 0 var(--space-3);
+  }
+}
+
+/* Tighten further on the smallest viewports (≤360 px) so Blog · Docs ·
+   GitHub stay on one line. */
+@media (max-width: 360px) {
+  .nav-mobile-strip { gap: var(--space-1); }
+  .nav-mobile-strip a { font-size: 12px; padding: 0 var(--space-1); }
+  .nav-mobile-strip a:not(:last-child)::after { margin-left: var(--space-2); }
+}
+
+/* Safe-area insets */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body > header {
+    padding-left: calc(var(--space-5) + env(safe-area-inset-left));
+    padding-right: calc(var(--space-5) + env(safe-area-inset-right));
+  }
+}
+
+/* ---- Skip-to-content visible state for keyboard users ---- */
+.skip-to-content { font-family: var(--font-body); }

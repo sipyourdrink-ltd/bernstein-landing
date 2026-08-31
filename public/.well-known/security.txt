@@ -1,0 +1,12 @@
+# Security Policy for bernstein.run
+# https://securitytxt.org/
+#
+# RFC 9116 section 2.5.5 asks for an Expires value under one year out.
+# Push it forward on every release; do not park it years ahead.
+
+Contact: https://github.com/sipyourdrink-ltd/bernstein/security/advisories/new
+Contact: mailto:forte@bernstein.run
+Expires: 2027-06-30T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://bernstein.run/.well-known/security.txt
+Policy: https://github.com/sipyourdrink-ltd/bernstein/security/policy

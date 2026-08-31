@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "comment": "Publication gate. Only slugs listed in `ready` are emitted as static pages and registered in the sitemap, so a page goes live when its content has been checked rather than when the adapter is detected. Removing a slug deletes the page on the next deploy.",
+  "ready": [
+    "claude",
+    "codex",
+    "gemini",
+    "aider",
+    "cursor"
+  ]
+}

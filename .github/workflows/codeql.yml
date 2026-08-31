@@ -1,0 +1,47 @@
+name: codeql
+
+# Static analysis for JavaScript / TypeScript. Findings land in the
+# repository's Security tab rather than failing the build, so a new
+# query shipping upstream never turns an unrelated pull request red.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: "17 3 * * 2"  # Weekly, Tuesday 03:17 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: analyze javascript-typescript
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938  # v4
+        with:
+          languages: javascript-typescript
+          queries: security-and-quality
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938  # v4
+        with:
+          category: "/language:javascript-typescript"

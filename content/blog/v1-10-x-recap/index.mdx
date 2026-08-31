@@ -1,0 +1,85 @@
+---
+title: "bernstein 1.10.x recap: agents.md sync, a2a, cost guards"
+description: "five point releases in five days: agents.md cross-cli sync, runtime cost guards, a2a v1.0 signed agent cards, four new cli adapters."
+date: "2026-05-10"
+tags: ["multi-agent orchestration", "release", "AGENTS.md", "A2A", "cost guards", "adapters"]
+schemaType: "TechArticle"
+techDependencies:
+  - "Bernstein 1.10.x"
+  - "AGENTS.md canonical instruction file plus CLI-specific sync outputs"
+  - ".sdd/metrics/ cost ledger for budget banners and run caps"
+  - "A2A v1.0 agent cards with Ed25519 signing keys"
+  - "Adapter registry entries for the new CLI surfaces"
+---
+
+<Lead>
+The v1.10.0 post covered the regulated-deployment work. The five point releases since are not headline-shaped. They are the things people kept asking for in issues and the things that were quietly broken once we tried to use the orchestrator on a real polyglot codebase. Worth a single round-up so the trajectory is legible from one page.
+</Lead>
+
+## a single AGENTS.md the rest of the agents can read
+
+If you run more than one CLI agent on the same repo you already know the problem. Cursor wants `.cursor/rules/*.mdc`. Claude Code wants `CLAUDE.md`. Aider wants `CONVENTIONS.md` plus a tiny `.aider.conf.yml` line so it actually loads on every session. Goose wants `.goosehints`. Each of those files holds the same handful of facts about your codebase, said five different ways, which means a real repo carries four drifting copies of the same instructions.
+
+`bernstein agents-md` reads the repo's roles, hooks, skills, capability matrix, and install snippets, emits one [AAIF AGENTS.md](https://agents.md) as the single source of truth, then rewrites that into the four vendor shapes above. Five subcommands. `generate` previews the canonical IR to stdout. `write` produces one target. `sync` produces the canonical plus all four CLI-specific files in one pass. `verify` is a CI gate that fails on drift. `diff` shows what is stale.
+
+The IR is intentionally schema-free, because the AAIF spec doesn't impose one and locking ourselves in would have meant fighting upstream every quarter. The CI gate is the part that compounds. After three months of drift you can re-run `agents-md sync` and watch four files all snap back to the same content without anyone hand-merging. The orchestrator runs `agents-md verify` against its own tree on every PR; the pattern is the same one anyone with more than one agent ends up wanting.
+
+## cost legibility you don't have to grep for
+
+Two patches, both small, both the kind of thing that should have shipped in 1.0.
+
+The first is a per-turn budget banner. `bernstein run` now prints a one-line countdown each turn: dollars and tokens remaining against the task budget. The Anthropic prompt-caching beta header is lit by default, so cache hits actually land. Operators stop pattern-matching for a wallet limit in their head while the agent is mid-thought. CI runs with a cost ceiling get a real per-turn signal instead of finding out post-mortem.
+
+The second is `--max-cost-usd`. A hard cap on a run's cumulative routed-model spend. Crosses the threshold, the run aborts cleanly, with the partial results merged or rolled back the same way a normal cancel works. Pair it with the run summary's "estimated savings vs. single-shot through the most expensive routed model" line that 1.10.1 added and the wallet picture is finally visible without a `jq` on `.sdd/runtime/costs.jsonl`. The bandit router has been doing the right thing for a while; the operator surface has not.
+
+## A2A v1.0 with a verifier you can actually run
+
+If you connect Bernstein to other agents over the A2A protocol, every Bernstein agent now publishes a signed agent card at `/.well-known/agent.json` and the public verification keys at `/.well-known/jwks.json`. JWS detached signature over JCS canonical bytes with Ed25519, audience binding via RFC 8707 resource indicators, persistent keystore with `O_EXCL` plus `0o600` semantics, and a 24-hour rotation grace window so a peer that fetched JWKS five minutes ago can still verify the previous key after a rotation without races.
+
+The compliance side ships a verifier you don't have to trust us to run. `tools/verify_audit_dsse.py` depends only on the Python standard library and `cryptography`. Its own test asserts that `import bernstein` raises `ModuleNotFoundError` from inside the verifier's venv, because that is the property an external auditor wants from a verifier they will hand to their own team. The audit log itself is HMAC-SHA256 chained, JCS-canonicalised per RFC 8785, timestamp-anchored against an external TSA via RFC 3161 chain validation, and exported as a DSSE plus in-toto v1 envelope. Multi-tenant slicing via `bernstein audit slice` exports a deterministic subset for an evaluator without breaking the chain on either side.
+
+Honest framing: the compliance surface ships with tests, runbooks, and the standalone verifier above, but it has not been bashed against an external regulatory audit yet. Treat it as code an evaluator can read and stand up themselves, not as a SOC 2 attestation.
+
+## four new adapters
+
+Adapter count went from 31 to 44 over the five releases. The four worth calling out by name:
+
+- **Devin for Terminal (Cognition).** First-class adapter for the enterprise coding agent. 558 lines of contract tests verify the spawn surface mirrors the long-running adapter pattern. Drop-in via `cli_agent: devin_terminal`.
+- **JetBrains Junie.** BYOK across Anthropic, OpenAI, Google, xAI, OpenRouter, and the Copilot proxy. Bring whichever key the org already has procurement for.
+- **AWS Q Developer.** Wraps `q chat --no-interactive --trust-all-tools` so AWS-resident teams can route the steps where their security model wants the AWS-trusted lane.
+- **DeepSeek V4-Flash and V4-Pro.** Self-hosted via an Ollama-compatible endpoint. Ships an EU-residency guard that pins the endpoint host and rejects DNS rebinding via a loopback test. The Hypothesis bug-hunt suite caught a `10.example.com` rebinding bypass while the adapter was still in development, which is roughly the point of running the Hypothesis suite.
+
+The Cursor adapter also got a real rewrite. The previous code shelled a non-existent `cursor agent` binary with fictional flags. New version targets the real `cursor-agent` CLI surface (`-p`, `--workspace`, `--output-format stream-json`, `--trust`, `--approve-mcps`, `--force`) with 242 lines of new contract tests so it can't regress to vapor again.
+
+## the smaller things
+
+A few that don't need a whole section but matter in a specific situation.
+
+`bernstein run` learned a `pending_approval` state. Tasks pause there until an operator approves or rejects through the API or a panel, with the decision logged to the audit chain. The fresh-context retry mode (`agent_restart_between_retries`, opt-in) restarts the agent cold instead of inheriting the failed run's context bloat, which is the right default once you have watched a 200k-token context retry and somehow get worse.
+
+`bernstein scaffold <prompt>` is a first slice for going from one sentence to a working repo skeleton. `bernstein wiki build` generates a per-repo wiki from the canonical AGENTS.md IR. The A/B runner primitive lets you compare two adapter configurations on the same task set without writing a custom harness. None of these are finished; they ship as the smallest viable slice so the spec, the test, and the runtime artefact all exist while the operational surface stays thin enough not to lock in a bad shape.
+
+There is also an opt-in LLM watcher that reads the deterministic loop's events and annotates them with a natural-language summary. Off by default, runs on Haiku, useful when you are explaining a failed run to a human reviewer who is not going to read the JSONL by hand. The orchestrator stays deterministic. The watcher is a side-channel.
+
+## why these matter
+
+Most of the friction in running a multi-agent setup is not the agents. It is the four config files that disagree, the run that quietly burned through a budget at 3am, the A2A peer that won't verify your card because your keystore lost a race condition, the EU-residency requirement that bites the second a transitive dependency tries to phone home. None of those are interesting to write up as a feature. All of them are the thing that decides whether someone runs the orchestrator twice.
+
+## try it
+
+```bash
+pipx install --upgrade bernstein
+bernstein agents-md sync          # one canonical, four vendor shapes
+bernstein run --max-cost-usd 5    # hard cap; per-turn countdown shows above
+```
+
+Container: `ghcr.io/sipyourdrink-ltd/bernstein:1.10.6`.
+
+## next
+
+The KF-1 through KF-9 slices each shipped as smallest-viable. The next release fills the operational surface for the ones people actually use; the others stay slices until somebody asks. Hypothesis property-test coverage gets extended into the orchestrator runtime path, which is the surface most likely to leak invariants nobody wrote down. If you hit something rough in 1.10.x, [open an issue](https://github.com/sipyourdrink-ltd/bernstein/issues); the next batch is shaped by what blocks real work.
+
+## related
+
+- [v1.9 release notes](/blog/v1-9-release) for what landed one cut earlier.
+- [v2.0 release notes](/blog/v2-0-release) for what came next: the web GUI and the dispatch-pipeline fixes that close out the 1.10.x cycle.

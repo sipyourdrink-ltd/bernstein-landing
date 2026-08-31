@@ -1,0 +1,54 @@
+---
+title: "bernstein 2.x in one page: lineage, ten trackers, A2A, MCP hardening"
+description: "Thirteen point releases since the 1.10 recap, grouped into nine themes a reader can scan in two minutes."
+date: "2026-05-20"
+url: "https://bernstein.run/blog/v2-x-recap"
+tags: ["summary", "release", "lineage", "trackers", "A2A", "MCP", "supply chain"]
+source_post: "v2-x-recap"
+summary_modes:
+  quick:
+    title: "Bernstein 2.x ships lineage, ten trackers, A2A handshakes, and self-healing CI"
+    items:
+      - "Per-artefact Ed25519 transparency log plus a standalone bernstein-verify wheel an auditor can run without installing the orchestrator."
+      - "Ten tracker adapters under one TrackerContract (Jira, GitLab, Linear, Plane, Asana, ServiceNow, ClickUp, GitHub Projects v2, plus webhook ingestion) with tracker comments as the orchestration handoff bus."
+      - "A2A capability cards plus an MCP client that treats every upstream as untrusted; bernstein desktop-register binds the orchestrator into Claude Desktop, Claude Code, Cursor, Continue, Cline, Zed, and Aider."
+    whyItMatters: "The friction of running a multi-agent setup on a regulated codebase, against a non-GitHub backlog, alongside another editor host, just got addressed end to end."
+  takeaways:
+    title: "Nine themes, thirteen releases: a bernstein 2.x reading list"
+    items:
+      - "Lineage v1 plus v2 sign every agent edit and every tracker state move; bernstein-verify is its own wheel so the auditor never depends on bernstein."
+      - "Ten tracker adapters share one conformance suite, so Linear, Plane, Jira, GitLab, and the rest get the same orchestration semantics GitHub already had."
+      - "A2A capability cards close the multi-host handshake gap; the MCP client treats every upstream as untrusted (retry-with-continuation, schema-violation containment, per-server cost metering)."
+      - "Web UI plus PWA ships inside the wheel; bernstein desktop-register adds the orchestrator to seven host editors with one command."
+      - "Auto-heal v2 grew teeth (bot-PR class eliminated, Andon gate, hotfix R-counter, idempotency self-check); a review-bot ack gate blocks merges on must-address findings."
+      - "Cost guards are now calibrated: Brier-scored forecasts, per-quota-envelope attribution, criterion profile plus TOPSIS routing, hard cap that survives a CLI restart."
+    whyItMatters: "The compounding effect is that none of the regulated-codebase or multi-host gotchas is a special case anymore."
+  technical:
+    title: "bernstein 2.x reference: signed lineage, A2A, MCP hardening, calibrated routing"
+    items:
+      - "Lineage v1 (#1379) writes Ed25519-signed entries against agent A2A cards; lineage v2 (#1602) extends signing to tracker state moves; bernstein compliance pack emits a SLSA-style ZIP that bernstein-verify (its own wheel) checks without importing bernstein."
+      - "TrackerContract unifies ten adapters; tracker comments are the cross-machine handoff bus; the issue-to-PR pipeline walks one ticket through plan synthesis, plan-comment review, and PR creation."
+      - "A2A v1.0 contract (JCS body per RFC 8785, detached JWS per RFC 7515, Ed25519 per RFC 8037, JWKS at /.well-known/jwks.json, RFC 8707 audience binding); capability-card validation, retry-with-continuation, in-flight cancellation, schema-violation containment on every MCP call."
+      - "Single-writer RunActor with typed events, monotonic seq, bounded ReplayBuffer with explicit Gap{up_to_seq} on eviction; deterministic session ids; supervisor respawn budget; versioned .sdd migrations; memorable run names."
+      - "TOPSIS multi-criteria routing per criterion profile; calibration log scored with Brier; per-quota-envelope attribution; preflight estimator picks the most expensive role, not the first declared; hard cap via --max-cost-usd and per-ticket cost.hard_cap in bernstein.yaml."
+      - "Playwright sandbox captures screenshot, console, network for UI agents and judges via LLM; secrets broker mints short-lived per-task tokens; 163 zizmor findings resolved; harden-runner on every workflow."
+    whyItMatters: "The orchestration surface that was capable but invisible in 1.x is now legible and auditable from the CLI without spelunking JSONL."
+  when_to_read: "If you operate bernstein on a regulated codebase, run a non-GitHub backlog, host the orchestrator inside another editor, or care about cost legibility across multi-model routing."
+---
+
+## summary
+
+bernstein 2.x consolidates thirteen point releases since the 1.10 recap into nine themes. The audit chain became a per-artefact transparency log with Ed25519 signatures, layered onto tracker state moves, and shipped a standalone bernstein-verify wheel an auditor runs without installing bernstein. Ten tracker adapters land under one `TrackerContract` covering Jira, GitLab Issues, Linear, Plane, Asana, ServiceNow, ClickUp, GitHub Projects v2, and webhook ingestion; tracker comments became the orchestration handoff bus so sessions resume across CLI restarts and across operator machines. A2A capability cards close the multi-host handshake gap; the MCP client treats every upstream as untrusted. A web UI plus PWA ships in the wheel, and `bernstein desktop-register` binds the orchestrator into Claude Desktop, Claude Code, Cursor, Continue, Cline, Zed, and Aider with one command. Auto-heal v2 grew teeth (bot-PR class eliminated, Andon gate, hotfix R-counter). Cost guards are calibrated with Brier-scored forecasts plus per-quota-envelope attribution. A secrets broker mints short-lived per-task tokens; supply-chain coverage adds OSSF Scorecard, SBOM, 163 zizmor findings resolved, and a Playwright sandbox for UI agents. The shipped package no longer defaults to the maintainer's private observability endpoints.
+
+## key takeaways
+
+- Two agents writing the same file no longer race silently; the chain reads back, line by line, who edited what and what they had signed for.
+- A non-GitHub backlog is not a special case anymore; ten adapters share the same conformance suite that has been keeping the CLI adapters honest.
+- `bernstein gui serve --tunnel` is one command for a public URL, a QR, an installable PWA, and a diceware-passphrase login.
+- The compliance pack is a single ZIP an auditor can verify with `bernstein-verify` (its own wheel) without trusting the orchestrator to run.
+- Cost decisions are read-back instead of inferred: criterion profile, TOPSIS routing, Brier-scored forecasts, per-quota-envelope attribution.
+- The MCP client treats every upstream as untrusted, which is the posture the larger ecosystem will end up needing.
+
+## when to read this
+
+For operators evaluating compliance-grade audit chains for the EU AI Act, multi-tracker setups beyond GitHub, the desktop-register binding into Claude Code or Cursor, A2A or MCP hardening posture, or how cost calibration lands in practice on a multi-model cascade.

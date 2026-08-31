@@ -1,0 +1,35 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:00"
+    open-pull-requests-limit: 5
+    labels: [dependencies]
+    groups:
+      # One pull request per ecosystem cluster rather than one per
+      # package: a framework and its plugins have to move together, and
+      # reviewing them apart means reviewing a tree that never existed.
+      next:
+        patterns: ["next", "eslint-config-next", "@next/*"]
+      react:
+        patterns: ["react", "react-dom", "@types/react", "@types/react-dom"]
+      markdown:
+        patterns: ["remark*", "rehype*", "unified", "react-markdown", "mdx*", "@mdx-js/*"]
+      dev-minor-patch:
+        dependency-type: development
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:30"
+    labels: [dependencies, ci]
+    groups:
+      actions:
+        patterns: ["*"]

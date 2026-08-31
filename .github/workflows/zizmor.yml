@@ -1,0 +1,50 @@
+name: zizmor (workflow static analysis)
+
+# Static analysis of the workflows in this directory: unpinned actions,
+# excessive permissions, injection through untrusted `github.*` context.
+# The workflows are the part of a public repository an outside pull
+# request can most easily turn against it, so they get their own gate.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+  schedule:
+    - cron: "55 4 * * 0"  # Weekly, Sunday 04:55 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: zizmor-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  zizmor:
+    name: zizmor static analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054  # v0.6.2
+        with:
+          advanced-security: true
+          # The default repository token can be rejected by external tag
+          # lookups; keep the audit offline so the gate stays reliable.
+          online-audits: false

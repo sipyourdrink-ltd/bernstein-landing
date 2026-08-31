@@ -1,0 +1,60 @@
+---
+title: "The install we should have shipped at launch"
+description: "Three months after launch Bernstein got a real curl | sh one-liner. It only happened because a community contributor picked up the issue we kept deferring."
+date: "2026-04-24"
+tags: ["open source", "developer experience", "onboarding", "CLI installers", "pipx", "PowerShell", "community"]
+schemaType: "BlogPosting"
+---
+
+<Lead>
+Bernstein's install instructions were "Python 3.12+, pipx, then `pipx install bernstein`" for the first three months. Which sounds fine. Which is not fine for the 60% of readers who have neither.
+</Lead>
+
+## the gap
+
+You launch a Python CLI, the README says `pipx install <x>`, you feel productive. Then a real person turns up. They have Python 3.10 from Homebrew, or 3.12 from the macOS installer with no pipx, or Microsoft Store Python on a busted PATH. They paste `pipx install bernstein`. The terminal answers `zsh: command not found: pipx`.
+
+That's where the tab closes.
+
+I knew. I even filed an issue - "one-line install script (curl | sh) with OS detection" - back in April. It sat in the backlog because it wasn't technically hard, which is the precise category of work that never gets done in a solo project. Too mundane for the founder, too peripheral to be sprint-worthy.
+
+## the one-liner
+
+```bash
+curl -fsSL https://bernstein.run/install.sh | sh
+```
+
+Windows:
+
+```powershell
+irm https://bernstein.run/install.ps1 | iex
+```
+
+Each script:
+
+1. Checks Python 3.12+ with a real interpreter call (not `python --version` parsing).
+2. Runs `ensurepip` if pip is missing.
+3. Installs pipx if it isn't on PATH.
+4. Fixes PATH for the current shell so the binary is visible *now*, not after a restart.
+5. Installs or upgrades Bernstein.
+
+Edge cases that turned out to matter: brew Python on Apple Silicon, the Windows `py -3` launcher fallback, `pip install --user` dropping binaries into a directory that isn't on PATH yet. All handled. The shell script is 67 lines.
+
+## not me
+
+I didn't write any of it. [@vedangit](https://github.com/vedangit) asked to pick up the issue, spent a couple of evenings on it, and worked through every edge case with a calm back-and-forth - including the brew environments and the Windows paths. Other people showed up to review the PR, gave it a thumbs-up, asked good questions. From issue to merge it was the [healthiest open-source loop](https://github.com/sipyourdrink-ltd/bernstein/pull/923) I've seen on the project: maintainer writes the requirements clearly, contributor owns the implementation, neither side micromanages the other.
+
+Thanks, Vedangi. The tab-close rate just dropped.
+
+## also in 1.8.14
+
+Same release brings the adapter list to 31 (every mainstream CLI agent on the market) and four operator commands: `bernstein pr`, `from-ticket`, `remote`, `hooks`. Long write-up in [the operator-pack post](/blog/operator-pack).
+
+```bash
+curl -fsSL https://bernstein.run/install.sh | sh
+bernstein -g "your first goal"
+```
+
+---
+
+Next: [first multi-agent run, five minutes](/blog/getting-started). Or, if you're past that, [we orchestrate the orchestrators now](/blog/orchestrate-the-orchestrators) on the leaf-node delegation pattern.

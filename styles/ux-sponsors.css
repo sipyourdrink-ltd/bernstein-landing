@@ -1,0 +1,310 @@
+/* ============================================================================
+   Sponsor wall + /sponsors page styles.
+   Loaded from app/layout.tsx alongside the other ux-*.css files.
+   Kept token-driven (no raw colors) so palette changes propagate without
+   touching this file.
+   ============================================================================ */
+
+.sponsors-page {
+  max-width: var(--container-w);
+  margin: 0 auto;
+  padding: calc(var(--header-h) + var(--space-7)) var(--space-5) var(--space-9);
+  display: grid;
+  gap: var(--space-7);
+}
+
+.sponsors-page__intro h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(28px, 4vw, 40px);
+  letter-spacing: -0.01em;
+  margin-bottom: var(--space-3);
+}
+
+.sponsors-page__intro p {
+  color: var(--ink-soft);
+  max-width: 64ch;
+  margin-bottom: var(--space-3);
+}
+
+.sponsors-page__back {
+  display: inline-block;
+  margin-bottom: var(--space-4);
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.sponsors-page__back:hover { color: var(--ink); }
+
+/* ---------- sponsor wall ---------- */
+
+.sponsor-wall {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.sponsor-wall__heading {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+}
+
+.sponsor-wall__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: var(--space-4);
+}
+
+/* Empty-state grid: single, full-width placeholder card. */
+.sponsor-wall__grid--empty {
+  grid-template-columns: 1fr;
+}
+
+.sponsor-wall__cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+}
+
+.sponsor-wall__cell--real a {
+  color: inherit;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sponsor-wall__avatar {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px solid var(--rule);
+  background: var(--bg-paper-2);
+  object-fit: cover;
+}
+
+.sponsor-wall__cell--real a:hover .sponsor-wall__avatar {
+  border-color: var(--accent);
+}
+
+.sponsor-wall__login {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  word-break: break-all;
+  max-width: 96px;
+}
+
+/* Placeholder card. Visually distinct from a real avatar so nobody can
+   mistake it for a sponsor name. The dashed frame + caption is the
+   sponsorkit convention for "open slot". */
+.sponsor-wall__cell--placeholder {
+  padding: var(--space-3);
+}
+
+.sponsor-wall__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sponsor-wall__placeholder-frame {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px dashed var(--rule-strong);
+  background: var(--bg-paper);
+  display: grid;
+  place-items: center;
+  color: var(--ink-faint);
+  font-size: 1.25rem;
+}
+
+.sponsor-wall__placeholder-caption {
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  max-width: 22ch;
+}
+
+/* When the grid is the empty-state full-width card, give the caption
+   more horizontal room and bump the type a notch. */
+.sponsor-wall__grid--empty .sponsor-wall__placeholder {
+  padding: var(--space-5);
+  border: 1px dashed var(--rule-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg-paper-2);
+}
+
+.sponsor-wall__grid--empty .sponsor-wall__placeholder-caption {
+  font-size: 0.875rem;
+  max-width: 56ch;
+  color: var(--ink-soft);
+}
+
+/* ---------- tier table ---------- */
+
+.tier-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--bg-paper-2);
+}
+
+.tier-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.tier-table caption {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg-paper);
+}
+
+.tier-table th,
+.tier-table td {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule);
+}
+
+.tier-table th {
+  font-weight: 600;
+  color: var(--ink-soft);
+  font-size: 0.8125rem;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+}
+
+.tier-table td:first-child {
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.tier-table tr:last-child th,
+.tier-table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* ---------- cta block ---------- */
+
+.sponsors-page__cta {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  background: var(--bg-paper-2);
+  display: grid;
+  gap: var(--space-3);
+}
+
+.sponsors-page__cta a {
+  display: inline-block;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--bg-paper);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  width: fit-content;
+}
+
+.sponsors-page__cta a:hover {
+  background: var(--accent);
+}
+
+.sponsors-page__footnote {
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+}
+
+.sponsors-page__footnote code {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: var(--code-paper);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+/* ---------- audience panels ----------
+   Four-up grid that runs above the sponsor wall. Each card describes
+   one kind of reader and which tier suits them. Token-driven; no raw
+   colors. */
+
+.sponsors-audiences {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.audience-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
+.audience-card {
+  border: 1px solid var(--rule);
+  background: var(--bg-paper-2, var(--bg-paper));
+  padding: var(--space-4);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.audience-card h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.audience-card p {
+  color: var(--ink-soft);
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.audience-card .audience-tier-hint {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8125rem;
+  color: var(--ink-faint, var(--ink-soft));
+  margin-top: auto;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--rule);
+}
+
+/* Mobile: keep the wall avatars at 64px but tighten gutters. */
+@media (max-width: 480px) {
+  .sponsor-wall__grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: var(--space-3);
+  }
+  .sponsors-page {
+    padding: calc(var(--header-h) + var(--space-6)) var(--space-4) var(--space-7);
+  }
+  .audience-grid {
+    grid-template-columns: 1fr;
+  }
+}

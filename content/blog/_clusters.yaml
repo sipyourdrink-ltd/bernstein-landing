@@ -1,0 +1,84 @@
+# Topic-cluster map for /blog cross-linking.
+#
+# Why this file exists: each blog post used to link to ~2 other posts
+# (sampled on /blog/introducing-bernstein, 2026-05-12). Google's
+# topic-cluster signal and LLM crawlers both want ≥ 5 sibling links per
+# post so the hub-and-spoke graph is visible. This map drives the
+# RelatedPosts component (components/blog/RelatedPosts.tsx), which
+# renders 3–5 sibling cards below every post body.
+#
+# Shape:
+#   clusters:
+#     <cluster-slug>:
+#       fallback: <other-cluster-slug>      # used when a cluster has < 3 siblings
+#       posts:                              # post slugs (the dir name under content/blog/)
+#         - <post-slug>
+#         - ...
+#
+# Picker rules (lib/clusters.ts):
+#   1. A post's primary cluster = first cluster (in declared order)
+#      that lists the post in its `posts` array.
+#   2. Siblings = primary.posts \ {self}, deterministically sorted by slug.
+#   3. If picked.length < max, append entries from the primary's `fallback`
+#      cluster (excluding self + already-picked), in deterministic order,
+#      until we hit `max` (default 5).
+#   4. Cap at 5 entries.
+#
+# Build-time check: lib/mdx.ts asserts every published post appears in
+# at least one cluster. A post added to content/blog/ without an entry
+# here fails the build (see getAllPosts / getPost).
+#
+# A post MAY appear in multiple clusters — only the first declared one
+# is used for sibling-picking, but membership in others is fine and lets
+# fallbacks find each other.
+
+clusters:
+  routing:
+    # Cost / model-routing cluster. Small, so it leans on `agents` for
+    # the 5-card target. cost-aware-routing is the anchor post.
+    fallback: agents
+    posts:
+      - cost-aware-routing
+      - orchestrate-the-orchestrators
+
+  agents:
+    # Core "what is the orchestrator" cluster. Largest by design; acts
+    # as fallback for routing, release-notes, and cloud-deployment when
+    # those clusters are too small.
+    fallback: release-notes
+    posts:
+      - introducing-bernstein
+      - getting-started
+      - orchestrator-vs-desktop-ade
+      - module-decomposition
+      - autofix-daemon
+      - operator-pack
+
+  release-notes:
+    # Version notes and the community spotlight (release-adjacent).
+    fallback: agents
+    posts:
+      - v3-14-159-pi
+      - v3-x-recap
+      - output-economy-and-agent-lifecycle
+      - v2-16-recap
+      - v2-x-recap
+      - v2-0-release
+      - v1-9-release
+      - v1-10-x-recap
+      - community-spotlight-april-2026
+
+  compliance:
+    # Audit-trail, on-prem, refactoring-the-monolith content. Small;
+    # leans on cloud-deployment for related ops topics.
+    fallback: cloud-deployment
+    posts:
+      - orchestrator-on-someone-elses-box
+
+  cloud-deployment:
+    # Run-it-on-a-box, install, operator-day cluster.
+    fallback: agents
+    posts:
+      - cloudflare-cloud-execution
+      - operator-commands
+      - frictionless-install

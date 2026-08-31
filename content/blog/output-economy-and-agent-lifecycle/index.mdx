@@ -1,0 +1,235 @@
+---
+title: "Running many agents on 2.16: the output-economy suite, safer summaries, and a fleet you can pin"
+description: "A walkthrough of what shipped across the 2.4 to 2.16 arc for operators running many agents at once: per-role response-style profiles, per-profile cost attribution off the spend ledger, a three-arm cost-and-quality A/B harness, proactive context compaction with chained receipts, a credential-shaped-content gate on compaction input, schema-enforced worker completion payloads with typed refusals, digest-pinned team manifests with drift detection, and the Windows adapter path fix."
+date: "2026-07-06"
+draft: false
+featured: false
+tags:
+  - "multi-agent orchestration"
+  - "release"
+  - "cost control"
+  - "output economy"
+  - "response style"
+  - "context compaction"
+  - "audit log"
+  - "deterministic replay"
+  - "worker payloads"
+  - "team manifest"
+  - "Windows"
+  - "adapters"
+schemaType: "TechArticle"
+techDependencies:
+  - "Python 3.12+ with `pipx install --upgrade bernstein` (or `pip install --upgrade bernstein`)"
+  - "An existing `bernstein.yaml` from a 2.x install; configs and plans run unchanged"
+  - "Two models configured if you want `bernstein ab-test`; the profile harness (`bernstein eval ab`) defaults to its offline synthetic executor and needs nothing extra"
+  - "Windows 10/11 users: a wrapped agent binary reachable on `PATH` (the adapter now resolves `.exe` / `.cmd` / `.bat` via `PATHEXT` and reports a structured error when it is genuinely missing)"
+---
+
+<Lead>
+The 2.16 line is the first one where the interesting question stopped being "can it run four agents" and became "can I run forty and still read the bill, trust the summaries, and reproduce the run." This is the operator walkthrough of the pieces that answer that. Same posture as every recap: not a roadmap, not a refactor, just the things that started to hurt once the orchestrator was doing real work at real fan-out.
+</Lead>
+
+*Editor's note, 2026-08-10: the first version of this post showed commands that did not exist. The features were real; the command names were not. Every code block below is now checked against the shipping CLI at v3.14.159. Two sections described surfaces that never shipped in any version - a spawner hold/release lifecycle and a per-agent stats command - and have been rewritten around the surfaces that do exist.*
+
+If you are running one agent, most of this is invisible. If you are running many, each item below removes a specific class of "I do not know what just happened" that shows up only at scale: spend you cannot attribute, summaries you cannot trust, completion payloads you cannot parse, a fleet you cannot pin.
+
+## the output-economy suite
+
+The bill was never the problem. The problem was that the bill arrived at the end, as one number, with no line you could point at and no lever you could pull before the fact. Four related surfaces landed to turn output spend from a post-hoc surprise into something you shape up front and read back per task.
+
+### per-role response-style profiles
+
+Every role can now carry a **response-style profile** that governs how verbose its output is meant to be. A `docs` role that writes prose and a `qa` role that should emit a terse pass/fail verdict were, until this cycle, spending output tokens the same way. They should not.
+
+A profile is a small declaration on the role's `role_model_policy` entry in `bernstein.yaml`. The vocabulary is `verbose` / `balanced` / `terse`:
+
+```yaml
+role_model_policy:
+  qa:
+    response_style: terse      # verdict + minimal rationale, no restated context
+  docs:
+    response_style: verbose    # full prose, examples allowed
+  # unset roles resolve to "balanced", which renders no addendum at all -
+  # a spawn without a profile is byte-identical to a pre-2.16 spawn
+```
+
+The profile renders as a system-prompt addendum at spawn, and the addendum's SHA-256 is recorded in the task's cost ledger entry and audit trail, so the style a role ran under is part of the reproducible record, not a prompt you have to reconstruct later. Resolution is deterministic: a task's declared mode wins, then the role's entry, then the policy default, then `balanced`. The point is not to clamp quality; it is to stop paying full-prose output rates for a role whose whole job is to say "green" or "here are three findings."
+
+### per-profile cost attribution, straight off the ledger
+
+The cost ledger was already per-task, per-step, per-adapter, per-model. This cycle adds the response-style profile as an attribution dimension, so the bill can answer "what did my verbose roles cost me versus my terse ones" without a spreadsheet.
+
+```bash
+bernstein cost --by profile        # quick breakdown off the spend ledger
+bernstein cost profile-report      # content-addressed report, appended to the audit chain
+```
+
+```
+profile    tasks   out tokens   cost usd   tokens/task   pass rate
+verbose       12      418,220    $4.9100         34852         92%
+balanced      31      192,540    $2.1600          6211         94%
+terse         58       61,110    $0.7200          1054         93%
+```
+
+Attribution is strict: a task that changed profile mid-run is excluded from the table and reported separately - per profile or not at all. The report itself is computed from recorded ledger entries only, hashed over canonical JSON with no timestamps in the payload, and written as `<sha256>.json`, so a third party holding the ledger can recompute it byte-identically. The line-item breakdown is the whole point: "the run cost more than I planned" becomes "my verbose roles were 63 percent of output spend and half of them are `docs` tasks that could be `balanced`." That is a decision you can act on. The unattributed total was not.
+
+### a three-arm cost-and-quality A/B harness
+
+Cheaper output is only a win if the work still passes. Two harnesses landed, one per question. `bernstein ab-test --model-a opus --model-b sonnet --task "..."` runs the same task under two models and prints a side-by-side comparison. The profile harness is the more careful one:
+
+```bash
+bernstein eval ab --suite suite.yaml --arm-b terse --arms 3
+```
+
+With `--arms 3` the suite runs under three arms: `baseline` (profile unset), `control` (a built-in minimal terse addendum), and `candidate` (the profile under test). The control arm exists because comparing a profile against an unconstrained baseline conflates the profile's content with the generic instruction to be brief; the honest delta is candidate versus control, and the artifact labels candidate-versus-baseline `conflated`. Every cost figure is a sum over concrete spend-ledger rows, referenced by the hash of their raw bytes, so a verifier holding the ledger can recompute every aggregate. A winner is declared only when both cost and quality are measured for both honest arms; a run missing either emits `incomparable`, never a partial winner. There is no automatic downgrade hidden inside this: the harness measures, the operator chooses.
+
+### operator-gated role-template compression
+
+The role templates - the standing instructions each role carries into every task - accreted over dozens of releases. Compression rewrites a role's templates to a shorter form that preserves their behaviour, which cuts the fixed input cost every task in that role pays.
+
+The load-bearing word is **operator-gated**. `bernstein templates compress` states what it is about to do and asks; nothing is rewritten until you confirm. The rewrite then has to pass a battery of mechanical validators - fenced code blocks, headings, URLs, placeholders, and the completion-contract block must all survive byte-equal, with at most two targeted fix passes - and the originals are backed up out of tree, keyed by content hash, before anything changes on disk. Every applied rewrite is receipted on the audit chain.
+
+```bash
+bernstein templates compress backend    # confirm, validate, back up, rewrite
+bernstein templates compress --all      # every role, same gate
+bernstein templates restore backend     # byte-identical rollback from the backup
+```
+
+The gate exists because a role template is behaviour, and a "helpful" automatic rewrite of behaviour is exactly the kind of change you want a human to have signed for. The token saving is real - it shows up in `bernstein cost --by role` - and the whole thing is reversible to the byte, which is what makes it safe to try.
+
+## proactive context compaction, with a receipt
+
+Long-running agents fill their context window. The old behaviour was purely reactive: compact when you are about to overflow, mid-task, under pressure, which is the worst possible moment to be summarising your own working memory. Compaction now also runs **proactively** - on a threshold tick, before the window is tight, when there is headroom to do it carefully. The reactive path remains as post-overflow recovery.
+
+Two properties make this safe to trust rather than merely convenient:
+
+- **Mechanical validation.** After the summary stage, deterministic validators run over the before/after pair: every fenced code block in the summary must be byte-equal to a block in the original (a block may be dropped, but only whole - never rewritten or truncated), quoted error text must survive verbatim, retained failed-action records and pinned lines must survive byte-equal, and the summary may not invent file paths. A summary that fails gets exactly one targeted fix pass; if it still fails, the compaction is rejected and the un-compacted context is kept. A summary that drops the thing you were doing is worse than a full window.
+- **A chained receipt.** Every accepted compaction writes an HMAC-chained `compaction.receipt` event recording the trigger, the before/after token counts, the pre- and post-compaction context hashes, and each validator's verdict - and registers the compaction as a step in the worker's replay journal. `bernstein compaction log --task <id>` prints a task's receipt chain; `--verify` re-checks that the chain and the journal agree, and exits non-zero when they do not.
+
+You do not invoke compaction; it runs inside long tasks. What you get is the receipt, and the guarantee that a compaction that would have dropped a load-bearing fact never happened silently.
+
+## a credential-shaped-content gate on compaction input
+
+When a long task compacts its context, slices of that context go to a model to be summarised. Worker contexts routinely contain file reads, so the input can carry a secret the agent read along the way: an API key in a config file, a token in an error message, a PEM banner in a log.
+
+The **credential-shaped-content gate** scans compaction input before the summary stage. A hit with a well-defined span - a complete PEM block, an AWS access key id, a `ghp_` token, a high-entropy value assigned to a name like `api_key` - is replaced in place with a typed placeholder carrying the rule id and a hash of the original. A hit the gate cannot safely delimit - a path-shaped token like `.env` or `id_rsa`, an unterminated PEM header - refuses the whole compaction instead, on the theory that credential file contents may surround it in ways no span can bound. Findings and audit events record only the SHA-256 of the offending span, never the span itself.
+
+This is deliberately a *shape* gate, not a semantic one. It does not claim to understand whether a string is a live credential; it claims that content shaped like a credential does not reach the summary model - redacted when it can be cut out cleanly, refused when it cannot. For an operator running many agents over repositories they did not personally vet, that is the property that matters: the blast radius of "an agent read a `.env` it should not have" stops at the redaction line, or at the refusal.
+
+## schema-enforced worker completion payloads, with typed refusals
+
+A worker that finishes is supposed to hand back a completion payload the orchestrator can act on. When that payload was free-form, a worker could return prose the orchestrator then had to guess at, and a *refusal* - "I could not do this" - looked syntactically identical to a success.
+
+Completion payloads are now **schema-enforced**. A worker returns a typed object validated against a closed contract (`worker-completion/v1`) at the completion API boundary; unknown fields, unknown refusal kinds, and malformed JSON are contract violations that carry the JSONPath of the offending field, never silent accepts. Critically, refusal is a first-class, typed outcome with a closed taxonomy - `awaiting_operator`, `underspecified`, `scope_exceeded`, `blocked_on_dependency` - and per-kind machine-readable fields:
+
+```json
+{
+  "contract": "worker-completion/v1",
+  "kind": "underspecified",
+  "detail": "acceptance criteria reference an endpoint that does not exist on this branch",
+  "question": "is criterion 3 stale, or should the endpoint land first?"
+}
+```
+
+A typed refusal routes differently from a failure and completely differently from a success. A `scope_exceeded` refusal carries a proposed split from which follow-up tasks are derived deterministically - the same payload always produces the same follow-up ids, so a re-delivered refusal cannot duplicate the split. The orchestrator can surface "this worker refused because the precondition was wrong" as its own state and stop pretending an honest "I will not do this because X" was a crash. At fan-out, the difference between a refusal and a failure is the difference between a five-minute fix and a wild-goose chase.
+
+## sha256-pinned team manifests, with drift detection
+
+A **team manifest** declares the fleet as one named unit: the role list, a model policy and response profile per role, coordination settings, and pinned sha256 digests of the role templates the team spawns from. It lives at `templates/teams/<name>.toml` and is referenced from `bernstein.yaml` as `team_manifest: <name>` - or `<name>@sha256`, which pins the manifest itself to an exact content hash. The digest is computed over a canonical serialization - sorted keys, fixed quoting, LF endings - defined precisely so two operators can prove their team configurations match byte-for-byte.
+
+```bash
+bernstein team list             # every manifest visible from the workdir
+bernstein team show reviewers   # digest, roles, policies, pinned template digests
+bernstein team drift            # recompute on-disk template digests, compare to the pins
+```
+
+`bernstein team drift` is the check you put in CI: it exits non-zero when any pinned role template no longer matches what is on disk, and records the drift finding on the HMAC-chained audit log. Two operators who both pass it against the same manifest digest are running the byte-identical fleet, which is the precondition for comparing their runs at all. A team that drifts is a team whose results you cannot trust to be about the change you made rather than about the fleet that moved.
+
+## stopping the fleet without losing its work
+
+At fan-out you sometimes need to stop the fleet: a cost spike, an upstream outage, a bad plan you want to stop before it spends more. The original version of this post described a `bernstein spawner hold` / `release` pair for this. Those commands do not exist and never did. What exists is `bernstein stop`, and it is worth describing accurately, because it does most of what an operator reaching for "hold" actually wants.
+
+```bash
+bernstein stop               # soft stop: agents get a shutdown signal and time to save
+bernstein stop --timeout 60  # wait longer before terminating stragglers
+bernstein stop --force       # hard stop: kill immediately, best-effort recovery after
+```
+
+The default is the graceful path: it writes shutdown signal files so agents can save their work, waits up to the timeout, saves session state, and returns claimed tickets to open before terminating what remains. The part that matters at fan-out is the last one: work a stopped agent had claimed goes back to the open pool, so the next run picks it up instead of losing it. There is no pause-and-resume of a running fleet; a stop is a stop. It is just a stop that gives the work back.
+
+## per-agent run instrumentation
+
+Aggregate fleet metrics tell you the run is slow or expensive; they do not tell you *which agent*. The original version of this post invented an `agents stats` command for this. The real surface is the spend ledger itself, which attributes per agent, plus the trace:
+
+```bash
+bernstein cost --by agent    # spend and task counts per agent
+bernstein trace <task-id>    # one agent's decision trace
+bernstein ps                 # running agents, cross-checked against the process table
+```
+
+```
+  By Agent:
+    calm-heron            $   4.91  (54%)  ████████████████  12 tasks
+    brisk-sparrow         $   2.16  (24%)  ███████           31 tasks
+    wary-finch            $   1.29  (14%)  ████               9 tasks
+    lucid-otter           $   0.72  ( 8%)  ██                58 tasks
+```
+
+What this cycle adds to that view is the join: every ledger row now carries the response-style profile and addendum hash the task ran under, so the per-agent breakdown and the per-profile breakdown are projections of the same rows. The value at scale is triage. "The run was expensive" is not actionable; "`calm-heron` is 54 percent of spend across 12 tasks, go read its trace" is. The instrumentation ties each number to the agent that produced it, so the outlier is a row you can read instead of an average you have to decompose.
+
+## the Windows adapter path fix
+
+The unglamorous one, and the most important line here for anyone on Windows.
+
+The standard install path - `pipx install bernstein`, point it at a wrapped agent, run a plan - was failing on Windows in a way that produced no useful signal. The adapter's binary discovery resolved the agent executable through a cascade that was implicitly POSIX-shaped: it did not account for the `.exe` / `.cmd` / `.bat` extension resolution Windows applies through `PATHEXT`, so a binary that was genuinely present and on `PATH` read as absent. Worse, the failure surfaced as a silent exit rather than an error, so the operator got no traceback, no hint, no next step.
+
+The fix does two things:
+
+- **Extension-aware discovery.** The resolver now walks the platform's executable-extension rules, so a Windows agent binary on `PATH` resolves the same way its POSIX sibling does. The discovery cascade - operator override wins, then the preferred binary, then the fallback - is unchanged; only the platform-correct lookup underneath it was wrong.
+- **A structured error instead of a silent exit.** When discovery genuinely fails, the adapter raises `BinaryNotInstalledError` with the binary name it looked for and where it looked, routed through the same first-run categorisation guard the rest of the CLI uses. The operator gets a hint panel and a `sysexits.h` exit code, not a blank prompt.
+
+Why this matters more than a normal bug: the platform install path most people follow is the one that has to work without a support thread, and on Windows it silently did not. A regression that only surfaces through user reports is exactly the class that costs the most to run down - by the time it reaches you it has already cost someone else an afternoon. The adapter conformance suite now exercises the Windows discovery path so it stays closed.
+
+## why these fit together
+
+Read as a list, this is a grab-bag. Read as one arc, it is a single answer to the fan-out question: at forty agents, the things that break first are the things you cannot see, cannot attribute, and cannot pin.
+
+- The output-economy suite makes spend **attributable and shapeable** before the fact.
+- Proactive compaction and the credential gate make an agent's own summaries **trustworthy** - they will not silently drop a requirement or forward a secret.
+- Schema-enforced payloads with typed refusals make worker completions **legible** - a refusal is a refusal, not a mystery.
+- Pinned manifests with drift detection make the fleet **reproducible** - two operators can prove they ran the same team.
+- A graceful stop and per-agent attribution make the running fleet **stoppable and readable** - claimed work goes back to the pool, and you can see which agent spent what.
+
+None of these is a headline on its own. Together they are the difference between an orchestrator you can demo and one you can operate.
+
+## upgrading
+
+```bash
+pipx install --upgrade bernstein     # or: pip install --upgrade bernstein
+```
+
+That is the whole upgrade. 2.x configs and plans run unchanged - `bernstein run`, `bernstein conduct`, `bernstein dashboard` all behave as before. The new surfaces are opt-in: response-style profiles default to the previous behaviour until you set them, the A/B harnesses and template compression are commands you invoke deliberately, and proactive compaction plus the credential gate run inside tasks without changing their interface.
+
+```bash
+# read the bill by response-style profile
+bernstein cost --by profile
+bernstein cost profile-report
+
+# measure a profile's cost against its quality before adopting it
+bernstein eval ab --suite suite.yaml --arm-b terse --arms 3
+
+# check the fleet's pinned templates in CI
+bernstein team drift
+
+# read a task's compaction receipts
+bernstein compaction log --task <id> --verify
+
+# see which agent spent what
+bernstein cost --by agent
+```
+
+## related
+
+- [bernstein 2.x recap](/blog/v2-x-recap): the cycle this one picks up from - lineage, ten trackers, A2A cards, the standalone verifier.
+- [cost-aware routing](/blog/cost-aware-routing): the bandit that decides which arm gets the work, which the output-economy suite now attributes and bounds.
+- [v2.0 release notes](/blog/v2-0-release): when the web UI landed in the wheel.

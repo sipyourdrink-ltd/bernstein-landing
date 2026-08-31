@@ -1,0 +1,219 @@
+openapi: 3.0.3
+info:
+  title: Bernstein Task Server API
+  description: >-
+    REST API for the Bernstein task server. Bernstein is a deterministic
+    orchestrator for CLI coding agents - reproducible parallel runs, signed
+    audit trail, air-gap friendly. The task server is operator-hosted - it runs
+    on the machine where Bernstein is installed - so the `servers` entry is a
+    URL template, not a hosted endpoint.
+  version: 3.15.1
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+  contact:
+    name: Alex Chernysh
+    url: https://github.com/sipyourdrink-ltd/bernstein
+servers:
+  - url: http://{host}:{port}
+    description: >-
+      Task server started by the Bernstein CLI on the operator's own machine.
+      There is no hosted instance; substitute the host and port of your install.
+    variables:
+      host:
+        default: 127.0.0.1
+        description: Interface the task server binds to. Loopback by default.
+      port:
+        default: '8052'
+        description: Task server port. Override with BERNSTEIN_PORT.
+paths:
+  /tasks:
+    post:
+      summary: Create a new task
+      operationId: createTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [goal]
+              properties:
+                goal:
+                  type: string
+                  description: Task goal description
+                role:
+                  type: string
+                  description: Agent role (e.g. backend, frontend, qa)
+                priority:
+                  type: integer
+                  minimum: 0
+                  maximum: 10
+                complexity:
+                  type: string
+                  enum: [trivial, simple, moderate, complex, epic]
+      responses:
+        '201':
+          description: Task created
+    get:
+      summary: List tasks by status
+      operationId: listTasks
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, assigned, done, failed]
+      responses:
+        '200':
+          description: Task list
+  /tasks/{id}/complete:
+    post:
+      summary: Mark task as completed
+      operationId: completeTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task completed
+  /tasks/{id}/fail:
+    post:
+      summary: Mark task as failed
+      operationId: failTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task failed
+  /tasks/{id}/progress:
+    post:
+      summary: Report task progress
+      operationId: reportProgress
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                files_changed:
+                  type: array
+                  items:
+                    type: string
+                tests_passing:
+                  type: boolean
+                errors:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Progress recorded
+  /bulletin:
+    post:
+      summary: Post a cross-agent finding or blocker
+      operationId: postBulletin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+                type:
+                  type: string
+                  enum: [finding, blocker, info]
+      responses:
+        '201':
+          description: Bulletin posted
+    get:
+      summary: Read recent bulletins
+      operationId: getBulletins
+      parameters:
+        - name: since
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Bulletin list
+  /status:
+    get:
+      summary: Dashboard summary
+      operationId: getStatus
+      responses:
+        '200':
+          description: System status
+  /api/csp-report:
+    description: >-
+      Content-Security-Policy violation sink for the landing site. This is
+      the one path in this document that does not live on the operator's
+      task server, so it carries its own `servers` entry below. Browsers
+      post here on their own - the route is named by the `report-uri` and
+      `report-to` directives of every response's Content-Security-Policy -
+      and nothing else is expected to call it.
+    servers:
+      - url: https://bernstein.run
+        description: The landing site. Not the task server.
+    post:
+      summary: Receive a Content-Security-Policy violation report
+      description: >-
+        Accepts both wire formats: a single kebab-case report under a
+        `csp-report` key (`report-uri`, which is what Firefox and Safari
+        send) and an array of Reporting API envelopes (`report-to`, which
+        Chrome sends and batches). Envelopes whose `type` is not
+        `csp-violation` are ignored. Unauthenticated by construction,
+        since browsers send these without credentials; the body is treated
+        as hostile, summarised into the server log, and never echoed back.
+      operationId: reportCspViolation
+      requestBody:
+        required: true
+        content:
+          application/csp-report:
+            schema:
+              type: object
+              properties:
+                csp-report:
+                  type: object
+                  description: One violation, kebab-case fields.
+          application/reports+json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    description: Report kind. Only `csp-violation` is read.
+                  body:
+                    type: object
+                    description: One violation, camelCase fields.
+      responses:
+        '204':
+          description: >-
+            Always, whatever happened. A report that was rate-limited,
+            oversized, wrongly typed or unparseable gets the same empty
+            reply as one that was logged: a browser cannot act on the
+            status, and a uniform answer tells a prober nothing.
+    get:
+      summary: Not supported - reports arrive by POST
+      operationId: cspReportMethodNotAllowed
+      responses:
+        '405':
+          description: Always. The response names POST in its Allow header.

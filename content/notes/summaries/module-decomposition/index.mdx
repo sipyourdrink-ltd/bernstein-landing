@@ -1,0 +1,78 @@
+---
+title: 'From 4,000 lines to 200, by the orchestrator''s own hand'
+description: >-
+  11 parallel agents, 4,198-line orchestrator.py, 15 sub-packages on the first
+  pass. What we learned breaking it apart.
+date: '2026-04-13'
+url: 'https://bernstein.run/blog/module-decomposition'
+tags:
+  - summary
+  - Python refactoring
+  - code decomposition
+source_post: module-decomposition
+summary_modes:
+  quick:
+    title: '11 ai agents refactor a 4,000-line python file in 3 hours'
+    items:
+      - >-
+        eleven parallel ai agents split a 4,198-line python file into fifteen
+        sub-packages in three hours.
+      - >-
+        the original file was restructured with backward-compatible shims,
+        enabling seamless adoption.
+    whyItMatters: >-
+      large codebases can be safely refactored quickly without breaking existing
+      workflows.
+  takeaways:
+    title: 'how 11 ai agents refactored a 4,000-line python file in 3 hours'
+    items:
+      - >-
+        eleven parallel ai agents decomposed a 4,198-line python file into
+        fifteen sub-packages in three hours of wall-clock time.
+      - >-
+        each agent handled one sub-package, extracting code, fixing imports, and
+        running tests while preserving backward compatibility.
+      - >-
+        a yaml-defined dependency graph ensured correct extraction order to
+        prevent circular imports and maintain functionality.
+      - >-
+        the original file became a shim for re-exporting, allowing existing
+        imports to continue working without changes.
+    whyItMatters: >-
+      large codebases can be safely refactored quickly with automation while
+      maintaining compatibility and team workflow.
+  technical:
+    title: eleven ai agents refactor a 4k-line python file in three hours
+    items:
+      - >-
+        eleven parallel bernstein agents executed a yaml-defined plan to split a
+        4,198-line orchestrator.py into fifteen sub-packages.
+      - >-
+        each sub-package was assigned a single concern, with post-split sizes
+        ranging from ~180 to ~380 lines, all under the 600-line ceiling.
+      - >-
+        the decomposition respected dependency order, defined in a yaml plan
+        with edges such as tasks/ before agents/ to prevent circular imports.
+      - >-
+        the original file became a re-export shim to maintain backward
+        compatibility, allowing existing imports to continue working without
+        changes.
+    whyItMatters: >-
+      large codebases can be safely refactored quickly with automated agents and
+      clear architectural boundaries.
+---
+
+## summary
+
+`orchestrator.py` grew to 4,198 lines, 47 imports, and 23 public methods through two months of reasonable incremental additions. bernstein decomposed it into 15 focused sub-packages using a YAML plan with dependency edges executed by 11 parallel agents - about three hours wall-clock versus an estimated two to three human days. the decomposition used a hard rule of 600 lines as the ceiling for any single module; the largest sub-package after the split was `agents/` at ~380 lines. the original file became a ~200-line re-export shim so that `from bernstein.core.orchestrator import Orchestrator` kept working in all existing scripts. later refactors took the count from 15 to 22 sub-packages by mid-April.
+
+## key takeaways
+
+- 11 parallel agents extracted 15 sub-packages in ~3 hours wall-clock; each sub-package is under 380 lines and averages ~280.
+- the `orchestrator.py` shim kept all existing import paths working - backward compatibility was non-negotiable.
+- the plan had explicit dependency edges (`tasks/` before `agents/`) because the merge queue calls task-completion callbacks; extracting in the wrong order would have produced circular imports.
+- the test suite caught 14 import errors, 3 circular imports, and 1 module-level state bug during the decomposition - the safety net that made parallelism viable.
+
+## when to read this
+
+for teams considering using bernstein to execute a large refactor or module decomposition on their own codebase, or for anyone asking "what does a self-hosted multi-agent refactor actually look like in practice."
