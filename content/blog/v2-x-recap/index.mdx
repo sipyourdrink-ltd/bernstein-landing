@@ -1,0 +1,197 @@
+---
+title: "bernstein 2.x recap: lineage, ten trackers, A2A capability cards, and a CI that started fixing itself"
+description: "Thirteen releases since the 1.10 recap consolidated into nine themes: a per-artefact transparency log with Ed25519 signatures, ten tracker adapters from Jira to Plane, A2A capability cards, MCP client and server hardening, a Playwright sandbox for UI agents, a secrets broker, supply-chain coverage with SBOM and OSSF Scorecard, calibrated cost guards, and a web UI plus PWA in the wheel."
+date: "2026-05-20"
+featured: false
+tags:
+  - "multi-agent orchestration"
+  - "release"
+  - "lineage"
+  - "audit log"
+  - "EU AI Act"
+  - "A2A"
+  - "MCP"
+  - "trackers"
+  - "Jira"
+  - "Linear"
+  - "GitLab Issues"
+  - "Plane"
+  - "Claude Code"
+  - "Cursor"
+  - "Aider"
+  - "playwright"
+  - "secrets broker"
+  - "SBOM"
+  - "OSSF Scorecard"
+  - "deterministic replay"
+  - "operator UI"
+  - "PWA"
+  - "cost calibration"
+schemaType: "TechArticle"
+techDependencies:
+  - "Python 3.12+ with `pipx install --upgrade bernstein` (or `pip install --upgrade bernstein`)"
+  - "An existing `bernstein.yaml` from a 1.10.x install; configs and plans run unchanged"
+  - "A modern browser to reach the SPA at `http://127.0.0.1:8052/ui/` (Chrome / Firefox / Safari current)"
+---
+
+<Lead>
+Ten days since the 1.10 recap. Thirteen point releases later. Not a roadmap and not a refactor. The cumulative effect of fixing the things that started to hurt the moment we tried to run the orchestrator on a regulated codebase, against a non-GitHub backlog, alongside three editors that all wanted to host the agent themselves.
+</Lead>
+
+This is a single round-up so the trajectory between then and now is legible from one page. The point releases are not headline-shaped individually. Grouped by theme, they are: a per-artefact transparency log with signatures every auditor can verify on their own laptop; ten tracker adapters from Jira to Plane under one contract; A2A capability cards plus an MCP client that treats every upstream as untrusted; a web UI, a PWA, and a one-command registration for seven host editors; a Playwright sandbox for the UI agents; a secrets broker plus the supply-chain hardening around it; an auto-heal CI that finally grew teeth; cost guards backed by a Brier-scored forecast log; and a single-writer state model that makes a session reconnect across machines.
+
+## a transparency log per artefact
+
+The audit chain was already there. What was missing: the part that lets two agents touch the same file without losing the trail.
+
+Lineage now writes every agent edit as an Ed25519-signed entry against the agent's A2A card. Two writers on the same path surface as siblings; the Steward writes an explicit merge entry rather than letting one quietly overwrite the other. `bernstein lineage gate` is a required CI check; merges with unresolved parallel-edit forks fail. The same idea layers on tracker state moves - every transition the orchestrator drives (open, label, transfer, comment, close) is captured as a signed entry, so a ticket that loses or gains the wrong label reads back, line by line, who did it and what they had signed for.
+
+The compliance side ships a verifier you don't need to trust the orchestrator to run. `bernstein compliance pack --since … --org "…" --output …` produces a signed ZIP with PDF, CSV, raw log, Agent Cards, and a SLSA-style manifest. `bernstein-verify pack <bundle>.zip` is its own wheel: `cryptography` and `click` are the only dependencies. The verifier's own test asserts that `import bernstein` raises `ModuleNotFoundError` from inside its venv, because that is the property an external auditor wants from a verifier they will hand to their own team.
+
+Honest framing: the surface ships with tests, runbooks, and the standalone verifier. It has not been bashed against an external regulatory audit yet. Treat it as code an evaluator can read and stand up themselves, not as an attestation. The three reference demos under `examples/lineage/` (fintech, healthcare, EU manufacturer) are written so a compliance officer can pattern-match the EU AI Act Article 12 surface against their own paperwork.
+
+## ten trackers, one contract
+
+The work people had been asking for since 1.0. Ten adapters land under one `TrackerContract`: Jira Cloud and Jira DC, GitLab Issues, Linear, Plane, Asana, ServiceNow, ClickUp, GitHub Projects v2, plus webhook ingestion. Third-party trackers plug in via the same pluggy hookspec the orchestrator uses internally; `bernstein trackers` surfaces them on the CLI. A multi-tracker federation layer sits above the adapters, so a single team running Jira for engineering and Linear for product can route to both from one orchestrator config.
+
+Two design surprises earned their own slices. Tracker comments became the orchestration handoff bus: worker agents now coordinate over the same comment thread the operator reads, so a session resumes across CLI restarts and across operator machines without a synthetic state file in between. And the issue-to-PR pipeline walks a tracker issue through plan synthesis, plan-comment posting for human review, and PR creation in one path. Run-failure classification closes the loop on the other side: when a run dies, the orchestrator labels the ticket with what class of failure killed it.
+
+The unhonest framing would be that you can wire this up in an afternoon. The honest one is that all ten adapters were lit in two weeks while one operator (me) ate the integration cost ten different ways, and every one of them is bound by the same conformance suite that has been keeping the CLI adapters honest. If your shop runs on Linear and you want the same orchestration semantics as a GitHub-resident one, the contract says you should.
+
+## interop, finally
+
+The piece that kept blocking real cross-process work was the lack of a real handshake. Claude Desktop is one process, Claude Code is another, both can spawn agents, neither knew what the other had already decided.
+
+A2A capability cards close that gap. One process mints a signed manifest of what it can do; the other consumes it, verifies the signature against a trusted-issuer set, and refuses to delegate when the advertised policies don't meet the operator's required policies. The lineage chain rides through the same envelope, so the audit trail does not break at the organisation boundary. The handshake builds on the A2A v1.0 contract: JCS body per RFC 8785, detached JWS per RFC 7515, Ed25519 per RFC 8037, JWKS at `/.well-known/jwks.json`, audience binding via RFC 8707.
+
+The MCP client got the matching upgrade. Upstream servers will return malformed responses, hang mid-stream, demand re-auth, lie about their capability manifest. The client now treats every upstream as untrusted: capability-card validation before a tool call, retry-with-continuation on dropped streams, in-flight cancellation that preserves partial output, per-server cost metering, schema-violation containment that marks a misbehaving server degraded for the rest of the task. None of this is exotic; it is the brittle-real-world posture that the larger MCP ecosystem will end up needing.
+
+The MCP server side got a prompt catalogue plus OAuth-2 PKCE discovery metadata so auto-discovering hosts that expect a real RFC 8414 / RFC 9728 surface stop skipping us. Full token issuance and OIDC federation are deferred to a follow-up; the discovery metadata is what unblocks the common case.
+
+## operator surfaces, plural
+
+`bernstein gui serve` boots a FastAPI server with a React SPA mounted at `/ui`. No Node toolchain at install time; the Vite bundle is committed under `src/bernstein/gui/static/`. Default at `http://127.0.0.1:8052/ui/`. Tasks, Agents, Approvals, Audit, Costs, Fleet, Settings. Six functional panels and one placeholder. The per-task drawer has six tabs: Summary, Logs (SSE-streamed with ANSI, virtualised list, search), Diff (split or unified `git diff <base>...<branch>` with syntax highlight, copy, `.patch` download), Gates (quality-gate report with auto-expanded failures), Deps (upstream / downstream task graph), Trace (timeline from `.sdd/traces/{task_id}.jsonl`).
+
+`bernstein gui serve --tunnel` publishes through the tunnel driver registry (cloudflared / ngrok / bore / tailscale, auto-select). The same command issues a URL-safe bearer token plus a 6-word diceware passphrase, persisted at `~/.bernstein/dashboard.passphrase` with mode 0600, prints an ASCII QR, and ships an installable PWA: service worker with stale-while-revalidate for `/api/projects` and `/api/cost`, programmatic maskable icons, iOS Safari and Android Chrome install cleanly.
+
+For operators who already live in another host: `bernstein desktop-register --host <name>` writes the host-specific config entry for Claude Desktop, Claude Code, Cursor, Continue, Cline, Zed, and Aider. One command. `bernstein doctor --substrate` reports which hosts have us registered, which do not, and which have a stale registration. The orchestrator is a guest in the host's settings file; we ship the plugin, the host renders it.
+
+Honest framing on the web UI: it is a minimal demo of the operator surface. No theme toggle, no mobile-responsive pass, the Settings screen is a placeholder, the Fleet screen is scaffolding with a real data plane behind it, no front-end test suite, no Playwright smoke test in CI. It exists because the core could support it and operators asked. Tracking issue #1262 is the contributor welcome mat; small PRs preferred. Each per-host adapter is small enough that a host-spec change is a one-day fix, not a re-architecture. That is the cost of being a guest.
+
+## a CI that started fixing itself
+
+The auto-heal daemon shipped with twenty-six parameters and produced zero successful heals in its first three weeks. The post-mortem was dull in the best way. A fetch URL had moved. The classifier was missing the `agents-md drift` class, so doc-only commits looked like a new failure shape. Ruff was running before `agents-md sync`, so the sync's whitespace tweaks looked like lint regressions. And the heal-branch CI never started because push events from `GITHUB_TOKEN` don't fire downstream workflows by default; the daemon now dispatches explicitly.
+
+The rest of the immune system landed in the same wave. Inline-pushing the regenerated lockfile to a PR head instead of opening a bot-PR for it removed the dominant bot-PR-class source. A weekly aggregated digest issue replaces N auto-release-skipped notifications. A hotfix R-counter detects when a hotfix begets another hotfix and blocks further auto-merge after two-in-a-row. A trunk-health Andon gate holds merges on red trunk. An idempotency self-check in the regen path so a non-deterministic regen halts itself instead of looping. CI concurrency split by branch so rapid-merge bursts drain the queue instead of cancelling each other. The macOS runner queue (20 to 70 minutes during burst-merge waves) got split off the per-PR default matrix into push-to-main, `macos_sensitive`-path-changed, or `macos-needed`-labelled gated jobs, with a nightly full matrix.
+
+Every PR now also passes through a review-bot acknowledgement gate. CodeRabbit and Sourcery findings classified as must-address block merge until they are addressed in a fixup commit (with `bot-ack: <id>` in the commit message) or acknowledged in the PR body with a structured marker (`<!-- bot-ack: <id> reason=... -->`). A nightly sweeper and a reusable shepherd workflow template ship in the same wave, so the cadence stays predictable.
+
+## deterministic replay and one writer per session
+
+Three small things compounded into something operationally useful. Session ids are bound deterministically so a replayed run reproduces its own event stream without colliding with a sibling. The supervisor enforces a bounded respawn budget and parks an agent when the budget is exhausted, instead of looping respawns indefinitely. On-disk state has a versioned migrations module so an older `.sdd/` upgrades predictably. Plus the cosmetic-but-real win: runs surface a memorable deterministic name in user-facing output, so the operator can refer to "the brisk-sparrow run" instead of memorising a UUID.
+
+The bigger structural piece is the single-writer RunActor. One per-session actor owns canonical state. Mutations flow as typed events through one async queue. A pure `apply_event` reducer applies them with monotonic seq numbers. `ReplayBuffer` is a bounded ring (default 1024) that emits an explicit `Gap{up_to_seq}` marker when a subscriber asks for an evicted range, so a reconnect-after-eviction is observable instead of silently corrupt.
+
+`bernstein simulate` is the digital-twin runner that pairs with this. Feed it a plan plus a route and it executes the orchestration without the adapter network. Rehearse an expensive plan before paying for it.
+
+## cost guards, calibrated
+
+The bandit router had been doing the right thing for a while. What was missing was a way to read the routing decisions back.
+
+A per-task criterion profile plus TOPSIS multi-criteria ranking means a latency-sensitive task routes differently from a thorough one. A structured decision log covers every routing, retry, and gate verdict with its inputs. The calibration log got teeth: every forecast is scored with a Brier. Per-quota-envelope attribution shows where the spend actually went, not where the most expensive role declared it would. The preflight estimator stopped picking the first declared role and started picking the most expensive one; old behaviour underestimated by 40 to 60 percent on multi-role plans.
+
+The hard cap is `--max-cost-usd <N>`. Cross the threshold, the run aborts cleanly, partial results merged or rolled back the same way a normal cancel works. The per-ticket variant lives in `bernstein.yaml` so the cap survives a CLI restart and writes back to the tracker on termination. The same cap, posted via REST, now fails fast at the request boundary with 422 instead of bleeding into the task store as an unhandled 500.
+
+## supply chain, secrets, and a sandbox for the UI agents
+
+The security workstream does not write up as a single feature. Half of it is the broker that hands a task a short-lived token scoped to what it declared in its plan; the other half is the dozen smaller things that surround the broker.
+
+A secrets broker mints per-task tokens, scoped to the resources the task declared. Audit events dispatch outside the broker lock so a misbehaving sink can't stall the issuance path. Constant-time HMAC compare. Approval responses bound to a 16-byte server-minted single-use nonce; mismatches surface as 409, evicted replays as 410. Per-tool allowlist with fail-closed policy and a read-only profile.
+
+Prompt-injection containment runs against three surfaces. Invisible Unicode Tag codepoints are stripped from injected skills before any prompt sees them. Promptware cross-agent C2 strings are detected in tool output. MCP tool-call inputs are JSON-Schema validated, deny-by-default. A `security-pentest` eval scenario exercises the lot end to end.
+
+Supply-chain coverage on the workflow side: OSSF Scorecard, an SBOM emitted on every release, `actions/dependency-review` on PRs, trufflesecurity/trufflehog for secret scanning, Dependabot extended to the `github-actions` ecosystem, `step-security/harden-runner` on every workflow job (audit mode first, then block). The workflow security pass resolved 163 zizmor findings across `unpinned-uses`, `artipacked`, `template-injection`, `bot-conditions`, `dangerous-triggers`, `ref-version-mismatch`, `cache-poisoning`, `excessive-permissions`, and `dependabot-cooldown`. The three jobs that legitimately push back to git keep their credentials with an annotated rationale.
+
+A self-testing layer drives a Playwright context against the dev server, captures screenshots, console messages, and network errors as a structured artefact, and hands the result back to an LLM judge for verdict. This is the slice that closes the loop on UI and web agent tasks the way the existing test harness closed it for backend tasks. The agent's diff plus the post-run screenshot plus the console log feed one judge prompt; the judge returns a structured pass-or-fail with a rationale that lands in the task transcript.
+
+Honest mistake worth naming. The shipped wheel had `errors.bernstein.run` baked in as the GlitchTip DSN default and `telemetry.bernstein.run` as the telemetry endpoint default. Both backends soft-fail when their env vars are unset, so the package never actually reached out without consent. But the hostnames were sitting there as defaults, which is the kind of thing that turns into a real leak the day someone wires a config they did not read. Stripped, with a test that asserts zero operator-private host, IP, or DSN matches in `src/` and fails the build if a future change reintroduces one. Telemetry is now portable behind one Sentry-compatible `BERNSTEIN_TELEMETRY_DSN`, so each operator runs against their own backend rather than mine.
+
+## observability under one umbrella
+
+`bernstein doctor observe` runs each per-backend probe (Sonar, GlitchTip, Dependency-Track, GitHub Code Scanning) in order and renders one Rich table with metric, value, delta-since-last-check, threshold, and status. `--json` and `--watch`. Each backend soft-fails to SKIPPED when its env vars are unset, so a fresh checkout stays green. A per-PR sticky summary comment and a daily trends snapshot ride on the same JSON. Per-backend `bernstein doctor sonar` and `bernstein doctor glitchtip` ship behind the same umbrella for the operators who want one signal at a time.
+
+## the smaller things
+
+A bucket of cuts that do not need a whole section but matter in a specific situation.
+
+- **AI-BOM in three formats.** `bernstein bom emit` and `bernstein bom verify` ship a Bernstein-native JSON encoder plus CycloneDX 1.5 with the AI/ML extension plus SPDX 2.3 with AI-specific annotations behind one dispatcher. Pure projection from existing lineage / cost / adapter state; determinism enforced by Hypothesis property tests.
+- **Diary plus synthesizer.** One structured entry per closed task (tried / worked / failed / rationale / tags) with redaction of OpenAI keys, GitHub tokens, AWS access keys, PEM banners, and high-entropy hex. The synthesizer clusters diaries by tag-overlap Jaccard and drafts a markdown report. HITL-gated; reports default to `approved: false`.
+- **Consensus relay.** HMAC-chained per-cycle handoff at `.sdd/runtime/consensus/<cycle>.json` so an operator restarting a long evolution cycle can pull the prior cycle's decisions, blockers, and open questions without rediscovery.
+- **Three-layer skill customisation.** BASE / TEAM / USER under XDG paths with a deterministic merge spec: scalars override, tables deep-merge, keyed arrays replace by name, unkeyed arrays append, missing layers fall through cleanly.
+- **Canonical stream-signal vocabulary.** A small text-line vocabulary (COMPLETED, FAILED, QUESTION, PLAN_DRAFT, PLAN_READY, BLOCKED) parseable from any wrapped CLI stdout, so non-stream-json adapters surface lifecycle events through the same channel as native stream-json adapters.
+- **Empirical-confidence ledger.** Append-only SQLite store of per-decision outcomes; sample-size-gated; refuses to return below a documented threshold. Backs the model recommender with measured outcomes over the capability-tier heuristic.
+- **`bernstein export`, `bernstein analyze`, `bernstein adapters list`, `bernstein compare`.** The operator-side cuts that make the orchestrator legible from the CLI without spelunking the JSONL.
+- **Adapter count is at 44.** Devin for Terminal, JetBrains Junie (BYOK across the usual five providers plus the Copilot proxy), AWS Q Developer, DeepSeek V4-Flash and V4-Pro via an Ollama-compatible endpoint with an EU-residency guard.
+
+## two open questions for the community
+
+Two RFCs are live where the design genuinely depends on what other operators think. Drive-by comments welcome; full proposals more welcome.
+
+[#1720 - Skills end-to-end](https://github.com/sipyourdrink-ltd/bernstein/issues/1720). The skill subsystem already has discovery, layered merge (BASE / TEAM / USER under XDG, above), and an injector for Claude Code. The operator never touches it because there is no `install`, no `sync`, no `publish`, no `lint`, no `test`, no `init`, no `watch`. If you have an opinion on the verb surface, the manifest shape, or whether a community index belongs in scope at all, the RFC is where to leave it.
+
+[#1719 - Opt-in telemetry to a community-shared backend](https://github.com/sipyourdrink-ltd/bernstein/issues/1719). The package already has a portable telemetry pipeline behind `BERNSTEIN_TELEMETRY_DSN`. The current state (no maintainer-side endpoint, package never reaches out by default) is fine. The question on the table is whether an explicitly opt-in maintainer-operated endpoint is worth adding so the rare class of bug that bites many operators looks different from the rare class that bites one. The consent and transparency contract is the live debate.
+
+Both issues are tagged `up-for-grabs`; both have zero comments at the time of writing.
+
+## why these matter
+
+If you read the 1.10 recap and asked which of the friction points you were actually going to feel, the answer ten days later is most of them.
+
+Two agents writing the same file no longer race silently. A non-GitHub backlog is not a special case; ten adapters share the same conformance suite that has been keeping the CLI adapters honest. The web UI is one command and one port; the same command issues a tunnel, a QR, and an installable PWA. A CI break that the heuristic can fix does not need a human-dispatched hotfix. The compliance pack is a single ZIP an auditor can verify without installing the orchestrator. The MCP client treats every upstream as untrusted, which is the posture the larger ecosystem will end up needing. Cost decisions are read-back instead of inferred. Sessions reconnect across CLI restarts and across machines without rediscovery.
+
+The one I noticed most was the removed-our-own-infrastructure cut. The kind of mistake that ships invisibly. The kind of fix that should be a test.
+
+## try it
+
+```bash
+pipx install --upgrade bernstein
+
+# operator surface
+bernstein gui serve                             # web UI at http://127.0.0.1:8052/ui/
+bernstein gui serve --tunnel                    # public URL + QR + bearer + diceware
+bernstein desktop-register --host cursor        # register as a plugin in another host
+bernstein doctor --substrate                    # which hosts have us registered
+bernstein doctor observe                        # one umbrella table over four backends
+
+# routing and replay
+bernstein simulate --plan plan.yaml             # digital-twin a routing decision
+bernstein plan dag                              # render the declarative task DAG
+bernstein run --max-cost-usd 5                  # per-run hard cap
+
+# trackers and lineage
+bernstein trackers                              # plugin index for tracker adapters
+bernstein lineage gate                          # required check; fails on unresolved forks
+bernstein compliance pack \
+  --since 2026-04-01 --until 2026-05-19 \
+  --org "Your Org" --output pack.zip
+pipx install bernstein-verify
+bernstein-verify pack pack.zip                  # zero-trust verification
+
+# AI-BOM
+bernstein bom emit --format cyclonedx-1.5 > sbom.json
+bernstein bom verify sbom.json
+```
+
+Container: `ghcr.io/sipyourdrink-ltd/bernstein:2.5.1`.
+
+## next
+
+The spec-quality gate and the empirical-confidence ledger are the two slices most likely to compound. The first refuses to advance a feature spec until a deterministic, library-only rule set passes; the second backs the model recommender with a measured-outcomes store rather than a heuristic. Both are in early shape; both get bigger only if the operator surface stays restrained.
+
+If you hit something rough across the 2.0 to 2.5 surface, [open an issue](https://github.com/sipyourdrink-ltd/bernstein/issues). The next batch is shaped by what blocks real work.
+
+## related
+
+- [v1.10.x recap](/blog/v1-10-x-recap): the one this picks up from.
+- [v2.0 release notes](/blog/v2-0-release): when the web UI landed.
+- [orchestrator on someone else's box](/blog/orchestrator-on-someone-elses-box): the on-prem deployment story this release strengthens.

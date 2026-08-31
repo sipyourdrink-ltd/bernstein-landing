@@ -1,0 +1,82 @@
+---
+title: "Picking a cheaper model when the task allows"
+description: "Bernstein's contextual bandit picks a model and effort level per task. Internal runs cut roughly in half. Measure your own with bernstein cost."
+date: "2026-04-07"
+dateModified: "2026-08-10"
+tags: ["AI cost optimization", "model routing", "contextual bandit", "multi-agent orchestration", "LLM cost reduction"]
+schemaType: "TechArticle"
+techDependencies:
+  - "Bernstein orchestrator (Python 3.12+) with the routing sub-package on disk"
+  - "At least two model arms available so the bandit has something to choose between (e.g. Haiku, Sonnet, Opus)"
+  - "Writable .sdd/routing/ so the learned policy survives orchestrator restarts"
+  - "BERNSTEIN_ROUTING=bandit (or bandit-shadow) in the environment; default routing is static"
+---
+
+<Lead>
+Most agent frameworks send everything to the same model. Renaming a variable, designing an auth system: same prompt budget, same model either way. Bernstein's router learns which task type each model handles. Our own self-development runs roughly halved their per-session bill once the bandit warmed up.
+</Lead>
+
+<Callout title="Editor's note (2026-08-10)">
+The router this post first described - an epsilon-greedy bandit over a Haiku → Sonnet → Opus cascade - is retired. The sections below describe routing as it ships in v3.14.159: a LinUCB contextual bandit plus a UCB1 effort bandit, opt-in via `BERNSTEIN_ROUTING=bandit`. The bill numbers at the end are April 2026 measurements of the old router. They stay, dated.
+</Callout>
+
+## the uniform problem
+
+Routing a docstring task to Opus instead of Haiku is, at current pricing, about 5x overspend. Forty tasks a session, that's a real number - the kind that turns "side project" into a line item your spouse asks about.
+
+## three layers
+
+**Cascade (default).** Every task carries a `complexity` (low/medium/high), a `scope`, a `role` (backend, qa, security, docs…) and a priority. The static cascade router starts each task at the cheapest viable tier and escalates on failure, a janitor verification failure, or low-confidence output. The cascade is `sonnet → opus`; Haiku was dropped from it after Sonnet-for-everything measured better on the Max plan.
+
+**Bandit (opt-in).** LinUCB, contextual. The feature vector covers complexity, scope, priority, repo size, estimated tokens, task type, language, and a role embedding. Reward is `quality_score * (1 - normalized_cost)`: quality is 1.0 when janitor verification passes, 0.0 when it fails; cost is normalised against the per-task budget ceiling. A separate UCB1 bandit learns the effort level (low/high/max) per (task type, model) pair. Below `warmup_min` completions (50 by default) the bandit delegates to the same static heuristics the cascade router uses.
+
+```python
+# Simplified
+decision = router.select(task)  # model + effort
+# spawn with decision.model / decision.effort ...
+router.record_outcome(
+    task=task, model=decision.model, effort=decision.effort,
+    cost_usd=actual_cost, quality_score=1.0 if janitor_passed else 0.0,
+)
+```
+
+**Capability floors.** The bandit's pick is clamped from below. High-stakes work - manager/architect/security roles, high complexity, large scope, priority 1 - never drops under Sonnet; tasks that combine a high-stakes role with high complexity and large scope are pinned to Opus. Wasting an agent's hour on the wrong model isn't actually cheap.
+
+**Persistence.** Policy state lives in `.sdd/routing/policy.json` (LinUCB matrices) and `.sdd/routing/bandit_state.json` (completion counts), so learning accumulates across orchestrator restarts. Delete the directory and the router starts cold.
+
+## what falls out
+
+After warm-up:
+
+| Task type | Typical model | Why |
+|-----------|--------------|-----|
+| Docs, docstrings | Sonnet | Templated, low reasoning - cheapest cascade tier |
+| Test writing | Sonnet | Code understanding, not creativity |
+| Bug fixes | Sonnet | Pattern matching |
+| Refactoring | Sonnet/Opus | Depends on scope |
+| Architecture, security | Opus | Floor-clamped; deep reasoning |
+
+The floors are hardcoded; the rest is learned. If your test suite is unusually gnarly, the bandit will figure that out and route accordingly.
+
+## config
+
+Static cascade routing is the default. The bandit is an environment switch:
+
+```bash
+BERNSTEIN_ROUTING=bandit         # bandit picks model and effort
+BERNSTEIN_ROUTING=bandit-shadow  # static routes; bandit logs what it would have picked
+```
+
+Shadow mode writes its would-have-been decisions to `.sdd/routing/shadow_decisions.jsonl` alongside the executed model, so you can compare the two policies on your own workload before switching. Unset the variable and routing stays static.
+
+## numbers
+
+Across our self-development sessions in April 2026 - Bernstein refactoring its own codebase, on the since-retired epsilon-greedy router - bandit routing cut the bill roughly in half versus Sonnet-for-everything. Completion rate stayed within a couple of percent. A 10-agent / 50-task session that used to run $15-20 landed at $7-10. We haven't repeated the measurement on the LinUCB router. Measure your own with `bernstein cost`.
+
+## further
+
+- [Architecture](https://bernstein.readthedocs.io/en/latest/architecture/ARCHITECTURE/) for where routing sits in the pipeline.
+- [Source](https://github.com/sipyourdrink-ltd/bernstein/tree/main/src/bernstein/core/routing).
+- [orchestrate the orchestrators](/blog/orchestrate-the-orchestrators) covers leaf-node delegation: how Bernstein routes through wrapped sub-orchestrators (Composio AO, ralphex) as if each were a single agent.
+- [v2.0 release notes](/blog/v2-0-release) for the per-step `cli:` / `model:` directives that let a plan pin specific arms of the bandit per task.
+- [cost calculator](/cost) lets you put your own monthly LLM spend in and see what the routing band would shift.

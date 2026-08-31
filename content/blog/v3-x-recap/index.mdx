@@ -1,0 +1,168 @@
+---
+title: "bernstein 3.x recap: deterministic replay, evidence bundles, tournament runs, and a run you can walk away from"
+seo_title: "bernstein 3.x recap: replay, evidence, tournaments"
+description: "The arc from 2.0 to 3.5.0, in one page. The 2.x line taught the orchestrator to do more. The 3.x line made each of those things carry its own proof: an always-on signed lineage spine, deterministic replay by default, content-addressed evidence bundles, a durable ledger that resumes on another machine, detached runs, tournament selection with no model in the decision path, cost-aware dispatch under USD caps, a run review board, SPIFFE identity, an MCP Tasks surface, a stateless chain-anchored MCP core, and provider-side context mutations recorded into the replay journal."
+date: "2026-07-16"
+draft: false
+featured: false
+tags:
+  - "multi-agent orchestration"
+  - "release"
+  - "deterministic replay"
+  - "audit log"
+  - "lineage"
+  - "evidence bundles"
+  - "tournament runs"
+  - "detached runs"
+  - "cost control"
+  - "cost-aware scheduling"
+  - "provider failover"
+  - "run review board"
+  - "SPIFFE"
+  - "MCP"
+  - "MCP Tasks"
+  - "Windows"
+  - "adapters"
+  - "Claude Code"
+  - "Codex"
+  - "Gemini CLI"
+schemaType: "TechArticle"
+techDependencies:
+  - "Python 3.12+ with `pipx install --upgrade bernstein` (or `uv tool upgrade bernstein`)"
+  - "An existing `bernstein.yaml` from a 2.x install; configs and plans run unchanged, no migration"
+  - "Optional `bernstein[spiffe]` extra plus a running SPIRE agent if you want X.509-SVID binding; the self-contained Ed25519 identity path stays the default without it"
+  - "A task-capable MCP client (Claude Code, Cursor, Cline) to drive long runs asynchronously through the MCP Tasks surface"
+---
+
+<Lead>
+The 2.x line taught the orchestrator to do more: ten trackers, a web UI, a cost economy, forty agents at once. The 3.x line did something quieter, and for anyone who has to answer for a run after the fact, more useful. It made each of those things carry its own proof. "Done" stopped being a status you trust and became an artefact you can recompute.
+</Lead>
+
+This is the single round-up for the whole arc, so the trajectory from 2.0 to 3.5.0 reads from one page. The 2.x story (lineage, the tracker family, A2A cards, the output-economy suite) already has its own recaps, linked at the bottom. This one picks up at 3.0 and follows the ten releases that carried the line to 3.5.0. The theme underneath all of them is the same sentence said nine ways: the record is not written *next to* the work, the record *is* the work, hashed and signed, and you can hand it to someone who does not trust the orchestrator and they can check it themselves.
+
+## one chained record, always on
+
+Before 3.0, lineage was a set of optional per-subsystem logs. Useful, but you had to opt in, and the pieces did not join up into one thing you could verify start to finish.
+
+3.0 collapsed them into a single Ed25519-signed spine. Every step that produces an artefact folds into one chain, and `bernstein lineage verify <run_id>` walks the whole thing. The matching change is the one that pays off most often: deterministic replay is now on by default. The step journal is a Merkle chain where each entry hashes its predecessor, the inputs, the model, the prompt, the tool call, and the tool result. `bernstein replay --from-step N` rebuilds state by walking it.
+
+The reason that matters is not archival. It changes how non-determinism shows up. Two runs from the same seed, plan, and state are compared by hash, so a run that drifts is a hash divergence at an exact position, not a flaky test you rerun until it passes. The coordinator has no model in its scheduling loop, which is what makes the property hold: given the same inputs, it schedules the byte-identical task graph. If yours does not, the chain tells you which step broke the tie.
+
+## done is a bundle you can recompute
+
+"Done" used to be a status line plus a scatter of logs that died with the worktree. 3.1 replaced it with a verification evidence bundle.
+
+A task declares its evidence producers in the spec: a test command, coverage, lint, and for web-facing work an optional screenshot or recording. Required producers gate completion; advisory ones attach a failure record without blocking. The bundle is content-addressed, stored under a size-capped store with garbage collection, referenced from the task's lineage record, and sealed by an audit-chain event. `bernstein evidence show <task>` renders it, and `bernstein audit verify` now covers bundle integrity, so a tampered evidence file is caught exactly like a tampered chain entry, and the error names the file that broke.
+
+Two details make it safe to lean on. Deterministic producers replay to byte-identical bundle hashes, so "the tests passed" is a claim you recompute rather than a checkbox someone ticked. And sealing is fail-open: a task that declares no producers is untouched, and any error while sealing is logged and swallowed so it can never block a completion. Generated pull-request bodies link the sealed bundle, so the reviewer sees the evidence the merge is standing on without leaving the PR.
+
+## a run you can walk away from
+
+This is the operator win of the whole line. Before 3.2, an interrupted run threw away finished work and a crashed process took the run with it.
+
+The durable work ledger fixed the first half. Every task-graph transition appends a redacted, content-addressed, Merkle-chained entry. `bernstein ledger resume` rebuilds scheduler state purely by replaying the chain and re-dispatches only the tasks with no completion entry, so finished work is never re-run. The ledger is machine-portable: clone the repository on another laptop and resume there with zero lost work, and any divergence surfaces as a hash mismatch at an exact position instead of a silent merge. Checkpointed retries land on top: when the agent session recorded a checkpoint, a failed retry resumes warm with a corrective instruction, or forks a fresh session off the checkpoint, with cold restart as the always-safe fallback. Every warm/fork/cold decision is journaled.
+
+3.4 fixed the second half with the detached run service. `bernstein run-service` submits a goal, detaches to a supervisor, and lets you reattach later; a restart resumes from the durable descriptor and ledger rather than starting cold, and submit, detach, reattach, and completion are each `run.lifecycle` receipts in the chain. Two more availability pieces round it out: per-role provider fallback chains reroute a provider outage as a deterministic, receipted failover decision (rehearse it with `bernstein doctor --failover-drill` before a real outage forces the question), and OpenAI-compatible local endpoints can serve worker roles once `bernstein doctor --endpoint` admits them behind a signed certification receipt.
+
+## the scheduler grew opinions, and it shows its work
+
+Three of the 3.4 features share one shape: a scheduling decision with no model in the loop, emitted as a receipt you can recompute offline.
+
+Tournament runs are the clearest example. A hard task declares `attempts: N` with scripted evaluators (test pass rate, lint, coverage delta, mutation score, or an arbitrary command). The scheduler runs N sibling attempts in isolated worktrees with identical inputs, and the winner is a pure function of the evaluator outputs with a stable attempt-hash tie-break. No model call decides it. The result is a signed `TournamentReceipt` naming every attempt hash, every evaluator output, the winner, and the lineage edges, and `bernstein tournament verify` recomputes the selection offline, so a hand-picked winner or a doctored score diverges from the replay and fails. Fan-out is gated on the ticket's budget ceiling and aborts before spawning if the projected spend would breach it.
+
+Cost-aware scheduling is the same idea applied to dispatch. Each decision is a `cost.dispatch_receipt`: a deterministic admit or halt under USD caps, pinned by a hash over the price table, the spend ledger, and the caps, so two operators replay the same verdict. Non-interactive work routes to a provider batch surface where the adapter declares one, and 3.4.2 wired that into the live run loop with a `cost.batch_route` entry per decision. And the spec-to-graph pipeline gives spec-first teams a supported path: `bernstein plan compile` holds at most one model call, in the draft step; approve binds the requirement-set hash into the chain as a `spec.requirement_set` receipt, and compile is a pure, model-free transformation from the approved set to a task graph. Edit one requirement and only the affected node re-plans, because each node is content-addressed over the requirement lines it implements.
+
+## the operator surfaces caught up
+
+The web UI shipped in 2.0 as a minimal demo. The 3.x line gave it the two things a demo does not have: access control and a way to review a finished run without reading raw JSONL.
+
+The dashboard is no longer all-or-nothing. Operators issue scoped credentials with `bernstein dashboard-token`, read-only or operator scope, and every allow or deny is a governance journal receipt, so an access review can reconstruct who reached which surface under which credential. Token grants and revocations are signed journal rows; a tampered grant fails signature verification and counts as no grant.
+
+The run review board is the surface I reach for most. It is a deterministic projection of the run journal into a web view, so the same journal always renders the same board, with no hand-maintained status anywhere. 3.4 added a diff viewer and an evidence panel, so a reviewer sees the run diff and the sealed evidence behind each step in one place, and approvals and rejections are `review_board.action` receipts joined back to the journal. On the adapter side, a nightly conformance canary now probes every primary adapter against whatever upstream version is installed and seals each probe as a content-addressed receipt; a last-green table names the newest version each adapter passed with, and `bernstein doctor` warns when your installed version is newer than the last one that was attested. The `agy` adapter joined the matrix under the same contract in 3.3.
+
+## identity, and talking to the rest of the stack
+
+Two interop pieces are worth calling out for teams that do not run bernstein in isolation.
+
+SPIFFE-compatible workload identity, added in 3.4, maps the Ed25519 install identity and each agent card onto a deterministic SPIFFE ID, so two operators derive the same id for the same install and a verifier re-derives it later. With a SPIRE agent present (the optional `bernstein[spiffe]` extra), the issued X.509-SVID is bound to a card by a `spiffe.svid_binding` receipt that refuses any SVID whose id disagrees. Without the extra, the self-contained Ed25519 path stays the default and every existing flow is unchanged, which is the right default for the common case.
+
+The MCP Tasks surface, contributed by [@Amanmeena0](https://github.com/sipyourdrink-ltd/bernstein/pull/2468) and shipped experimentally in 3.4.4, exposes a long-running run as a verifiable handle. A task-capable client (Claude Code, Cursor, Cline) starts a run with the `bernstein_run` tool, gets a `CreateTaskResult`, and then polls `get_task`, `get_task_result`, `list_tasks`, and `cancel_task` without holding a blocking session open. The handle embeds the run's audit-chain head hash as `{task_id}:{head_hash}`, so a stateless client can still tie a progress claim back to the signed chain, and incoming W3C trace-context is propagated per task so a run never inherits another run's context. Packaging got the matching hardening: installing bernstein as a skill or plugin now produces a `plugin.update_receipt` that refuses an update whose manifest hash does not match, and 3.4.2 added offline signed-image provenance so a registry listing that points at a different or unsigned image fails the release.
+
+## the chain outlives the session
+
+3.0 shipped the stateless MCP protocol core. 3.5.0 finished the job across the client, the remote transport, and the gateway: none of them depend on protocol sessions anymore. Every call carries content-derived trace and span ids in `_meta`, an input-required retry resumes from an echoed request state on any server instance, and each served or proxied call lands as an `mcp.stateless_call` entry bound to the audit-chain head.
+
+Two properties fall out. A tool-call sequence completes correctly even when consecutive requests land on different transport instances with no shared memory, so a restart or a second instance stops being a session-loss event. And `bernstein audit verify` reconstructs the full MCP call ordering of a run from chain entries alone; tampering with any single entry fails verification at exactly that entry. Legacy clients that still send a session header keep working through a compatibility shim with an explicit removal window, and the deprecated protocol surfaces (Roots, Sampling, the Logging advertisement) moved behind the same shim ahead of the upcoming MCP specification revision.
+
+## replay that notices the provider
+
+Byte-identical replay carried an assumption: context-as-sent equals context-as-consumed. Providers can now mutate context server side (context compaction and similar opaque state), which breaks that assumption quietly, from outside the journal. 3.5.0 records every such mutation as a content-addressed chain entry.
+
+Deterministic runs request suppression and fail loudly if a mutation arrives anyway. Replay flags an unrecorded mutation as divergence at the exact step, instead of drifting silently. And two replays of a run with recorded mutations produce byte-identical journal heads. The guarantee stays the same sentence it has been all along: if the model saw different bytes, the chain says so, and it says where.
+
+## security, CI, and the contributor path
+
+The quieter 3.5.0 lines, briefly. pillow moved to 12.3.0, clearing eight published advisories, and a code-scanning pass tightened salt derivation, cookie security flags, and workflow permissions. On the CI side, the weekly digest now counts real failures only, the workflow topology report self-heals after workflow-editing merges, observability metric regressions page someone instead of landing in a file nobody reads, and CodeQL analyses on main are no longer cancelled mid-run.
+
+On the contributor side, the web UI overview docs now match the shipped seven-route surface (thanks [@Om-Rohilla](https://github.com/sipyourdrink-ltd/bernstein/pull/2505)), and the [web UI tracking issue](https://github.com/sipyourdrink-ltd/bernstein/issues/1262) carries a prioritized contributor roadmap with good first picks, so someone showing up to work on the frontend has a marked place to start instead of an open-ended issue thread.
+
+## the Windows line finally holds
+
+The unglamorous thread that runs through the whole arc. The 2.16.1 fix (thanks to [@ViteaVlaikov](https://github.com/sipyourdrink-ltd/bernstein/issues/2287) for the report) made `.cmd` and `.bat` adapter shims spawn correctly through the command interpreter, with `PATHEXT` passed to the worker environment. That closed the silent-exit bug, but it was one fix on an unproven platform.
+
+The 3.x line turned it into a tested lane. 3.3 added the platform pieces (reap receipts for killed worker trees, Job Object process grouping so orphaned children cannot leak, junction-aware worktree isolation for filesystems where symlinks need elevation). Then 3.4.2 did the part that actually earns trust: the adapter conformance suite for the claude, codex, and gemini adapters now runs on a real `windows-latest` runner, exercising the actual spawn, stop, and restart contract and the Windows worktree-isolation path against a cross-platform fake-CLI harness. That replaced the mock-only coverage for those paths. First-class Windows support is still tracked as its own line of work, but the dominant install path is now checked on the platform it runs on rather than assumed to work.
+
+## honest framing
+
+The determinism, the replay, and the signed bundles are code you can stand up and read, with tests and runbooks. The compliance verifier still ships as a standalone `bernstein-verify` wheel whose own test asserts `import bernstein` raises `ModuleNotFoundError` from inside its venv, because independence from the thing it audits is the property an external reviewer wants.
+
+<Callout title="Limitation" tone="warning">
+None of this has been through an external regulatory audit. Treat the audit chain, the evidence bundles, and the verifier as verifiable artefacts an evaluator can recompute, not as an attestation someone else has already signed off. Several 3.4 items also shipped a complete first phase with follow-ups tracked separately (broader supervisor back-pressure, additional provider batch endpoints, first-class Windows), and the 3.5.0 MCP work keeps a compatibility shim for legacy session-header clients with an explicit removal window. The release notes say which for each.
+</Callout>
+
+## why these fit together
+
+Read as a changelog, the 3.x line is a pile of unrelated features. Read as one arc, it is a single answer to a single question: after a run finishes, or fails, or gets interrupted, what can you actually prove about what happened?
+
+- The lineage spine and default replay make a run **reconstructable**: drift is a hash divergence at a named step, not a rerun.
+- Evidence bundles make "done" **recomputable**: the tests passed is a hash you check, not a box someone ticked.
+- The durable ledger and detached runs make a run **survivable**: it resumes on another machine, and it outlives the process that started it.
+- Tournament, cost-aware dispatch, and spec compile make scheduling decisions **replayable**: a winner or a spend verdict is a pure function you can recompute offline, with no model in the loop to argue with.
+- Scoped tokens, the review board, and SPIFFE identity make the operator surfaces **accountable**: who did what, under which credential, joins back to the journal.
+- The stateless MCP core and recorded context mutations make the interop boundary **checkable**: call ordering reconstructs from the chain alone, and a provider that rewrites the context shows up as divergence at a named step, not as a mystery rerun.
+
+None of these is a headline on its own. Together they are the difference between an orchestrator you trust because it usually works and one you can hand to a reviewer who does not trust you at all.
+
+## try it
+
+```bash
+pipx install --upgrade bernstein     # or: uv tool upgrade bernstein
+
+# the record
+bernstein lineage verify <run_id>               # walk the signed spine
+bernstein replay --from-step 12                 # rebuild state from the Merkle chain
+bernstein evidence show <task>                  # render the sealed evidence bundle
+bernstein audit verify                          # covers chain + bundle integrity
+
+# runs that survive
+bernstein run-service submit --goal "…"         # detach and reattach later
+bernstein ledger resume                         # re-dispatch only unfinished tasks
+bernstein doctor --failover-drill               # rehearse provider outages
+
+# scheduling that shows its work
+bernstein tournament verify <run>               # recompute the winner offline
+bernstein plan compile --spec spec.md           # draft, approve, model-free compile
+
+# surfaces and identity
+bernstein dashboard-token issue --scope read    # scoped dashboard credential
+bernstein spiffe id                             # derive the SPIFFE id offline
+```
+
+Container: `ghcr.io/sipyourdrink-ltd/bernstein:3.5.0`.
+
+## related
+
+- [bernstein 2.x recap](/blog/v2-x-recap): where this arc starts - lineage, ten trackers, A2A cards, the standalone verifier.
+- [Running many agents on 2.16](/blog/output-economy-and-agent-lifecycle): the output-economy suite, the Windows adapter path fix, and the fan-out workflow that 3.x makes reproducible.
+- [cost-aware routing](/blog/cost-aware-routing): the bandit that decides which arm gets the work, which cost-aware dispatch now bounds and receipts.
+- [v2.0 release notes](/blog/v2-0-release): when the web UI landed in the wheel.

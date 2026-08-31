@@ -1,0 +1,11 @@
+# funding sources for bernstein-landing.
+# order matters: github sponsors lives at 0% personal-account fee and
+# is what the github "sponsor" button hits by default, so it goes first.
+# polar.sh is held as monetization optionality (license keys for the
+# cloudflare workers cloud runtime); kept second so it shows in the
+# .yml-derived sponsor menu but never preempts github sponsors. open
+# collective stays as a tertiary fallback because some companies'
+# procurement only pays via OC.
+github: chernistry
+polar: bernstein
+open_collective: bernstein

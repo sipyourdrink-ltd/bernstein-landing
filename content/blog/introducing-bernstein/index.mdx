@@ -1,0 +1,67 @@
+---
+title: "bernstein 1.0: open-source orchestrator for ai coding agents"
+seo_title: "Run Claude Code in parallel with audit chain | Bernstein"
+description: "Orchestrate Claude Code, Codex, Gemini CLI and other CLI coding agents in parallel git worktrees. Deterministic scheduler, HMAC-signed audit chain."
+date: "2026-03-29"
+tags: ["multi-agent orchestration", "AI coding agents", "Claude Code", "open-source", "deterministic scheduling"]
+schemaType: "TechArticle"
+techDependencies:
+  - "Python 3.12+ with the Bernstein orchestrator installed"
+  - "Git with worktree support for per-agent isolation"
+  - "Writable .sdd/ state directories for tasks, metrics, and traces"
+  - "At least one CLI coding agent on PATH"
+featured: true
+---
+
+<Lead>
+Bernstein 1.0 is up on PyPI today. It's an orchestrator for CLI coding agents - Claude Code, Codex, Gemini CLI, anything that talks over a terminal - with a plain-Python scheduler and a worktree per agent so they don't trample each other.
+</Lead>
+
+## why
+
+I started the project after a 47-hour weekend running twelve Claude Code sessions in parallel and watching them race for the same files. The full story is on my [personal blog](https://alexchernysh.com/blog/bernstein-multi-agent-orchestration). The short version is that twelve agents with no coordination produce a merge horror show; twelve with worktrees and a scheduler produce a working codebase.
+
+## what's different
+
+No LLM in the scheduling loop. The orchestrator is plain Python, the only model call decomposes the goal into tasks, the rest is a state machine. Predictable. Replayable from the audit log.
+
+Seven adapters. Claude Code, Codex, Gemini CLI, Aider, Amp, Qwen, Roo Code, plus a generic wrapper for anything else that talks over a terminal. New adapters land in roughly 100 lines of Python; the list [grew to eighteen within weeks](/blog/community-spotlight-april-2026). Agents are interchangeable workers, not pets.
+
+Git worktree per agent. No conflicts during execution; the merge queue lands what passes the gates and rolls back what doesn't.
+
+State in `.sdd/` files. YAML and JSON, no database, no Redis. `cat`, `grep`, `git` all work on it.
+
+Short-lived agents. Each one handles one to three tasks and exits. Fresh context, no token rot.
+
+## install
+
+```bash
+pip install bernstein
+export ANTHROPIC_API_KEY=sk-...
+bernstein run --goal "Add input validation to the user registration endpoint"
+```
+
+For multi-stage projects there's a YAML plan format:
+
+```yaml
+stages:
+  - name: validation
+    steps:
+      - goal: "Add Pydantic models for all API request bodies"
+        role: backend
+  - name: testing
+    depends_on: [validation]
+    steps:
+      - goal: "Write integration tests for all validation rules"
+        role: qa
+```
+
+```bash
+bernstein run plans/api-hardening.yaml
+```
+
+## what's in 1.0
+
+Tick-based orchestrator, task store with retry and a dead-letter queue, quality gates, cost tracking, HMAC-signed audit log, task server on `:8052`, a TUI. The full [changelog](https://github.com/sipyourdrink-ltd/bernstein/releases/tag/v1.0.0) has the rest. The [getting started](/blog/getting-started) post walks the first run.
+
+Cost-aware routing, cloud execution, MCP and A2A - all on the roadmap, all Apache 2.0, all in the open. Source: [github.com/sipyourdrink-ltd/bernstein](https://github.com/sipyourdrink-ltd/bernstein). The [cost-aware routing](/blog/cost-aware-routing) post walks through the bandit that fell out of the routing roadmap; the [v2.0 release](/blog/v2-0-release) closes the v1 -> v2 arc with the web GUI.

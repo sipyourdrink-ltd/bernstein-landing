@@ -1,0 +1,40 @@
+---
+title: "Summary: Running many agents on 2.16: the output-economy suite, safer summaries, and a fleet you can pin"
+description: "A walkthrough of what shipped across the 2.4 to 2.16 arc for operators running many agents at once: per-role response-style profiles, per-profile cost attr"
+date: "2026-07-06"
+url: "https://bernstein.run/blog/output-economy-and-agent-lifecycle"
+tags: ["summary"]
+source_post: "output-economy-and-agent-lifecycle"
+summary_modes:
+  quick:
+    title: "running many agents without losing control"
+    items:
+      - "per-role output profiles and cost attribution let you shape spend by verbosity and role."
+      - "schema-enforced completions, compaction receipts, and pinned manifests make fleets reproducible and auditable."
+    whyItMatters: "you can trust the results and costs of large-scale agent runs because every change is tracked and verified."
+  takeaways:
+    title: "running many agents: cost control, compaction safety, and fleet reproducibility"
+    items:
+      - "per-role response-style profiles let operators define output verbosity and tie it to cost attribution."
+      - "cost ledgers now attribute spend by response profile, enabling direct comparison of verbose versus terse roles."
+      - "proactive context compaction with chained receipts ensures safe, verifiable memory management during long tasks."
+      - "team manifests with sha256 pins and drift detection guarantee byte-identical fleet configurations across runs."
+    whyItMatters: "operators can now trust that their agent fleets behave consistently, spend predictably, and fail safely at scale."
+  technical:
+    title: "running many agents: cost, safety, and reproducibility at scale"
+    items:
+      - "per-role response-style profiles in bernstein.yaml govern output verbosity with verbose/balanced/terse modes, and the selected profile's SHA-256 is recorded in the cost ledger for auditability. resolution follows a deterministic hierarchy: task declaration, role entry, policy default, then balanced."
+      - "cost attribution now includes response-style profile as a dimension in the spend ledger, enabling direct comparison of output costs across profiles; tasks changing profile mid-run are excluded from aggregates to ensure strict attribution. reports are computed over canonical JSON without timestamps and written as .json for third-party verification."
+      - "the three-arm A/B harness bernstein ab-test --arms 3 compares baseline, control (minimal terse), and candidate profiles, with winners declared only when both cost and quality metrics are complete across honest arms. every cost figure is derived from hashed spend-ledger rows, enabling byte-identical recomputation by verifiers holding the ledger."
+      - "sha256-pinned team manifests in templates/teams/*.toml define fleet-wide roles, policies, and template digests using canonical serialization (sorted keys, LF endings). bernstein team drift checks for on-disk divergence and exits non-zero if any pinned template no longer matches, recording findings in the HMAC-chained audit log."
+    whyItMatters: "operators can now attribute spend, enforce safety, and reproduce runs across distributed fleets with confidence."
+---
+
+## summary
+
+per-role response-style profiles let operators define output verbosity and tie it to cost attribution. cost ledgers now attribute spend by response profile, enabling direct comparison of verbose versus terse roles. proactive context compaction with chained receipts ensures safe, verifiable memory management during long tasks. team manifests with sha256 pins and drift detection guarantee byte-identical fleet configurations across runs.
+
+## key takeaways
+
+- per-role output profiles and cost attribution let you shape spend by verbosity and role.
+- schema-enforced completions, compaction receipts, and pinned manifests make fleets reproducible and auditable.

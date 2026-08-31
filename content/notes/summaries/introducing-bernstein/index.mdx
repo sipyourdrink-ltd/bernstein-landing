@@ -1,0 +1,46 @@
+---
+title: "Bernstein 1.0"
+description: "An open-source orchestrator for CLI coding agents. Deterministic scheduler, file-based state, one git worktree per agent."
+date: "2026-03-29"
+url: "https://bernstein.run/blog/introducing-bernstein"
+tags: ["summary", "multi-agent orchestration", "open-source"]
+source_post: "introducing-bernstein"
+summary_modes:
+  quick:
+    title: "bernstein 1.0: deterministic orchestrator for CLI coding agents"
+    items:
+      - "Plain-Python tick scheduler with no LLM in the scheduling loop; only goal decomposition calls a model."
+      - "One git worktree per agent so parallel sessions never collide on file paths; merge queue lands what passes quality gates."
+    whyItMatters: "It treats multi-agent work as scheduling, not prompting, which is the gap most agent frameworks leave open."
+  takeaways:
+    title: "What bernstein 1.0 actually ships"
+    items:
+      - "No LLM in the scheduling loop; the orchestrator is a deterministic state machine that only calls a model for goal decomposition."
+      - "18 CLI adapters at launch (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Aider, Cursor, Amp, Kiro, Kilo, Qwen, Goose, and more); new adapters are roughly 100 lines of Python."
+      - "State lives in .sdd/ as YAML and JSON, so cat, grep, and git all work on orchestrator state with no database required."
+      - "1.0 ships a tick-based orchestrator, task store with retry plus dead-letter queue, quality gates, cost tracking, HMAC-signed audit log, task server on port 8052, and a TUI."
+    whyItMatters: "Operators can audit, replay, and reason about runs with the tools they already use; no proprietary state plane."
+  technical:
+    title: "bernstein 1.0 design: worktree isolation, deterministic ticks, file-based state"
+    items:
+      - "The scheduler is a plain-Python loop that ticks at a fixed cadence, dispatches tasks to short-lived agent processes (one to three tasks each to avoid token rot), and collects results into a merge queue; no LLM decides what runs next."
+      - "Each agent gets its own git worktree, so two agents editing the same path are physically isolated until merge time; the merge queue applies what passes quality gates and rolls back what does not."
+      - "State persistence is .sdd/ files (YAML and JSON), with no Redis or database hop; the entire system can be inspected by reading the directory, which keeps debugging boring and the audit trail HMAC-chained."
+      - "The 18 launch adapters share one base class, so new CLIs (Claude Code, Codex, Gemini CLI, Aider, Cursor, Amp, Goose, and the rest) plug in at roughly 100 lines each; the cost tracker meters every dispatch against a per-repo cap."
+    whyItMatters: "Each design choice is one less reason for an operator to hit a black box; the orchestrator is observable by the same tools that observe a normal codebase."
+---
+
+## summary
+
+bernstein 1.0 is an open-source orchestrator for CLI coding agents - Claude Code, Codex, Gemini CLI, and anything else that talks over a terminal. the project started after a 47-hour weekend run with twelve parallel Claude Code sessions that produced merge conflicts instead of a working codebase. the solution is a plain-Python tick-based scheduler with no LLM in the scheduling loop, a git worktree per agent so they never share file paths during execution, and a merge queue that lands what passes quality gates and rolls back what doesn't. state lives in `.sdd/` as YAML and JSON with no database required. agents are short-lived (one to three tasks each) to avoid token rot.
+
+## key takeaways
+
+- no LLM in the scheduling loop - the orchestrator is a plain state machine; only the goal decomposition step calls a model.
+- 18 adapters at launch (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Aider, Cursor, Amp, Kiro, Kilo, Qwen, Goose, and more); new adapters are roughly 100 lines of Python.
+- state in `.sdd/` files means `cat`, `grep`, and `git` all work on orchestrator state - no Redis, no database.
+- 1.0 ships: tick-based orchestrator, task store with retry and dead-letter queue, quality gates, cost tracking, HMAC-signed audit log, task server on port 8052, and a TUI.
+
+## when to read this
+
+for developers evaluating bernstein before a first run, or anyone who wants to understand the core design decisions - worktree isolation, deterministic scheduling, file-based state - and why they were made.

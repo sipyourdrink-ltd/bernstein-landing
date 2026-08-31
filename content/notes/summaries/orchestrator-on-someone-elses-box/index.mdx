@@ -1,0 +1,79 @@
+---
+title: Shipping the orchestrator onto someone else's box
+description: >-
+  On-prem / regulated deployment notes for Bernstein 1.10: cluster mTLS, signed
+  lineage, air-gapped install, lethal-trifecta capability gate. Not an install
+  guide - for security architects and procurement reviewers, not laptop
+  developers.
+date: '2026-05-05'
+url: 'https://bernstein.run/blog/orchestrator-on-someone-elses-box'
+tags:
+  - summary
+  - enterprise
+  - audit-trail
+source_post: orchestrator-on-someone-elses-box
+summary_modes:
+  quick:
+    title: on-prem readiness for regulated deployments
+    items:
+      - >-
+        cluster mtls and signed lineage now enforce security and auditability by
+        default.
+      - >-
+        air-gapped installs and lethal-trifecta capability gates close critical
+        compliance gaps.
+    whyItMatters: >-
+      these changes make it feasible to deploy the orchestrator in environments
+      where security, compliance, and operational integrity are non-negotiable.
+  takeaways:
+    title: on-prem readiness for regulated deployments
+    items:
+      - >-
+        cluster mTLS is enabled by default with locally issued certs and no
+        shared secrets.
+      - >-
+        lineage records are now signed and include regulatory tags for audit
+        compliance.
+      - >-
+        air-gapped installs are supported via self-contained, verifiable
+        tarballs with egress denial.
+      - >-
+        a capability gate blocks agent spawns that combine private data,
+        untrusted input, and external communication.
+    whyItMatters: >-
+      this release makes it possible to deploy the orchestrator in environments
+      where security, compliance, and network isolation are mandatory.
+  technical:
+    title: on-prem readiness for regulated deployments
+    items:
+      - >-
+        cluster mtls uses locally pinned certs with short-lived node identities
+        and refuses non-ca chains.
+      - >-
+        signed lineage records chain hmac-signed entries with regulatory tags
+        and dual signatures.
+      - >-
+        air-gapped install verified via gpg-signed manifest and sha256 checks
+        with egress-deny mode.
+      - >-
+        lethal-trifecta gate blocks agent spawn if private data, untrusted
+        input, and external comms coexist.
+    whyItMatters: >-
+      this release shifts the orchestrator from developer tooling to
+      production-grade deployment with enforceable security controls.
+---
+
+## summary
+
+this post covers the four things a security architect or procurement reviewer asks before approving an on-prem bernstein deployment. cluster mode now uses mTLS by default, with a local CA, short-lived node certs with role and node-id baked in, and a two-process test harness covering six chaos scenarios (worker SIGKILL, central restart with in-flight claims, network partition, token expiry, two workers racing, cert revocation). every agent write now emits a signed lineage record linking output bytes to their inputs, producing agent, prompt SHA, cost, and token count, chained via HMAC; `bernstein lineage <file>:<line>` returns provenance six months later. `bernstein wheelhouse build` produces a self-contained tarball with pinned wheels and a GPG-signed manifest for air-gapped installs; `--profile airgap` puts the orchestrator into explicit egress-deny mode. a capability gate blocks any agent whose tool belt combines `PRIVATE_DATA`, `UNTRUSTED_INPUT`, and `EXTERNAL_COMM` - the lethal-trifecta exfiltration class - before any prompt runs.
+
+## key takeaways
+
+- cluster mTLS uses a private CA with cert rotation; the central trusts any cert with a valid chain to the cluster CA - no shared symmetric secret.
+- lineage records include a `regulatory_class` tag (`pii`, `phi`, `dora`, `nis2`, `none`) and a customer-key ed25519 signature alongside the cluster-key signature, designed for DORA/NIS2 evidence packages.
+- `doctor airgap` runs ten self-checks and returns a single pass/fail line suitable for a procurement runbook.
+- FIPS-140 hardware keys, MESH/HIERARCHICAL cluster topologies, and multi-tenant isolation inside a single cluster are explicitly named as not yet done - deferred to 1.11.
+
+## when to read this
+
+for security architects, compliance officers, and procurement reviewers evaluating bernstein for deployment inside a regulated or air-gapped environment.

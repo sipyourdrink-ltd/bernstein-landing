@@ -1,0 +1,50 @@
+---
+title: "The 3.x arc: every run carries its own proof"
+description: "From 3.0 to 3.5.0: signed lineage spine, deterministic replay by default, recomputable evidence bundles, a durable ledger that resumes anywhere, tournament selection with no model in the loop."
+date: "2026-07-16"
+url: "https://bernstein.run/blog/v3-x-recap"
+tags: ["summary", "deterministic replay", "evidence bundles", "audit log", "release"]
+source_post: "v3-x-recap"
+summary_modes:
+  quick:
+    title: "the 3.x line made 'done' an artefact you can recompute, not a status you trust"
+    items:
+      - "Every run now folds into one Ed25519-signed lineage spine with deterministic replay on by default: drift between two runs is a hash divergence at a named step, not a flaky test you rerun."
+      - "Task completion is a content-addressed evidence bundle (tests, coverage, lint, optional screenshot) sealed into the audit chain; the durable ledger resumes an interrupted run on another machine with zero lost work."
+    whyItMatters: "The record is not written next to the work — the record is the work, and you can hand it to a reviewer who does not trust the orchestrator."
+  takeaways:
+    title: "What shipped between 3.0 and 3.5.0, in one pass"
+    items:
+      - "Deterministic replay is default: the step journal is a Merkle chain over inputs, model, prompt, tool calls and results, and `bernstein replay --from-step N` rebuilds state by walking it."
+      - "`bernstein ledger resume` re-dispatches only tasks with no completion entry — clone the repo on another laptop and finish the run there; `bernstein run-service` detaches a run from your terminal entirely."
+      - "Tournament runs execute N sibling attempts in isolated worktrees and pick the winner as a pure function of scripted evaluator outputs — no model call decides it, and `bernstein tournament verify` recomputes the selection offline."
+      - "Cost-aware dispatch admits or halts each task under USD caps as a receipted, replayable verdict; the run review board renders the journal deterministically with diffs and evidence panels."
+      - "SPIFFE-compatible workload identity, an experimental MCP Tasks surface for task-capable clients, and a fully stateless MCP core round out the interop story."
+    whyItMatters: "Each scheduling and access decision is a signed receipt an operator can recompute, so answering for a run after the fact stops depending on trust in the tool."
+  technical:
+    title: "the 3.x mechanics: chained journal, sealed bundles, portable ledger, receipted scheduling"
+    items:
+      - "3.0 collapsed per-subsystem logs into one Ed25519-signed spine; `bernstein lineage verify <run_id>` walks the whole chain, and the coordinator keeps no model in its scheduling loop, which is what makes byte-identical task graphs from identical inputs possible."
+      - "3.1 evidence bundles: producers declared in the spec gate completion, bundles are content-addressed under a size-capped GC'd store, sealing is fail-open so it can never block a completion, and `bernstein audit verify` catches a tampered evidence file exactly like a tampered chain entry."
+      - "3.2/3.4 durability: the work ledger is a redacted, content-addressed, Merkle-chained record of task-graph transitions; checkpointed retries resume warm, fork from checkpoint, or cold-restart, and every choice is journaled. Per-role provider fallback chains reroute outages as receipted failover decisions."
+      - "3.4 receipted scheduling: TournamentReceipt names every attempt hash, evaluator output, and lineage edge; cost dispatch receipts pin the price table, spend ledger, and caps by hash; `bernstein plan compile` holds at most one model call, in the draft step, and compiles approved requirements to a task graph as a pure transformation."
+      - "3.5.0 closes two replay gaps: the MCP core is stateless end-to-end (call ordering reconstructs from chain entries alone), and provider-side context mutations are recorded as content-addressed chain entries, so a provider that rewrites context shows up as divergence at a named step."
+    whyItMatters: "Determinism, evidence, and identity compose into one property: after a run finishes, fails, or is interrupted, what happened is provable offline from the chain alone."
+---
+
+## summary
+
+the 2.x line taught the orchestrator to do more; the 3.x line made each capability carry its own proof. every run folds into a single Ed25519-signed lineage spine, deterministic replay is on by default (the step journal is a Merkle chain, so drift is a hash divergence at a named step), and "done" became a content-addressed evidence bundle sealed into the audit chain instead of a status line. the durable work ledger makes runs survivable — resume on another machine with zero lost work, or detach a run entirely with `bernstein run-service` — and scheduling grew receipted, model-free decisions: tournament selection recomputable offline, cost dispatch under USD caps pinned by hash, spec-to-graph compilation as a pure transformation.
+
+## key takeaways
+
+- deterministic replay by default: `bernstein replay --from-step N` rebuilds state from the Merkle-chained step journal; non-determinism surfaces as a hash divergence at an exact position.
+- evidence bundles gate completion with declared producers (tests, coverage, lint); deterministic producers replay to byte-identical bundle hashes, and PR bodies link the sealed bundle.
+- `bernstein ledger resume` and the detached run service make runs survive interrupts, crashes, and machine swaps; provider failover is a receipted decision you can rehearse with `bernstein doctor --failover-drill`.
+- tournament runs pick winners as a pure function of scripted evaluator outputs — no model in the decision path; `bernstein tournament verify` recomputes the selection offline.
+- the operator surfaces caught up: scoped dashboard tokens, a deterministic run review board with diff and evidence panels, SPIFFE-compatible identity, an experimental MCP Tasks surface, and a stateless chain-anchored MCP core.
+- windows went from one silent-exit fix to a tested lane: adapter conformance for claude, codex, and gemini runs on a real windows runner.
+
+## honest framing
+
+none of this has been through an external regulatory audit: treat the chain, the bundles, and the standalone `bernstein-verify` wheel as verifiable artefacts an evaluator can recompute, not as an attestation someone has already signed off.

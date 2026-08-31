@@ -1,0 +1,77 @@
+---
+title: 'Agents on Cloudflare: Workers, Workflows, Durable Objects'
+description: >-
+  Bernstein 1.8.4 adds a Cloudflare backend. Workers run agents, Durable
+  Workflows handle multi-step tasks, R2 holds artifacts, D1 keeps state.
+date: '2026-04-14'
+url: 'https://bernstein.run/blog/cloudflare-cloud-execution'
+tags:
+  - summary
+  - Cloudflare Workers
+  - serverless orchestration
+source_post: cloudflare-cloud-execution
+summary_modes:
+  quick:
+    title: cloudflare backend for ai coding agents
+    items:
+      - >-
+        agents run on cloudflare workers with near-zero cold start and survive
+        disconnects.
+      - >-
+        durable workflows, r2, and d1 handle state, artifacts, and retries
+        across tasks.
+    whyItMatters: >-
+      it moves compute off the laptop so you can scale agents without
+      overheating or losing progress.
+  takeaways:
+    title: cloudflare backend for ai coding agents
+    items:
+      - >-
+        adds cloud execution on cloudflare workers to offload agent tasks from
+        local machines.
+      - >-
+        uses durable workflows to manage multi-step tasks with retry and state
+        persistence.
+      - >-
+        stores artifacts in r2 and state in d1, replacing the local .sdd/
+        directory when in cloud mode.
+      - >-
+        keeps local execution functional while enabling scalable,
+        battery-friendly cloud runs.
+    whyItMatters: >-
+      it allows developers to run many agents without overheating their laptops
+      or losing progress.
+  technical:
+    title: cloudflare backend for ai agents with workers and durable workflows
+    items:
+      - >-
+        agents run as isolated cloudflare workers with sub-50ms cold starts,
+        enabling rapid spawning and low overhead per task.
+      - >-
+        multi-step workflows are managed by durable objects, which maintain
+        state and resume from the last completed step after failure.
+      - >-
+        artifacts such as diffs and test outputs are stored in r2, with costs
+        amounting to pennies per session.
+      - >-
+        task state, queue, and audit data are persisted in d1, replacing the
+        local .sdd/ directory for cloud runs.
+    whyItMatters: >-
+      it enables scalable, reliable agent execution without draining laptop
+      resources or losing progress during interruptions.
+---
+
+## summary
+
+bernstein 1.8.4 adds a Cloudflare backend that moves agent execution off the local machine. stateless agent runs go to Workers (cold start under 50ms), multi-step tasks with ordering and retry land on Durable Workflows, diffs and generated files go to R2, and task queue plus audit log go to D1. the local `.sdd/` story stays intact for development; the cloud backend is for when running four or five concurrent agents on a MacBook starts causing thermal problems or you need sessions that survive a lid close. `bernstein cloud deploy` creates the full topology in one command; `bernstein run --cloud` dispatches tasks against it.
+
+## key takeaways
+
+- Workers bill per request, not per VM; for a typical 50-task session, compute cost is roughly $0.50-2.00, while R2 and D1 are pennies.
+- a Durable Object holds orchestrator tick state so a Worker crash mid-task resumes from the last completed step rather than from scratch.
+- API keys are stored as Worker secrets via `wrangler secret put` and never leave Cloudflare.
+- the Cloudflare backend replaces local `.sdd/` state for cloud runs; multiple Workers can read D1 without stepping on each other.
+
+## when to read this
+
+for teams hitting concurrency or thermal limits on a local machine, or needing agent sessions that survive network disconnects and laptop lid-closes.

@@ -1,0 +1,427 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schemas/server/v1.json",
+  "schema_version": "0.1",
+  "name": "bernstein",
+  "display_name": "Bernstein",
+  "version": "3.15.1",
+  "protocol_version": "2025-03-26",
+  "description": "Deterministic Python orchestrator for a crew of CLI coding agents (Claude Code, Codex, Gemini CLI, Aider, Cursor, and 40+ more). Scheduling is plain Python with no LLM in the coordination loop, so runs are reproducible end to end; every task runs in its own git worktree behind lint/type/test gates. Bernstein exposes its task server as MCP tools so any MCP client can spawn, monitor, approve, or stop multi-agent runs.",
+  "summary": "Deterministic orchestrator for CLI coding agents, exposed as MCP tools. No model in the coordination loop, so runs replay byte-identically and a reviewer checks the record offline.",
+  "author": {
+    "name": "Alex Chernysh",
+    "email": "alex@alexchernysh.com",
+    "url": "https://alexchernysh.com"
+  },
+  "license": "Apache-2.0",
+  "license_url": "https://github.com/sipyourdrink-ltd/bernstein/blob/main/LICENSE",
+  "homepage": "https://bernstein.run",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sipyourdrink-ltd/bernstein"
+  },
+  "documentation": "https://bernstein.readthedocs.io/",
+  "changelog": "https://github.com/sipyourdrink-ltd/bernstein/blob/main/CHANGELOG.md",
+  "issues": "https://github.com/sipyourdrink-ltd/bernstein/issues",
+  "package": {
+    "registry": "pypi",
+    "name": "bernstein",
+    "url": "https://pypi.org/project/bernstein/"
+  },
+  "categories": [
+    "developer-tools",
+    "agent-orchestration",
+    "ci-cd",
+    "code-generation"
+  ],
+  "tags": [
+    "agents",
+    "orchestration",
+    "multi-agent",
+    "claude-code",
+    "codex",
+    "gemini-cli",
+    "aider",
+    "cursor",
+    "git-worktrees"
+  ],
+  "runtimes": [
+    "python>=3.12"
+  ],
+  "platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "install": {
+    "pipx": "pipx install bernstein",
+    "pip": "pip install bernstein",
+    "uv": "uv tool install bernstein"
+  },
+  "transports": [
+    {
+      "type": "stdio",
+      "default": true,
+      "command": "bernstein",
+      "args": [
+        "mcp"
+      ],
+      "description": "Local IDE integration. Default transport. Pair with `bernstein --start-server` in another shell, or set BERNSTEIN_MCP_AUTOSTART=1.",
+      "client_config_example": {
+        "mcpServers": {
+          "bernstein": {
+            "command": "bernstein",
+            "args": [
+              "mcp"
+            ],
+            "env": {
+              "BERNSTEIN_AUTH_TOKEN": "<optional-bearer-for-task-server>"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "sse",
+      "default": false,
+      "command": "bernstein",
+      "args": [
+        "mcp",
+        "--transport",
+        "sse",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8053"
+      ],
+      "endpoint_template": "http://{host}:{port}/sse",
+      "description": "Server-Sent Events transport for remote/web clients. Bind to a non-loopback host only with BERNSTEIN_MCP_TOKEN set."
+    },
+    {
+      "type": "http",
+      "default": false,
+      "endpoint_template": "http://{host}:{port}/mcp",
+      "description": "Streamable HTTP transport (MCP 2025-03-26 spec). ASGI app exposed via bernstein.mcp.remote_transport.create_asgi_app(). Refuses non-loopback bind without BERNSTEIN_MCP_TOKEN.",
+      "auth": {
+        "type": "bearer",
+        "header": "Authorization",
+        "env_var": "BERNSTEIN_MCP_TOKEN"
+      }
+    }
+  ],
+  "capabilities": {
+    "tools": {
+      "listChanged": false
+    },
+    "resources": false,
+    "prompts": false,
+    "sampling": false,
+    "logging": true
+  },
+  "tools": [
+    {
+      "name": "bernstein_health",
+      "description": "Liveness check; returns {\"status\":\"ok\"} when the MCP server is reachable.",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "bernstein_run",
+      "description": "Start an orchestration run by posting a task to the Bernstein task server.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "goal"
+        ],
+        "properties": {
+          "goal": {
+            "type": "string",
+            "description": "What you want Bernstein to accomplish."
+          },
+          "role": {
+            "type": "string",
+            "default": "backend",
+            "description": "Specialist role (backend, frontend, qa, security, devops, docs, architect, ml-engineer, ...)."
+          },
+          "priority": {
+            "type": "integer",
+            "default": 2,
+            "description": "1=critical, 2=normal, 3=nice-to-have."
+          },
+          "scope": {
+            "type": "string",
+            "default": "medium",
+            "enum": [
+              "small",
+              "medium",
+              "large"
+            ]
+          },
+          "complexity": {
+            "type": "string",
+            "default": "medium",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "estimated_minutes": {
+            "type": "integer",
+            "default": 30
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_status",
+      "description": "Summary of total/open/claimed/done/failed task counts plus per-role breakdown.",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "bernstein_tasks",
+      "description": "List tasks with optional status filter (open, claimed, in_progress, done, failed, blocked, cancelled).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_cost",
+      "description": "Cost summary: total USD spent across the run plus per-role breakdown.",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "bernstein_stop",
+      "description": "Graceful shutdown via .sdd/runtime/signals/SHUTDOWN signal file.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "workdir": {
+            "type": "string",
+            "default": ".",
+            "description": "Project root directory."
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_approve",
+      "description": "Approve a pending or blocked task at an approval gate; marks it complete.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "task_id"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string",
+            "default": "Approved via MCP"
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_create_subtask",
+      "description": "Create a subtask linked to a parent task. Parent transitions to WAITING_FOR_SUBTASKS.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "parent_task_id",
+          "goal"
+        ],
+        "properties": {
+          "parent_task_id": {
+            "type": "string"
+          },
+          "goal": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "default": "auto"
+          },
+          "priority": {
+            "type": "integer",
+            "default": 2
+          },
+          "scope": {
+            "type": "string",
+            "default": "medium"
+          },
+          "complexity": {
+            "type": "string",
+            "default": "medium"
+          },
+          "estimated_minutes": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_scenarios",
+      "description": "List Bernstein scenario templates (id, name, description, tags, task_count, roles).",
+      "input_schema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "bernstein_scenario",
+      "description": "Invoke a scenario by id. Spawns one task per template. Returns orchestration_id.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "scenario_id"
+        ],
+        "properties": {
+          "scenario_id": {
+            "type": "string",
+            "description": "e.g. \"pr-review-comprehensive\"."
+          },
+          "context": {
+            "type": "string",
+            "default": ""
+          },
+          "pr_number": {
+            "type": "integer"
+          },
+          "branch": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_scenario_status",
+      "description": "Aggregate the status of every task belonging to a running scenario orchestration.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "orchestration_id"
+        ],
+        "properties": {
+          "orchestration_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "load_skill",
+      "description": "Progressive-disclosure loader for skill packs. Fetches the SKILL.md body and optional reference/script files from templates/roles.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Skill name; matches the index entry, e.g. \"backend\"."
+          },
+          "reference": {
+            "type": "string",
+            "description": "Optional filename under references/."
+          },
+          "script": {
+            "type": "string",
+            "description": "Optional filename under scripts/."
+          }
+        }
+      }
+    }
+  ],
+  "resources": [],
+  "prompts": [],
+  "examples": [
+    {
+      "title": "Spawn a backend task from any MCP client",
+      "tool": "bernstein_run",
+      "arguments": {
+        "goal": "Add a /healthz endpoint that returns {ok:true} and write a unit test.",
+        "role": "backend",
+        "priority": 2
+      }
+    },
+    {
+      "title": "Run a scenario",
+      "tool": "bernstein_scenario",
+      "arguments": {
+        "scenario_id": "pr-review-comprehensive",
+        "pr_number": 42
+      }
+    }
+  ],
+  "_meta": {
+    "status": "stable",
+    "catalog_published": "2026-05-09",
+    "catalog_url": "https://bernstein.run/mcp-catalog.json",
+    "source_files": [
+      "src/bernstein/mcp/server.py",
+      "src/bernstein/mcp/routine_tools.py",
+      "src/bernstein/mcp/remote_transport.py"
+    ],
+    "aggregator_compatibility": [
+      {
+        "aggregator": "modelcontextprotocol/registry",
+        "url": "https://github.com/modelcontextprotocol/registry",
+        "notes": "Top-level fields name/version/description/repository/license/install/transports/tools follow the official MCP server registry schema shape."
+      },
+      {
+        "aggregator": "smithery.ai",
+        "url": "https://smithery.ai",
+        "notes": "display_name, summary, categories, tags, and install map satisfy Smithery's catalog ingestion."
+      },
+      {
+        "aggregator": "mcp.so",
+        "url": "https://mcp.so",
+        "notes": "Flat tools[] with name+description+input_schema is what mcp.so scrapers expect."
+      },
+      {
+        "aggregator": "mcpservers.org",
+        "url": "https://mcpservers.org",
+        "notes": "homepage, repository, transports[].type, and capabilities cover the minimal manifest."
+      },
+      {
+        "aggregator": "glama-mcp-discovery",
+        "url": "https://glama.ai/mcp",
+        "notes": "name + capabilities + transports[].type + endpoint info as expected by glama discovery."
+      },
+      {
+        "aggregator": "bernstein-mcp-catalog/1.0",
+        "notes": "Unknown UA observed crawling /mcp-catalog.json. Defensive superset shape used to satisfy whatever subset it parses."
+      }
+    ],
+    "verification": {
+      "tools_verified_against_source": true,
+      "no_fabricated_tools": true,
+      "fastmcp_registrations": [
+        "bernstein.mcp.server._register_health_tool",
+        "bernstein.mcp.server._register_query_tools",
+        "bernstein.mcp.server._register_action_tools",
+        "bernstein.mcp.server._register_skill_tools",
+        "bernstein.mcp.routine_tools.register_scenario_tools"
+      ]
+    }
+  }
+}

@@ -1,0 +1,183 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://bernstein.run/#software",
+      "name": "Bernstein",
+      "description": "Bernstein is a deterministic orchestrator for CLI coding agents (Claude Code, Codex, Gemini CLI, and 40+ more). Scheduling is plain Python - no LLM in the coordination loop - so runs are reproducible end to end. Every task runs in its own git worktree behind lint/type/test gates. An always-on lineage spine and replay journal record what happened; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Air-gap install profile included. Apache-2.0.",
+      "url": "https://bernstein.run",
+      "applicationCategory": "DeveloperApplication",
+      "applicationSubCategory": "CLI Agent Orchestration",
+      "operatingSystem": "macOS, Linux, Windows",
+      "programmingLanguage": "Python",
+      "runtimePlatform": "Python 3.12+",
+      "softwareVersion": "3.15.1",
+      "license": "https://www.apache.org/licenses/LICENSE-2.0",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "author": {
+        "@type": "Person",
+        "@id": "https://bernstein.run/#author",
+        "name": "Alex Chernysh",
+        "url": "https://alexchernysh.com",
+        "sameAs": [
+          "https://alexchernysh.com",
+          "https://github.com/chernistry",
+          "https://x.com/alex_chernysh"
+        ]
+      },
+      "codeRepository": "https://github.com/sipyourdrink-ltd/bernstein",
+      "downloadUrl": "https://pypi.org/project/bernstein/",
+      "installUrl": "https://pypi.org/project/bernstein/",
+      "releaseNotes": "https://github.com/sipyourdrink-ltd/bernstein/releases",
+      "softwareRequirements": "Python 3.12+, Git",
+      "featureList": [
+        "Deterministic scheduling (no LLM in the coordination loop)",
+        "40+ CLI agent adapters (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, etc.)",
+        "Always-on lineage spine and replay journal",
+        "Per-task git worktree isolation",
+        "Air-gap install profile",
+        "Pluggable sandbox backends (git worktree, Docker, E2B, Modal, Blaxel, Cloudflare, Daytona, Runloop, Vercel)",
+        "Cloud artifact sinks via BufferedSink (S3, GCS, Azure Blob, Cloudflare R2)",
+        "Progressive-disclosure skill packs with load_skill MCP tool",
+        "Quality gates (lint, types, tests, security)",
+        "Cost-aware contextual bandit routing",
+        "Token monitoring with auto-intervention",
+        "MCP server mode",
+        "A2A protocol support",
+        "Opt-in HMAC-chained audit log with signed receipts",
+        "Prometheus metrics and OpenTelemetry",
+        "YAML plan files for repeatable workflows",
+        "Self-evolution capability"
+      ],
+      "screenshot": "https://bernstein.run/api/og?title=Bernstein",
+      "keywords": [
+        "deterministic orchestration",
+        "AI coding agents",
+        "Claude Code",
+        "Codex",
+        "Gemini CLI",
+        "OpenAI Agents SDK",
+        "parallel agents",
+        "deterministic scheduling",
+        "quality gates",
+        "git worktrees",
+        "cost tracking"
+      ]
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://bernstein.run/#org",
+      "name": "Bernstein",
+      "url": "https://bernstein.run",
+      "logo": "https://bernstein.run/favicon.svg",
+      "sameAs": [
+        "https://github.com/sipyourdrink-ltd/bernstein",
+        "https://pypi.org/project/bernstein/",
+        "https://x.com/alex_chernysh"
+      ],
+      "founder": {
+        "@type": "Person",
+        "@id": "https://bernstein.run/#author"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://bernstein.run/#website",
+      "url": "https://bernstein.run",
+      "name": "Bernstein",
+      "description": "Deterministic orchestrator for CLI coding agents (Claude Code, Codex, Gemini CLI, +40 more). No model in the coordination loop, so parallel runs in per-task git worktrees replay byte-identically. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy.",
+      "publisher": {
+        "@id": "https://bernstein.run/#org"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://bernstein.run/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://bernstein.run/"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://bernstein.run/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Bernstein?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Bernstein is an open-source deterministic orchestrator for CLI coding agents (Claude Code, Codex, Gemini CLI and 40+ more) that runs them in parallel on your codebase. It decomposes goals into tasks, assigns each to an agent in its own git worktree, and verifies results through lint, type, and test gates before merging. The scheduler is plain Python with no model in the coordination loop, so a run replays byte-identically."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I install Bernstein?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Install Bernstein with pipx: 'pipx install bernstein'. You can also use pip ('pip install bernstein') or uv ('uv tool install bernstein'). Requires Python 3.12+ and at least one supported CLI coding agent."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What AI coding agents does Bernstein support?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Bernstein ships 40+ CLI agent adapters including Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, Cloudflare Agents, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral Vibe, Autohand, Forge, Hermes, OpenHands, Open Interpreter, gptme, Plandex, AIChat, Letta Code, and a generic adapter for wrapping any CLI tool."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What makes a Bernstein run reproducible?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The scheduler is plain Python with no model in the coordination loop, so the same plan produces the same task graph. Each task runs in its own git worktree behind lint, type, and test gates, and an always-on lineage spine plus a replay journal record every step. Replaying a run recomputes the chain and reports a divergence at the exact step rather than surfacing it as a flaky rerun. Signature and hash-chain checks read the on-disk records alone; the opt-in HMAC audit chain additionally needs the key it was written with."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Bernstein free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Bernstein is open-source under the Apache 2.0 license. You only pay for the AI model API usage of the agents themselves (e.g., Anthropic API costs for Claude Code, OpenAI costs for Codex). Local models via Ollama are completely free."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use Bernstein with local models?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Use the Ollama adapter to run fully local models with zero API costs. You can also mix local and cloud models in the same run - for example, use local models for simple tasks and cloud models for complex architecture work."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Bernstein handle quality?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Bernstein runs configurable quality gates on every task result before merging: linting (ruff), type checking (pyright), test execution (pytest), and security scanning (bandit/semgrep). Failed tasks are automatically retried with potentially more capable models. After max retries, tasks go to a dead letter queue for manual review."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does cost tracking work in Bernstein?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Bernstein tracks costs per-agent, per-model, per-task, and per-run. It uses a contextual bandit router to learn which model works best for each task type. In our own runs, spend dropped roughly in half compared to uniformly using expensive models. You can set hard budget limits, alert thresholds, and automatic drain mode when budget is exhausted."
+          }
+        }
+      ]
+    }
+  ]
+}

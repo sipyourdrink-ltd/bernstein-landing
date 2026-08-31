@@ -1,0 +1,115 @@
+---
+title: "agents on cloudflare: workers, durable objects, r2, d1"
+description: "bernstein's cloudflare integration for ai coding agents: workers run agents, workflows carry multi-step tasks, r2 + d1 hold workspace and metering state. experimental; runs on your own account."
+date: "2026-04-14"
+dateModified: "2026-08-10"
+tags: ["Cloudflare Workers", "cloud AI agents", "serverless orchestration", "multi-agent orchestration", "Durable Objects"]
+featured: true
+schemaType: "TechArticle"
+techDependencies:
+  - "Bernstein 3.x with the Cloudflare integration (surface verified at 3.14.159)"
+  - "Cloudflare account with Workers, Durable Objects, R2, and D1 enabled"
+  - "wrangler CLI v3.0+ authenticated against the target account"
+  - "An R2 bucket and a D1 database provisioned for workspace sync and analytics"
+---
+
+<Lead>
+Bernstein can run agents on Cloudflare. Workers and Durable Objects handle the agent lifecycle, Workflows carry multi-step tasks, workspaces sync through R2, metering lands in D1. The orchestrator stays local and deterministic. Everything runs on your own Cloudflare account — the hosted service isn't live yet.
+</Lead>
+
+<Callout title="Editor's note (2026-08-10)" tone="warning">
+An earlier version of this post documented `bernstein cloud deploy` and a `--cloud` flag on `run` and `dashboard`. The deploy command is gone in the 3.x line and the flag never shipped. The post below matches the CLI at 3.14.159. Cloud execution is experimental: the hosted API at `api.bernstein.run` does not resolve in DNS, so `cloud login`, `run`, `status`, `runs`, and `cost` report the service unreachable and exit non-zero. Workers, R2, and D1 work against your own Cloudflare account.
+</Callout>
+
+## why bother
+
+Local works for one developer until it doesn't. CPU and memory fight your IDE. Long sessions drain the battery. Closing the lid kills the run. Past four or five concurrent agents on a MacBook the fans get angry.
+
+Cloud execution moves the work off the laptop. Sessions survive disconnects. Twenty-some concurrent agents stop being a thermal event.
+
+## why Cloudflare
+
+Cloudflare became [OpenAI's infrastructure partner for agent cloud computing](https://openai.com/index/cloudflare-openai-agent-cloud/), same primitives we'd already been mapping orchestration onto. The pieces line up cleanly:
+
+**Workers.** Stateless agent runs in isolated Workers. Cold start under 50ms, so spawning a new agent is nearly free.
+
+**Workflows.** Multi-step tasks (clone, run, test, report) need ordering and retry on failure. If a Worker dies mid-task the workflow resumes from the last completed step, not from scratch.
+
+**R2.** Workspace snapshots go up, diffs and test output come back. Pennies per session.
+
+**D1.** Usage metering, billing tiers, cost reporting. The orchestrator and its `.sdd/` state stay local; D1 is the ledger, not the source of truth.
+
+## the picture
+
+<Mermaid chart={`flowchart TB
+  subgraph Local["Your machine or CI"]
+    CLI["bernstein cloud init<br/>npx wrangler deploy"]
+    Orch["Orchestrator<br/>deterministic tick loop"]
+    Bridge["RuntimeBridge"]
+  end
+  subgraph CF["Cloudflare (your account)"]
+    W["Workers + Durable Objects<br/>agent lifecycle"]
+    WF["Workflows<br/>multi-step, retry"]
+    R2[("R2<br/>workspace sync")]
+    D1[("D1<br/>metering")]
+  end
+  CLI -- deploys --> W
+  Orch --> Bridge
+  Bridge --> W
+  Bridge --> WF
+  WF --> W
+  W <--> R2
+  Orch --> D1
+`} />
+
+The orchestrator does not move to the cloud. It keeps its deterministic tick loop on your machine and dispatches agent work through a bridge. Workflows resume from the last completed step; agents read their workspace from R2 and write results back; D1 keeps the metering ledger.
+
+## deploy
+
+Prereqs: Cloudflare account with Workers, R2, D1 turned on; `wrangler` v3.0+ installed.
+
+```bash
+wrangler login
+
+bernstein cloud init --worker-name my-project
+# Creates:
+#   - wrangler.toml (free-tier defaults, no paid bindings)
+#   - src/index.js worker entry point
+
+# Set account_id in wrangler.toml, then:
+npx wrangler deploy
+```
+
+Storage is two more wrangler calls:
+
+```bash
+wrangler r2 bucket create bernstein-workspaces
+wrangler d1 create bernstein-analytics
+```
+
+`bernstein cloud init` only scaffolds; the deploy itself is a wrangler step against your own account. API keys land as Worker secrets via `npx wrangler secret put`. They never leave Cloudflare.
+
+## the hosted part
+
+The CLI also ships `bernstein cloud login`, `logout`, `run`, `status`, `runs`, and `cost`. All of them target the hosted service at `api.bernstein.run`, and that host does not resolve in DNS. Today they report the service is unreachable and exit non-zero. The commands shipped before the service did.
+
+## cost
+
+Workers bill per request, not per VM. For a typical 50-task session:
+
+- Workers compute: ~$0.50-2.00
+- R2 storage: pennies
+- D1 reads/writes: pennies
+
+Tiny next to the LLM bill. Real savings come from not keeping a laptop running and being able to scale concurrency without melting hardware.
+
+## next
+
+The open item is the hosted service itself. When `api.bernstein.run` resolves, `cloud login`, `run`, `status`, `runs`, and `cost` start working against it. Until then, everything above runs on your own Cloudflare account.
+
+`pip install bernstein`. Source: [github.com/sipyourdrink-ltd/bernstein](https://github.com/sipyourdrink-ltd/bernstein).
+
+## further reading
+
+- [frictionless install](/blog/frictionless-install) walks through the local install path the Cloudflare integration sits on top of.
+- [operator commands](/blog/operator-commands) covers the dashboard / status / cost surfaces for local sessions.

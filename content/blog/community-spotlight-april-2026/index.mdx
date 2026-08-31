@@ -1,0 +1,42 @@
+---
+title: "community spotlight: april 2026 bernstein contributors"
+description: "first community spotlight. contributors who shaped bernstein's architecture decomposition, adapter list, windows support, cost-aware router."
+date: "2026-04-14"
+tags: ["community", "open-source", "contributors", "multi-agent orchestration"]
+schemaType: "BlogPosting"
+---
+
+<Lead>
+First time doing one of these. April was the first full month after going public, the diff between v1.0.0 and v1.8.8, and a number of those releases shipped with someone else's commits in them.
+</Lead>
+
+## what landed
+
+- **Architecture decomposition.** The 4,198-line orchestrator broken into 22 focused sub-packages, each under 600 lines. Story is in [the decomposition post](/blog/module-decomposition).
+- **Eighteen adapters.** Started at seven, ended the month at eighteen: Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, Cloudflare Agents, IaC, generic. ~200 lines apiece.
+- **Cost-aware routing.** [Bandit router](/blog/cost-aware-routing) cut spend roughly in half on internal runs.
+- **Cloud execution.** [Cloudflare backend](/blog/cloudflare-cloud-execution): Workers, Durable Workflows, R2, D1.
+- **Windows support.** Real Windows, not a footnote: env passthrough, Unicode, process management, terminal handling. Done by [@oldschoola](https://github.com/oldschoola).
+
+## who
+
+Thanks to the people who showed up:
+
+- [@oldschoola](https://github.com/oldschoola) - Windows compat (3 PRs), codex config, task filtering, auto-PR
+- [@Ai-chan-0411](https://github.com/Ai-chan-0411) - spotlight template
+- [@alexanderxfgl-bit](https://github.com/alexanderxfgl-bit) - spotlight generator script
+- [@forfreedomforrich-eng](https://github.com/forfreedomforrich-eng) - `--dry-run` flag, trigger URL fix
+- [@TheCodingDragon0](https://github.com/TheCodingDragon0) - `bernstein config diff`, glossary
+- [@internet-dot](https://github.com/internet-dot) - HOL workflow
+- [@Beledarian](https://github.com/Beledarian) - config path validation
+
+Everyone's in [CONTRIBUTORS.md](https://github.com/sipyourdrink-ltd/bernstein/blob/main/CONTRIBUTORS.md).
+
+## ways in
+
+Apache 2.0, no CLA. If you want something to do:
+
+- [Good first issues](https://github.com/sipyourdrink-ltd/bernstein/labels/good%20first%20issue)
+- [Write a post](https://github.com/sipyourdrink-ltd/bernstein/issues/786) - gets published here
+- [Adopt an adapter](https://github.com/sipyourdrink-ltd/bernstein/issues/775) - be the maintainer for your favourite agent
+- [Submit benchmarks](https://github.com/sipyourdrink-ltd/bernstein/issues/787)

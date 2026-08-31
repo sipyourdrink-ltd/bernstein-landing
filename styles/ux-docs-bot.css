@@ -1,0 +1,1093 @@
+/* =========================================================================
+   ux-docs-bot.css — RAG bot panel (RAG-004).
+
+   Same editorial token set as /ask: cream paper, italic Fraunces accent,
+   JetBrains Mono labels, single muted-bronze accent. Inherits --bg-paper,
+   --ink, --accent etc. from globals.css.
+
+   Visual hierarchy:
+     - shell:           low-key card, dotted bottom rule
+     - input row:       primary action with bronze submit
+     - body min-height: ~3 lines so the layout stays put while streaming
+     - answer card:     paper-2 background, solid hairline rule
+     - decline card:    paper-3 (warmer cream) + dashed bronze rule —
+                        deliberately "different" so users register decline
+                        in <2s
+     - citation chip:   tight inline pill with bronze ink, popover on
+                        hover/focus
+     - shimmer:         three short bars, ease-in-out — held ≥120ms so a
+                        50ms loader doesn't flash
+
+   Reduced motion: disabled in @media (prefers-reduced-motion).
+   ========================================================================= */
+
+.docs-bot {
+  margin: 0 auto;
+  max-width: 880px;
+}
+
+.docs-bot--hero {
+  margin-bottom: 0;
+}
+.docs-bot--page {
+  margin-bottom: var(--space-5);
+}
+
+/* ---- HEADER ---- */
+.docs-bot-header {
+  margin-bottom: var(--space-3);
+}
+.docs-bot-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: var(--space-3);
+}
+.docs-bot-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0 0 var(--space-3);
+  text-wrap: balance;
+}
+.docs-bot-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent);
+}
+
+/* ---- TRANSCRIPT (multi-turn recap) ----
+   Renders prior user/assistant pairs ABOVE the input. Dimmed slightly
+   so the active answer (when streaming) reads as the foreground.
+   The active answer surface lives in `.docs-bot-body` below the form;
+   the recap precedes the form so the conversation flows top-to-
+   bottom: oldest turn, then newer turns, then the prompt cursor. */
+.docs-bot-transcript {
+  list-style: none;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  opacity: 0.78;
+}
+.docs-bot-transcript-turn {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-paper);
+}
+.docs-bot-transcript-q {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  margin: 0 0 var(--space-2);
+}
+.docs-bot-transcript-q::before {
+  content: '> ';
+  color: var(--accent);
+}
+.docs-bot-transcript-a {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0;
+}
+/* Recap markdown rhythm — slightly tighter than the live answer so
+   prior turns visually recede. Inherits the same element vocabulary
+   (p, ul, ol, strong, em, a, code, pre, blockquote) styled below. */
+.docs-bot-transcript-a p {
+  margin: 0 0 var(--space-2);
+}
+.docs-bot-transcript-a p:last-child {
+  margin-bottom: 0;
+}
+.docs-bot-transcript-a ul,
+.docs-bot-transcript-a ol {
+  margin: 0 0 var(--space-2);
+  padding-left: 1.4em;
+}
+.docs-bot-transcript-a ul { list-style: disc; }
+.docs-bot-transcript-a ol { list-style: decimal; }
+.docs-bot-transcript-a li { margin: 0; }
+.docs-bot-transcript-a strong { font-weight: 600; }
+.docs-bot-transcript-a em { font-style: italic; }
+.docs-bot-transcript-a a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.docs-bot-transcript-a code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: oklch(94% 0.01 75);
+}
+.docs-bot-transcript-a pre {
+  margin: 0 0 var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: 6px;
+  background: var(--bg-terminal, oklch(20% 0.01 250));
+  color: var(--ink-on-terminal, oklch(94% 0.005 75));
+  overflow-x: auto;
+  font-size: 12.5px;
+}
+.docs-bot-transcript-a pre code {
+  background: transparent;
+  padding: 0;
+}
+.docs-bot-transcript-cites {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+/* ---- FORM ---- */
+.docs-bot-form {
+  display: flex;
+  gap: var(--space-3);
+  align-items: stretch;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+.docs-bot-input {
+  flex: 1 1 320px;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.4;
+  padding: 14px 16px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 10px;
+  background: var(--bg-paper-2);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+.docs-bot-input::placeholder {
+  color: var(--ink-faint);
+}
+.docs-bot-input:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px oklch(70% 0.06 35 / 0.25);
+}
+.docs-bot-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.docs-bot-submit {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  padding: 14px 28px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--bg-paper);
+  cursor: pointer;
+  transition: background 0.15s ease-out, border-color 0.15s ease-out, transform 0.05s ease-out;
+}
+.docs-bot-submit:hover:not(:disabled) {
+  background: oklch(48% 0.10 35);
+  border-color: oklch(48% 0.10 35);
+}
+.docs-bot-submit:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.docs-bot-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.docs-bot-stop {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.15s ease-out, border-color 0.15s ease-out;
+}
+.docs-bot-stop:hover {
+  color: var(--ink);
+  border-color: var(--rule-strong);
+}
+.docs-bot-hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  margin-bottom: 0;
+}
+
+/* ---- EXAMPLE CHIPS (cold state) ----
+   Thin row above the input that surfaces 3 in-corpus example
+   questions. Clicking a chip prefills the input (no auto-submit).
+   Per research-005: scoping the offer to concrete questions reduces
+   off-topic asks that decline at the gateway. Chips wrap on mobile
+   so the row never overflows the bot panel. */
+.docs-bot-examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+}
+.docs-bot-examples-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--ink-faint);
+}
+.docs-bot-example {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  padding: 5px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
+}
+.docs-bot-example:hover {
+  color: var(--ink);
+  border-color: var(--rule-strong);
+  background: var(--bg-paper-2);
+}
+.docs-bot-example:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px oklch(70% 0.06 35 / 0.25);
+}
+
+/* ---- BODY (state-dependent) ---- */
+.docs-bot-body {
+  /* Pre-allocate vertical space so the page doesn't jump when the
+     stream begins. ~3 lines worth. */
+  position: relative;
+}
+
+/* ---- SHIMMER PLACEHOLDER ---- */
+.docs-bot-shimmer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+}
+.docs-bot-shimmer span {
+  display: block;
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-paper-2) 0%,
+    oklch(91% 0.018 75) 50%,
+    var(--bg-paper-2) 100%
+  );
+  background-size: 200% 100%;
+  animation: docs-bot-shimmer-anim 1.4s ease-in-out infinite;
+}
+.docs-bot-shimmer span:nth-child(1) { width: 70%; }
+.docs-bot-shimmer span:nth-child(2) { width: 90%; }
+.docs-bot-shimmer span:nth-child(3) { width: 60%; }
+@keyframes docs-bot-shimmer-anim {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---- ANSWER CARD ---- */
+.docs-bot-answer-card {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-5);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--bg-paper-2);
+}
+
+/* ---- PREVIEW BLOCK (research-006) ---- */
+/* Sits ABOVE the main answer while the cheap preview streams. Once the
+   full answer arrives, --collapsed shrinks the block to a soft
+   "superseded" pill above the real answer. The colour swatch is one
+   tone-step subtler than the answer card so the eye reads it as a
+   secondary element. */
+.docs-bot-preview {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--rule);
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-paper-1, var(--bg-paper-2));
+  /* Width transition for the soft-collapse path; keep the body
+     element-flow but reduce visible weight. */
+  transition: opacity 240ms ease, padding 240ms ease;
+}
+.docs-bot-preview--collapsed {
+  opacity: 0.6;
+  padding: var(--space-2) var(--space-4);
+}
+.docs-bot-preview-eyebrow {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  color: var(--ink-soft, var(--ink));
+}
+.docs-bot-preview-body {
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-bot-preview {
+    transition: none;
+  }
+}
+.docs-bot-answer {
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--ink);
+  text-wrap: pretty;
+  /* react-markdown emits real block elements (<p>, <ul>, <pre>);
+     we let the browser collapse whitespace normally so streamed
+     newlines don't double-space inside paragraphs. */
+}
+/* Markdown child element styling. The renderer is react-markdown +
+   remark-gfm; we inherit the body font/colour from the container and
+   only spec the structural rhythm. Tight margins so a short answer
+   doesn't open a yawning vertical gap above the meta footer. */
+.docs-bot-answer p {
+  margin: 0 0 var(--space-3);
+}
+.docs-bot-answer p:last-child {
+  margin-bottom: 0;
+}
+.docs-bot-answer ul,
+.docs-bot-answer ol {
+  margin: 0 0 var(--space-3);
+  padding-left: 1.6em;
+}
+.docs-bot-answer ul:last-child,
+.docs-bot-answer ol:last-child {
+  margin-bottom: 0;
+}
+.docs-bot-answer ul {
+  list-style: disc;
+}
+.docs-bot-answer ol {
+  list-style: decimal;
+}
+.docs-bot-answer li {
+  margin: 0 0 var(--space-1, 4px);
+}
+.docs-bot-answer li:last-child {
+  margin-bottom: 0;
+}
+.docs-bot-answer li > p {
+  margin: 0;
+}
+.docs-bot-answer strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.docs-bot-answer em {
+  font-style: italic;
+}
+.docs-bot-answer a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.docs-bot-answer a:hover {
+  color: oklch(48% 0.10 35);
+}
+.docs-bot-answer code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: oklch(94% 0.01 75);
+  color: var(--ink);
+}
+.docs-bot-answer pre {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: 8px;
+  /* Mirror the audit-log terminal: dark slate background, soft cream
+     foreground. The token names are pinned in globals.css; we use an
+     oklch fallback so the chunk loads even if a future global drops
+     them. */
+  background: var(--bg-terminal, oklch(20% 0.01 250));
+  color: var(--ink-on-terminal, oklch(94% 0.005 75));
+  overflow-x: auto;
+  line-height: 1.55;
+  font-size: 13px;
+}
+.docs-bot-answer pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+  font-size: inherit;
+}
+.docs-bot-answer blockquote {
+  margin: 0 0 var(--space-3);
+  padding: 0 var(--space-3);
+  border-left: 3px solid var(--accent-soft);
+  color: var(--ink-soft);
+}
+.docs-bot-answer h1,
+.docs-bot-answer h2,
+.docs-bot-answer h3,
+.docs-bot-answer h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  margin: var(--space-3) 0 var(--space-2);
+  color: var(--ink);
+  line-height: 1.25;
+}
+.docs-bot-answer h1 { font-size: 1.4em; }
+.docs-bot-answer h2 { font-size: 1.25em; }
+.docs-bot-answer h3 { font-size: 1.1em; }
+.docs-bot-answer h4 { font-size: 1em; }
+.docs-bot-answer hr {
+  margin: var(--space-3) 0;
+  border: 0;
+  border-top: 1px dashed var(--rule);
+}
+.docs-bot-answer table {
+  border-collapse: collapse;
+  margin: 0 0 var(--space-3);
+  font-size: 13.5px;
+}
+.docs-bot-answer th,
+.docs-bot-answer td {
+  border: 1px solid var(--rule);
+  padding: 4px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+.docs-bot-answer th {
+  background: var(--bg-paper);
+  font-weight: 600;
+}
+.docs-bot-cursor {
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--accent);
+  animation: docs-bot-cursor-blink 1s step-end infinite;
+}
+@keyframes docs-bot-cursor-blink {
+  0%, 50%   { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.docs-bot-answer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+.docs-bot-model {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--ink-soft);
+}
+.docs-bot-elapsed {
+  color: var(--ink-soft);
+}
+
+/* ---- COPY-AS-MARKDOWN ---- */
+.docs-bot-copy-md {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: color 0.15s ease-out, border-color 0.15s ease-out;
+}
+.docs-bot-copy-md:hover {
+  color: var(--ink);
+  border-color: var(--rule-strong);
+}
+
+/* ---- CITATION CHIP ---- */
+.docs-bot-cite-chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  background: var(--bg-paper);
+  border: 1px solid var(--accent-soft);
+  border-radius: 6px;
+  padding: 1px 5px;
+  margin: 0 2px;
+  text-decoration: none;
+  vertical-align: 1px;
+  transition: background 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out;
+}
+.docs-bot-cite-chip[data-has-citation="false"],
+.docs-bot-cite-chip[data-linkable="false"] {
+  cursor: default;
+  border-color: var(--rule);
+  color: var(--ink-faint);
+}
+/* Hover/focus highlights apply only to linkable chips so a non-link
+   `<span>` chip doesn't pretend to be interactive on pointer-over. */
+.docs-bot-cite-chip[data-linkable="true"]:hover,
+.docs-bot-cite-chip[data-linkable="true"]:focus-visible {
+  background: var(--accent);
+  color: var(--bg-paper);
+  border-color: var(--accent);
+}
+
+/* ---- CITATION POPOVER ---- */
+/* Portal-rendered to document.body and absolutely positioned via inline
+   style from CitationChip.tsx. We dropped the HTML `popover="manual"`
+   path: without anchor positioning the spec drops the popover at the
+   top layer's 0,0 origin, which is what users saw on the live site. */
+.docs-bot-cite-popover {
+  width: 320px;
+  max-width: calc(100vw - 16px);
+  padding: var(--space-4);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--bg-paper);
+  box-shadow: var(--shadow-lg);
+  margin: 0;
+  animation: docs-bot-popover-fade 200ms ease-out;
+}
+@keyframes docs-bot-popover-fade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+.docs-bot-cite-popover-header {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  margin-bottom: var(--space-2);
+}
+.docs-bot-cite-popover-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.docs-bot-cite-popover-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  text-wrap: balance;
+}
+/* Post-rerank relevance hint in the header - same quiet mono
+   treatment as the section breadcrumb so it reads as metadata,
+   not content. Pushed to the right edge of the header row. */
+.docs-bot-cite-popover-score {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.docs-bot-cite-popover-section {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  margin-bottom: var(--space-2);
+}
+.docs-bot-cite-popover-excerpt {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin-bottom: var(--space-3);
+}
+.docs-bot-cite-popover-open {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--accent);
+}
+/* Rendered when the gateway didn't ship a URL for this citation —
+   visible signal that the source exists but we can't deep-link. */
+.docs-bot-cite-popover-open--unavailable {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+/* ---- DECLINE CARD (deliberately distinct) ---- */
+.docs-bot-decline-card {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-5);
+  /* dashed instead of solid; warmer paper background than the answer
+     card; bronze accent on the kicker. Three signals so the eye
+     registers "different" in <2s. */
+  border: 1.5px dashed var(--accent-soft);
+  border-radius: var(--radius-lg, 12px);
+  background: oklch(92% 0.03 75);
+}
+.docs-bot-decline-kicker {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.125rem;
+  color: var(--accent);
+  margin: 0 0 var(--space-3);
+}
+.docs-bot-decline-lead {
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  color: var(--ink);
+  margin: 0 0 var(--space-3);
+}
+.docs-bot-decline-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.docs-bot-decline-list li {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+.docs-bot-decline-action {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.docs-bot-decline-list a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.docs-bot-decline-reason {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--rule);
+}
+.docs-bot-decline-reason-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ---- FOLLOW-UPS ---- */
+.docs-bot-followups {
+  margin: 0 0 var(--space-5);
+}
+.docs-bot-followups-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: var(--space-3);
+}
+.docs-bot-followups-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.docs-bot-followup-pill {
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  color: var(--ink);
+  background: var(--bg-paper-2);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out;
+}
+.docs-bot-followup-pill:hover {
+  background: oklch(91% 0.018 75);
+  border-color: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ---- ERROR + RETRY ---- */
+.docs-bot-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--bg-paper-2);
+  margin: 0 0 var(--space-5);
+}
+.docs-bot-error-message {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin: 0;
+}
+.docs-bot-retry {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent-soft);
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s ease-out;
+}
+.docs-bot-retry:hover {
+  border-color: var(--accent);
+}
+
+/* ---- SLASH-COMMAND MODAL ---- */
+.docs-bot-modal {
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-lg, 12px);
+  padding: 0;
+  width: min(880px, 92vw);
+  background: var(--bg-paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-xl);
+}
+.docs-bot-modal::backdrop {
+  background: oklch(20% 0.005 60 / 0.45);
+  backdrop-filter: blur(2px);
+}
+.docs-bot-modal-inner {
+  position: relative;
+  padding: var(--space-5);
+}
+.docs-bot-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+.docs-bot-modal-close:hover {
+  color: var(--ink);
+  border-color: var(--rule-strong);
+}
+
+/* ---- REDUCED MOTION ---- */
+@media (prefers-reduced-motion: reduce) {
+  .docs-bot-shimmer span,
+  .docs-bot-cursor,
+  .docs-bot-cite-popover {
+    animation: none;
+  }
+}
+
+/* ---- SPONSOR NOTE (post-answer, one-time per browser) ---- */
+.docs-bot-sponsor-note {
+  position: relative;
+  margin: var(--space-5) 0 var(--space-3);
+  padding: var(--space-4) var(--space-5) var(--space-4);
+  border: 1px dashed oklch(70% 0.06 35 / 0.55);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--bg-paper-3, oklch(96% 0.008 75));
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+.docs-bot-sponsor-note-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: var(--space-3);
+}
+.docs-bot-sponsor-note-divider::before,
+.docs-bot-sponsor-note-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+.docs-bot-sponsor-note-body {
+  margin: 0;
+  text-wrap: pretty;
+}
+.docs-bot-sponsor-note-body a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.docs-bot-sponsor-note-body a:hover {
+  color: oklch(48% 0.10 35);
+}
+.docs-bot-sponsor-note-sig {
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  text-align: right;
+}
+.docs-bot-sponsor-note-x {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  line-height: 1;
+  color: var(--ink-faint);
+  cursor: pointer;
+}
+.docs-bot-sponsor-note-x:hover {
+  color: var(--ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .docs-bot-sponsor-note { transition: none; }
+}
+
+
+/* ---- CTA STRIP (post-answer, every answer) ----
+   One-line three-slot navigation rendered below every settled, non-
+   declined answer. Monospace small text; no card chrome — it reads
+   as a directional "next step" rail rather than a marketing band.
+   Sits above the SponsorNote (when that's mounted) so the
+   call-to-action is always the closest affordance to the answer. */
+.docs-bot-cta-strip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin: var(--space-3) 0 var(--space-2);
+  padding: var(--space-2) 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  border-top: 1px dashed oklch(70% 0.04 75 / 0.45);
+}
+.docs-bot-cta-strip-item {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.docs-bot-cta-strip-item:hover,
+.docs-bot-cta-strip-item:focus-visible {
+  color: oklch(48% 0.10 35);
+  text-decoration-thickness: 2px;
+}
+.docs-bot-cta-strip-item code {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  padding: 0;
+}
+.docs-bot-cta-strip-install {
+  display: inline-flex;
+  align-items: baseline;
+}
+.docs-bot-cta-strip-sep {
+  color: var(--ink-faint);
+  user-select: none;
+}
+
+
+/* ---- THINKING SHIMMER (folder phase, 2s+) ----
+   1-bit Mac System-7 folder + papers animation. The bars phase lives
+   under .docs-bot-shimmer above; this kicks in after 2s of waiting. */
+.docs-bot-thinking {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5) 0 var(--space-4);
+  color: var(--ink-soft);
+}
+.docs-bot-folder {
+  width: 160px;
+  height: 110px;
+  color: var(--ink-soft);
+}
+/* Folder body: 1-bit black outline, stippled fill for the wallet,
+   solid for the tab + lid (front face). */
+.docs-bot-folder-tab,
+.docs-bot-folder-lid {
+  fill: var(--bg-paper-2, #efe8db);
+  stroke: var(--ink, #1a1a1a);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+.docs-bot-folder-wallet {
+  fill: url(#docs-bot-stipple);
+  stroke: var(--ink, #1a1a1a);
+  stroke-width: 1.4;
+}
+.docs-bot-folder-lid {
+  /* Pivot from the back edge so it lifts away from the viewer. */
+  transform-origin: 80px 60px;
+  transform-box: fill-box;
+  animation: docs-bot-folder-lid 4.2s ease-in-out infinite;
+}
+.docs-bot-folder-papers > * {
+  fill: var(--bg-paper, #f7f1e8);
+  stroke: var(--ink, #1a1a1a);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.docs-bot-folder-paper {
+  animation-duration: 4.2s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+.docs-bot-folder-paper.p1 { animation-name: docs-bot-paper-1; }
+.docs-bot-folder-paper.p2 { animation-name: docs-bot-paper-2; }
+.docs-bot-folder-paper.p3 { animation-name: docs-bot-paper-3; }
+.docs-bot-folder-scribble {
+  stroke: var(--ink-soft, #5a5a5a);
+  stroke-width: 0.8;
+  stroke-linecap: round;
+  opacity: 0;
+  animation: docs-bot-paper-scribble 4.2s ease-in-out infinite;
+}
+.docs-bot-folder-scribble.s1 { animation-delay: 0.2s; }
+.docs-bot-folder-scribble.s2 { animation-delay: 0.35s; }
+.docs-bot-folder-scribble.s3 { animation-delay: 0.5s; }
+.docs-bot-folder-scribble.s4 { animation-delay: 0.65s; }
+
+/* Lid keyframes — open quickly, hold, close slowly so the viewer can
+   see the papers; rest is the closed neutral. */
+@keyframes docs-bot-folder-lid {
+  0%   { transform: rotateX(0deg); }
+  18%  { transform: rotateX(-65deg); }
+  72%  { transform: rotateX(-65deg); }
+  92%  { transform: rotateX(0deg); }
+  100% { transform: rotateX(0deg); }
+}
+
+/* Each paper drifts up + slightly sideways, then returns. Different
+   delays so they read as a small flock, not a single block. */
+@keyframes docs-bot-paper-1 {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  18%  { transform: translate(-22px, -32px) rotate(-8deg); opacity: 1; }
+  60%  { transform: translate(-26px, -36px) rotate(-5deg); opacity: 1; }
+  82%  { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(0, 0); opacity: 0; }
+}
+@keyframes docs-bot-paper-2 {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  20%  { transform: translate(2px, -40px); opacity: 1; }
+  62%  { transform: translate(-2px, -44px); opacity: 1; }
+  84%  { transform: translate(0, 0); opacity: 1; }
+  100% { transform: translate(0, 0); opacity: 0; }
+}
+@keyframes docs-bot-paper-3 {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  22%  { transform: translate(24px, -32px) rotate(8deg); opacity: 1; }
+  64%  { transform: translate(28px, -36px) rotate(5deg); opacity: 1; }
+  86%  { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(0, 0); opacity: 0; }
+}
+@keyframes docs-bot-paper-scribble {
+  0%, 18%   { opacity: 0; }
+  30%, 60%  { opacity: 1; }
+  82%, 100% { opacity: 0; }
+}
+
+.docs-bot-thinking-status {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  margin: 0;
+  text-align: center;
+  /* Reserve a stable width so the line doesn't reflow as the text
+     length changes through the four-stage cycle. */
+  min-height: 1.2em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-bot-folder-lid,
+  .docs-bot-folder-paper,
+  .docs-bot-folder-scribble {
+    animation: none;
+  }
+  /* Hold the open state so the still image still reads as "looking
+     through papers". */
+  .docs-bot-folder-lid { transform: rotateX(-50deg); }
+  .docs-bot-folder-paper { opacity: 1; }
+  .docs-bot-folder-scribble { opacity: 1; }
+}

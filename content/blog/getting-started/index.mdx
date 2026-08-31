@@ -1,0 +1,125 @@
+---
+title: "getting started: first multi-agent claude code run in 5 min"
+description: "install bernstein, point it at claude code (or codex/gemini cli), run a goal in parallel, read the tui. five minutes if python 3.12 is ready."
+date: "2026-04-14"
+dateModified: "2026-08-10"
+tags: ["multi-agent orchestration tutorial", "AI coding agents setup", "Claude Code tutorial", "getting started", "Python CLI tools"]
+schemaType: "HowTo"
+howToSteps:
+  - name: "install"
+    text: "Install Bernstein from pip or uv (pip install bernstein), then run bernstein --version to confirm the binary is on PATH."
+  - name: "point it at an agent"
+    text: "Install at least one CLI agent (Claude Code is the easiest), export ANTHROPIC_API_KEY, then run bernstein integrations list --installed to confirm the adapter is detected."
+  - name: "run a goal"
+    text: "From your project directory run bernstein run --goal '<task>'; the orchestrator decomposes into tasks, spawns agents in isolated worktrees, and merges results through the queue."
+  - name: "read the TUI"
+    text: "Watch tasks in the TUI: check marks for merged work, arrows for active agents, circles for pending. q is a graceful stop, Ctrl+C is the hammer."
+  - name: "see what changed"
+    text: "Inspect the result with git log --oneline -5 - one commit per agent, all merged through the same queue."
+  - name: "next things to poke"
+    text: "Try a YAML plan with bernstein run plans/<file>.yaml, add a second adapter so the router has options, and check per-session spend with bernstein cost."
+---
+
+<Lead>
+Five minutes from `pip install` to the first session, assuming you have Python 3.12 and Claude Code already on the box. If you don't, the prereqs eat the first three.
+</Lead>
+
+<Callout title="Editor's note (2026-08-10)">
+This post first ran against bernstein 1.8.8. Commands and paths below are re-verified against 3.14.159; the flow is unchanged.
+</Callout>
+
+## install
+
+```bash
+pip install bernstein
+# or
+uv pip install bernstein
+
+bernstein --version
+# bernstein 3.14.159
+```
+
+## point it at an agent
+
+Bernstein needs at least one CLI agent on PATH. 40+ adapters ship in the box; Claude Code is the path of least resistance:
+
+```bash
+npm install -g @anthropic-ai/claude-code
+export ANTHROPIC_API_KEY=sk-ant-...
+
+bernstein integrations list --installed
+# Bernstein integrations (1)
+# name    installed  headline
+# claude  yes        Anthropic Claude Code CLI - default headless coding agent
+```
+
+Codex, Gemini CLI, the OpenAI Agents SDK, Aider, Cursor - see the [adapter index](https://bernstein.readthedocs.io/en/latest/adapters/) for the full list. Bernstein auto-detects whichever ones are installed.
+
+## run a goal
+
+```bash
+cd your-project
+bernstein run --goal "Add type hints to all functions in src/utils.py"
+```
+
+What happens, in order: goal gets decomposed into tasks, tasks get a role and a model, agents spawn into isolated worktrees, heartbeats and stdout get parsed, completed work merges back through the queue. Failed tasks roll back and end up in `.sdd/runtime/dlq.jsonl`.
+
+## read the TUI
+
+```
+┌─ Bernstein v3.14.159 ──────────────────────────────┐
+│ Goal: Add type hints to all functions in src/utils  │
+│ Tasks: 3 total │ 1 running │ 1 done │ 1 pending    │
+│ Agents: 2 active │ Cost: $0.12                      │
+├─────────────────────────────────────────────────────┤
+│ ✓ task-001  Analyze existing type usage    00:42    │
+│ ► task-002  Add type hints to helpers      01:15    │
+│ ○ task-003  Add type hints to validators   pending  │
+└─────────────────────────────────────────────────────┘
+```
+
+`✓` merged, `►` running, `○` waiting on a dependency or a free agent. `q` is a graceful stop (lets the current task finish), `Ctrl+C` is the hammer.
+
+## see what changed
+
+```bash
+git log --oneline -5
+# a1b2c3d Add type hints to validator functions
+# d4e5f6g Add type hints to helper functions
+# h7i8j9k Analyze existing type usage in src/utils.py
+```
+
+One commit per agent, all merged through the same queue.
+
+## next things to poke
+
+YAML plans for anything multi-stage:
+
+```bash
+bernstein run plans/my-project.yaml
+```
+
+Plans take stages, dependencies, roles, and complexity per task. Schema's in the [plans doc](https://bernstein.readthedocs.io/en/latest/architecture/plans/).
+
+A second adapter so the router has something to choose between:
+
+```bash
+npm install -g @openai/codex   # or any other supported agent
+bernstein integrations list --installed
+```
+
+Per-session cost:
+
+```bash
+bernstein cost
+# Session total: $0.47
+# By model: haiku=$0.03, sonnet=$0.28, opus=$0.16
+```
+
+The task server runs on `:8052` while a session is live, if you want to script against it.
+
+## further
+
+- [How the bandit picks a model](/blog/cost-aware-routing) - cut spend roughly in half on our own runs
+- [Running on Cloudflare](/blog/cloudflare-cloud-execution) when the laptop is the bottleneck
+- [Source](https://github.com/sipyourdrink-ltd/bernstein), [PyPI](https://pypi.org/project/bernstein/)

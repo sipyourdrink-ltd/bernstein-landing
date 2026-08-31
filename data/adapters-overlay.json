@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "comment": "Hand-curated overlay merged into the extracted adapters.json at build time. Each entry is keyed by slug and supplies fields the extractor's heuristics can't infer reliably (install command, license, parallel-safe flag, decision-matrix paragraphs). NO AI-generated narrative — operator wrote each entry from primary sources (project README, official docs, latest release notes).",
+  "entries": {
+    "claude": {
+      "install": "curl -fsSL https://claude.ai/install.sh | sh  (or brew install --cask claude-code)",
+      "verified": { "upstream": "@anthropic-ai/claude-code 2.1.x", "date": "2026-05-05" },
+      "license": "Anthropic proprietary",
+      "auth": "Anthropic API key or Claude Pro/Max subscription",
+      "parallelSafe": true,
+      "mcpSupport": true,
+      "auditChain": false,
+      "homepage": "https://docs.anthropic.com/en/docs/claude-code",
+      "summary": "Claude Code is Anthropic's official terminal-native coding agent. It runs as a single Node binary, supports MCP, and ships per-project skills. Designed for one developer driving one repo at a time.",
+      "whenToChoose": "If your work fits one focused thread per session, Claude Code alone is faster than wrapping it in an orchestrator. The CLI is mature, the cache-control story is best-in-class, and the Claude Pro/Max subscription is a fixed-cost option Bernstein cannot replicate.",
+      "whenToChooseBernstein": "If you want to run Claude Code alongside Codex, Cursor, or Aider on the same goal - Bernstein splits the goal into parallel tasks and routes each to the cheapest agent whose recent pass rate is above threshold. Claude Code is then ONE adapter among 42, not the only seat at the table."
+    },
+    "codex": {
+      "install": "npm i -g @openai/codex  (or brew install --cask codex)",
+      "verified": { "upstream": "@openai/codex 0.117.x", "date": "2026-05-05" },
+      "license": "OpenAI proprietary",
+      "auth": "OPENAI_API_KEY",
+      "parallelSafe": true,
+      "mcpSupport": true,
+      "auditChain": false,
+      "homepage": "https://github.com/openai/codex",
+      "summary": "OpenAI Codex CLI is OpenAI's terminal coding agent built on the GPT-5.5 family. The `codex exec` command runs non-interactively with `--full-auto` and emits structured JSON so Bernstein parses every step.",
+      "whenToChoose": "If you live inside the OpenAI ecosystem (gpt-5.5 / gpt-5.5-mini / o3) and want one tool that handles plan, edit, and apply - Codex is the canonical answer. The o-series reasoning models are also accepted by the same binary, no adapter switch needed.",
+      "whenToChooseBernstein": "When the same goal benefits from a cross-model second opinion: have Codex draft, have Claude review, have Aider apply patches that survive both. Bernstein's quality gates and cross-model verifier make this a one-line config in `bernstein.yaml`, not a hand-rolled shell script."
+    },
+    "gemini": {
+      "install": "npm install -g @google/gemini-cli",
+      "verified": { "upstream": "@google/gemini-cli 0.40.x", "date": "2026-05-05" },
+      "license": "Google proprietary",
+      "auth": "GEMINI_API_KEY or Google AI Studio session",
+      "parallelSafe": true,
+      "mcpSupport": true,
+      "auditChain": false,
+      "homepage": "https://github.com/google-gemini/gemini-cli",
+      "summary": "Google's Gemini CLI runs gemini-3.1-pro / gemini-3-flash / gemini-3.1-flash-lite from a terminal with non-interactive mode and MCP support. Strong on long-context reasoning over big repos.",
+      "whenToChoose": "When the task lives or dies on a 1M-token context window - Gemini's long-context tier is currently the cheapest path to whole-repo reasoning, and the CLI exposes that without you wiring up the API yourself.",
+      "whenToChooseBernstein": "When you want Gemini's long-context analysis to feed into a multi-step plan that other agents execute. Bernstein lets Gemini do the architecture pass, then spawns Claude / Codex / Aider on the resulting tasks in parallel - each agent picks up only the slice it needs to read."
+    },
+    "aider": {
+      "install": "pip install aider-chat",
+      "verified": { "upstream": "aider-chat 0.86.x", "date": "2026-05-05" },
+      "license": "Apache-2.0",
+      "auth": "Provider API key (anthropic / openai / openrouter / etc.)",
+      "parallelSafe": true,
+      "mcpSupport": false,
+      "auditChain": false,
+      "homepage": "https://aider.chat",
+      "summary": "Aider is the original open-source coding agent. Talks to ~50 LLM providers via LiteLLM, commits each change to git automatically, ships a repo-map for context. Apache-2.0, 30k+ stars.",
+      "whenToChoose": "If you already use Aider and like its `/add`, `/run`, `/test` muscle memory - Bernstein doesn't replace any of that. Aider is also the right tool when MCP is overkill: many tasks are one repo, one agent, one provider, and Aider's surface is smaller and faster than anything wrapping it.",
+      "whenToChooseBernstein": "When you want Aider's reliability AND parallelism. Bernstein spawns 3-8 Aiders in separate worktrees against the same goal, each scoped to a different sub-task, and reconciles the diffs. The audit chain on top of Aider's per-change commits is also a regulatory differentiator the bare CLI doesn't have."
+    },
+    "cursor": {
+      "install": "curl https://cursor.com/install -fsS | bash  (macOS/Linux/WSL)",
+      "verified": { "upstream": "cursor-agent 2026.05.x", "date": "2026-05-05" },
+      "license": "Anysphere proprietary",
+      "auth": "Cursor account login (`cursor-agent login`)",
+      "parallelSafe": true,
+      "mcpSupport": true,
+      "auditChain": false,
+      "homepage": "https://docs.cursor.com/cli",
+      "summary": "Cursor publicly launched a real terminal CLI on 2026-01-16 and shipped a v3 agent-first UX in April plus the Cursor SDK in May 2026, all sharing the same `cursor-agent` binary surface.",
+      "whenToChoose": "If your team already pays for Cursor Pro and you want their model-routing decisions (which often pick the right thing) without managing N provider keys yourself. The IDE and the CLI share a session, so handoff between editing in Cursor and shipping with `cursor-agent` is seamless.",
+      "whenToChooseBernstein": "When the per-seat Cursor cost stops scaling - Bernstein lets you run one Cursor seat plus Claude/Codex/Aider in parallel and merge the result. The orchestrator is open-source, on-prem, and the audit log is yours, which is the part Cursor can't unlock at any price tier today."
+    }
+  }
+}

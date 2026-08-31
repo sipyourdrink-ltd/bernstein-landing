@@ -1,0 +1,40 @@
+---
+title: "Summary: bernstein 2.0.0: a web UI ships in the wheel, CLI unchanged"
+description: "Bernstein 2.0 ships a FastAPI + React web UI inside the wheel. CLI and TUI surfaces are unchanged, configs do not move, agents and adapters keep working."
+date: "2026-05-17"
+url: "https://bernstein.run/blog/v2-0-release"
+tags: ["summary"]
+source_post: "v2-0-release"
+summary_modes:
+  quick:
+    title: "bernstein 2.0 adds web ui, keeps cli intact"
+    items:
+      - "bernstein now includes a FastAPI and React web interface accessible at http://127.0.0.1:8052/ui/."
+      - "the cli, configs, and agent workflows remain unchanged and fully compatible."
+    whyItMatters: "operators gain a modern ui without losing the reliability of existing automation scripts."
+  takeaways:
+    title: "bernstein 2.0 adds web ui without changing core behavior"
+    items:
+      - "bernstein now includes a FastAPI and React web interface shipped directly in the wheel."
+      - "the cli and tui remain unchanged, with no disruption to existing configurations or workflows."
+      - "the web ui is intentionally minimal, with no new frontend dependencies beyond the core stack."
+      - "existing agents, adapters, and task logic continue to function without modification."
+    whyItMatters: "operators gain a modern web interface while preserving the stability and simplicity of the system."
+  technical:
+    title: "bernstein 2.0 adds web ui in wheel, cli unchanged"
+    items:
+      - "the bernstein gui serve command starts a fastapi server with a react spa mounted at /ui and api routes at /api/v1/. the vite-built frontend is included in src/bernstein/gui/static/ to avoid requiring node at install time."
+      - "the ui includes tabs for tasks, agents, approvals, audit, costs, fleet, and settings, with per-task drawers showing summary, kpis, logs, diff, gates, deps, and trace data from .sdd/traces/.jsonl files."
+      - "agent sessions are displayed in a live grid with real-time metrics and logs, using sse-starlette for streaming and a lightweight stack of react, react router, react query, and tailwind css without heavy dependencies."
+      - "three bugs were fixed alongside the ui: per-step model directives now persist in plan runs, the startup banner is restored, and manager-to-task-server auth works correctly in nested processes with proper bearer token propagation."
+    whyItMatters: "operators gain a visual interface without sacrificing the reliability of the existing cli or configuration structure."
+---
+
+## summary
+
+bernstein now includes a FastAPI and React web interface shipped directly in the wheel. the cli and tui remain unchanged, with no disruption to existing configurations or workflows. the web ui is intentionally minimal, with no new frontend dependencies beyond the core stack. existing agents, adapters, and task logic continue to function without modification.
+
+## key takeaways
+
+- bernstein now includes a FastAPI and React web interface accessible at http://127.0.0.1:8052/ui/.
+- the cli, configs, and agent workflows remain unchanged and fully compatible.

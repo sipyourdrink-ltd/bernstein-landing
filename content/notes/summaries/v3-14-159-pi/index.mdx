@@ -1,0 +1,40 @@
+---
+title: "Summary: bernstein 3.14.159: the stranger's ninety minutes"
+description: "A first-use report described ninety minutes of setup that ended in nothing. v3.14.159 answers it: the plan loader raises named errors instead of swallowing"
+date: "2026-08-10"
+url: "https://bernstein.run/blog/v3-14-159-pi"
+tags: ["summary"]
+source_post: "v3-14-159-pi"
+summary_modes:
+  quick:
+    title: "bernstein 3.14.159: fixing silent failures and streamlining the cli"
+    items:
+      - "the plan loader now raises named errors instead of silently accepting malformed fields."
+      - "five commands are removed and the rest use deprecation warnings to reduce cognitive load."
+    whyItMatters: "clearer errors and a simpler command surface make the tool easier to learn and trust."
+  takeaways:
+    title: "bernstein 3.14.159: fixing silent failures and tightening the cli"
+    items:
+      - "the plan loader now raises named errors for malformed fields instead of silently applying defaults."
+      - "five commands were removed and others reorganized to reduce cognitive load and simplify the interface."
+      - "reference documentation is now enforced in ci to match the live cli, preventing drift."
+      - "new features include a muse code adapter, agent plugins v1.0.0, offline-verified run receipts, and audit diagnose."
+    whyItMatters: "users can trust that errors are reported clearly and the system behaves as documented."
+  technical:
+    title: "bernstein 3.14.159: fixing silent failures and tightening validation"
+    items:
+      - "the plan loader now raises named PlanLoadError exceptions for malformed fields, enforcing schema types and ranges instead of silently applying defaults."
+      - "five commands were removed without deprecation: postmortem, incident, commit-stats, consensus, and issue-to-pr, reducing command surface complexity."
+      - "reference documentation is now ci-gated to match the live cli, failing ci if commands or flags diverge between code and docs."
+      - "a new bernstein audit diagnose command analyzes signed per-step journals to identify the first faulty step in a failed run."
+    whyItMatters: "users can now trust error feedback and documentation accuracy, reducing debugging time and configuration drift."
+---
+
+## summary
+
+the plan loader now raises named errors for malformed fields instead of silently applying defaults. five commands were removed and others reorganized to reduce cognitive load and simplify the interface. reference documentation is now enforced in ci to match the live cli, preventing drift. new features include a muse code adapter, agent plugins v1.0.0, offline-verified run receipts, and audit diagnose.
+
+## key takeaways
+
+- the plan loader now raises named errors instead of silently accepting malformed fields.
+- five commands are removed and the rest use deprecation warnings to reduce cognitive load.

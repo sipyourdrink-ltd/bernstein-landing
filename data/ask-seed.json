@@ -1,0 +1,316 @@
+{
+  "$schema": "./ask-seed.schema.json",
+  "version": 3,
+  "updated": "2026-08-01",
+  "notes": "Canonical Q->A pairs for AIO / LLM citation. Each entry: slug (kebab), q (lowercase, no em-dash), a (60-180 words, plain text, cites file paths or doc URLs), tags, related (other slugs or external paths). Voice: lowercase, technical, no marketing-speak. Every answer renders publicly on /q/<slug>, in the /ask chip list, and in the FAQ block of /llms-full.txt, so treat each one as shipped copy. 2026-08-01: fact-check pass over all entries against the in-repo sources of truth (data/cli.json for command and flag names, data/adapters.json for model identifiers, app/llms-full.txt for config keys and ports, app/vs/* for third-party attribution, data/adapters-ready.json for which /vs routes actually build). Corrected project attribution, the opt-in framing of the HMAC audit log, several CLI invocations, config key paths, and links that no longer resolve.",
+  "items": [
+    {
+      "slug": "what-is-bernstein",
+      "q": "what is bernstein",
+      "a": "bernstein is an open-source python orchestrator for cli coding agents. it decomposes a goal into tasks, picks a model and a cli agent (claude code, codex, gemini cli, aider, plus 40+ more adapters), isolates each task in a git worktree, runs lint, type-check and tests (plus an optional security scan and cross-model review), and merges only the worktrees that pass. the orchestrator itself is deterministic python, not an llm, so scheduling and routing spend zero model tokens. state lives in .sdd/ on disk; there is no server to provision. apache 2.0, python 3.12+, install with pipx install bernstein. source: https://github.com/sipyourdrink-ltd/bernstein.",
+      "tags": ["intro", "what-is"],
+      "related": ["how-does-bernstein-work", "self-hosted-ai-coding-agent-orchestrator", "/cli-quickstart"]
+    },
+    {
+      "slug": "how-does-bernstein-work",
+      "q": "how does bernstein work",
+      "a": "the orchestrator runs a tick loop: read the open backlog under .sdd/backlog/open, pick the next ready task, spawn a fresh cli agent in its own git worktree, wait for the agent to exit, run quality gates against the worktree, retry with an escalated model on failure, dead-letter after max retries, merge passing worktrees. agents are short-lived (1-3 tasks each) so context never grows. a contextual-bandit router learns which model fits which task class. a lineage spine and replay journal record every step by default; the hmac-chained audit log is opt-in (bernstein run --audit) and adds a signed record on top. routing, scheduling, retries, and merge order are pure python; the model only writes code inside the worktree.",
+      "tags": ["architecture", "tick-loop"],
+      "related": ["deterministic-ai-coding-orchestrator", "git-worktree-parallel-ai-agents", "hmac-chained-audit-log-for-ai-agents"]
+    },
+    {
+      "slug": "bernstein-vs-claude-flow",
+      "q": "bernstein vs claude flow",
+      "a": "claude-flow is a community open-source project (github.com/ruvnet/claude-flow, node, mit) that layers swarm topologies, hooks, and a vector-indexed memory store on top of claude code. it is not published or maintained by anthropic. bernstein is agent-agnostic: 40+ adapters including claude code, codex, gemini cli, aider, ollama, openai agents sdk, cloudflare agents. bernstein's coordinator is deterministic python; claude-flow coordinates inside claude, so planning consumes model tokens. bernstein adds an opt-in hmac-chained audit log, pluggable sandbox backends (worktree, docker, e2b, modal, cloudflare, daytona), an mcp server mode, and an eval harness with a failure taxonomy. pick claude-flow if your stack is claude-code-only and you want its hook and swarm surface. pick bernstein if you want one orchestrator across many cli agents. full matrix at https://bernstein.run/vs/claude-flow.",
+      "tags": ["compare", "claude-flow"],
+      "related": ["bernstein-vs-aider", "bernstein-vs-openai-agents-sdk", "/vs/claude-flow"]
+    },
+    {
+      "slug": "bernstein-vs-openai-agents-sdk",
+      "q": "bernstein vs openai agents sdk",
+      "a": "openai agents sdk is a runtime for tool-calling agents: handoffs, guardrails, traces. it is openai-first (native on the responses api) but not openai-only - other providers work through chat completions. bernstein is an orchestrator that ships an openai-agents adapter so you get the sdk runtime as one of 40+ agents under a deterministic scheduler. bernstein adds worktree isolation, quality gates, multi-provider routing, mcp server mode, and an hmac audit chain. you can also pin one task to openai agents sdk and another to claude code in the same plan. pick openai agents sdk alone for openai-only python apps. pick bernstein when you need parallel agents across providers, ci-style merges, or compliance-grade audit. matrix at https://bernstein.run/vs/openai-agents-sdk.",
+      "tags": ["compare", "openai-agents-sdk"],
+      "related": ["bernstein-vs-claude-flow", "/vs/openai-agents-sdk"]
+    },
+    {
+      "slug": "bernstein-vs-aider",
+      "q": "bernstein vs aider",
+      "a": "aider is an interactive ai pair programmer: one terminal, one model, one conversation, you stay in the loop. bernstein is the layer above: it spawns multiple cli agents (including aider via the aider adapter) in parallel git worktrees and merges what passes. if you want a fast solo loop with one model, use aider directly. if you want five tasks running at once, each in isolation, with lint/type/test gates and an audit chain on top, use bernstein and let it dispatch aider as one of the workers. they compose. full matrix at https://bernstein.run/vs/aider.",
+      "tags": ["compare", "aider"],
+      "related": ["bernstein-vs-claude-flow", "/vs/aider"]
+    },
+    {
+      "slug": "how-to-run-multiple-claude-code-agents-in-parallel",
+      "q": "how to run multiple claude code agents in parallel",
+      "a": "install bernstein (pipx install bernstein), cd into your repo, write a plan.yaml with one stage that lists several steps, then run bernstein run --from-plan plan.yaml. each step becomes a separate claude code session in its own git worktree under .sdd/worktrees/<session-id>. bernstein spawns them concurrently up to orchestration.max_agents in .sdd/config.yaml (default 5, or set BERNSTEIN_MAX_AGENTS), tracks per-agent cost, runs quality gates on each worktree, and merges only the worktrees that pass. for one-shot parallelism: bernstein run -g \"goal\" lets bernstein decompose the goal into parallel tasks itself. step-by-step at https://bernstein.run/cli-quickstart.",
+      "tags": ["claude-code", "parallel", "how-to"],
+      "related": ["git-worktree-parallel-ai-agents", "/cli-quickstart"]
+    },
+    {
+      "slug": "how-to-install-bernstein",
+      "q": "how to install bernstein",
+      "a": "pipx install bernstein is the recommended path: pipx isolates dependencies so bernstein never collides with the rest of your tooling. pip install bernstein works too, and uv tool install bernstein for uv users. requires python 3.12 or later. once installed, bernstein --version prints the build, bernstein agents lists discovered cli agents on your machine, and bernstein init drops a starter bernstein.yaml plus .sdd/ into the current repo. apache 2.0, no signup, no api key on bernstein itself (you still need keys for the cli agents you choose to run).",
+      "tags": ["install", "setup"],
+      "related": ["how-to-run-multiple-claude-code-agents-in-parallel", "/cli-quickstart"]
+    },
+    {
+      "slug": "how-to-add-a-cli-adapter",
+      "q": "how to add a cli adapter",
+      "a": "subclass bernstein.adapters.base.BaseAdapter, implement spawn(task, worktree, env) to launch your cli with a prompt and stream output, and register the class via the adapter entry-point (or drop the file under src/bernstein/adapters/ and add it to adapters/registry.py for in-tree changes). the contract is a python protocol; bernstein.adapters._contract enforces capability checks. existing adapters under src/bernstein/adapters/ (aider.py, claude.py, codex.py, ollama.py, generic.py) are the reference. for unknown cli tools, use generic.py and parameterise it through bernstein.yaml. the plugin sdk in src/bernstein/adapters/plugin_sdk.py lets you ship adapters as separate pip packages.",
+      "tags": ["adapters", "extension"],
+      "related": ["bernstein-vs-aider", "mcp-server-for-multi-agent-coding"]
+    },
+    {
+      "slug": "how-does-the-audit-chain-work",
+      "q": "how does the audit chain work",
+      "a": "the audit chain is opt-in: enable it with bernstein run --audit (a lineage spine and replay journal run regardless). once on, every orchestration action (task created, agent spawned, gate passed, merge committed) is appended to .sdd/audit/<YYYY-MM-DD>.jsonl (one file per utc day) as a json line with a sha-256 hmac that chains over the previous entry's hmac and the current payload. the signing key lives outside the audit volume by design - default ~/.local/state/bernstein/audit.key, overridable with BERNSTEIN_AUDIT_KEY_PATH - so whoever can edit the log cannot re-sign it. bernstein audit verify walks the file front to back and fails fast on the first broken link, so a single edited line invalidates everything after it. that gives you tamper-evident replay: hand the log plus the key to a reviewer and they can re-verify every step offline. source: src/bernstein/core/security/audit.py.",
+      "tags": ["audit", "security", "hmac"],
+      "related": ["audit-grade-ai-coding-orchestrator-for-regulated-teams", "fail-closed-agent-orchestrator"]
+    },
+    {
+      "slug": "deterministic-ai-coding-orchestrator",
+      "q": "deterministic ai coding orchestrator",
+      "a": "bernstein's orchestrator is pure python: tick loop, task store, scheduler, router, merge queue, quality gates. no llm call sits on the coordination path. given the same backlog, the same .sdd/ state, and the same model outputs, a re-run produces the same task ordering and the same merge sequence. that determinism is what makes the hmac audit chain meaningful (no model nondeterminism in the metadata) and what lets the eval harness replay an entire run from a recorded fixture. bernstein verify --determinism <run-id> prints the execution fingerprint for a run. frameworks that put an llm in the coordination path trade this property for flexibility at planning time.",
+      "tags": ["determinism", "architecture"],
+      "related": ["how-does-bernstein-work", "audit-grade-ai-coding-orchestrator-for-regulated-teams"]
+    },
+    {
+      "slug": "audit-grade-ai-coding-orchestrator-for-regulated-teams",
+      "q": "audit grade ai coding orchestrator for regulated teams",
+      "a": "bernstein records a lineage spine and replay journal on every run and can write an hmac-chained audit log of every orchestration action when you enable it (bernstein run --audit). it scopes credentials per agent (each worker gets only the keys it needs), keeps all state on disk in .sdd/, supports policy-engine and pii-gate plugins under src/bernstein/core/security/, and ships a bernstein audit verify command that re-checks the chain offline. there is no hosted backend in the default install; you run the orchestrator on your own box. note: the project does not claim soc 2, hipaa, or fedramp coverage. those are organisational programs around a tool, not a property of the tool itself. what bernstein gives you is the technical primitives a regulated team needs to make its own case.",
+      "tags": ["compliance", "audit", "regulated"],
+      "related": ["how-does-the-audit-chain-work", "self-hosted-ai-coding-agent-orchestrator"]
+    },
+    {
+      "slug": "self-hosted-ai-coding-agent-orchestrator",
+      "q": "self hosted ai coding agent orchestrator",
+      "a": "bernstein runs entirely on your machine. pipx install bernstein, run bernstein in your repo, the orchestrator process and every agent it spawns are local. state is .sdd/ files on disk. there is no required cloud control plane, no signup, no telemetry call-home. the http task server binds 127.0.0.1:8052 by default. agents reach their llm providers directly with credentials you supply; bernstein does not proxy or store keys for them. for fleet management across multiple repos use bernstein fleet, still local. apache 2.0, source at github.com/sipyourdrink-ltd/bernstein.",
+      "tags": ["self-hosted", "privacy"],
+      "related": ["what-is-bernstein", "audit-grade-ai-coding-orchestrator-for-regulated-teams"]
+    },
+    {
+      "slug": "mcp-server-for-multi-agent-coding",
+      "q": "mcp server for multi agent coding",
+      "a": "bernstein exposes itself as an mcp server. run bernstein mcp for stdio (the default transport) or bernstein mcp --transport http --port 8053 for streamable http. the published tools are bernstein_run, bernstein_status, bernstein_tasks, bernstein_cost, bernstein_stop, bernstein_approve, bernstein_health, bernstein_create_subtask, and load_skill. any mcp client (claude desktop, claude code, codex, custom) can invoke bernstein orchestration as a tool call. bernstein mcp also carries catalog, install, list, test, and usage subcommands for the bundled mcp marketplace. it consumes mcp too: each agent worktree gets its own mcp config so workers can call third-party mcp servers. source: src/bernstein/mcp/server.py.",
+      "tags": ["mcp", "protocol"],
+      "related": ["how-to-add-a-cli-adapter", "how-does-bernstein-work"]
+    },
+    {
+      "slug": "git-worktree-parallel-ai-agents",
+      "q": "git worktree parallel ai agents",
+      "a": "each task gets its own git worktree under .sdd/worktrees/<session-id>. the worktree shares the object store with the main repo but has its own working copy and head, so two agents can edit overlapping paths at the same time without stepping on each other. bernstein creates the worktree on assignment, the agent does its work, quality gates run inside the worktree, the merge queue picks up passing worktrees in dependency order and squash-merges them into the target branch. on failure or kill the worktree stays on disk so you can inspect or cherry-pick. source: src/bernstein/core/git/worktree.py.",
+      "tags": ["git", "worktree", "isolation"],
+      "related": ["how-does-bernstein-work", "how-to-run-multiple-claude-code-agents-in-parallel"]
+    },
+    {
+      "slug": "hmac-chained-audit-log-for-ai-agents",
+      "q": "hmac chained audit log for ai agents",
+      "a": "with the audit log enabled (bernstein run --audit), bernstein writes one json line per orchestration event to .sdd/audit/<YYYY-MM-DD>.jsonl, one file per utc day. each line carries an hmac-sha256 over (previous-line-hmac || event-payload), using a key held outside the audit volume (default ~/.local/state/bernstein/audit.key, overridable with BERNSTEIN_AUDIT_KEY_PATH). mutating or deleting any line breaks the chain at that point. bernstein audit verify walks the file and reports the first broken link. that gives a tamper-evident record of which agent took which action under which model and at what cost, in a format you can replay offline against the source key. without the flag you still get the always-on lineage spine and replay journal, just not the hmac chain. format and signing logic: src/bernstein/core/security/audit.py.",
+      "tags": ["audit", "hmac"],
+      "related": ["how-does-the-audit-chain-work", "audit-grade-ai-coding-orchestrator-for-regulated-teams"]
+    },
+    {
+      "slug": "fail-closed-agent-orchestrator",
+      "q": "fail closed agent orchestrator",
+      "a": "fail-closed means: on any unrecoverable condition the orchestrator stops merging rather than risk a bad commit. budget exceeded -> drain mode (finish in-flight, start nothing new). quality gate fails after max retries -> task goes to the dead-letter queue, not main. agent heartbeat lost -> reaped, work-in-progress preserved in its worktree for inspection. audit chain broken (when the audit log is enabled) -> bernstein refuses to start. policy-engine denies a tool call -> agent gets a denial, not a workaround. the default posture is to halt and surface the problem rather than auto-recover by guessing. config under .sdd/config.yaml controls thresholds; defaults live in src/bernstein/core/defaults.py.",
+      "tags": ["safety", "fail-closed"],
+      "related": ["how-does-the-audit-chain-work", "what-is-the-dead-letter-queue"]
+    },
+    {
+      "slug": "what-is-the-dead-letter-queue",
+      "q": "what is the bernstein dead letter queue",
+      "a": "tasks that fail their quality gates after max retries do not merge. instead they move to .sdd/backlog/dead-letter/, with the full agent transcripts, last-known worktree path, gate output, and a synth-generated failure-class label from the eval taxonomy. you can inspect each entry, fix the prompt or split the task, and re-queue. the dead-letter pile is bernstein's escape hatch: rather than burn budget retrying a broken brief, the orchestrator parks it for a human. the eval harness also pulls from this directory to build regression cases for future runs. source: src/bernstein/core/tasks/dead_letter.py.",
+      "tags": ["safety", "dead-letter"],
+      "related": ["fail-closed-agent-orchestrator", "how-does-bernstein-work"]
+    },
+    {
+      "slug": "how-does-cost-tracking-work",
+      "q": "how does bernstein cost tracking work",
+      "a": "every agent run reports per-model token usage back to the task server. bernstein attributes that cost to the task, the role (backend, qa, security ...) and the model. bernstein cost prints the breakdown per run (--by agent|model|task|day, --last 24h, --json). .sdd/metrics/cost.jsonl is the raw record. set cost.budget_limit in .sdd/config.yaml to cap a run; at cost.alert_threshold (default 0.8) the orchestrator warns, at 100 percent it drains (finish in-flight tasks, start nothing new). per-agent anomaly detection flags context-growth or token-spike behaviour so a stuck agent gets reaped before it burns the budget. source: src/bernstein/core/cost/.",
+      "tags": ["cost", "budget"],
+      "related": ["fail-closed-agent-orchestrator", "what-models-does-bernstein-use"]
+    },
+    {
+      "slug": "what-models-does-bernstein-use",
+      "q": "what models does bernstein use",
+      "a": "bernstein itself does not call an llm; the cli agents you configure do. you decide which models per role in bernstein.yaml. the contextual-bandit router picks among the models you allow for a given task class and learns from outcomes. typical configurations: claude opus 4.7 for architect, claude sonnet 4.6 for backend, claude haiku 4.5 for docs, gpt-5.5 for review, gemini-3.1-pro for ml. local-only setups can route everything through ollama. bernstein cost prints the realised mix after each run. routing source: src/bernstein/core/routing/.",
+      "tags": ["models", "routing"],
+      "related": ["how-does-bernstein-work", "how-does-cost-tracking-work"]
+    },
+    {
+      "slug": "does-bernstein-support-local-models",
+      "q": "does bernstein support local models",
+      "a": "yes. the ollama adapter targets the ollama daemon (or any openai-compatible local endpoint), so you can route every task through a locally hosted model with zero outbound api calls. mix local and cloud in the same plan: cheap, low-stakes tasks on a local llama or qwen, harder tasks on a paid model. configure under agents: in bernstein.yaml with the endpoint url and model name. ollama adapter source: src/bernstein/adapters/ollama.py. the clm adapter (sovereign llm gateway) is the production-grade variant for teams running mtls-fronted internal endpoints.",
+      "tags": ["local", "ollama", "privacy"],
+      "related": ["self-hosted-ai-coding-agent-orchestrator", "what-models-does-bernstein-use"]
+    },
+    {
+      "slug": "what-quality-gates-does-bernstein-run",
+      "q": "what quality gates does bernstein run",
+      "a": "by default: ruff (lint), pyright or mypy (types), pytest (tests). the security gate (bandit or semgrep) is opt-in, as is cross-model review. each gate runs inside the agent's worktree before the merge queue considers it. failed gates trigger a retry, optionally with an escalated model (sonnet -> opus). after the retry budget is exhausted the task moves to the dead-letter queue. gates are pluggable via the pluggy hookspecs in src/bernstein/plugins/, so you can add a custom gate (terraform plan, openapi diff, license check) without forking the core. configure which gates run under quality.gates in bernstein.yaml.",
+      "tags": ["quality", "gates"],
+      "related": ["how-does-bernstein-work", "what-is-the-dead-letter-queue"]
+    },
+    {
+      "slug": "how-does-bernstein-pick-tasks-for-agents",
+      "q": "how does bernstein pick tasks for agents",
+      "a": "the scheduler reads .sdd/backlog/open/ each tick, filters out tasks whose dependencies are not yet satisfied, applies a fair-priority ordering (critical -> high -> medium -> low, with starvation guards), and emits the next ready task. the router then chooses the model and the cli agent: a contextual bandit with epsilon-greedy exploration over a feature vector (role, complexity, file scope, historical outcomes). bernstein trace <task-id> prints the step-by-step decision trail for a task, including which agent and model it landed on. source: src/bernstein/core/orchestration/ and src/bernstein/core/routing/.",
+      "tags": ["scheduler", "routing"],
+      "related": ["how-does-bernstein-work", "what-models-does-bernstein-use"]
+    },
+    {
+      "slug": "can-bernstein-run-in-ci",
+      "q": "can bernstein run in ci",
+      "a": "yes. bernstein run plan.yaml --auto-approve --quiet skips the interactive merge prompt and exits non-zero if any task ends up in the dead-letter queue, which makes it a normal failing ci step. pair it with --max-cost-usd to bound an unattended run. for the github app path, bernstein responds to /bernstein slash-commands in pr comments via src/bernstein/github_app/, and the autofix daemon (bernstein autofix) watches bernstein-opened prs, reads the ci log on failure, spawns an agent against the failing worktree, and pushes a fix commit. running inside ephemeral runners works (worktrees are local files); long-running orchestration is happier on a persistent box.",
+      "tags": ["ci", "github"],
+      "related": ["how-to-install-bernstein", "what-models-does-bernstein-use"]
+    },
+    {
+      "slug": "what-is-the-bernstein-eval-harness",
+      "q": "what is the bernstein eval harness",
+      "a": "an in-tree benchmark runner under src/bernstein/eval/. ships a golden suite of curated coding tasks, an llm-as-judge for code quality, a closed failure taxonomy that labels every failure into one of ~20 categories, and a vcr fixture system so an entire run can be re-played deterministically without re-calling the llm. swe-bench integration lives under src/bernstein/benchmark/. you score a config or a model swap against a baseline before promoting it, and the harness is also what the self-evolution loop uses to gate proposed orchestrator changes. bernstein verify --determinism <run-id> prints the execution fingerprint the replay compares against.",
+      "tags": ["eval", "benchmark"],
+      "related": ["deterministic-ai-coding-orchestrator", "what-is-self-evolution"]
+    },
+    {
+      "slug": "what-is-self-evolution",
+      "q": "what is bernstein self evolution",
+      "a": "an experimental loop under src/bernstein/evolution/ that lets bernstein propose changes to itself. metrics from past runs flow into a detector, which surfaces opportunities (slow tick, expensive task class, poor gate signal). a creative pipeline drafts a change, an approval gate routes by risk score, the eval harness runs the change against the golden suite, and only proposals that improve the baseline without regressing protected invariants are applied. an invariants guard hash-locks safety-critical files so the loop cannot edit them. circuit-breaker halts evolution on safety violation. opt-in; off by default.",
+      "tags": ["evolution", "experimental"],
+      "related": ["what-is-the-bernstein-eval-harness", "deterministic-ai-coding-orchestrator"]
+    },
+    {
+      "slug": "what-sandbox-backends-does-bernstein-support",
+      "q": "what sandbox backends does bernstein support",
+      "a": "the default backend is a local git worktree. swap it via sandbox.backend in bernstein.yaml: docker (containerised), e2b (cloud sandbox), modal, blaxel, cloudflare workers sandboxes, daytona, runloop, vercel sandboxes. each is a plug-in implementing the sandboxbackend protocol in src/bernstein/core/sandbox/. install the matching extra (pip install \"bernstein[e2b]\", [modal], [cloudflare], ...). the orchestrator and adapters are unchanged; only the place where the agent's filesystem and process live changes. useful when you want hard isolation, or when the agent needs a different os than the orchestrator host.",
+      "tags": ["sandbox", "isolation"],
+      "related": ["git-worktree-parallel-ai-agents", "self-hosted-ai-coding-agent-orchestrator"]
+    },
+    {
+      "slug": "does-bernstein-have-a-tui",
+      "q": "does bernstein have a tui",
+      "a": "yes. bernstein dashboard or bernstein live opens a textual-based tui with the task list, live agent logs, cost sparkline, quality-gate panel, scheduling visualiser, and approval overlay. bindings are vim-friendly, themable, and configurable per project (tui keybindings live under src/bernstein/tui/). a rich-based fallback renders on terminals that do not support textual. for plain text, bernstein status prints a one-shot snapshot. the tui talks to the same task server (127.0.0.1:8052) the cli uses, so you can run it in a separate terminal against a long-running orchestration.",
+      "tags": ["tui", "ui"],
+      "related": ["how-does-bernstein-work"]
+    },
+    {
+      "slug": "how-do-i-stop-or-pause-bernstein",
+      "q": "how do i stop bernstein",
+      "a": "bernstein stop sends a graceful drain signal: in-flight tasks finish, no new tasks start, the orchestrator exits clean. bernstein stop --hard kills the process group via the pid file under .sdd/runtime/. never grep for the word bernstein and kill matches; you risk hitting unrelated processes that contain the substring. on relaunch the orchestrator reads .sdd/ back, sees the unfinished tasks, and resumes from the last persisted checkpoint (wal in src/bernstein/core/persistence/). worktrees and logs from the previous run are preserved.",
+      "tags": ["lifecycle", "stop"],
+      "related": ["fail-closed-agent-orchestrator", "how-does-bernstein-work"]
+    },
+    {
+      "slug": "how-does-bernstein-compare-to-emdash",
+      "q": "bernstein vs emdash",
+      "a": "emdash is an electron desktop app that wraps cli coding agents in a gui, 23 adapters, typescript. bernstein is a python cli plus library plus mcp server, 40+ adapters, with a textual tui rather than a native window. emdash is the right pick if you want a downloadable desktop ade with one-click setup. bernstein is the right pick if you want headless ci / mcp / library use, a deterministic scheduler, an hmac audit chain, and pluggable cloud sandboxes. they are not direct substitutes; some teams run emdash for interactive work and bernstein for unattended batch runs.",
+      "tags": ["compare", "emdash"],
+      "related": ["bernstein-vs-claude-flow", "what-is-bernstein"]
+    },
+    {
+      "slug": "how-does-bernstein-handle-secrets",
+      "q": "how does bernstein handle secrets",
+      "a": "credentials are scoped per agent under src/bernstein/core/credential_scoping.py: each spawned worker gets only the env vars it declares it needs, never the orchestrator's full environment. for long-lived credentials, bernstein connect <provider> writes to the os keychain (macOS keychain, gnome-keyring, kdewallet) and every subsequent run reads from there, so api keys never live in the repo. pii gating in src/bernstein/core/security/ keeps flagged files out of agent context. the orchestrator never persists keys to .sdd/. bring-your-own-key model: bernstein adds no signup and stores no provider credentials on its side.",
+      "tags": ["secrets", "credentials"],
+      "related": ["self-hosted-ai-coding-agent-orchestrator", "audit-grade-ai-coding-orchestrator-for-regulated-teams"]
+    },
+    {
+      "slug": "bernstein-vs-crewai",
+      "q": "bernstein vs crewai",
+      "a": "crewai is a python framework for multi-agent systems. its crews are llm-driven (role prompts, with a model deciding delegation); its flows are deterministic, event-driven pipelines you wire yourself. bernstein orchestrates external cli coding agents (claude code, codex, aider, and 40+ more) with a deterministic python scheduler and merges their git worktrees. crewai fits when the work is reasoning over tools; bernstein fits when the work is code edits that need lint, type, test, and security gates before merge. you can run a crewai agent under bernstein via the generic adapter if you want its role logic under bernstein's merge queue. compare index: https://bernstein.run/vs.",
+      "tags": ["compare", "crewai"],
+      "related": ["bernstein-vs-claude-flow", "bernstein-vs-langgraph", "deterministic-ai-coding-orchestrator"]
+    },
+    {
+      "slug": "bernstein-vs-langgraph",
+      "q": "bernstein vs langgraph",
+      "a": "langgraph is langchain's graph runtime for stateful agent workflows: nodes, edges, checkpoints, time-travel debug. bernstein is a cli-agent orchestrator: it spawns claude code, codex, aider, ollama, and 40+ other adapters in git worktrees and merges what passes lint, type, test, security gates. langgraph helps you design the agent's thinking; bernstein dispatches the agents that do the editing. they compose: a langgraph node can invoke bernstein via the mcp server to delegate a coding subtask to a parallel fleet. pick langgraph for orchestrating thought; pick bernstein for orchestrating commits. compare index: /vs.",
+      "tags": ["compare", "langgraph"],
+      "related": ["bernstein-vs-crewai", "bernstein-vs-openai-agents-sdk", "mcp-server-for-multi-agent-coding"]
+    },
+    {
+      "slug": "bernstein-vs-openai-swarm",
+      "q": "bernstein vs openai swarm",
+      "a": "openai swarm was an educational, experimental framework from openai for routing between agent objects via handoffs, in-process and openai-only. it is no longer the recommended path: openai superseded it with the openai agents sdk, which is the production successor. bernstein orchestrates real cli coding agents (claude code, codex, aider, gemini, plus 40+ more) in parallel git worktrees with a deterministic python coordinator and quality gates. swarm remains useful for reading the handoff pattern. bernstein is what you reach for once agents need to write code, pass lint+type+test gates, and merge to a real branch. if you are building new, compare against the agents sdk instead: /vs/openai-agents-sdk.",
+      "tags": ["compare", "openai-swarm"],
+      "related": ["bernstein-vs-openai-agents-sdk", "bernstein-vs-claude-flow"]
+    },
+    {
+      "slug": "how-to-resume-a-killed-bernstein-run",
+      "q": "how to resume bernstein after a crash",
+      "a": "bernstein writes a write-ahead log to .sdd/persistence/ on every state transition. when you restart with bernstein run, the orchestrator loads the wal, rebuilds the task table, re-attaches to live worktrees under .sdd/worktrees/, and continues from the last persisted checkpoint. tasks that were mid-flight when the process died are re-queued with a +1 attempt counter; the prior worktree is preserved so you can diff it before the retry overwrites the branch. bernstein verify --wal-integrity <run-id> checks the log's hash chain before you resume. never grep for the literal string bernstein and kill matches; use the pid file under .sdd/runtime/ instead (bernstein stop --hard does this for you).",
+      "tags": ["recovery", "lifecycle"],
+      "related": ["how-do-i-stop-or-pause-bernstein", "fail-closed-agent-orchestrator"]
+    },
+    {
+      "slug": "how-to-keep-claude-code-from-blowing-context",
+      "q": "how to keep claude code from blowing context window",
+      "a": "the cause of context blow-up is one long-lived agent doing many tasks. bernstein addresses it structurally: each task gets a fresh claude code subprocess in its own git worktree and exits when the task finishes (typically 1-3 tasks per agent). nothing carries over between tasks except the file system, so context starts near-empty every time. for tasks where you do want a longer thread (large refactors), bernstein.orchestration.context_window_strategy can be set to extend or stream, and the caching_adapter prefix-dedups across spawns. tokens still grow inside one task; the win is that you stop paying for hour-old prose to be re-attended. source: src/bernstein/core/streaming_merge.py, src/bernstein/adapters/caching_adapter.py.",
+      "tags": ["claude-code", "context", "tuning"],
+      "related": ["how-to-run-multiple-claude-code-agents-in-parallel", "how-does-bernstein-work"]
+    },
+    {
+      "slug": "can-bernstein-use-local-ollama-llama-qwen",
+      "q": "can bernstein use ollama for coding agents",
+      "a": "yes. set agents.<name>.adapter: ollama in bernstein.yaml with endpoint (default http://127.0.0.1:11434) and model (e.g. qwen2.5-coder:32b, llama3.1:70b, deepseek-coder:33b). the ollama adapter at src/bernstein/adapters/ollama.py speaks the ollama or any openai-compatible /v1/chat/completions endpoint, so vllm, llama.cpp server, lm studio, and tabbyapi all work. mix-mode is supported: route docs through ollama and architecture through claude opus in the same plan; bernstein.cost prints the realised split. zero outbound api calls when every agent in a run points at ollama, which is what teams under strict data residency rules ask for.",
+      "tags": ["local", "ollama", "self-host"],
+      "related": ["does-bernstein-support-local-models", "what-models-does-bernstein-use", "self-hosted-ai-coding-agent-orchestrator"]
+    },
+    {
+      "slug": "how-to-run-bernstein-in-github-actions",
+      "q": "how to run bernstein in github actions",
+      "a": "the supported pattern is bernstein run plan.yaml --auto-approve --quiet as a normal job step. provide the cli agent's api key via secrets (anthropic_api_key, openai_api_key) and let bernstein scope it per worker. the job exits non-zero on any dead-letter, which fails the workflow. add --max-cost-usd so a runaway run cannot burn the budget unattended. worktrees and .sdd/ live in the runner's workspace and are torn down with it. for the slash-command flow (/bernstein fix on a pr), install the github app (src/bernstein/github_app/) and point it at the same secret store. setup walkthrough: /cli-quickstart. heavy orchestration is happier on a persistent box than on ephemeral runners.",
+      "tags": ["ci", "github-actions"],
+      "related": ["can-bernstein-run-in-ci", "how-to-install-bernstein"]
+    },
+    {
+      "slug": "how-to-handle-merge-conflicts-between-agents",
+      "q": "how does bernstein handle merge conflicts between parallel agents",
+      "a": "the merge queue serializes worktree merges in dependency order, so two passing worktrees never run their merges concurrently. if a worktree's branch has drifted from main while the agent worked, bernstein attempts a 3-way merge; on conflict it triggers the resolver role with a prompt that includes both sides of the diff and the merge-base. if the resolver fails, the task moves to dead-letter rather than committing a botched merge (fail-closed). speculative worktrees (the optional plan-ahead mode) are rebased and re-gated before they enter the queue. source: src/bernstein/core/git/ and src/bernstein/core/orchestration/merge_queue.py.",
+      "tags": ["git", "merge", "conflicts"],
+      "related": ["git-worktree-parallel-ai-agents", "fail-closed-agent-orchestrator"]
+    },
+    {
+      "slug": "what-is-the-cheapest-way-to-run-bernstein",
+      "q": "cheapest way to run bernstein",
+      "a": "free tier: route every task through ollama against a local model (qwen2.5-coder or deepseek-coder); zero api spend, only your electricity. cheap cloud: claude haiku 4.5 for docs, claude sonnet 4.6 for backend, only escalate to opus on retry; cap with cost.budget_limit in .sdd/config.yaml, or bernstein run --max-cost-usd for a single run. mixed: pin the architect role to a paid model, run the rest on ollama. the caching_adapter (src/bernstein/adapters/caching_adapter.py) deduplicates prompt prefixes across spawns so repeat work does not get re-billed. bernstein cost --last 1h tracks recent spend; the alert threshold (default 0.8) warns before you blow the cap.",
+      "tags": ["cost", "budget", "local"],
+      "related": ["how-does-cost-tracking-work", "can-bernstein-use-local-ollama-llama-qwen"]
+    },
+    {
+      "slug": "how-to-write-a-bernstein-plan-yaml",
+      "q": "how to write a bernstein plan yaml",
+      "a": "minimal plan.yaml: a top-level stages list, each stage holds steps, each step has a name, a role (backend, qa, docs, ...), and an instruction string. file paths under files: scope the worktree. dependencies via depends_on: keep ordering tight. example: stages: [{ name: feat-x, steps: [{ name: design, role: architect, instruction: ...}, { name: implement, role: backend, depends_on: [design], instruction: ...}]}]. run with bernstein run plan.yaml, or bernstein run --plan-only to print the decomposed plan without executing. for ad-hoc goals skip the yaml entirely: bernstein run -g \"goal\" builds a synthetic plan on the fly. command reference: https://bernstein.run/docs/cli.",
+      "tags": ["plan", "yaml", "how-to"],
+      "related": ["how-to-run-multiple-claude-code-agents-in-parallel", "how-to-install-bernstein"]
+    },
+    {
+      "slug": "what-is-the-bernstein-autofix-daemon",
+      "q": "what is the bernstein autofix daemon",
+      "a": "bernstein autofix watches prs opened by bernstein for ci failures. on red ci it pulls the failing job's logs, parses them via src/bernstein/adapters/ci/, spawns an agent against the worktree that opened the pr, gives it the failure trace as context, and pushes a fix commit to the same pr branch. the daemon respects the same budget, audit, and policy gates as a normal bernstein run; it does not bypass approval if approval is required for the touched paths. typical use: the operator goes to sleep, bernstein opens 3 prs overnight, autofix patches the two that go red so the morning queue has 3 green prs ready to review.",
+      "tags": ["autofix", "ci"],
+      "related": ["can-bernstein-run-in-ci", "how-to-run-bernstein-in-github-actions"]
+    },
+    {
+      "slug": "does-bernstein-have-an-mcp-client",
+      "q": "does bernstein use mcp servers",
+      "a": "yes. each agent worktree gets its own .mcp.json built from the merged config in bernstein.yaml mcp: section plus the agent's own discovery (claude code reads ~/.config/claude/mcp.json, codex reads its own). bernstein passes mcp tool calls through transparently; it does not proxy them. the merger lives in src/bernstein/adapters/claude_mcp_loader.py. you can also expose bernstein itself as an mcp server (see mcp-server-for-multi-agent-coding) so a claude desktop session can dispatch coding tasks into a bernstein fleet via tool calls. mcp config is per task, so a security task can be given a different toolset than a docs task.",
+      "tags": ["mcp", "client", "config"],
+      "related": ["mcp-server-for-multi-agent-coding", "how-to-add-a-cli-adapter"]
+    },
+    {
+      "slug": "how-does-bernstein-scope-permissions",
+      "q": "how does bernstein scope tool permissions for agents",
+      "a": "two layers. first, credential scoping (src/bernstein/core/credential_scoping.py): each agent only sees the env vars it declared needing, so a docs agent never gets the prod database url. second, tool-call approval (src/bernstein/core/approval/): every shell, file-write, network, and mcp call routes through a pluggable approval gate. defaults are off-line-safe (writes inside worktree are auto-approved, anything else surfaces). policy plugins under src/bernstein/plugins/ let you wire pii gates, license checks, or organisation-specific denylists. the security_review plugin scans the produced diff before merge. progressive disclosure (plugins/permission_explain.py) shows why approval is being asked for, so you can decide informedly rather than blanket-approving.",
+      "tags": ["permissions", "approval", "security"],
+      "related": ["how-does-bernstein-handle-secrets", "fail-closed-agent-orchestrator"]
+    },
+    {
+      "slug": "what-is-the-bernstein-fleet-dashboard",
+      "q": "what is the bernstein fleet dashboard",
+      "a": "bernstein fleet supervises multiple bernstein projects from one terminal. point it at a list of repos in ~/.config/bernstein/projects.toml (override with --config) and it polls each repo's task server (127.0.0.1:8052 by default), aggregates task counts, costs, and gate health, and renders them in a single textual panel; --web serves the same view over http. useful when one operator runs 4-6 parallel bernstein orchestrations across different products: instead of cycling through terminals, the fleet panel surfaces the one that needs attention. bernstein fleet ls, bulk-pause, bulk-resume, bulk-stop, and bulk-cost-report act across the whole set. all reads are local; the dashboard never phones home. source: src/bernstein/core/fleet/.",
+      "tags": ["fleet", "tui", "supervise"],
+      "related": ["does-bernstein-have-a-tui", "how-does-bernstein-work"]
+    }
+  ]
+}

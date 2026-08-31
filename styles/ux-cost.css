@@ -1,0 +1,606 @@
+/* ============================================================================
+   ux-cost.css — /cost page (token-bill calculator).
+   Tokens reuse globals.css (oklch palette). Component classes are scoped
+   under .cost-* prefixes. Voice: lowercase, italic emphasis, periods,
+   no marketing adjectives. The calculator output is the visual centre.
+   ============================================================================ */
+
+.cost-page {
+  background: var(--bg-paper);
+  min-height: 100vh;
+  padding: 0 0 64px;
+}
+
+.cost-page-inner {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 32px 32px 0;
+}
+
+.cost-page-header {
+  margin-bottom: 48px;
+}
+
+.cost-page-header .blog-back-link {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+.cost-page-header h1 {
+  font-family: var(--font-display);
+  font-weight: 350;
+  font-size: clamp(36px, 5vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.022em;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+
+.cost-page-header .cost-page-lede {
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 640px;
+}
+
+/* ---------------------------------------------------------------------------
+   CALCULATOR — the centerpiece widget.
+   --------------------------------------------------------------------------- */
+.cost-calc {
+  background: var(--bg-paper-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 48px;
+}
+
+.cost-calc-header h2 {
+  font-family: var(--font-display);
+  font-weight: 380;
+  font-size: clamp(26px, 3vw, 34px);
+  letter-spacing: -0.012em;
+  color: var(--ink);
+  margin: 8px 0 12px;
+}
+
+.cost-calc-header h2 em {
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 380;
+}
+
+.cost-calc-header .v2-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+}
+
+.cost-calc-header .cost-calc-lede {
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 640px;
+  margin-bottom: 32px;
+}
+
+/* INPUT/OUTPUT GRID */
+.cost-calc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 720px) {
+  .cost-calc-grid { grid-template-columns: 1fr; gap: 24px; }
+  .cost-calc { padding: 24px; }
+  .cost-page-inner { padding: 16px 16px 0; }
+}
+
+/* INPUT FIELDSET */
+.cost-calc-inputs {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 16px 20px 20px;
+  background: var(--bg-paper);
+}
+
+.cost-calc-inputs legend {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+  padding: 0 6px;
+}
+
+.cost-calc-input {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.cost-calc-input:first-of-type { margin-top: 8px; }
+
+.cost-calc-input label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.cost-calc-input-row {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--bg-paper);
+  overflow: hidden;
+  transition: border-color 120ms ease;
+}
+
+.cost-calc-input-row:focus-within {
+  border-color: var(--accent);
+}
+
+.cost-calc-prefix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  background: var(--bg-paper-2);
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  border-right: 1px solid var(--rule);
+}
+
+.cost-calc-input-row input[type='number'] {
+  flex: 1 1 auto;
+  border: 0;
+  outline: 0;
+  padding: 10px 12px;
+  background: var(--bg-paper);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+
+.cost-calc-input-row input[type='number']::-webkit-outer-spin-button,
+.cost-calc-input-row input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* OUTPUT BLOCK */
+.cost-calc-output {
+  background: var(--bg-deep);
+  color: oklch(96% 0.015 75);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 200px;
+  justify-content: center;
+}
+
+.cost-calc-output-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: oklch(70% 0.005 60);
+}
+
+.cost-calc-tooltip {
+  display: inline-block;
+  margin-left: 6px;
+  color: oklch(80% 0.01 75);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.cost-calc-tooltip:hover { color: var(--accent-soft); text-decoration: underline; }
+
+.cost-calc-output-figure {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5vw, 52px);
+  font-weight: 380;
+  line-height: 1.04;
+  letter-spacing: -0.018em;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cost-calc-output-sep { color: oklch(70% 0.005 60); }
+
+.cost-calc-output-unit {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: oklch(70% 0.005 60);
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.cost-calc-output-meta {
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: oklch(82% 0.005 60);
+}
+
+/* MATH BREAKDOWN */
+.cost-calc-math {
+  border-top: 1px dashed var(--rule);
+  padding-top: 24px;
+  margin-bottom: 24px;
+}
+
+.cost-calc-math h3 {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+}
+
+.cost-calc-math ol {
+  list-style: decimal;
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.cost-calc-math ol li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+  padding: 6px 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+  border-bottom: 1px solid var(--rule);
+}
+
+.cost-calc-math ol li:last-child { border-bottom: 0; }
+
+.cost-calc-math-label { color: var(--ink-soft); }
+
+.cost-calc-math-value {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  color: var(--ink);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cost-calc-math-value small {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  margin-left: 6px;
+}
+
+.cost-calc-math-footnote {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+/* CTA BLOCK */
+.cost-calc-cta {
+  background: var(--bg-paper);
+  border: 1px solid var(--accent-soft);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.cost-calc-cta strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cost-calc-cta-link {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+
+.cost-calc-cta-link a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.cost-calc-cta-link a:hover { text-decoration: underline; }
+
+/* ---------------------------------------------------------------------------
+   PRICE TABLE
+   --------------------------------------------------------------------------- */
+.cost-prices {
+  margin-bottom: 48px;
+}
+
+.cost-prices h2 {
+  font-family: var(--font-display);
+  font-weight: 380;
+  font-size: clamp(22px, 2.5vw, 28px);
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.cost-prices-meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-bottom: 16px;
+}
+
+.cost-prices-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--bg-paper);
+}
+
+.cost-prices-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.cost-prices-table th,
+.cost-prices-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+.cost-prices-table th {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  font-size: 11px;
+  color: var(--ink-soft);
+  background: var(--bg-paper-2);
+}
+
+/* Brand group header. The table is grouped by provider, one tbody per
+   provider, with this row naming it. Styled like the column header but
+   left-aligned with the model column and without the uppercase tracking,
+   so it reads as a divider rather than a second header row. */
+.cost-prices-brand-row th {
+  background: var(--bg-paper-2);
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-size: 12px;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.cost-prices-table tbody:last-child tr:last-child td { border-bottom: 0; }
+
+.cost-prices-table code {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--ink);
+  background: transparent;
+}
+
+.cost-prices-sources {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-top: 14px;
+}
+
+.cost-prices-sources a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.cost-prices-sources a:hover { text-decoration: underline; }
+
+.cost-prices-footnote {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin-top: 10px;
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------------------
+   METHOD BLOCK (auditable text)
+   --------------------------------------------------------------------------- */
+.cost-method {
+  margin-bottom: 48px;
+}
+
+.cost-method h2 {
+  font-family: var(--font-display);
+  font-weight: 380;
+  font-size: clamp(22px, 2.5vw, 28px);
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.cost-method p {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+  max-width: 720px;
+}
+
+.cost-method code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--code-paper);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* ---------------------------------------------------------------------------
+   CLI QUICKSTART — /cli-quickstart page styles. Reuses cost-page wrappers
+   for the header/lede; the numbered-step body is scoped under .cliqs-*.
+   --------------------------------------------------------------------------- */
+.cliqs-body {
+  margin-bottom: 48px;
+}
+
+.cliqs-body p {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+  max-width: 720px;
+}
+
+.cliqs-body code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--code-paper);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.cliqs-body a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cliqs-step-heading {
+  font-family: var(--font-display);
+  font-weight: 380;
+  font-size: clamp(22px, 2.5vw, 28px);
+  color: var(--ink);
+  margin: 36px 0 14px;
+  scroll-margin-top: 80px;
+}
+
+.cliqs-step-num {
+  font-family: var(--font-mono);
+  font-size: 0.7em;
+  color: var(--accent);
+  margin-right: 8px;
+}
+
+.cliqs-code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--code-paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md, 8px);
+  padding: 14px 16px;
+  margin: 8px 0 18px;
+  overflow-x: auto;
+  line-height: 1.55;
+  color: var(--ink);
+  max-width: 720px;
+}
+
+.cliqs-code code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+.cliqs-list {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin: 0 0 18px 18px;
+  padding: 0;
+  max-width: 720px;
+}
+
+.cliqs-list li {
+  list-style: disc;
+  margin-bottom: 8px;
+}
+
+/* FAQ section (AIO-2026-05-17 visible mirror of the JSON-LD Q&A).
+   The markup in app/cost/page.tsx shipped with .cost-faq* class names
+   that were never given CSS, so the questions (h3) and answers (p)
+   rendered with no hierarchy or spacing - one unstyled wall of text.
+   These rules restore the question/answer distinction and inter-item
+   spacing, reusing the same type tokens as .cost-calc-math and
+   .cliqs-body (720px reading measure, mono uppercase section label). */
+.cost-faq {
+  border-top: 1px dashed var(--rule);
+  padding-top: 32px;
+  margin-top: 48px;
+  max-width: 720px;
+}
+
+.cost-faq h2 {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-soft);
+  margin-bottom: 24px;
+}
+
+.cost-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.cost-faq-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cost-faq-item h3 {
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+  margin: 0;
+}
+
+.cost-faq-item p {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin: 0;
+}

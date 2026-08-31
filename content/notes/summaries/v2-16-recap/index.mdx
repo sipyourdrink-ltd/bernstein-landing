@@ -1,0 +1,40 @@
+---
+title: "Summary: bernstein 2.16: the output-economy suite, and a Windows adapter path that finally holds"
+description: "The 2.4 through 2.16 arc, grouped: an output-economy suite that caps and attributes token spend per task, deterministic auditable orchestration hardened en"
+date: "2026-07-06"
+url: "https://bernstein.run/blog/v2-16-recap"
+tags: ["summary"]
+source_post: "v2-16-recap"
+summary_modes:
+  quick:
+    title: "bernstein 2.16: output economy, audit fixes, windows install path"
+    items:
+      - "the output-economy suite now enforces per-task token budgets and attributes spend with a line-item ledger."
+      - "a long-standing windows adapter path bug is fixed, replacing silent failures with clear errors and proper binary resolution."
+    whyItMatters: "this release makes token spending visible and controlled while finally making the standard install work reliably on windows."
+  takeaways:
+    title: "bernstein 2.16: output economy, audit fixes, and windows install path"
+    items:
+      - "the output-economy suite enforces per-task token budgets and attributes spend to specific tasks, steps, adapters, and models."
+      - "cost forecasts are now scored with Brier scores to measure guard confidence against actual outcomes, not just asserted."
+      - "deterministic orchestration is hardened end to end, with byte-identical replays verified by hash and an unbroken HMAC-chained audit log."
+      - "the windows adapter path now correctly resolves executables with .exe, .cmd, or .bat extensions and fails with structured errors instead of silently."
+    whyItMatters: "this release makes token spend visible and controllable, strengthens audit integrity, and fixes a critical silent failure on windows."
+  technical:
+    title: "output economy, deterministic runs, and windows adapter fixes in 2.16"
+    items:
+      - "per-task cost budgets now enforce --max-cost-usd at the step level, halting runaway agents before they consume the entire run's allowance."
+      - "an attributed ledger records every token charge by task, step, adapter, and model, enabling line-item cost attribution via bernstein costs."
+      - "the orchestrator's audit chain now covers all state transitions with hmac-chained entries, and the standalone bernstein-verify tool validates compliance without importing the main package."
+      - "windows adapter discovery now respects pathext for .exe/.cmd/.bat files and raises structured errors instead of failing silently on missing binaries."
+    whyItMatters: "this release closes critical gaps in cost visibility, reproducibility, and cross-platform reliability."
+---
+
+## summary
+
+the output-economy suite enforces per-task token budgets and attributes spend to specific tasks, steps, adapters, and models. cost forecasts are now scored with Brier scores to measure guard confidence against actual outcomes, not just asserted. deterministic orchestration is hardened end to end, with byte-identical replays verified by hash and an unbroken HMAC-chained audit log. the windows adapter path now correctly resolves executables with .exe, .cmd, or .bat extensions and fails with structured errors instead of silently.
+
+## key takeaways
+
+- the output-economy suite now enforces per-task token budgets and attributes spend with a line-item ledger.
+- a long-standing windows adapter path bug is fixed, replacing silent failures with clear errors and proper binary resolution.

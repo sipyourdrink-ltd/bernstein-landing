@@ -1,0 +1,77 @@
+---
+title: 'Community spotlight: April 2026'
+description: >-
+  First spotlight. Contributors who shaped the architecture decomposition, the
+  adapter list, Windows support, and the cost router.
+date: '2026-04-14'
+url: 'https://bernstein.run/blog/community-spotlight-april-2026'
+tags:
+  - summary
+  - community
+  - open-source
+source_post: community-spotlight-april-2026
+summary_modes:
+  quick:
+    title: april 2026 community contributions spotlight
+    items:
+      - >-
+        bernstein's monolithic orchestrator was split into 22 focused
+        sub-packages, each under 600 lines.
+      - >-
+        eighteen adapters landed, expanding tool support from seven to eighteen
+        in one month.
+    whyItMatters: >-
+      the project became more maintainable and widely usable through
+      community-driven growth.
+  takeaways:
+    title: april 2026 community contributions advance core systems and accessibility
+    items:
+      - >-
+        the orchestrator was decomposed into 22 smaller packages to improve
+        maintainability and reduce complexity.
+      - >-
+        eighteen adapters were added, expanding integration support for various
+        agent platforms and tools.
+      - >-
+        cost-aware routing was implemented, cutting internal cloud spending by
+        approximately half.
+      - >-
+        windows support was fully implemented with proper environment, unicode,
+        and process handling.
+    whyItMatters: >-
+      these changes make the system more scalable, cost-efficient, and
+      accessible to a wider range of users and environments.
+  technical:
+    title: 'april 2026 contributions: architecture, adapters, routing, windows'
+    items:
+      - >-
+        the orchestrator was decomposed into 22 sub-packages, each under 600
+        lines, down from a single 4,198-line module.
+      - >-
+        eighteen adapters were added, averaging ~200 lines each, expanding from
+        the initial seven to support diverse agent backends.
+      - >-
+        the bandit-based cost-aware router reduced cloud spend by approximately
+        50 percent during internal execution runs.
+      - >-
+        windows support was fully implemented with proper env passthrough,
+        unicode handling, and process management in the core runtime.
+    whyItMatters: >-
+      these changes improve maintainability, reduce operational costs, and
+      expand platform compatibility for broader adoption.
+---
+
+## summary
+
+april 2026 was bernstein's first full month as a public project - the span between v1.0.0 and v1.8.8. a handful of contributors shipped work that made the release: the 4,198-line orchestrator broken into 22 sub-packages, the adapter list grown from 7 to 18, the epsilon-greedy bandit router that halved per-session costs, the Cloudflare cloud execution backend, and genuine Windows support with correct env passthrough, Unicode handling, and process management. seven contributors are named; all are in `CONTRIBUTORS.md`.
+
+## key takeaways
+
+- [@oldschoola](https://github.com/oldschoola) landed Windows compatibility across 3 PRs, plus codex config, task filtering, and auto-PR.
+- adapter count grew from 7 to 18 in one month; each adapter is roughly 200 lines.
+- bandit router cut spend roughly in half on internal self-development runs.
+- the project is Apache 2.0 with no CLA; contributor entry points are good-first-issues, adapter adoption, and benchmark submissions.
+
+## when to read this
+
+for contributors or teams evaluating bernstein's community health who want to understand what shipped in the first month post-launch and who drove it.

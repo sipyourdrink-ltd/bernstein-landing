@@ -1,0 +1,81 @@
+{
+  "name": "Bernstein",
+  "description": "Deterministic orchestrator for CLI coding agents (Claude Code, Codex, Gemini CLI, +40 more). No model in the coordination loop, so parallel runs in per-task git worktrees replay byte-identically. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy.",
+  "url": "https://bernstein.run/api/a2a",
+  "preferredTransport": "JSONRPC",
+  "supportedInterfaces": [
+    {
+      "url": "https://bernstein.run/api/a2a",
+      "transport": "JSONRPC"
+    }
+  ],
+  "schemaVersion": "1.0",
+  "protocolVersion": "0.3.0",
+  "adapterCount": 45,
+  "provider": {
+    "organization": "Bernstein",
+    "url": "https://bernstein.run",
+    "author": {
+      "name": "Alex Chernysh",
+      "url": "https://alexchernysh.com",
+      "github": "https://github.com/chernistry",
+      "x": "https://x.com/alex_chernysh"
+    }
+  },
+  "version": "3.15.1",
+  "agentVersion": "3.15.1",
+  "homepage": "https://bernstein.run",
+  "repository": "https://github.com/sipyourdrink-ltd/bernstein",
+  "package": "https://pypi.org/project/bernstein/",
+  "documentationUrl": "https://bernstein.readthedocs.io/",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": false
+  },
+  "authentication": {
+    "schemes": []
+  },
+  "defaultInputModes": [
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "text/plain"
+  ],
+  "skills": [
+    {
+      "id": "orchestrate",
+      "name": "Multi-Agent Orchestration",
+      "description": "Orchestrate 40+ CLI coding agents (Claude Code, Codex, Gemini CLI, Aider, and more) against one goal in parallel. Decomposes into tasks, assigns roles, isolates each task in its own git worktree, and gates every merge on lint, types, and tests. Scheduling is plain Python with no LLM in the coordination loop, so a run is reproducible end to end. A lineage spine and replay journal are always on; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with.",
+      "tags": [
+        "orchestration",
+        "multi-agent",
+        "coding",
+        "automation",
+        "deterministic",
+        "audit-trail",
+        "reproducible-runs"
+      ],
+      "examples": [
+        "Add JWT authentication with refresh tokens, tests, and API docs",
+        "Refactor the payment module to use Stripe webhooks",
+        "Fix all failing CI tests and update deprecated dependencies",
+        "Replay last night's run and verify every step against the audit chain"
+      ]
+    },
+    {
+      "id": "plan",
+      "name": "Project Planning",
+      "description": "Decompose a project goal into a structured YAML plan with stages, steps, roles, priorities, and dependencies.",
+      "tags": [
+        "planning",
+        "decomposition",
+        "project-management"
+      ],
+      "examples": [
+        "Plan a migration from REST to GraphQL",
+        "Create a plan to add i18n support to the frontend"
+      ]
+    }
+  ]
+}

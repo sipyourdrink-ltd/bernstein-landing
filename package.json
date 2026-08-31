@@ -1,0 +1,54 @@
+{
+  "name": "bernstein-landing",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build:adapters": "node scripts/extract-adapters.mjs",
+    "build:cli": "node scripts/extract-cli.mjs",
+    "build:counts": "node scripts/sync-adapter-count.mjs",
+    "build:version": "node scripts/sync-version.mjs",
+    "build:prices": "node scripts/fetch-model-prices.mjs",
+    "prebuild": "node scripts/prebuild.mjs",
+    "build": "next build",
+    "postbuild": "node scripts/submit-indexnow.mjs || true",
+    "postbuild:indexnow": "node scripts/submit-indexnow.mjs",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "node --test --experimental-strip-types tests __tests__"
+  },
+  "dependencies": {
+    "@react-email/components": "^1.0.12",
+    "@react-email/render": "^2.0.8",
+    "@vercel/og": "^0.11.1",
+    "gray-matter": "^4.0.3",
+    "mermaid": "^11.16.1",
+    "minisearch": "^7.2.0",
+    "next": "15.5.22",
+    "next-mdx-remote": "^6.0.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "react-markdown": "^9.1.0",
+    "reading-time": "^1.5.0",
+    "rehype-pretty-code": "^0.14.3",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.1",
+    "shiki": "^4.0.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "autoprefixer": "^10.4.19",
+    "eslint-config-next": "15.5.22",
+    "postcss": "^8.5.10",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.5.2"
+  },
+  "overrides": {
+    "uuid": "^11.1.1",
+    "postcss": "^8.5.10",
+    "sharp": "^0.35.0"
+  }
+}

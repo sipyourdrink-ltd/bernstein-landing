@@ -1,0 +1,54 @@
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets — never commit. .env.local is the source of truth for
+# `scripts/manage.py env-sync`; .env on the VPS is generated from it.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+secrets/
+credentials.json
+credentials*.json
+*_token.json
+
+# Python (canary tooling under scripts/canary/ creates .venv/__pycache__)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local-only design specs / brainstorming notes — never push to remote.
+docs/superpowers/specs/
+
+# Internal working directories — planning notes, drafts and scratch state.
+# Local-only; kept on disk, never tracked.
+.sdd/
+pr/
+.DS_Store
+
+# canary persistence (auto-committed by canary workflow)
+canary/results.jsonl
+canary/alert-state.json
+canary/archive/
+
+# scratch — TTFT probes, not for prod
+scratch/
+
+# Claude Code worktrees (per-session ephemeral, agent-isolation paths).
+# A stray gitlink leaked into commit 8aa7e75 (Apr 27); ignore this dir
+# so accidental `git add .` runs from a worktree don't repeat that.
+.claude/worktrees/
+
+# IndexNow snapshot — deploy-local sitemap diff state. Regenerated on
+# every postbuild; per-environment (CI vs prod), so don't commit.
+data/last-sitemap-snapshot.json

@@ -1,0 +1,6208 @@
+{
+  "version": 1,
+  "builtAt": "2026-08-10T14:15:56.936Z",
+  "source": "live",
+  "root": {
+    "usage": "bernstein [OPTIONS] COMMAND [ARGS]...",
+    "description": "Declarative agent orchestration for engineering teams. Deterministic Python scheduler for CLI coding agents — 48 adapters, parallel git worktrees, HMAC-SHA256 audit chain (RFC 2104).",
+    "flags": [
+      {
+        "spec": "--goal, -g",
+        "flags": [
+          "--goal",
+          "-g"
+        ],
+        "primary": "--goal",
+        "type": "TEXT",
+        "help": "Inline goal (no seed file needed).",
+        "default": null
+      },
+      {
+        "spec": "--budget",
+        "flags": [
+          "--budget"
+        ],
+        "primary": "--budget",
+        "type": "FLOAT",
+        "help": "Cost cap in USD; stop spawning agents when reached (0=unlimited).",
+        "default": "0.0"
+      },
+      {
+        "spec": "--dry-run",
+        "flags": [
+          "--dry-run"
+        ],
+        "primary": "--dry-run",
+        "type": "FLAG",
+        "help": "Preview task plan without spawning agents.",
+        "default": null
+      },
+      {
+        "spec": "--plan-only",
+        "flags": [
+          "--plan-only"
+        ],
+        "primary": "--plan-only",
+        "type": "FLAG",
+        "help": "Show execution plan without running agents.",
+        "default": null
+      },
+      {
+        "spec": "--from-plan",
+        "flags": [
+          "--from-plan"
+        ],
+        "primary": "--from-plan",
+        "type": "PATH",
+        "help": "Execute a saved plan file (skips interactive planning).",
+        "default": null
+      },
+      {
+        "spec": "--auto-approve",
+        "flags": [
+          "--auto-approve"
+        ],
+        "primary": "--auto-approve",
+        "type": "FLAG",
+        "help": "Skip confirmation prompt before execution.",
+        "default": null
+      },
+      {
+        "spec": "--approval",
+        "flags": [
+          "--approval"
+        ],
+        "primary": "--approval",
+        "type": "[auto|review|pr]",
+        "help": "Approval gate: auto=merge immediately, review=pause for human review, pr=open GitHub PR.",
+        "default": "auto"
+      },
+      {
+        "spec": "--merge",
+        "flags": [
+          "--merge"
+        ],
+        "primary": "--merge",
+        "type": "[pr|direct]",
+        "help": "Merge strategy: pr=create GitHub PR (default), direct=push directly to main branch.",
+        "default": "pr"
+      },
+      {
+        "spec": "--cli",
+        "flags": [
+          "--cli"
+        ],
+        "primary": "--cli",
+        "type": "[claude|codex|gemini|qwen|auto]",
+        "help": "Force a specific agent (overrides auto-detection).",
+        "default": null
+      },
+      {
+        "spec": "--model",
+        "flags": [
+          "--model"
+        ],
+        "primary": "--model",
+        "type": "MODEL",
+        "help": "Force a specific model (e.g. opus, sonnet, o3).",
+        "default": null
+      },
+      {
+        "spec": "--workflow",
+        "flags": [
+          "--workflow"
+        ],
+        "primary": "--workflow",
+        "type": "[governed]",
+        "help": "Activate governed workflow mode (deterministic phase-based execution).",
+        "default": null
+      },
+      {
+        "spec": "--verbose, -v",
+        "flags": [
+          "--verbose",
+          "-v"
+        ],
+        "primary": "--verbose",
+        "type": "FLAG",
+        "help": "Show debug-level output.",
+        "default": null
+      },
+      {
+        "spec": "--quiet, -q",
+        "flags": [
+          "--quiet",
+          "-q"
+        ],
+        "primary": "--quiet",
+        "type": "FLAG",
+        "help": "Suppress all non-error output.",
+        "default": null
+      },
+      {
+        "spec": "--task, -t",
+        "flags": [
+          "--task",
+          "-t"
+        ],
+        "primary": "--task",
+        "type": "PATTERN",
+        "help": "Run only backlog tasks matching PATTERN (e.g. 'gh-62' or 'mutant-fish').",
+        "default": null
+      },
+      {
+        "spec": "--auto-pr",
+        "flags": [
+          "--auto-pr"
+        ],
+        "primary": "--auto-pr",
+        "type": "FLAG",
+        "help": "Automatically create a GitHub PR when all tasks complete.",
+        "default": null
+      },
+      {
+        "spec": "--activity-log",
+        "flags": [
+          "--activity-log"
+        ],
+        "primary": "--activity-log",
+        "type": "PATH",
+        "help": "Write activity to log file. Default: .sdd/logs/activity.log",
+        "default": ".sdd/logs/activity.log"
+      },
+      {
+        "spec": "--sandbox",
+        "flags": [
+          "--sandbox"
+        ],
+        "primary": "--sandbox",
+        "type": "[docker|podman|worktree|e2b|modal|daytona|blaxel|runloop|vercel]",
+        "help": "Sandbox backend (overrides selector). Free: worktree, docker, podman. Paid (require --allow-paid): e2b, modal, daytona, blaxel, runloop, vercel.",
+        "default": null
+      },
+      {
+        "spec": "--allow-paid",
+        "flags": [
+          "--allow-paid"
+        ],
+        "primary": "--allow-paid",
+        "type": "FLAG",
+        "help": "Allow the sandbox selector to consider paid cloud backends.",
+        "default": null
+      },
+      {
+        "spec": "--fresh",
+        "flags": [
+          "--fresh"
+        ],
+        "primary": "--fresh",
+        "type": "FLAG",
+        "help": "Ignore saved session; start from scratch.",
+        "default": null
+      },
+      {
+        "spec": "--version",
+        "flags": [
+          "--version"
+        ],
+        "primary": "--version",
+        "type": "FLAG",
+        "help": "Show the version and exit.",
+        "default": null
+      }
+    ],
+    "subcommands": [
+      {
+        "name": "run",
+        "help": "execute a plan file (stages + steps)"
+      },
+      {
+        "name": "init",
+        "help": "initialize project (.sdd/ + bernstein.yaml)"
+      },
+      {
+        "name": "stop",
+        "help": "graceful stop (agents save work first)"
+      },
+      {
+        "name": "status",
+        "help": "task summary and agent health"
+      },
+      {
+        "name": "ps",
+        "help": "running agent processes"
+      },
+      {
+        "name": "doctor",
+        "help": "pre-flight: adapters, API keys, ports"
+      },
+      {
+        "name": "live",
+        "help": "interactive TUI dashboard (3 columns)"
+      },
+      {
+        "name": "dashboard",
+        "help": "open web dashboard in browser"
+      },
+      {
+        "name": "cost",
+        "help": "spend breakdown by model and task"
+      },
+      {
+        "name": "logs",
+        "help": "tail agent output"
+      },
+      {
+        "name": "trace",
+        "help": "step-by-step agent decision trace"
+      },
+      {
+        "name": "replay",
+        "help": "replay a saved trace deterministically"
+      },
+      {
+        "name": "checkpoint",
+        "help": "save progress for later resume"
+      },
+      {
+        "name": "wrap-up",
+        "help": "end session with summary + learnings"
+      },
+      {
+        "name": "agents",
+        "help": "agent catalog: list, sync, discover"
+      },
+      {
+        "name": "evolve",
+        "help": "self-improvement proposals"
+      },
+      {
+        "name": "demo",
+        "help": "zero-to-running demo in 60 seconds"
+      },
+      {
+        "name": "quickstart",
+        "help": "zero-config demo: 3 tasks on a Flask TODO API"
+      },
+      {
+        "name": "audit",
+        "help": "verify the HMAC-SHA256 audit chain"
+      },
+      {
+        "name": "verify",
+        "help": "verify run integrity"
+      },
+      {
+        "name": "preview",
+        "help": "sandboxed dev-server with public tunnel link"
+      },
+      {
+        "name": "pr",
+        "help": "open a GitHub PR for the current run"
+      },
+      {
+        "name": "from-ticket",
+        "help": "spin up a run from a backlog ticket"
+      },
+      {
+        "name": "ticket",
+        "help": "ticket lifecycle commands"
+      },
+      {
+        "name": "remote",
+        "help": "remote workspace commands"
+      },
+      {
+        "name": "tunnel",
+        "help": "tunnel provider management"
+      },
+      {
+        "name": "creds",
+        "help": "credential vault (OS keychain)"
+      },
+      {
+        "name": "connect",
+        "help": "register a new credential in the vault"
+      },
+      {
+        "name": "review-responder",
+        "help": "respond to inline PR review comments"
+      },
+      {
+        "name": "autofix",
+        "help": "auto-repair CI failures on Bernstein PRs"
+      },
+      {
+        "name": "scaffold",
+        "help": "scaffold a new project from a template"
+      },
+      {
+        "name": "watch",
+        "help": "watch a directory and re-run on change"
+      },
+      {
+        "name": "wiki",
+        "help": "wiki commands"
+      },
+      {
+        "name": "memory",
+        "help": "persistent memory store commands"
+      },
+      {
+        "name": "skills",
+        "help": "progressive-disclosure skill packs"
+      },
+      {
+        "name": "mcp",
+        "help": "MCP server / catalog commands"
+      },
+      {
+        "name": "auth",
+        "help": "authentication commands"
+      },
+      {
+        "name": "login",
+        "help": "log in to bernstein cloud"
+      },
+      {
+        "name": "self-update",
+        "help": "upgrade bernstein in place"
+      },
+      {
+        "name": "diff",
+        "help": "diff two runs"
+      },
+      {
+        "name": "merge",
+        "help": "merge a run's branches into main"
+      },
+      {
+        "name": "incident",
+        "help": "open / close an incident record"
+      },
+      {
+        "name": "report",
+        "help": "generate a run report"
+      },
+      {
+        "name": "history",
+        "help": "list past runs"
+      },
+      {
+        "name": "cleanup",
+        "help": "remove stale .sdd/ artefacts"
+      },
+      {
+        "name": "test",
+        "help": "run quality gates without an agent"
+      },
+      {
+        "name": "test-adapter",
+        "help": "smoke-test a CLI adapter"
+      },
+      {
+        "name": "ci",
+        "help": "CI integration commands"
+      },
+      {
+        "name": "cloud",
+        "help": "cloud-execution commands"
+      },
+      {
+        "name": "gateway",
+        "help": "gateway server commands"
+      },
+      {
+        "name": "compliance",
+        "help": "compliance bundle commands"
+      },
+      {
+        "name": "policy",
+        "help": "policy enforcement commands"
+      },
+      {
+        "name": "security",
+        "help": "security commands"
+      },
+      {
+        "name": "fingerprint",
+        "help": "install-rev fingerprint commands"
+      },
+      {
+        "name": "fleet",
+        "help": "supervise multiple Bernstein projects"
+      },
+      {
+        "name": "triggers",
+        "help": "trigger source adapters"
+      },
+      {
+        "name": "templates",
+        "help": "role / prompt templates"
+      },
+      {
+        "name": "prompts",
+        "help": "prompt management"
+      },
+      {
+        "name": "manifest",
+        "help": "manifest validation commands"
+      },
+      {
+        "name": "workflow",
+        "help": "Archon-style YAML workflow manifests"
+      },
+      {
+        "name": "validate",
+        "help": "validate a plan file"
+      },
+      {
+        "name": "dep-impact",
+        "help": "dependency impact analysis"
+      },
+      {
+        "name": "graph",
+        "help": "task dependency graph"
+      },
+      {
+        "name": "explain",
+        "help": "explain a flag / command"
+      },
+      {
+        "name": "config-path",
+        "help": "print active config path"
+      },
+      {
+        "name": "init-wizard",
+        "help": "interactive init flow"
+      },
+      {
+        "name": "aliases",
+        "help": "list short command aliases"
+      },
+      {
+        "name": "debug-bundle",
+        "help": "build a debug bundle"
+      },
+      {
+        "name": "approve-tool",
+        "help": "approve a pending tool call"
+      },
+      {
+        "name": "reject-tool",
+        "help": "reject a pending tool call"
+      },
+      {
+        "name": "chat",
+        "help": "chat-control bridge"
+      },
+      {
+        "name": "acp",
+        "help": "Agent Client Protocol (ACP) bridge"
+      },
+      {
+        "name": "notify",
+        "help": "notification driver commands"
+      },
+      {
+        "name": "lineage",
+        "help": "per-artefact lineage trail"
+      },
+      {
+        "name": "agents-md",
+        "help": "AGENTS.md generator + cross-CLI rewrite"
+      },
+      {
+        "name": "wheelhouse",
+        "help": "air-gap wheel bundle build/verify"
+      },
+      {
+        "name": "routine",
+        "help": "Claude Code Routine bridge"
+      },
+      {
+        "name": "cluster",
+        "help": "cluster lifecycle helpers (mTLS bootstrap)"
+      },
+      {
+        "name": "handoff",
+        "help": "session handoff between surfaces"
+      },
+      {
+        "name": "identity",
+        "help": "install-rev identity helpers"
+      },
+      {
+        "name": "changelog",
+        "help": "show CHANGELOG.md"
+      },
+      {
+        "name": "run-changelog",
+        "help": "show changelog for a single run"
+      },
+      {
+        "name": "dr",
+        "help": "disaster recovery commands"
+      },
+      {
+        "name": "postmortem",
+        "help": "open a postmortem template"
+      },
+      {
+        "name": "profile",
+        "help": "performance profile"
+      },
+      {
+        "name": "slo",
+        "help": "service-level objective commands"
+      },
+      {
+        "name": "man-pages",
+        "help": "generate man pages"
+      },
+      {
+        "name": "undo",
+        "help": "undo the last run's merge"
+      },
+      {
+        "name": "worker",
+        "help": "join a cluster as a remote worker node"
+      }
+    ]
+  },
+  "commands": [
+    {
+      "name": "run",
+      "summary": "execute a plan file (stages + steps)",
+      "usage": "bernstein run [OPTIONS] [PLAN_FILE]",
+      "description": "Parse seed, init workspace, start server, launch agents. Top-level wrapper: routes any uncaught exception through the first-run categorisation guard so the operator sees a structured hint panel and a sysexits.h exit code instead of a raw traceback.",
+      "flags": [
+        {
+          "spec": "--goal",
+          "flags": [
+            "--goal"
+          ],
+          "primary": "--goal",
+          "type": "TEXT",
+          "help": "Inline goal (skips bernstein.yaml).",
+          "default": null,
+          "slug": "goal",
+          "ready": true
+        },
+        {
+          "spec": "--seed",
+          "flags": [
+            "--seed"
+          ],
+          "primary": "--seed",
+          "type": "TEXT",
+          "help": "Path to a custom seed YAML file (default: bernstein.yaml).",
+          "default": null,
+          "slug": "seed",
+          "ready": true
+        },
+        {
+          "spec": "--port",
+          "flags": [
+            "--port"
+          ],
+          "primary": "--port",
+          "type": "INTEGER",
+          "help": "Port for the task server.  [default: 8052]",
+          "default": "8052",
+          "slug": "port",
+          "ready": true
+        },
+        {
+          "spec": "--cells",
+          "flags": [
+            "--cells"
+          ],
+          "primary": "--cells",
+          "type": "INTEGER",
+          "help": "Number of parallel orchestration cells (1 = single-cell, >1 = MultiCellOrchestrator). [default: 1]",
+          "default": null,
+          "slug": "cells",
+          "ready": true
+        },
+        {
+          "spec": "--remote",
+          "flags": [
+            "--remote"
+          ],
+          "primary": "--remote",
+          "type": "",
+          "help": "Bind server to 0.0.0.0 for remote/cluster access (default: 127.0.0.1).",
+          "default": null,
+          "slug": "remote",
+          "ready": true
+        },
+        {
+          "spec": "--cli",
+          "flags": [
+            "--cli"
+          ],
+          "primary": "--cli",
+          "type": "",
+          "help": "[agy|aichat|aider|amp|antigravity|auggie|auto|autohand|charm|claude|cline|clm|codebuff|codex|cody|composio|computer_use|continue|copilot|cursor|devin_terminal|droid|forge|gemini|generic|goose|gptme|hermes|iac|junie|kilo|kimchi|kimi|kiro|letta_code|mistral|muse|ollama|open_interpreter|openai_agents|opencode|openhands|pi|plandex|pydantic_ai|python_runtime|q_dev|qwen|ralphex|rovo] Force specific CLI agent (overrides auto- detection and config file).",
+          "default": null,
+          "slug": "cli",
+          "ready": true
+        },
+        {
+          "spec": "--model",
+          "flags": [
+            "--model"
+          ],
+          "primary": "--model",
+          "type": "TEXT",
+          "help": "Force specific model (e.g. opus, sonnet, o4-mini; overrides config file).",
+          "default": null,
+          "slug": "model",
+          "ready": true
+        },
+        {
+          "spec": "--workflow",
+          "flags": [
+            "--workflow"
+          ],
+          "primary": "--workflow",
+          "type": "",
+          "help": "[governed]           Activate a governed workflow mode (deterministic phase-based execution).",
+          "default": null,
+          "slug": "workflow",
+          "ready": true
+        },
+        {
+          "spec": "--routing",
+          "flags": [
+            "--routing"
+          ],
+          "primary": "--routing",
+          "type": "",
+          "help": "[static|bandit|bandit-shadow] Model routing strategy: 'static' = fixed cascade heuristics (default), 'bandit' = contextual LinUCB bandit that learns cost- quality tradeoffs, 'bandit-shadow' = log bandit decisions without changing live routing.",
+          "default": null,
+          "slug": "routing",
+          "ready": true
+        },
+        {
+          "spec": "--compliance",
+          "flags": [
+            "--compliance"
+          ],
+          "primary": "--compliance",
+          "type": "",
+          "help": "[development|standard|regulated] Compliance preset: 'development' = audit + WAL + AI labels, 'standard' = + HMAC chain + governed workflow + approval gates, 'regulated' = + signed WAL + data residency + SBOM + evidence bundle.",
+          "default": null,
+          "slug": "compliance",
+          "ready": true
+        },
+        {
+          "spec": "--container",
+          "flags": [
+            "--container"
+          ],
+          "primary": "--container",
+          "type": "",
+          "help": "/ --no-container    Run agents inside containers for kernel- level isolation (requires Docker or Podman).",
+          "default": null,
+          "slug": "container",
+          "ready": true
+        },
+        {
+          "spec": "--container-image",
+          "flags": [
+            "--container-image"
+          ],
+          "primary": "--container-image",
+          "type": "TEXT",
+          "help": "Container image for agent execution (default: bernstein-agent:latest). Requires --container.",
+          "default": null,
+          "slug": "container-image",
+          "ready": true
+        },
+        {
+          "spec": "--sandbox",
+          "flags": [
+            "--sandbox"
+          ],
+          "primary": "--sandbox",
+          "type": "",
+          "help": "[docker|podman|worktree|e2b|modal|daytona|blaxel|runloop|vercel|microvm] Sandbox backend for agent isolation. Free: worktree, docker, podman. Paid (require --allow-paid): e2b, modal, daytona, blaxel, runloop, vercel. Overrides the selector's deterministic precedence; pass nothing to let the selector pick the cheapest backend that satisfies the manifest.",
+          "default": null,
+          "slug": "sandbox",
+          "ready": true
+        },
+        {
+          "spec": "--allow-paid",
+          "flags": [
+            "--allow-paid"
+          ],
+          "primary": "--allow-paid",
+          "type": "",
+          "help": "Allow the sandbox selector to consider paid cloud backends (e2b, modal, daytona, blaxel, runloop, vercel). Off by default so selector falls back to free backends only. Required when --sandbox names a paid backend explicitly.",
+          "default": null,
+          "slug": "allow-paid",
+          "ready": true
+        },
+        {
+          "spec": "--two-phase-sandbox",
+          "flags": [
+            "--two-phase-sandbox"
+          ],
+          "primary": "--two-phase-sandbox",
+          "type": "",
+          "help": "/ --no-two-phase-sandbox Codex-style two-phase sandboxed execution: Phase 1 installs dependencies with network access, Phase 2 runs the agent with the network fully disabled. Requires --container.",
+          "default": null,
+          "slug": "two-phase-sandbox",
+          "ready": true
+        },
+        {
+          "spec": "--worker",
+          "flags": [
+            "--worker"
+          ],
+          "primary": "--worker",
+          "type": "TEXT",
+          "help": "Skip manager decomposition and spawn a single agent with this role (e.g. backend, qa, frontend) directly against the seed goal.",
+          "default": null,
+          "slug": "worker",
+          "ready": true
+        },
+        {
+          "spec": "--plan-only",
+          "flags": [
+            "--plan-only"
+          ],
+          "primary": "--plan-only",
+          "type": "",
+          "help": "Generate and display the execution plan without running any agents.",
+          "default": null,
+          "slug": "plan-only",
+          "ready": true
+        },
+        {
+          "spec": "--from-plan",
+          "flags": [
+            "--from-plan"
+          ],
+          "primary": "--from-plan",
+          "type": "FILE",
+          "help": "Load a saved plan file and execute it (skips interactive planning).",
+          "default": null,
+          "slug": "from-plan",
+          "ready": true
+        },
+        {
+          "spec": "--auto-approve",
+          "flags": [
+            "--auto-approve"
+          ],
+          "primary": "--auto-approve",
+          "type": "",
+          "help": "Skip the confirmation prompt before execution.",
+          "default": null,
+          "slug": "auto-approve",
+          "ready": true
+        },
+        {
+          "spec": "--quiet",
+          "flags": [
+            "--quiet"
+          ],
+          "primary": "--quiet",
+          "type": "",
+          "help": "Suppress startup/TUI output and print only the final summary.",
+          "default": null,
+          "slug": "quiet",
+          "ready": true
+        },
+        {
+          "spec": "--skip-gate",
+          "flags": [
+            "--skip-gate"
+          ],
+          "primary": "--skip-gate",
+          "type": "TEXT",
+          "help": "Bypass a named quality gate for this run (requires quality_gates.allow_bypass: true).",
+          "default": null,
+          "slug": "skip-gate",
+          "ready": true
+        },
+        {
+          "spec": "--skip-gate-reason",
+          "flags": [
+            "--skip-gate-reason"
+          ],
+          "primary": "--skip-gate-reason",
+          "type": "TEXT",
+          "help": "Operator-visible reason recorded for quality-gate bypasses.",
+          "default": null,
+          "slug": "skip-gate-reason",
+          "ready": true
+        },
+        {
+          "spec": "--audit",
+          "flags": [
+            "--audit"
+          ],
+          "primary": "--audit",
+          "type": "",
+          "help": "Enable SOC 2 audit mode: append-only HMAC- chained audit log for every task lifecycle event, with Merkle tree seal on shutdown.",
+          "default": null,
+          "slug": "audit",
+          "ready": true
+        },
+        {
+          "spec": "--ab-test",
+          "flags": [
+            "--ab-test"
+          ],
+          "primary": "--ab-test",
+          "type": "",
+          "help": "A/B testing mode: spawn two agents with different models for each task.",
+          "default": null,
+          "slug": "ab-test",
+          "ready": true
+        },
+        {
+          "spec": "--dry-run",
+          "flags": [
+            "--dry-run"
+          ],
+          "primary": "--dry-run",
+          "type": "",
+          "help": "Show scheduling plan without executing: which agent/model/tier each task would be assigned to.",
+          "default": null,
+          "slug": "dry-run",
+          "ready": true
+        },
+        {
+          "spec": "--idle",
+          "flags": [
+            "--idle"
+          ],
+          "primary": "--idle",
+          "type": "",
+          "help": "GUI-dev mode: force every adapter to ``mock`` and have each spawned agent sleep for $BERNSTEIN_MOCK_IDLE_MIN_S..MAX_S seconds (defaults: min=15, max=120) instead of calling an LLM. Zero token spend - used to populate the web GUI with live state.",
+          "default": null,
+          "slug": "idle",
+          "ready": true
+        },
+        {
+          "spec": "--idle",
+          "flags": [
+            "--idle"
+          ],
+          "primary": "--idle",
+          "type": "",
+          "help": "forces the mock backend internally (it exports BERNSTEIN_ADAPTER=mock), so no bernstein.yaml edit is needed. Mutually exclusive with --dry-run.",
+          "default": null,
+          "slug": "idle",
+          "ready": true
+        },
+        {
+          "spec": "--cprofile",
+          "flags": [
+            "--cprofile"
+          ],
+          "primary": "--cprofile",
+          "type": "",
+          "help": "Profile orchestrator execution with cProfile. Writes .prof binary and .txt report to .sdd/runtime/profiles/.",
+          "default": null,
+          "slug": "cprofile",
+          "ready": true
+        },
+        {
+          "spec": "--profile",
+          "flags": [
+            "--profile"
+          ],
+          "primary": "--profile",
+          "type": "",
+          "help": "[airgap|sovereign]    Run profile. 'airgap' = no network egress by default, MCP catalog disabled, memo store pinned to .sdd/runtime/memo/. 'sovereign' = airgap network posture plus a signed, chain- anchored residency posture (local storage, offline catalog, strict EU residency, certified endpoints) that refuses spawns on drift. Combine with --allow-network to open specific destinations.",
+          "default": null,
+          "slug": "profile",
+          "ready": true
+        },
+        {
+          "spec": "--allow-network",
+          "flags": [
+            "--allow-network"
+          ],
+          "primary": "--allow-network",
+          "type": "",
+          "help": "HOST|CIDR|HOST:PORT|none|any Allow-list outbound network destinations. May be repeated. Use 'none' for explicit deny-all (the --profile airgap default), 'any' to opt out of the gate (legacy default).",
+          "default": null,
+          "slug": "allow-network",
+          "ready": true
+        },
+        {
+          "spec": "--permission-profile",
+          "flags": [
+            "--permission-profile"
+          ],
+          "primary": "--permission-profile",
+          "type": "",
+          "help": "[read-only|builder|reviewer|custom] Per-tool permission profile (roadmap #1318). 'read-only' = review/explore agents only; 'builder' = write + shell on an allowlist; 'reviewer' = read + diff only; 'custom' = honour [permissions.custom] in bernstein.yaml/bernstein.toml. Off by default to preserve existing behaviour.",
+          "default": null,
+          "slug": "permission-profile",
+          "ready": true
+        },
+        {
+          "spec": "-t, --task",
+          "flags": [
+            "-t",
+            "--task"
+          ],
+          "primary": "--task",
+          "type": "PATTERN",
+          "help": "Run only backlog tasks matching PATTERN (e.g. 'gh-62' or 'mutant-fish').",
+          "default": null,
+          "slug": "task",
+          "ready": true
+        },
+        {
+          "spec": "--auto-pr",
+          "flags": [
+            "--auto-pr"
+          ],
+          "primary": "--auto-pr",
+          "type": "",
+          "help": "Automatically create a GitHub PR when all tasks complete.",
+          "default": null,
+          "slug": "auto-pr",
+          "ready": true
+        },
+        {
+          "spec": "--activity-log",
+          "flags": [
+            "--activity-log"
+          ],
+          "primary": "--activity-log",
+          "type": "TEXT",
+          "help": "Write activity to log file (default: .sdd/logs/activity.log).",
+          "default": null,
+          "slug": "activity-log",
+          "ready": true
+        },
+        {
+          "spec": "--max-cost-usd",
+          "flags": [
+            "--max-cost-usd"
+          ],
+          "primary": "--max-cost-usd",
+          "type": "FLOAT",
+          "help": "Cost autopilot: hard cap on total run spend in USD. Aggregated across all agents; orchestrator stops spawning when reached. Off-by-default (overrides bernstein.yaml ``budget`` and run_config.json).",
+          "default": null,
+          "slug": "max-cost-usd",
+          "ready": true
+        },
+        {
+          "spec": "--budget",
+          "flags": [
+            "--budget"
+          ],
+          "primary": "--budget",
+          "type": "SPEC",
+          "help": "Soft cap on total run spend (issue #1320). Accepts ``5usd``, ``$5``, or ``5.0``. Warns + reroutes to a cheaper model at 80%, halts new work at 100%. Alias of ``--max-cost- usd`` with friendlier parsing; both flags set the same env var.",
+          "default": null,
+          "slug": "budget",
+          "ready": true
+        },
+        {
+          "spec": "--hard-budget",
+          "flags": [
+            "--hard-budget"
+          ],
+          "primary": "--hard-budget",
+          "type": "SPEC",
+          "help": "Hard cap kill switch (issue #1320). Accepts ``10usd``, ``$10``, or ``10.0``. Independent of ``--budget``: once tripped no new agent is spawned, no retry.",
+          "default": null,
+          "slug": "hard-budget",
+          "ready": true
+        },
+        {
+          "spec": "--budget-cap",
+          "flags": [
+            "--budget-cap"
+          ],
+          "primary": "--budget-cap",
+          "type": "FLOAT",
+          "help": "Preflight budget cap in USD. Aborts spawn before the orchestrator starts when the calibrated p90 of the cost band exceeds the cap. Distinct from --max-cost-usd / --hard- budget, which are enforced at runtime.",
+          "default": null,
+          "slug": "budget-cap",
+          "ready": true
+        },
+        {
+          "spec": "--retry-budget",
+          "flags": [
+            "--retry-budget"
+          ],
+          "primary": "--retry-budget",
+          "type": "SPEC",
+          "help": "Criterion-aware retry budget (issue #1352). Accepts ``'3 retries, degrade: coverage>tests>style'``. Each retry dials down the next criterion rather than burning identical rerun budget. Validated eagerly; the parsed spec is exported to ``BERNSTEIN_RETRY_BUDGET_SPEC`` for the orchestrator.",
+          "default": null,
+          "slug": "retry-budget",
+          "ready": true
+        },
+        {
+          "spec": "--criterion-profile",
+          "flags": [
+            "--criterion-profile"
+          ],
+          "primary": "--criterion-profile",
+          "type": "PRESET",
+          "help": "Per-task criterion profile applied to every task in this run (issue #1346).  A named preset such as 'safety-first', 'speed- first', 'balanced', or 'cost-first'.  Stamps the chosen preset onto each task's metadata so the router biases model selection accordingly. Individual tasks may still override by setting metadata['criterion_profile'] explicitly.",
+          "default": null,
+          "slug": "criterion-profile",
+          "ready": true
+        },
+        {
+          "spec": "--max-blast-radius",
+          "flags": [
+            "--max-blast-radius"
+          ],
+          "primary": "--max-blast-radius",
+          "type": "FLOAT",
+          "help": "RANGE  Reversibility gate (#1322): refuse merges whose blast-radius score exceeds the supplied ceiling [0, 1]. Hard one-way changes (DROP/DELETE SQL, rm -rf, schema migrations, secrets writes) always score 1.0. Off by default; existing runs are unaffected.  [0.0<=x<=1.0]",
+          "default": null,
+          "slug": "max-blast-radius",
+          "ready": true
+        },
+        {
+          "spec": "--attach",
+          "flags": [
+            "--attach"
+          ],
+          "primary": "--attach",
+          "type": "FILE",
+          "help": "Attach an image / diagram to the run (issue #1797). May be repeated for multiple files. The orchestrator builds a MultiModalContext at spawn time, records a multimodal.attach event in the audit chain, and refuses adapters that do not advertise multimodal capability. Capable adapters: claude, gemini.",
+          "default": null,
+          "slug": "attach",
+          "ready": true
+        },
+        {
+          "spec": "--fresh",
+          "flags": [
+            "--fresh"
+          ],
+          "primary": "--fresh",
+          "type": "",
+          "help": "Ignore any saved session (.sdd/runtime/session.json) and start from scratch instead of resuming. Use after a stopped run to force a full re-plan rather than resuming the prior session (issue #2798).",
+          "default": null,
+          "slug": "fresh",
+          "ready": true
+        },
+        {
+          "spec": "--refresh-cache",
+          "flags": [
+            "--refresh-cache"
+          ],
+          "primary": "--refresh-cache",
+          "type": "",
+          "help": "Cache policy bypass (issue #2551): ignore every policy cache hit for this run, then repopulate the cache with the fresh outputs. Exports BERNSTEIN_REFRESH_CACHE=1 for the orchestrator; tasks with no declared cache policy are unaffected.",
+          "default": null,
+          "slug": "refresh-cache",
+          "ready": true
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": true
+        }
+      ],
+      "subcommands": [],
+      "slug": "run",
+      "ready": true
+    },
+    {
+      "name": "init",
+      "summary": "initialize project (.sdd/ + bernstein.yaml)",
+      "usage": "bernstein init [OPTIONS]",
+      "description": "Init workspace -- create .sdd/ structure. Raises:     click.UsageError: When --wizard is combined with a flag the wizard         path does not implement.",
+      "flags": [
+        {
+          "spec": "--dir",
+          "flags": [
+            "--dir"
+          ],
+          "primary": "--dir",
+          "type": "TEXT",
+          "help": "Directory to initialise (default: current directory).  [default: .]",
+          "default": null,
+          "slug": "dir",
+          "ready": true
+        },
+        {
+          "spec": "--add-badge",
+          "flags": [
+            "--add-badge"
+          ],
+          "primary": "--add-badge",
+          "type": "",
+          "help": "Insert a shields.io 'powered by bernstein' badge into README.md. Use --badge-variant to pick the wording (default: signed).",
+          "default": null,
+          "slug": "add-badge",
+          "ready": true
+        },
+        {
+          "spec": "--badge-variant",
+          "flags": [
+            "--badge-variant"
+          ],
+          "primary": "--badge-variant",
+          "type": "",
+          "help": "[signed|audited-by|orchestrated-by|crew-managed-by] Badge variant when --add-badge is passed. [default: signed]",
+          "default": null,
+          "slug": "badge-variant",
+          "ready": true
+        },
+        {
+          "spec": "--remote",
+          "flags": [
+            "--remote"
+          ],
+          "primary": "--remote",
+          "type": "",
+          "help": "Initialise for a remote container quickstart (e.g. GitHub Codespaces). Skips local-binary checks that would fail in a fresh container.",
+          "default": null,
+          "slug": "remote",
+          "ready": true
+        },
+        {
+          "spec": "-w, --wizard",
+          "flags": [
+            "-w",
+            "--wizard"
+          ],
+          "primary": "--wizard",
+          "type": "",
+          "help": "Run interactive setup wizard to configure the workspace.",
+          "default": null,
+          "slug": "wizard",
+          "ready": true
+        },
+        {
+          "spec": "--non-interactive",
+          "flags": [
+            "--non-interactive"
+          ],
+          "primary": "--non-interactive",
+          "type": "",
+          "help": "With --wizard: take the wizard's defaults without prompting. Plain init never prompts.",
+          "default": null,
+          "slug": "non-interactive",
+          "ready": true
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": true
+        }
+      ],
+      "subcommands": [],
+      "slug": "init",
+      "ready": true
+    },
+    {
+      "name": "stop",
+      "summary": "graceful stop (agents save work first)",
+      "usage": "bernstein stop [OPTIONS]",
+      "description": "Stop all agents and the task server. Default (soft stop): writes SHUTDOWN signal files so agents can save their work, waits up to ``--timeout`` seconds, saves session state, returns claimed tickets to open, then kills remaining processes with SIGTERM. With ``--force`` / ``--hard``: skips signal files and waiting, kills everything immediately with SIGKILL, then does best-effort session save and ticket recovery.",
+      "flags": [
+        {
+          "spec": "--timeout",
+          "flags": [
+            "--timeout"
+          ],
+          "primary": "--timeout",
+          "type": "INTEGER",
+          "help": "Seconds to wait for agents (soft stop).  [default: 30]",
+          "default": "30",
+          "slug": "timeout",
+          "ready": true
+        },
+        {
+          "spec": "--force, --hard",
+          "flags": [
+            "--force",
+            "--hard"
+          ],
+          "primary": "--force",
+          "type": "",
+          "help": "Hard stop: kill immediately without waiting.",
+          "default": null,
+          "slug": "force",
+          "ready": true
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": true
+        }
+      ],
+      "subcommands": [],
+      "slug": "stop",
+      "ready": true
+    },
+    {
+      "name": "status",
+      "summary": "task summary and agent health",
+      "usage": "bernstein status [OPTIONS]",
+      "description": "Task summary, active agents, cost estimate. bernstein status                  # Rich table output bernstein status --json           # machine-readable JSON bernstein status --mode expert    # show all details bernstein status --mode novice    # minimal output",
+      "flags": [
+        {
+          "spec": "--json",
+          "flags": [
+            "--json"
+          ],
+          "primary": "--json",
+          "type": "",
+          "help": "Output raw JSON.",
+          "default": null,
+          "slug": "json",
+          "ready": true
+        },
+        {
+          "spec": "--no-color",
+          "flags": [
+            "--no-color"
+          ],
+          "primary": "--no-color",
+          "type": "",
+          "help": "Disable colour output.",
+          "default": null,
+          "slug": "no-color",
+          "ready": true
+        },
+        {
+          "spec": "--mode",
+          "flags": [
+            "--mode"
+          ],
+          "primary": "--mode",
+          "type": "",
+          "help": "[novice|standard|expert] Dashboard detail level (novice, standard, expert). Default: persisted or standard.",
+          "default": null,
+          "slug": "mode",
+          "ready": true
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": true
+        }
+      ],
+      "subcommands": [],
+      "slug": "status",
+      "ready": true
+    },
+    {
+      "name": "ps",
+      "summary": "running agent processes",
+      "usage": "bernstein ps [OPTIONS]",
+      "description": "Show running Bernstein agent processes.",
+      "flags": [
+        {
+          "spec": "--json-output",
+          "flags": [
+            "--json-output"
+          ],
+          "primary": "--json-output",
+          "type": "",
+          "help": "Output as JSON instead of table.",
+          "default": null,
+          "slug": "json-output",
+          "ready": false
+        },
+        {
+          "spec": "--pid-dir",
+          "flags": [
+            "--pid-dir"
+          ],
+          "primary": "--pid-dir",
+          "type": "TEXT",
+          "help": "PID metadata directory.",
+          "default": null,
+          "slug": "pid-dir",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "ps",
+      "ready": false
+    },
+    {
+      "name": "doctor",
+      "summary": "pre-flight: adapters, API keys, ports",
+      "usage": "bernstein doctor [OPTIONS] [airgap|observe|...]",
+      "description": "Run self-diagnostics: check Python, adapters, API keys, port, and workspace. bernstein doctor                  # print diagnostic report bernstein doctor --json           # machine-readable output bernstein doctor --fix            # attempt to auto-fix issues bernstein doctor --suggest-docs   # surface top curated documentation gaps bernstein doctor --endpoint http://127.0.0.1:11434/v1 # certify a local OpenAI-compatible endpoint per role bernstein doctor --failover-drill # probe every declared provider fallback chain bernstein doctor airgap           # battery of checks for an air-gapped run",
+      "flags": [
+        {
+          "spec": "--json",
+          "flags": [
+            "--json"
+          ],
+          "primary": "--json",
+          "type": "",
+          "help": "Output raw JSON.",
+          "default": null,
+          "slug": "json",
+          "ready": true
+        },
+        {
+          "spec": "--fix",
+          "flags": [
+            "--fix"
+          ],
+          "primary": "--fix",
+          "type": "",
+          "help": "Attempt to auto-fix issues.",
+          "default": null,
+          "slug": "fix",
+          "ready": true
+        },
+        {
+          "spec": "--suggest-docs",
+          "flags": [
+            "--suggest-docs"
+          ],
+          "primary": "--suggest-docs",
+          "type": "",
+          "help": "Print the top curated documentation gaps and exit.",
+          "default": null,
+          "slug": "suggest-docs",
+          "ready": true
+        },
+        {
+          "spec": "--endpoint",
+          "flags": [
+            "--endpoint"
+          ],
+          "primary": "--endpoint",
+          "type": "TEXT",
+          "help": "Certify an OpenAI-compatible endpoint (base URL, e.g. http://127.0.0.1:11434/v1).",
+          "default": null,
+          "slug": "endpoint",
+          "ready": true
+        },
+        {
+          "spec": "--endpoint-model",
+          "flags": [
+            "--endpoint-model"
+          ],
+          "primary": "--endpoint-model",
+          "type": "TEXT",
+          "help": "Model id to certify; defaults to the first entry of the endpoint's /models listing.",
+          "default": null,
+          "slug": "endpoint-model",
+          "ready": true
+        },
+        {
+          "spec": "--endpoint-engine",
+          "flags": [
+            "--endpoint-engine"
+          ],
+          "primary": "--endpoint-engine",
+          "type": "TEXT",
+          "help": "Runtime label recorded in the receipt (e.g. ollama, lmstudio, mlx).",
+          "default": null,
+          "slug": "endpoint-engine",
+          "ready": true
+        },
+        {
+          "spec": "--endpoint-api-key-env",
+          "flags": [
+            "--endpoint-api-key-env"
+          ],
+          "primary": "--endpoint-api-key-env",
+          "type": "TEXT",
+          "help": "NAME of the environment variable holding the endpoint's API key (never the key itself).",
+          "default": null,
+          "slug": "endpoint-api-key-env",
+          "ready": true
+        },
+        {
+          "spec": "--endpoint-timeout",
+          "flags": [
+            "--endpoint-timeout"
+          ],
+          "primary": "--endpoint-timeout",
+          "type": "FLOAT",
+          "help": "Per-probe response budget in seconds; exceeding it fails the probe.  [default: 60.0]",
+          "default": null,
+          "slug": "endpoint-timeout",
+          "ready": true
+        },
+        {
+          "spec": "--role",
+          "flags": [
+            "--role"
+          ],
+          "primary": "--role",
+          "type": "TEXT",
+          "help": "Role(s) to evaluate against --endpoint (repeatable). Defaults to the low-stakes local tier.",
+          "default": null,
+          "slug": "role",
+          "ready": true
+        },
+        {
+          "spec": "--failover-drill",
+          "flags": [
+            "--failover-drill"
+          ],
+          "primary": "--failover-drill",
+          "type": "",
+          "help": "Exercise every declared provider fallback chain; exit non-zero on any broken chain.",
+          "default": null,
+          "slug": "failover-drill",
+          "ready": true
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": true
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "airgap",
+          "help": "Run the battery of air-gap self-checks."
+        },
+        {
+          "name": "code-scanning",
+          "help": "Report open GitHub Code Scanning alerts for the..."
+        },
+        {
+          "name": "extended",
+          "help": "Run the extended doctor: adapter binaries, network,..."
+        },
+        {
+          "name": "migrations",
+          "help": "List applied and pending on-disk state migrations."
+        },
+        {
+          "name": "observe",
+          "help": "Aggregate observability backends (Code Scanning)."
+        },
+        {
+          "name": "promptware-scan",
+          "help": "Replay tool output for ``run_id`` and report..."
+        },
+        {
+          "name": "scoping",
+          "help": "Self-check: report the credential policy + flag..."
+        },
+        {
+          "name": "sovereign",
+          "help": "Run the battery of sovereign-profile self-checks."
+        }
+      ],
+      "slug": "doctor",
+      "ready": true
+    },
+    {
+      "name": "live",
+      "summary": "interactive TUI dashboard (3 columns)",
+      "usage": "bernstein live [OPTIONS]",
+      "description": "Live dashboard: active agents, task events, and stats (Ctrl+C to exit). Launches the 3-column interactive Textual TUI by default: Agents | Tasks | Activity feed + sparkline + chat input. Mouse + keyboard. Pass --classic for the simpler Rich Live display.",
+      "flags": [
+        {
+          "spec": "--interval",
+          "flags": [
+            "--interval"
+          ],
+          "primary": "--interval",
+          "type": "FLOAT",
+          "help": "Polling interval in seconds.  [default: 2.0]",
+          "default": "2.0",
+          "slug": "interval",
+          "ready": false
+        },
+        {
+          "spec": "--classic",
+          "flags": [
+            "--classic"
+          ],
+          "primary": "--classic",
+          "type": "",
+          "help": "Use the classic Rich Live display instead of the interactive TUI.",
+          "default": null,
+          "slug": "classic",
+          "ready": false
+        },
+        {
+          "spec": "--no-splash",
+          "flags": [
+            "--no-splash"
+          ],
+          "primary": "--no-splash",
+          "type": "",
+          "help": "Skip the premium startup splash.",
+          "default": null,
+          "slug": "no-splash",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "live",
+      "ready": false
+    },
+    {
+      "name": "dashboard",
+      "summary": "open web dashboard in browser",
+      "usage": "bernstein dashboard [OPTIONS]",
+      "description": "Open the web dashboard in your browser. Requires the Bernstein server to be running. If it is not, prints instructions on how to start it.",
+      "flags": [
+        {
+          "spec": "--port",
+          "flags": [
+            "--port"
+          ],
+          "primary": "--port",
+          "type": "INTEGER",
+          "help": "Server port.  [default: 8052]",
+          "default": "8052",
+          "slug": "port",
+          "ready": false
+        },
+        {
+          "spec": "--no-open",
+          "flags": [
+            "--no-open"
+          ],
+          "primary": "--no-open",
+          "type": "",
+          "help": "Do not open browser.",
+          "default": null,
+          "slug": "no-open",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "dashboard",
+      "ready": false
+    },
+    {
+      "name": "cost",
+      "summary": "spend breakdown by model and task",
+      "usage": "bernstein cost [OPTIONS] [COMMAND] [ARGS]...",
+      "description": "Show cost breakdown for recent runs.",
+      "flags": [
+        {
+          "spec": "--metrics-dir",
+          "flags": [
+            "--metrics-dir"
+          ],
+          "primary": "--metrics-dir",
+          "type": "TEXT",
+          "help": "Directory containing metrics JSONL files. [default: .sdd/metrics]",
+          "default": null,
+          "slug": "metrics-dir",
+          "ready": false
+        },
+        {
+          "spec": "--last",
+          "flags": [
+            "--last"
+          ],
+          "primary": "--last",
+          "type": "TEXT",
+          "help": "Time range: 1h, 24h, 7d, 30d.",
+          "default": null,
+          "slug": "last",
+          "ready": false
+        },
+        {
+          "spec": "--since",
+          "flags": [
+            "--since"
+          ],
+          "primary": "--since",
+          "type": "TEXT",
+          "help": "Anchor for --last (e.g. ``today``, ``yesterday``); shorthand for ``--last 24h`` etc.",
+          "default": null,
+          "slug": "since",
+          "ready": false
+        },
+        {
+          "spec": "--by",
+          "flags": [
+            "--by"
+          ],
+          "primary": "--by",
+          "type": "",
+          "help": "[agent|model|task|day|role|feature_label|envelope|profile] Group breakdown by agent, model, task, day, role, feature_label, envelope, or profile (issue #2245).",
+          "default": null,
+          "slug": "by",
+          "ready": false
+        },
+        {
+          "spec": "--ledger",
+          "flags": [
+            "--ledger"
+          ],
+          "primary": "--ledger",
+          "type": "TEXT",
+          "help": "Path to the rolling spend ledger (issue #1320). Used when --by is role|feature_label|profile.  [default: .sdd/cost/ledger.jsonl]",
+          "default": null,
+          "slug": "ledger",
+          "ready": false
+        },
+        {
+          "spec": "--json",
+          "flags": [
+            "--json"
+          ],
+          "primary": "--json",
+          "type": "",
+          "help": "Output raw JSON.",
+          "default": null,
+          "slug": "json",
+          "ready": false
+        },
+        {
+          "spec": "--share",
+          "flags": [
+            "--share"
+          ],
+          "primary": "--share",
+          "type": "",
+          "help": "Print only the shareable summary snippet.",
+          "default": null,
+          "slug": "share",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "envelopes",
+          "help": "Inspect per-quota-envelope cost attribution."
+        },
+        {
+          "name": "estimate",
+          "help": "Predict the cost of a task before running it."
+        },
+        {
+          "name": "policy",
+          "help": "Cost-aware scheduling: preflight pool caps, verify..."
+        },
+        {
+          "name": "profile-report",
+          "help": "Emit a content-addressed per-profile cost report (issue..."
+        }
+      ],
+      "slug": "cost",
+      "ready": false
+    },
+    {
+      "name": "logs",
+      "summary": "tail agent output",
+      "usage": "bernstein logs [OPTIONS] COMMAND [ARGS]...",
+      "description": "Tail and search agent log output. Examples: bernstein logs tail                        # last 50 lines of most recent log bernstein logs tail -f                     # follow in real time bernstein logs search \"TypeError\"          # search all logs for TypeError bernstein logs search \"rate limit\" \\ --time-range \"last 1h\" \\ --agent-role backend                   # filtered search",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "search",
+          "help": "Search logs across all agent sessions, the orchestrator, and..."
+        },
+        {
+          "name": "tail",
+          "help": "Tail agent log output."
+        }
+      ],
+      "slug": "logs",
+      "ready": false
+    },
+    {
+      "name": "trace",
+      "summary": "step-by-step agent decision trace",
+      "usage": "bernstein trace [OPTIONS] [COMMAND] [ARGS]...",
+      "description": "Inspect, serve, and verify local agent traces. bernstein trace <task-id>           Pretty-print a task trace (alias of show) bernstein trace show <task-id>      Pretty-print a task trace bernstein trace serve --port 8765   Run the local read-only viewer bernstein trace verify <trace-id>   Confirm on-disk bytes match sha256 bernstein trace reindex             Rebuild .sdd/traces/index.jsonl",
+      "flags": [
+        {
+          "spec": "--traces-dir",
+          "flags": [
+            "--traces-dir"
+          ],
+          "primary": "--traces-dir",
+          "type": "TEXT",
+          "help": "Directory containing trace files.  [default: .sdd/traces]",
+          "default": ".sdd/traces",
+          "slug": "traces-dir",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "project",
+          "help": "Project ``RUN_ID``'s event journal into a signed..."
+        },
+        {
+          "name": "reindex",
+          "help": "Rebuild ``.sdd/traces/index.jsonl`` from the on-disk..."
+        },
+        {
+          "name": "serve",
+          "help": "Run a read-only FastAPI viewer over the local..."
+        },
+        {
+          "name": "show",
+          "help": "Show execution trace for a task."
+        },
+        {
+          "name": "verify",
+          "help": "Confirm the on-disk bytes for ``trace_id`` match the..."
+        },
+        {
+          "name": "verify-projection",
+          "help": "Recompute span ids from ``RUN_ID``'s journal and..."
+        }
+      ],
+      "slug": "trace",
+      "ready": false
+    },
+    {
+      "name": "replay",
+      "summary": "replay a saved trace deterministically",
+      "usage": "bernstein replay [OPTIONS] RUN_ID...",
+      "description": "Replay a past orchestration run step-by-step. Reads .sdd/runs/{run_id}/journal.jsonl and displays events in a Rich table showing timing, event type, agent, task, and details. If run_id is \"latest\", replays the most recent run. Use \"list\" to show all available run IDs. Use ``diff`` to localise the first divergence between two recorded runs (events.jsonl). bernstein replay list                       # list available runs bernstein replay latest                     # replay most recent run bernstein replay 20240315-143022            # replay a specific run bernstein replay <RUN_ID> --verify          # recompute head, find divergence bernstein replay <RUN_ID> --from-step N     # rebuild state to step N bernstein replay diff RUN_A RUN_B           # first-divergence finder bernstein replay <AGENT_ID>                 # per-step journal view (#1799) bernstein replay export <AGENT_ID> -o RECEIPT   # portable receipt (#1799) bernstein replay publish <AGENT_ID> -o RECEIPT  # redacted publish (#1799) bernstein replay verify <RECEIPT>           # offline verifier (#1799) bernstein replay diff-journal A B           # per-step divergence finder bernstein replay debug <RUN>                # forensic single-chain walk (#2605) bernstein replay debug <LEFT> <RIGHT>       # two-run time-travel path diff bernstein replay debug <RUN> --fork-from N  # fork-and-reproduce at step N",
+      "flags": [
+        {
+          "spec": "--sdd-dir",
+          "flags": [
+            "--sdd-dir"
+          ],
+          "primary": "--sdd-dir",
+          "type": "TEXT",
+          "help": "Path to .sdd state directory.  [default: .sdd]",
+          "default": ".sdd",
+          "slug": "sdd-dir",
+          "ready": false
+        },
+        {
+          "spec": "--as-json",
+          "flags": [
+            "--as-json"
+          ],
+          "primary": "--as-json",
+          "type": "",
+          "help": "Output raw JSONL events.",
+          "default": null,
+          "slug": "as-json",
+          "ready": false
+        },
+        {
+          "spec": "--limit",
+          "flags": [
+            "--limit"
+          ],
+          "primary": "--limit",
+          "type": "INTEGER",
+          "help": "Show only the first N events.",
+          "default": null,
+          "slug": "limit",
+          "ready": false
+        },
+        {
+          "spec": "--model",
+          "flags": [
+            "--model"
+          ],
+          "primary": "--model",
+          "type": "TEXT",
+          "help": "Override model for task-trace replay.",
+          "default": null,
+          "slug": "model",
+          "ready": false
+        },
+        {
+          "spec": "--extra-context",
+          "flags": [
+            "--extra-context"
+          ],
+          "primary": "--extra-context",
+          "type": "TEXT",
+          "help": "Append additional hint text to the replayed task description.",
+          "default": null,
+          "slug": "extra-context",
+          "ready": false
+        },
+        {
+          "spec": "--verify",
+          "flags": [
+            "--verify"
+          ],
+          "primary": "--verify",
+          "type": "",
+          "help": "Recompute the journal head and report the first divergent step.",
+          "default": null,
+          "slug": "verify",
+          "ready": false
+        },
+        {
+          "spec": "--from-step",
+          "flags": [
+            "--from-step"
+          ],
+          "primary": "--from-step",
+          "type": "INTEGER",
+          "help": "Rebuild deterministic run state by walking the journal to step N.",
+          "default": null,
+          "slug": "from-step",
+          "ready": false
+        },
+        {
+          "spec": "--fork-from",
+          "flags": [
+            "--fork-from"
+          ],
+          "primary": "--fork-from",
+          "type": "INTEGER",
+          "help": "replay debug: fork-and-reproduce a worktree anchored at parent step N.",
+          "default": null,
+          "slug": "fork-from",
+          "ready": false
+        },
+        {
+          "spec": "--jump-to-failure",
+          "flags": [
+            "--jump-to-failure"
+          ],
+          "primary": "--jump-to-failure",
+          "type": "",
+          "help": "replay debug: position output at the diverging seq.",
+          "default": null,
+          "slug": "jump-to-failure",
+          "ready": false
+        },
+        {
+          "spec": "--sign",
+          "flags": [
+            "--sign"
+          ],
+          "primary": "--sign",
+          "type": "FILE",
+          "help": "replay debug: Ed25519 key path to sign the debug receipt.",
+          "default": null,
+          "slug": "sign",
+          "ready": false
+        },
+        {
+          "spec": "--full",
+          "flags": [
+            "--full"
+          ],
+          "primary": "--full",
+          "type": "",
+          "help": "replay debug: emit the unbounded step projection (default is capped).",
+          "default": null,
+          "slug": "full",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "replay",
+      "ready": false
+    },
+    {
+      "name": "checkpoint",
+      "summary": "save progress for later resume",
+      "usage": "bernstein checkpoint [OPTIONS]",
+      "description": "Snapshot current session progress to .sdd/sessions/<timestamp>-checkpoint.json. bernstein checkpoint           # snapshot now bernstein checkpoint --goal X  # attach a goal label",
+      "flags": [
+        {
+          "spec": "--goal",
+          "flags": [
+            "--goal"
+          ],
+          "primary": "--goal",
+          "type": "TEXT",
+          "help": "Goal label to embed in the checkpoint.",
+          "default": null,
+          "slug": "goal",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "checkpoint",
+      "ready": false
+    },
+    {
+      "name": "wrap-up",
+      "summary": "end session with summary + learnings",
+      "usage": "bernstein wrap-up [OPTIONS]",
+      "description": "End the current session with a structured wrap-up brief. bernstein wrap-up           # save brief, keep running bernstein wrap-up --stop    # save brief, then soft-stop",
+      "flags": [
+        {
+          "spec": "--stop",
+          "flags": [
+            "--stop"
+          ],
+          "primary": "--stop",
+          "type": "",
+          "help": "Also perform a soft stop after saving the wrap-up brief.",
+          "default": null,
+          "slug": "stop",
+          "ready": false
+        },
+        {
+          "spec": "--timeout",
+          "flags": [
+            "--timeout"
+          ],
+          "primary": "--timeout",
+          "type": "INTEGER",
+          "help": "Soft-stop timeout in seconds (only used with --stop). [default: 30]",
+          "default": null,
+          "slug": "timeout",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "wrap-up",
+      "ready": false
+    },
+    {
+      "name": "agents",
+      "summary": "agent catalog: list, sync, discover",
+      "usage": "bernstein agents [OPTIONS] COMMAND [ARGS]...",
+      "description": "Manage agent catalogs: sync, list, and validate. bernstein agents sync               # refresh all catalogs bernstein agents list               # show all available agents bernstein agents list --source local  # filter by source bernstein agents validate           # check catalog health",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "discover",
+          "help": "Scan known sources for agent directories and update..."
+        },
+        {
+          "name": "list",
+          "help": "List all available agents from loaded catalogs."
+        },
+        {
+          "name": "match",
+          "help": "Show which agent would be selected for a given role."
+        },
+        {
+          "name": "parked",
+          "help": "List sessions parked after exhausting their respawn..."
+        },
+        {
+          "name": "resume",
+          "help": "Resume a parked agent session, resetting its respawn..."
+        },
+        {
+          "name": "sandbox-backends",
+          "help": "List installed sandbox backends with their..."
+        },
+        {
+          "name": "showcase",
+          "help": "Rich display of available agents grouped by role,..."
+        },
+        {
+          "name": "sync",
+          "help": "Force-refresh all agent catalogs and update cache."
+        },
+        {
+          "name": "trust",
+          "help": "Show per-agent trust tiers and the permissions each..."
+        },
+        {
+          "name": "validate",
+          "help": "Validate all agent catalogs and report issues."
+        }
+      ],
+      "slug": "agents",
+      "ready": false
+    },
+    {
+      "name": "evolve",
+      "summary": "self-improvement proposals",
+      "usage": "bernstein evolve [OPTIONS] COMMAND [ARGS]...",
+      "description": "Manage self-evolution proposals. bernstein evolve review           # list proposals pending human review bernstein evolve approve <id>     # approve a specific proposal bernstein evolve run              # run the autoresearch evolution loop bernstein evolve status           # show evolution history table bernstein evolve export [path]    # export HTML/Markdown report",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "approve",
+          "help": "Approve an upgrade proposal by ID."
+        },
+        {
+          "name": "export",
+          "help": "Export a static evolution report (HTML or Markdown)."
+        },
+        {
+          "name": "review",
+          "help": "Show upgrade proposals pending human review."
+        },
+        {
+          "name": "run",
+          "help": "Read evolve config from bernstein.yaml if CLI flags were not set."
+        },
+        {
+          "name": "status",
+          "help": "Show evolution history as a rich table."
+        }
+      ],
+      "slug": "evolve",
+      "ready": false
+    },
+    {
+      "name": "demo",
+      "summary": "zero-to-running demo in 60 seconds",
+      "usage": "bernstein demo [OPTIONS]",
+      "description": "Zero-config demo: fix 4 bugs in a Flask app with mock agents. Creates a temp Flask app with 4 intentional bugs, seeds fix tasks, then runs agents to resolve them - all while showing live progress. Each agent runs in its own git worktree, so the demo needs about a minute or two to complete. No API key required in mock mode. bernstein demo              # mock agents (no API key) bernstein demo --real       # real agents (requires API key, ~$0.15) bernstein demo --dry-run    # preview the plan without spawning bernstein demo --flask-todo # run the Flask TODO API scenario",
+      "flags": [
+        {
+          "spec": "--dry-run",
+          "flags": [
+            "--dry-run"
+          ],
+          "primary": "--dry-run",
+          "type": "",
+          "help": "Show the demo plan without spawning any agents.",
+          "default": null,
+          "slug": "dry-run",
+          "ready": false
+        },
+        {
+          "spec": "--real",
+          "flags": [
+            "--real"
+          ],
+          "primary": "--real",
+          "type": "",
+          "help": "Use real agents (requires API key) instead of mock agents.",
+          "default": null,
+          "slug": "real",
+          "ready": false
+        },
+        {
+          "spec": "--adapter",
+          "flags": [
+            "--adapter"
+          ],
+          "primary": "--adapter",
+          "type": "NAME",
+          "help": "CLI adapter to use (auto-detected by default for --real, mock for demo).",
+          "default": null,
+          "slug": "adapter",
+          "ready": false
+        },
+        {
+          "spec": "--timeout",
+          "flags": [
+            "--timeout"
+          ],
+          "primary": "--timeout",
+          "type": "INTEGER",
+          "help": "Maximum seconds to wait for tasks to complete.  [default: 120]",
+          "default": null,
+          "slug": "timeout",
+          "ready": false
+        },
+        {
+          "spec": "--flask-todo",
+          "flags": [
+            "--flask-todo"
+          ],
+          "primary": "--flask-todo",
+          "type": "",
+          "help": "Run the Flask TODO API scenario instead (3 tasks on a Flask TODO API).",
+          "default": null,
+          "slug": "flask-todo",
+          "ready": false
+        },
+        {
+          "spec": "--keep",
+          "flags": [
+            "--keep"
+          ],
+          "primary": "--keep",
+          "type": "",
+          "help": "Preserve the temp project directory after the run (--flask-todo only; the standard demo always keeps it).",
+          "default": null,
+          "slug": "keep",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "demo",
+      "ready": false
+    },
+    {
+      "name": "quickstart",
+      "summary": "zero-config demo: 3 tasks on a Flask TODO API",
+      "usage": "bernstein quickstart [OPTIONS]",
+      "description": "[Deprecated] Use 'bernstein demo --flask-todo' instead.",
+      "flags": [
+        {
+          "spec": "--keep",
+          "flags": [
+            "--keep"
+          ],
+          "primary": "--keep",
+          "type": "",
+          "help": "Preserve the temp directory after completion.",
+          "default": null,
+          "slug": "keep",
+          "ready": false
+        },
+        {
+          "spec": "--timeout",
+          "flags": [
+            "--timeout"
+          ],
+          "primary": "--timeout",
+          "type": "INTEGER",
+          "help": "Maximum seconds to wait.  [default: 300]",
+          "default": "300",
+          "slug": "timeout",
+          "ready": false
+        },
+        {
+          "spec": "--adapter",
+          "flags": [
+            "--adapter"
+          ],
+          "primary": "--adapter",
+          "type": "NAME",
+          "help": "CLI adapter to use.",
+          "default": null,
+          "slug": "adapter",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "quickstart",
+      "ready": false
+    },
+    {
+      "name": "audit",
+      "summary": "verify the HMAC-SHA256 audit chain",
+      "usage": "bernstein audit [OPTIONS] COMMAND [ARGS]...",
+      "description": "Audit log integrity tools (RFC 2104 HMAC chain + Merkle seal). See docs/security/audit-log.md for the operator runbook.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "ack-tear",
+          "help": "Acknowledge tear evidence so verification and..."
+        },
+        {
+          "name": "archive",
+          "help": "Safely archive corrupt / pre-rotation audit chain..."
+        },
+        {
+          "name": "capabilities",
+          "help": "Print the lethal-trifecta capability matrix and any..."
+        },
+        {
+          "name": "diagnose",
+          "help": "Name the exact first faulty step of a run from its..."
+        },
+        {
+          "name": "export",
+          "help": "Export an evidence package for auditors."
+        },
+        {
+          "name": "pack",
+          "help": "Build a SOC 2 evidence checklist with real..."
+        },
+        {
+          "name": "query",
+          "help": "Query audit log events with filters."
+        },
+        {
+          "name": "receipt",
+          "help": "Export / verify standard, offline-verifiable audit..."
+        },
+        {
+          "name": "seal",
+          "help": "Compute a Merkle root across all audit log files..."
+        },
+        {
+          "name": "show",
+          "help": "Show recent audit log events from .sdd/audit/."
+        },
+        {
+          "name": "slice",
+          "help": "Write a deterministic subset of the audit log..."
+        },
+        {
+          "name": "taint",
+          "help": "Recompute the propagated-taint verdict for..."
+        },
+        {
+          "name": "verify",
+          "help": "Verify audit log integrity (HMAC chain per RFC 2104..."
+        },
+        {
+          "name": "verify-gates",
+          "help": "Verify clearance-gate integrity offline from the..."
+        },
+        {
+          "name": "verify-hmac",
+          "help": "Verify HMAC chain integrity across all audit log..."
+        },
+        {
+          "name": "verify-multitenant",
+          "help": "Verify a multi-tenant audit-export bundle offline."
+        },
+        {
+          "name": "verify-suspension",
+          "help": "Prove a durable suspend/resume continuity offline..."
+        }
+      ],
+      "slug": "audit",
+      "ready": false
+    },
+    {
+      "name": "verify",
+      "summary": "verify run integrity",
+      "usage": "bernstein verify [OPTIONS] COMMAND [ARGS]...",
+      "description": "Verify run receipts, ladder receipts, WAL integrity, determinism, memory, or a wheelhouse. bernstein verify run <run-id>               Build the signed run receipt bernstein verify receipt <path>             Verify a receipt offline (0/1/2) bernstein verify ladder <receipt-hash>      Re-derive a verifier-ladder receipt (0/1/2) bernstein verify <wheelhouse-path>          Verify air-gap wheelhouse signatures bernstein verify --wal-integrity <run-id>   Validate hash chain bernstein verify --determinism  <run-id>    Show execution fingerprint bernstein verify --memory-audit             Audit lesson memory provenance bernstein verify --formal <task-id>         Run Z3/Lean4 property checks Flag and positional modes route to the ``legacy`` subcommand unchanged.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "ladder",
+          "help": "Re-derive and verify the verifier-ladder receipt RECEIPT_HASH."
+        },
+        {
+          "name": "legacy",
+          "help": "Verify WAL integrity, execution determinism, memory..."
+        },
+        {
+          "name": "receipt",
+          "help": "Verify a run receipt offline from RECEIPT_PATH."
+        },
+        {
+          "name": "run",
+          "help": "Build the signed run receipt for RUN_ID."
+        }
+      ],
+      "slug": "verify",
+      "ready": false
+    },
+    {
+      "name": "preview",
+      "summary": "sandboxed dev-server with public tunnel link",
+      "usage": "bernstein preview [OPTIONS] COMMAND [ARGS]...",
+      "description": "Sandboxed dev-server preview with public tunnel link.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "list",
+          "help": "List every active preview."
+        },
+        {
+          "name": "start",
+          "help": "Boot the dev server and expose it through the existing tunnel..."
+        },
+        {
+          "name": "status",
+          "help": "Print details for one preview."
+        },
+        {
+          "name": "stop",
+          "help": "Stop one preview or every active preview."
+        }
+      ],
+      "slug": "preview",
+      "ready": false
+    },
+    {
+      "name": "pr",
+      "summary": "open a GitHub PR for the current run",
+      "usage": "bernstein pr [OPTIONS]",
+      "description": "Open a GitHub pull request from a completed Bernstein session. The command is safe to re-run: on ``--dry-run`` it never touches the network, and when ``gh`` is missing it exits with a helpful message instead of a traceback.",
+      "flags": [
+        {
+          "spec": "--session-id",
+          "flags": [
+            "--session-id"
+          ],
+          "primary": "--session-id",
+          "type": "TEXT",
+          "help": "Session to publish. Defaults to the most-recent completed session.",
+          "default": null,
+          "slug": "session-id",
+          "ready": false
+        },
+        {
+          "spec": "--base",
+          "flags": [
+            "--base"
+          ],
+          "primary": "--base",
+          "type": "TEXT",
+          "help": "Base branch for the pull request.  [default: main]",
+          "default": "main",
+          "slug": "base",
+          "ready": false
+        },
+        {
+          "spec": "--title",
+          "flags": [
+            "--title"
+          ],
+          "primary": "--title",
+          "type": "TEXT",
+          "help": "Override the auto-generated PR title.",
+          "default": null,
+          "slug": "title",
+          "ready": false
+        },
+        {
+          "spec": "--draft",
+          "flags": [
+            "--draft"
+          ],
+          "primary": "--draft",
+          "type": "",
+          "help": "Open the pull request as a draft.",
+          "default": null,
+          "slug": "draft",
+          "ready": false
+        },
+        {
+          "spec": "--dry-run",
+          "flags": [
+            "--dry-run"
+          ],
+          "primary": "--dry-run",
+          "type": "",
+          "help": "Print the would-be title and body without calling gh.",
+          "default": null,
+          "slug": "dry-run",
+          "ready": false
+        },
+        {
+          "spec": "--no-push",
+          "flags": [
+            "--no-push"
+          ],
+          "primary": "--no-push",
+          "type": "",
+          "help": "Skip `git push`; assume the branch is already on origin.",
+          "default": null,
+          "slug": "no-push",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "pr",
+      "ready": false
+    },
+    {
+      "name": "from-ticket",
+      "summary": "spin up a run from a backlog ticket",
+      "usage": "bernstein from-ticket [OPTIONS] URL",
+      "description": "Import a task into Bernstein from a ticket URL. URL may be any of: * https://linear.app/<workspace>/issue/<KEY-N>   or  linear://KEY-N * https://github.com/<owner>/<repo>/issues/<n> * https://<your-domain>/browse/<KEY-N>           (Jira Cloud)",
+      "flags": [
+        {
+          "spec": "--role",
+          "flags": [
+            "--role"
+          ],
+          "primary": "--role",
+          "type": "TEXT",
+          "help": "Assign a specific role. Defaults to label- based inference, then 'backend'.",
+          "default": null,
+          "slug": "role",
+          "ready": false
+        },
+        {
+          "spec": "--priority",
+          "flags": [
+            "--priority"
+          ],
+          "primary": "--priority",
+          "type": "",
+          "help": "[low|medium|high]  Override the task priority.",
+          "default": null,
+          "slug": "priority",
+          "ready": false
+        },
+        {
+          "spec": "--dry-run",
+          "flags": [
+            "--dry-run"
+          ],
+          "primary": "--dry-run",
+          "type": "",
+          "help": "Print the task payload without contacting the server.",
+          "default": null,
+          "slug": "dry-run",
+          "ready": false
+        },
+        {
+          "spec": "--run",
+          "flags": [
+            "--run"
+          ],
+          "primary": "--run",
+          "type": "",
+          "help": "Invoke `bernstein run` on the task immediately after creating it.",
+          "default": null,
+          "slug": "run",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "from-ticket",
+      "ready": false
+    },
+    {
+      "name": "ticket",
+      "summary": "ticket lifecycle commands",
+      "usage": "bernstein ticket [OPTIONS] COMMAND [ARGS]...",
+      "description": "Ticket import utilities.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "import",
+          "help": "Alias for `bernstein from-ticket`."
+        },
+        {
+          "name": "validate",
+          "help": "Validate one or more SDD ticket files against the packaged..."
+        }
+      ],
+      "slug": "ticket",
+      "ready": false
+    },
+    {
+      "name": "remote",
+      "summary": "remote workspace commands",
+      "usage": "bernstein remote [OPTIONS] COMMAND [ARGS]...",
+      "description": "Operate Bernstein against a remote SSH host.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "forget",
+          "help": "Remove any cached ControlMaster sockets for ``HOST``."
+        },
+        {
+          "name": "run",
+          "help": "Invoke ``bernstein run PATH`` against ``HOST`` over SSH."
+        },
+        {
+          "name": "test",
+          "help": "Check that ``HOST`` is reachable; run ``uptime`` and time the..."
+        }
+      ],
+      "slug": "remote",
+      "ready": false
+    },
+    {
+      "name": "tunnel",
+      "summary": "tunnel provider management",
+      "usage": "bernstein tunnel [OPTIONS] COMMAND [ARGS]...",
+      "description": "Manage local-to-public tunnels (cloudflared / ngrok / bore / tailscale).",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "list",
+          "help": "Show every active tunnel."
+        },
+        {
+          "name": "start",
+          "help": "Start a tunnel exposing ``localhost:<PORT>`` publicly."
+        },
+        {
+          "name": "stop",
+          "help": "Stop a named tunnel or (with ``--all``) every active tunnel."
+        }
+      ],
+      "slug": "tunnel",
+      "ready": false
+    },
+    {
+      "name": "creds",
+      "summary": "credential vault (OS keychain)",
+      "usage": "bernstein creds [OPTIONS] COMMAND [ARGS]...",
+      "description": "Inspect and manage credentials stored in the Bernstein vault.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "list",
+          "help": "List stored credentials."
+        },
+        {
+          "name": "revoke",
+          "help": "Remove a credential locally and call the provider's revoke..."
+        },
+        {
+          "name": "test",
+          "help": "Re-validate a stored credential against the provider's whoami."
+        }
+      ],
+      "slug": "creds",
+      "ready": false
+    },
+    {
+      "name": "connect",
+      "summary": "register a new credential in the vault",
+      "usage": "bernstein connect [OPTIONS] PROVIDER",
+      "description": "Connect Bernstein to a third-party provider and store the credential. bernstein connect github           # paste a PAT bernstein connect linear --oauth   # OAuth device-code flow bernstein connect jira             # email + base URL + API token bernstein connect slack            # paste a bot token bernstein connect telegram         # paste a bot token",
+      "flags": [
+        {
+          "spec": "--oauth",
+          "flags": [
+            "--oauth"
+          ],
+          "primary": "--oauth",
+          "type": "",
+          "help": "Use OAuth device-code flow (Linear only). Default is token paste.",
+          "default": null,
+          "slug": "oauth",
+          "ready": false
+        },
+        {
+          "spec": "--backend",
+          "flags": [
+            "--backend"
+          ],
+          "primary": "--backend",
+          "type": "",
+          "help": "[keyring|file]  Vault backend (default: keyring; file requires --passphrase-env).",
+          "default": null,
+          "slug": "backend",
+          "ready": false
+        },
+        {
+          "spec": "--passphrase-env",
+          "flags": [
+            "--passphrase-env"
+          ],
+          "primary": "--passphrase-env",
+          "type": "TEXT",
+          "help": "Env var holding the passphrase for the file backend.",
+          "default": null,
+          "slug": "passphrase-env",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "connect",
+      "ready": false
+    },
+    {
+      "name": "review-responder",
+      "summary": "respond to inline PR review comments",
+      "usage": "bernstein review-responder [OPTIONS] COMMAND [ARGS]...",
+      "description": "Manage the PR review responder service.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "start",
+          "help": "Print the responder configuration and (optionally) serve the..."
+        },
+        {
+          "name": "status",
+          "help": "Show persisted dedup state, optionally filtered by PR."
+        },
+        {
+          "name": "tick",
+          "help": "Run one polling pass synchronously and print the count of new..."
+        }
+      ],
+      "slug": "review-responder",
+      "ready": false
+    },
+    {
+      "name": "autofix",
+      "summary": "auto-repair CI failures on Bernstein PRs",
+      "usage": "bernstein autofix [OPTIONS] COMMAND [ARGS]...",
+      "description": "Auto-repair CI failures on Bernstein-opened pull requests.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "attach",
+          "help": "Stream the daemon's status log to stdout."
+        },
+        {
+          "name": "ladder",
+          "help": "Self-driving CI escalation ladder (RFC #1415)."
+        },
+        {
+          "name": "review",
+          "help": "Poll a PR's review threads and emit structured tasks..."
+        },
+        {
+          "name": "review-register",
+          "help": "Persist a ``pr_number -> worktree_path`` mapping."
+        },
+        {
+          "name": "review-resolve",
+          "help": "Print the registered worktree path for a PR (exit..."
+        },
+        {
+          "name": "start",
+          "help": "Start the autofix daemon."
+        },
+        {
+          "name": "status",
+          "help": "Print daemon status + the most recent attempts."
+        },
+        {
+          "name": "stop",
+          "help": "Stop the running autofix daemon."
+        }
+      ],
+      "slug": "autofix",
+      "ready": false
+    },
+    {
+      "name": "scaffold",
+      "summary": "scaffold a new project from a template",
+      "usage": "bernstein scaffold [OPTIONS] PROMPT",
+      "description": "Bootstrap a project skeleton from a single goal PROMPT. Examples: bernstein scaffold \"Build me a habit tracker\" bernstein scaffold \"CLI to convert markdown to PDF\" --template python-cli bernstein scaffold \"static landing page\" --output ./my-site",
+      "flags": [
+        {
+          "spec": "--template",
+          "flags": [
+            "--template"
+          ],
+          "primary": "--template",
+          "type": "NAME",
+          "help": "Template to use; 'auto' picks via keyword heuristic on PROMPT.  [default: auto]",
+          "default": null,
+          "slug": "template",
+          "ready": false
+        },
+        {
+          "spec": "--output",
+          "flags": [
+            "--output"
+          ],
+          "primary": "--output",
+          "type": "DIR",
+          "help": "Destination directory (default: ./<slug-of-prompt>).",
+          "default": null,
+          "slug": "output",
+          "ready": false
+        },
+        {
+          "spec": "--force",
+          "flags": [
+            "--force"
+          ],
+          "primary": "--force",
+          "type": "",
+          "help": "Allow writing into a non-empty directory.",
+          "default": null,
+          "slug": "force",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "scaffold",
+      "ready": false
+    },
+    {
+      "name": "watch",
+      "summary": "watch a directory and re-run on change",
+      "usage": "bernstein watch [OPTIONS] [DIRECTORY]",
+      "description": "Monitor the working directory and re-run tasks on file changes. Watches for source file changes and automatically re-runs affected Bernstein tasks.  Changes inside .sdd/, .git/, __pycache__/, and node_modules/ are ignored.  A 2-second debounce prevents rapid successive saves from triggering multiple runs. bernstein watch                         # watch current directory bernstein watch src/                    # watch a subdirectory bernstein watch --glob \"src/**/*.py\"    # only Python source files",
+      "flags": [
+        {
+          "spec": "--glob",
+          "flags": [
+            "--glob"
+          ],
+          "primary": "--glob",
+          "type": "PATTERN",
+          "help": "Restrict watching to files matching this glob (e.g. 'src/**/*.py').",
+          "default": null,
+          "slug": "glob",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "watch",
+      "ready": false
+    },
+    {
+      "name": "wiki",
+      "summary": "wiki commands",
+      "usage": "bernstein wiki [OPTIONS] COMMAND [ARGS]...",
+      "description": "Render a Markdown wiki for the current repo. Runs locally, with no network round-trip and no external service, so it works offline and on private repositories.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "build",
+          "help": "Render WIKI.md from the AST symbol graph and stream it to stdout."
+        }
+      ],
+      "slug": "wiki",
+      "ready": false
+    },
+    {
+      "name": "memory",
+      "summary": "persistent memory store commands",
+      "usage": "bernstein memory [OPTIONS] COMMAND [ARGS]...",
+      "description": "Manage persistent memories (conventions, decisions, learnings).",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "add",
+          "help": "Add a new persistent memory entry."
+        },
+        {
+          "name": "forget",
+          "help": "Append a signed tombstone for ``ENTRY_HASH`` without deleting it."
+        },
+        {
+          "name": "list",
+          "help": "List stored memories."
+        },
+        {
+          "name": "query",
+          "help": "List facts published under ``tag`` with values redacted by..."
+        },
+        {
+          "name": "remove",
+          "help": "Remove a memory entry by ID."
+        },
+        {
+          "name": "share",
+          "help": "Publish a fact under ``tag``/``key`` for other tasks to..."
+        },
+        {
+          "name": "verify",
+          "help": "Prove a fact was written by the claimed actor and never edited."
+        },
+        {
+          "name": "why",
+          "help": "Return the originating run id and step for a stored ``FACT``."
+        }
+      ],
+      "slug": "memory",
+      "ready": false
+    },
+    {
+      "name": "skills",
+      "summary": "progressive-disclosure skill packs",
+      "usage": "bernstein skills [OPTIONS] COMMAND [ARGS]...",
+      "description": "List and inspect progressive-disclosure skill packs. bernstein skills list           # compact overview bernstein skills list --layered # show layered (base/team/user) view bernstein skills show backend   # print SKILL.md body bernstein skills show backend --reference python-conventions.md bernstein skills show backend --per-layer  # merged + per-layer diff",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "bench",
+          "help": "Benchmark a deterministic trigger-set suite without model..."
+        },
+        {
+          "name": "bisect",
+          "help": "Build a local skill-activation bisect plan for a task."
+        },
+        {
+          "name": "catalog",
+          "help": "Browse, install, and upgrade skill packs from the..."
+        },
+        {
+          "name": "diff",
+          "help": "Compare two skill directories using canonical..."
+        },
+        {
+          "name": "helpfulness",
+          "help": "Rebuild the local skill helpfulness report."
+        },
+        {
+          "name": "init",
+          "help": "Create a deterministic local skill scaffold."
+        },
+        {
+          "name": "install",
+          "help": "Install a skill from a local path."
+        },
+        {
+          "name": "lint",
+          "help": "Advisory lint: validate frontmatter, references, sensitive..."
+        },
+        {
+          "name": "list",
+          "help": "List every discoverable skill with a one-line description."
+        },
+        {
+          "name": "package",
+          "help": "Install and verify the packaged bernstein agent skill."
+        },
+        {
+          "name": "provenance",
+          "help": "Print the recomputable usage-provenance graph for *skill*."
+        },
+        {
+          "name": "remove",
+          "help": "Remove a previously installed skill."
+        },
+        {
+          "name": "show",
+          "help": "Print the SKILL.md body for a skill (optionally a..."
+        },
+        {
+          "name": "sync",
+          "help": "Install every skill declared in ``bernstein-skills.toml``."
+        },
+        {
+          "name": "test",
+          "help": "Run a deterministic trigger-set suite without model calls."
+        },
+        {
+          "name": "verify",
+          "help": "Recompute *skill*'s install receipt and usage links."
+        },
+        {
+          "name": "watch",
+          "help": "Hot-reload the skill index on filesystem change."
+        }
+      ],
+      "slug": "skills",
+      "ready": false
+    },
+    {
+      "name": "mcp",
+      "summary": "MCP server / catalog commands",
+      "usage": "bernstein mcp [OPTIONS] [COMMAND] [ARGS]...",
+      "description": "Run the MCP server or manage the bundled MCP marketplace.",
+      "flags": [
+        {
+          "spec": "--transport",
+          "flags": [
+            "--transport"
+          ],
+          "primary": "--transport",
+          "type": "",
+          "help": "[stdio|http]        Transport mechanism.  [default: stdio]",
+          "default": "stdio",
+          "slug": "transport",
+          "ready": false
+        },
+        {
+          "spec": "--host",
+          "flags": [
+            "--host"
+          ],
+          "primary": "--host",
+          "type": "TEXT",
+          "help": "Host for HTTP transport.  [default: 127.0.0.1]",
+          "default": null,
+          "slug": "host",
+          "ready": false
+        },
+        {
+          "spec": "--port",
+          "flags": [
+            "--port"
+          ],
+          "primary": "--port",
+          "type": "INTEGER",
+          "help": "Port for HTTP transport.  [default: 8053]",
+          "default": "8053",
+          "slug": "port",
+          "ready": false
+        },
+        {
+          "spec": "--server-url",
+          "flags": [
+            "--server-url"
+          ],
+          "primary": "--server-url",
+          "type": "TEXT",
+          "help": "Bernstein server URL.  [default: http://localhost:8052]",
+          "default": null,
+          "slug": "server-url",
+          "ready": false
+        },
+        {
+          "spec": "--mcp-tier",
+          "flags": [
+            "--mcp-tier"
+          ],
+          "primary": "--mcp-tier",
+          "type": "",
+          "help": "[core|standard|all]  Tool tier to advertise (context-budget knob). Overrides BERNSTEIN_MCP_TOOL_TIER; defaults to 'standard'.",
+          "default": null,
+          "slug": "mcp-tier",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "catalog",
+          "help": "Browse, install, and upgrade MCP servers from the community..."
+        },
+        {
+          "name": "install",
+          "help": "Install or update a bundled MCP server entry in..."
+        },
+        {
+          "name": "list",
+          "help": "List bundled MCP marketplace entries and install status."
+        },
+        {
+          "name": "test",
+          "help": "Validate an installed MCP server with a bounded protocol smoke..."
+        },
+        {
+          "name": "tools",
+          "help": "Enumerate which MCP tools each tier would advertise."
+        },
+        {
+          "name": "usage",
+          "help": "Analyze historical MCP usage and print optimization..."
+        }
+      ],
+      "slug": "mcp",
+      "ready": false
+    },
+    {
+      "name": "auth",
+      "summary": "authentication commands",
+      "usage": "bernstein auth [OPTIONS] COMMAND [ARGS]...",
+      "description": "Manage authentication (SSO / token-based).",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "dashboard-token",
+          "help": "Issue, list, and revoke scoped dashboard tokens."
+        },
+        {
+          "name": "login",
+          "help": "Authenticate with the Bernstein server via device..."
+        },
+        {
+          "name": "logout",
+          "help": "Revoke current session and clear cached token."
+        },
+        {
+          "name": "status",
+          "help": "Show current authentication status."
+        }
+      ],
+      "slug": "auth",
+      "ready": false
+    },
+    {
+      "name": "login",
+      "summary": "log in to bernstein cloud",
+      "usage": "bernstein login [OPTIONS]",
+      "description": "Authenticate with the Bernstein server via device authorization flow. This initiates a device code flow: 1. The CLI requests a device code from the server 2. You open the server URL in your browser and log in via SSO 3. Enter the displayed user code to authorize the CLI 4. The CLI polls until authorized and caches the token",
+      "flags": [
+        {
+          "spec": "--server",
+          "flags": [
+            "--server"
+          ],
+          "primary": "--server",
+          "type": "TEXT",
+          "help": "Server URL (default: $BERNSTEIN_SERVER_URL or localhost:8052)",
+          "default": null,
+          "slug": "server",
+          "ready": false
+        },
+        {
+          "spec": "--sso",
+          "flags": [
+            "--sso"
+          ],
+          "primary": "--sso",
+          "type": "",
+          "help": "Open the browser automatically for the SSO flow.",
+          "default": null,
+          "slug": "sso",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "login",
+      "ready": false
+    },
+    {
+      "name": "self-update",
+      "summary": "upgrade bernstein in place",
+      "usage": "bernstein self-update [OPTIONS]",
+      "description": "Compatibility alias for the `bernstein self` update lifecycle. bernstein self-update             same as `bernstein self update` bernstein self-update --check     same as `bernstein self check-update` bernstein self-update --rollback  same as `bernstein self rollback`",
+      "flags": [
+        {
+          "spec": "--check",
+          "flags": [
+            "--check"
+          ],
+          "primary": "--check",
+          "type": "",
+          "help": "Check only; do not install.",
+          "default": null,
+          "slug": "check",
+          "ready": false
+        },
+        {
+          "spec": "--rollback",
+          "flags": [
+            "--rollback"
+          ],
+          "primary": "--rollback",
+          "type": "",
+          "help": "Revert to the previous receipted version.",
+          "default": null,
+          "slug": "rollback",
+          "ready": false
+        },
+        {
+          "spec": "-y, --yes",
+          "flags": [
+            "-y",
+            "--yes"
+          ],
+          "primary": "--yes",
+          "type": "",
+          "help": "Skip confirmation prompt.",
+          "default": null,
+          "slug": "yes",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "self-update",
+      "ready": false
+    },
+    {
+      "name": "diff",
+      "summary": "diff two runs",
+      "usage": "bernstein diff [OPTIONS] [TASK_ID]",
+      "description": "Show the git diff of what an agent changed for a task. Looks up the agent session that handled TASK_ID, then retrieves the diff from the live worktree (if still active) or from the merged branch/commit. Examples: bernstein diff 90307ac2                         # single task diff bernstein diff 90307ac2 --stat                  # summary only bernstein diff 90307ac2 --fold                  # collapse long hunks bernstein diff 90307ac2 --word-diff             # highlight changed words bernstein diff --compare backend-abc qa-def     # side-by-side bernstein diff --compare task1 task2 --stat     # stat comparison",
+      "flags": [
+        {
+          "spec": "--base",
+          "flags": [
+            "--base"
+          ],
+          "primary": "--base",
+          "type": "TEXT",
+          "help": "Base branch to diff against.  [default: main]",
+          "default": "main",
+          "slug": "base",
+          "ready": false
+        },
+        {
+          "spec": "--workdir",
+          "flags": [
+            "--workdir"
+          ],
+          "primary": "--workdir",
+          "type": "PATH",
+          "help": "Project root (parent of .sdd/).  [default: .]",
+          "default": ".",
+          "slug": "workdir",
+          "ready": false
+        },
+        {
+          "spec": "--stat",
+          "flags": [
+            "--stat"
+          ],
+          "primary": "--stat",
+          "type": "",
+          "help": "Show diff --stat summary only.",
+          "default": null,
+          "slug": "stat",
+          "ready": false
+        },
+        {
+          "spec": "--raw",
+          "flags": [
+            "--raw"
+          ],
+          "primary": "--raw",
+          "type": "",
+          "help": "Print raw diff without syntax highlighting.",
+          "default": null,
+          "slug": "raw",
+          "ready": false
+        },
+        {
+          "spec": "--fold",
+          "flags": [
+            "--fold"
+          ],
+          "primary": "--fold",
+          "type": "",
+          "help": "Collapse each hunk to a summary plus a few lines.",
+          "default": null,
+          "slug": "fold",
+          "ready": false
+        },
+        {
+          "spec": "--fold-lines",
+          "flags": [
+            "--fold-lines"
+          ],
+          "primary": "--fold-lines",
+          "type": "INTEGER",
+          "help": "Lines kept per hunk when --fold is set.  [default: 3]",
+          "default": null,
+          "slug": "fold-lines",
+          "ready": false
+        },
+        {
+          "spec": "--word-diff",
+          "flags": [
+            "--word-diff"
+          ],
+          "primary": "--word-diff",
+          "type": "",
+          "help": "Highlight only the words that changed on replaced lines.",
+          "default": null,
+          "slug": "word-diff",
+          "ready": false
+        },
+        {
+          "spec": "--compare",
+          "flags": [
+            "--compare"
+          ],
+          "primary": "--compare",
+          "type": "AGENT1",
+          "help": "AGENT2  Compare two agents side-by-side (task IDs or session IDs).",
+          "default": null,
+          "slug": "compare",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "diff",
+      "ready": false
+    },
+    {
+      "name": "merge",
+      "summary": "merge a run's branches into main",
+      "usage": "bernstein merge [OPTIONS]",
+      "description": "Pick the best agent solution and merge it. After comparing parallel branches with ``bernstein diff --compare``, use this command to merge the winning solution into the target branch. Examples: bernstein merge --pick backend-abc123           # merge agent's work bernstein merge --pick task-id-prefix           # resolve by task ID bernstein merge --pick agent1 --reject agent2   # merge one, delete other bernstein merge --pick agent1 --dry-run         # preview only",
+      "flags": [
+        {
+          "spec": "--pick",
+          "flags": [
+            "--pick"
+          ],
+          "primary": "--pick",
+          "type": "AGENT",
+          "help": "Task ID or session ID of the agent whose solution to merge.  [required]",
+          "default": null,
+          "slug": "pick",
+          "ready": false
+        },
+        {
+          "spec": "--base",
+          "flags": [
+            "--base"
+          ],
+          "primary": "--base",
+          "type": "TEXT",
+          "help": "Target branch to merge into.  [default: main]",
+          "default": "main",
+          "slug": "base",
+          "ready": false
+        },
+        {
+          "spec": "--workdir",
+          "flags": [
+            "--workdir"
+          ],
+          "primary": "--workdir",
+          "type": "PATH",
+          "help": "Project root (parent of .sdd/).  [default: .]",
+          "default": ".",
+          "slug": "workdir",
+          "ready": false
+        },
+        {
+          "spec": "--no-ff",
+          "flags": [
+            "--no-ff"
+          ],
+          "primary": "--no-ff",
+          "type": "",
+          "help": "Use --no-ff merge.  [default: True]",
+          "default": "True",
+          "slug": "no-ff",
+          "ready": false
+        },
+        {
+          "spec": "-m, --message",
+          "flags": [
+            "-m",
+            "--message"
+          ],
+          "primary": "--message",
+          "type": "TEXT",
+          "help": "Custom merge commit message.",
+          "default": null,
+          "slug": "message",
+          "ready": false
+        },
+        {
+          "spec": "--dry-run",
+          "flags": [
+            "--dry-run"
+          ],
+          "primary": "--dry-run",
+          "type": "",
+          "help": "Show what would be merged without merging.",
+          "default": null,
+          "slug": "dry-run",
+          "ready": false
+        },
+        {
+          "spec": "--reject",
+          "flags": [
+            "--reject"
+          ],
+          "primary": "--reject",
+          "type": "AGENT",
+          "help": "Also delete branches of rejected agents (repeatable).",
+          "default": null,
+          "slug": "reject",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "merge",
+      "ready": false
+    },
+    {
+      "name": "report",
+      "summary": "generate a run report",
+      "usage": "bernstein report [OPTIONS] [COMMAND] [ARGS]...",
+      "description": "Print a markdown summary of the latest (or specified) run. bernstein report                # latest run bernstein report --run-id abc   # specific run bernstein report --save         # print and save to .sdd/reports/",
+      "flags": [
+        {
+          "spec": "--run-id",
+          "flags": [
+            "--run-id"
+          ],
+          "primary": "--run-id",
+          "type": "TEXT",
+          "help": "Specific run ID to report on (default: latest).",
+          "default": null,
+          "slug": "run-id",
+          "ready": false
+        },
+        {
+          "spec": "--workdir",
+          "flags": [
+            "--workdir"
+          ],
+          "primary": "--workdir",
+          "type": "PATH",
+          "help": "Project root directory.",
+          "default": null,
+          "slug": "workdir",
+          "ready": false
+        },
+        {
+          "spec": "--save",
+          "flags": [
+            "--save"
+          ],
+          "primary": "--save",
+          "type": "",
+          "help": "/ --no-save  Also save the report to .sdd/reports/.",
+          "default": null,
+          "slug": "save",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "commits",
+          "help": "Show commit attribution by agent role."
+        },
+        {
+          "name": "incident",
+          "help": "View incident timelines correlated from logs, metrics, and..."
+        },
+        {
+          "name": "postmortem",
+          "help": "Generate a structured post-mortem report for a failed run."
+        }
+      ],
+      "slug": "report",
+      "ready": false
+    },
+    {
+      "name": "history",
+      "summary": "list past runs",
+      "usage": "bernstein history [OPTIONS] FILE_PATH",
+      "description": "Show archived tasks that modified a specific file.",
+      "flags": [
+        {
+          "spec": "--workdir",
+          "flags": [
+            "--workdir"
+          ],
+          "primary": "--workdir",
+          "type": "DIRECTORY",
+          "help": "Project root containing .sdd/archive/tasks.jsonl. [default: .]",
+          "default": null,
+          "slug": "workdir",
+          "ready": false
+        },
+        {
+          "spec": "--limit",
+          "flags": [
+            "--limit"
+          ],
+          "primary": "--limit",
+          "type": "INTEGER",
+          "help": "Maximum number of matching tasks to show.  [default: 10]",
+          "default": null,
+          "slug": "limit",
+          "ready": false
+        },
+        {
+          "spec": "--json",
+          "flags": [
+            "--json"
+          ],
+          "primary": "--json",
+          "type": "",
+          "help": "Output raw JSON.",
+          "default": null,
+          "slug": "json",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "history",
+      "ready": false
+    },
+    {
+      "name": "cleanup",
+      "summary": "remove stale .sdd/ artefacts",
+      "usage": "bernstein cleanup [OPTIONS]",
+      "description": "Remove Bernstein worktrees that no longer back active tasks.",
+      "flags": [
+        {
+          "spec": "--workdir",
+          "flags": [
+            "--workdir"
+          ],
+          "primary": "--workdir",
+          "type": "DIRECTORY",
+          "help": "Project root containing .sdd/runtime and .sdd/worktrees.  [default: .]",
+          "default": null,
+          "slug": "workdir",
+          "ready": false
+        },
+        {
+          "spec": "--yes",
+          "flags": [
+            "--yes"
+          ],
+          "primary": "--yes",
+          "type": "",
+          "help": "Skip the confirmation prompt.",
+          "default": null,
+          "slug": "yes",
+          "ready": false
+        },
+        {
+          "spec": "--force",
+          "flags": [
+            "--force"
+          ],
+          "primary": "--force",
+          "type": "",
+          "help": "Also delete agent branches that are NOT merged into main. Dangerous: may discard in-flight work. Only use after manually confirming the branches contain nothing you want to keep.",
+          "default": null,
+          "slug": "force",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "cleanup",
+      "ready": false
+    },
+    {
+      "name": "test",
+      "summary": "run quality gates without an agent",
+      "usage": "bernstein test [OPTIONS]",
+      "description": "Run automated resilience tests.",
+      "flags": [
+        {
+          "spec": "--duration",
+          "flags": [
+            "--duration"
+          ],
+          "primary": "--duration",
+          "type": "INTEGER",
+          "help": "Test duration in seconds.",
+          "default": null,
+          "slug": "duration",
+          "ready": false
+        },
+        {
+          "spec": "--workdir",
+          "flags": [
+            "--workdir"
+          ],
+          "primary": "--workdir",
+          "type": "PATH",
+          "help": "Project root.",
+          "default": null,
+          "slug": "workdir",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "test",
+      "ready": false
+    },
+    {
+      "name": "test-adapter",
+      "summary": "smoke-test a CLI adapter",
+      "usage": "bernstein test-adapter [OPTIONS]",
+      "description": "Spawn a single headless adapter run, wait for exit, and verify output.",
+      "flags": [
+        {
+          "spec": "--adapter",
+          "flags": [
+            "--adapter"
+          ],
+          "primary": "--adapter",
+          "type": "TEXT",
+          "help": "Adapter to test (e.g. gemini, codex).  [required]",
+          "default": null,
+          "slug": "adapter",
+          "ready": false
+        },
+        {
+          "spec": "--task",
+          "flags": [
+            "--task"
+          ],
+          "primary": "--task",
+          "type": "TEXT",
+          "help": "Task for the adapter to execute.  [required]",
+          "default": null,
+          "slug": "task",
+          "ready": false
+        },
+        {
+          "spec": "--model",
+          "flags": [
+            "--model"
+          ],
+          "primary": "--model",
+          "type": "TEXT",
+          "help": "Model to use for the smoke run.",
+          "default": null,
+          "slug": "model",
+          "ready": false
+        },
+        {
+          "spec": "--timeout",
+          "flags": [
+            "--timeout"
+          ],
+          "primary": "--timeout",
+          "type": "INTEGER",
+          "help": "Wait up to N seconds for exit.",
+          "default": null,
+          "slug": "timeout",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "test-adapter",
+      "ready": false
+    },
+    {
+      "name": "ci",
+      "summary": "CI integration commands",
+      "usage": "bernstein ci [OPTIONS] COMMAND [ARGS]...",
+      "description": "CI autofix: detect and fix failing GitHub Actions runs.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "fix",
+          "help": "One-shot fix of a specific failing GitHub Actions run."
+        },
+        {
+          "name": "watch",
+          "help": "Continuously watch a repo for new CI failures and auto-create..."
+        }
+      ],
+      "slug": "ci",
+      "ready": false
+    },
+    {
+      "name": "cloud",
+      "summary": "cloud-execution commands",
+      "usage": "bernstein cloud [OPTIONS] COMMAND [ARGS]...",
+      "description": "Manage Bernstein Cloud: hosted orchestration on Cloudflare.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "cost",
+          "help": "Show cloud usage and costs."
+        },
+        {
+          "name": "init",
+          "help": "Scaffold a deployable wrangler.toml and its worker entry point."
+        },
+        {
+          "name": "login",
+          "help": "Authenticate with Bernstein Cloud."
+        },
+        {
+          "name": "logout",
+          "help": "Remove stored cloud credentials."
+        },
+        {
+          "name": "run",
+          "help": "Run orchestration in Bernstein Cloud."
+        },
+        {
+          "name": "runs",
+          "help": "List recent cloud runs."
+        },
+        {
+          "name": "status",
+          "help": "Show status of cloud runs."
+        }
+      ],
+      "slug": "cloud",
+      "ready": false
+    },
+    {
+      "name": "gateway",
+      "summary": "gateway server commands",
+      "usage": "bernstein gateway [OPTIONS] COMMAND [ARGS]...",
+      "description": "MCP gateway proxy: transparent recording and replay.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "replay",
+          "help": "Replay recorded MCP tool calls from a previous gateway run."
+        },
+        {
+          "name": "settlements",
+          "help": "List recorded x402 settlements (issue #2528)."
+        },
+        {
+          "name": "start",
+          "help": "Start the MCP gateway proxy."
+        }
+      ],
+      "slug": "gateway",
+      "ready": false
+    },
+    {
+      "name": "compliance",
+      "summary": "compliance bundle commands",
+      "usage": "bernstein compliance [OPTIONS] COMMAND [ARGS]...",
+      "description": "Inspect compliance artifacts and policy enforcement. Shipped framework policy bundles: SOC 2, ISO 27001, PCI DSS, NIST 800-53. EU AI Act Article 12 (Regulation (EU) 2024/1689) record-keeping is mapped via ``bernstein audit export --article-12``. Cite: docs/compliance/.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "assess",
+          "help": "Run EU AI Act compliance assessment for this Bernstein..."
+        },
+        {
+          "name": "check",
+          "help": "Evaluate compliance policies against the current runtime..."
+        },
+        {
+          "name": "disable",
+          "help": "Deactivate a compliance framework."
+        },
+        {
+          "name": "enable",
+          "help": "Activate a compliance framework policy set."
+        },
+        {
+          "name": "eu-ai-act",
+          "help": "Show the current EU AI Act task-risk summary."
+        },
+        {
+          "name": "list",
+          "help": "List available compliance policies."
+        },
+        {
+          "name": "pack",
+          "help": "Assemble regulator-mapped evidence packs from the audit chain."
+        },
+        {
+          "name": "rego",
+          "help": "Export OPA/Rego rule files for a compliance framework."
+        },
+        {
+          "name": "report",
+          "help": "Print the EU AI Act compliance report from an existing..."
+        }
+      ],
+      "slug": "compliance",
+      "ready": false
+    },
+    {
+      "name": "policy",
+      "summary": "policy enforcement commands",
+      "usage": "bernstein policy [OPTIONS] COMMAND [ARGS]...",
+      "description": "Inspect and run policy-as-code checks.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "check",
+          "help": "Run YAML/Rego policies against the current repository diff."
+        }
+      ],
+      "slug": "policy",
+      "ready": false
+    },
+    {
+      "name": "security",
+      "summary": "security commands",
+      "usage": "bernstein security [OPTIONS] COMMAND [ARGS]...",
+      "description": "Security policy inspection and editing commands.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "role-adapter-policy",
+          "help": "Inspect and edit the per-role adapter allow-list."
+        }
+      ],
+      "slug": "security",
+      "ready": false
+    },
+    {
+      "name": "fingerprint",
+      "summary": "install-rev fingerprint commands",
+      "usage": "bernstein fingerprint [OPTIONS] COMMAND [ARGS]...",
+      "description": "Agent output fingerprinting for licence-risk detection.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "build",
+          "help": "Build a fingerprint index from a corpus directory."
+        },
+        {
+          "name": "check",
+          "help": "Resolve and return a CorpusIndex, or None if unavailable."
+        }
+      ],
+      "slug": "fingerprint",
+      "ready": false
+    },
+    {
+      "name": "fleet",
+      "summary": "supervise multiple Bernstein projects",
+      "usage": "bernstein fleet [OPTIONS] [COMMAND] [ARGS]...",
+      "description": "Supervisory dashboard for multiple Bernstein projects.",
+      "flags": [
+        {
+          "spec": "--config",
+          "flags": [
+            "--config"
+          ],
+          "primary": "--config",
+          "type": "TEXT",
+          "help": "Path to fleet config (default: ~/.config/bernstein/projects.toml).",
+          "default": null,
+          "slug": "config",
+          "ready": false
+        },
+        {
+          "spec": "--web",
+          "flags": [
+            "--web"
+          ],
+          "primary": "--web",
+          "type": "TEXT",
+          "help": "Run the web view instead of the TUI. Bind format: ``[host:]port``.",
+          "default": null,
+          "slug": "web",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "bulk-cost-report",
+          "help": "Run ``bernstein cost report`` against every matching..."
+        },
+        {
+          "name": "bulk-pause",
+          "help": "Pause every matching project (stops its daemon)."
+        },
+        {
+          "name": "bulk-resume",
+          "help": "Resume every matching project (restarts its daemon)."
+        },
+        {
+          "name": "bulk-stop",
+          "help": "Stop every matching project via its CLI."
+        },
+        {
+          "name": "list",
+          "help": "List instances discovered under the fleet root..."
+        },
+        {
+          "name": "ls",
+          "help": "List configured projects without launching the..."
+        },
+        {
+          "name": "reload",
+          "help": "Rescan the fleet root and report what would be picked..."
+        },
+        {
+          "name": "steer",
+          "help": "Steer one running worker: pause, resume, guidance,..."
+        }
+      ],
+      "slug": "fleet",
+      "ready": false
+    },
+    {
+      "name": "triggers",
+      "summary": "trigger source adapters",
+      "usage": "bernstein triggers [OPTIONS] COMMAND [ARGS]...",
+      "description": "Manage event-driven agent triggers.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "fire",
+          "help": "Manually fire a trigger by name (for testing)."
+        },
+        {
+          "name": "history",
+          "help": "Show recent trigger fire log."
+        },
+        {
+          "name": "list",
+          "help": "Show all configured triggers and their status."
+        }
+      ],
+      "slug": "triggers",
+      "ready": false
+    },
+    {
+      "name": "templates",
+      "summary": "role / prompt templates",
+      "usage": "bernstein templates [OPTIONS] COMMAND [ARGS]...",
+      "description": "Browse and scaffold reusable plan templates.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "compress",
+          "help": "Compress role prompt templates in place (operator-gated)."
+        },
+        {
+          "name": "hooks",
+          "help": "Browse and scaffold bundled command-hook templates."
+        },
+        {
+          "name": "list",
+          "help": "List available plan templates."
+        },
+        {
+          "name": "restore",
+          "help": "Restore ROLE's templates to the byte-identical..."
+        },
+        {
+          "name": "show",
+          "help": "Print the contents of a template to stdout."
+        },
+        {
+          "name": "use",
+          "help": "Copy TEMPLATE_NAME to OUTPUT (default: plans/<name>.yaml)."
+        }
+      ],
+      "slug": "templates",
+      "ready": false
+    },
+    {
+      "name": "prompts",
+      "summary": "prompt management",
+      "usage": "bernstein prompts [OPTIONS] COMMAND [ARGS]...",
+      "description": "Manage versioned prompts and A/B tests. bernstein prompts list                  # list all prompts bernstein prompts show <name>           # show versions bernstein prompts compare <name> v1 v2  # compare metrics bernstein prompts promote <name> <ver>  # promote version bernstein prompts ab-start <name> a b   # start A/B test bernstein prompts ab-stop <name>        # stop A/B test",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "ab-start",
+          "help": "Start an A/B test between two prompt versions."
+        },
+        {
+          "name": "ab-stop",
+          "help": "Stop an active A/B test without promoting either version."
+        },
+        {
+          "name": "compare",
+          "help": "Compare metrics between two prompt versions."
+        },
+        {
+          "name": "list",
+          "help": "List all versioned prompts and their active versions."
+        },
+        {
+          "name": "promote",
+          "help": "Promote a specific version to active."
+        },
+        {
+          "name": "seed",
+          "help": "Seed .sdd/prompts/ from templates/prompts/ as v1."
+        },
+        {
+          "name": "show",
+          "help": "Show all versions of a prompt with their metrics."
+        }
+      ],
+      "slug": "prompts",
+      "ready": false
+    },
+    {
+      "name": "manifest",
+      "summary": "manifest validation commands",
+      "usage": "bernstein manifest [OPTIONS] COMMAND [ARGS]...",
+      "description": "Inspect and compare run manifests. bernstein manifest list           # list all manifests bernstein manifest show <run-id>  # display a run's configuration bernstein manifest diff <a> <b>   # compare two run configurations",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "diff",
+          "help": "Compare two run configurations and highlight differences."
+        },
+        {
+          "name": "list",
+          "help": "List all available run manifests."
+        },
+        {
+          "name": "show",
+          "help": "Display the manifest for a past run."
+        }
+      ],
+      "slug": "manifest",
+      "ready": false
+    },
+    {
+      "name": "workflow",
+      "summary": "Archon-style YAML workflow manifests",
+      "usage": "bernstein workflow [OPTIONS] COMMAND [ARGS]...",
+      "description": "Manage workflow manifests. Two manifest flavours are supported and auto-detected by validate/list: - YAML manifest (declarative): nodes as a list, executed by `bernstein workflow run`. - DSL: nodes keyed by id with `phases:`, used by the orchestrator's deterministic crew-routing model. Examples: bernstein workflow list bernstein workflow run idea-to-pr -g \"Add JWT auth\" bernstein workflow init my-flow bernstein workflow validate path/to/flow.yaml bernstein workflow show ci-pipeline",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "init",
+          "help": "Scaffold a new YAML workflow manifest."
+        },
+        {
+          "name": "list",
+          "help": "List bundled and user-installed workflow manifests."
+        },
+        {
+          "name": "run",
+          "help": "Execute a YAML workflow manifest."
+        },
+        {
+          "name": "show",
+          "help": "Show details of a workflow DSL by name (legacy conditional DAG)."
+        },
+        {
+          "name": "validate",
+          "help": "Validate a workflow manifest (YAML manifest or DSL)."
+        }
+      ],
+      "slug": "workflow",
+      "ready": false
+    },
+    {
+      "name": "validate",
+      "summary": "validate a plan file",
+      "usage": "bernstein validate [OPTIONS] PLAN_FILE",
+      "description": "[Deprecated] Use 'bernstein plan validate' instead.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "validate",
+      "ready": false
+    },
+    {
+      "name": "dep-impact",
+      "summary": "dependency impact analysis",
+      "usage": "bernstein dep-impact [OPTIONS]",
+      "description": "[Deprecated] Analyse call-site impacts (use 'bernstein impact deps').",
+      "flags": [
+        {
+          "spec": "--base",
+          "flags": [
+            "--base"
+          ],
+          "primary": "--base",
+          "type": "REF",
+          "help": "Git ref to compare against.  [default: HEAD~1]",
+          "default": "HEAD~1",
+          "slug": "base",
+          "ready": false
+        },
+        {
+          "spec": "--workdir",
+          "flags": [
+            "--workdir"
+          ],
+          "primary": "--workdir",
+          "type": "DIRECTORY",
+          "help": "Repository root.",
+          "default": null,
+          "slug": "workdir",
+          "ready": false
+        },
+        {
+          "spec": "--strict",
+          "flags": [
+            "--strict"
+          ],
+          "primary": "--strict",
+          "type": "",
+          "help": "Exit 1 when any call-site impact is found.",
+          "default": null,
+          "slug": "strict",
+          "ready": false
+        },
+        {
+          "spec": "--json",
+          "flags": [
+            "--json"
+          ],
+          "primary": "--json",
+          "type": "",
+          "help": "Output results as JSON.",
+          "default": null,
+          "slug": "json",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "dep-impact",
+      "ready": false
+    },
+    {
+      "name": "graph",
+      "summary": "task dependency graph",
+      "usage": "bernstein graph [OPTIONS] COMMAND [ARGS]...",
+      "description": "Inspect the codebase knowledge graph.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "impact",
+          "help": "Print downstream files impacted by changing FILE_QUERY."
+        },
+        {
+          "name": "tasks",
+          "help": "Render the current task dependency graph as ASCII or Mermaid."
+        }
+      ],
+      "slug": "graph",
+      "ready": false
+    },
+    {
+      "name": "explain",
+      "summary": "explain a flag / command",
+      "usage": "bernstein explain [OPTIONS] [COMMAND_NAME]",
+      "description": "Show detailed help with examples for a command. Provides extended usage information, examples, related commands, and tips for any Bernstein CLI command. Examples: bernstein explain run bernstein explain doctor bernstein explain replay",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "explain",
+      "ready": false
+    },
+    {
+      "name": "config-path",
+      "summary": "print active config path",
+      "usage": "bernstein config-path [OPTIONS]",
+      "description": "Show where bernstein.yaml and .sdd/config.yaml are loaded from. Displays the resolved paths for the project configuration file and the workspace configuration file. Examples: bernstein config-path bernstein config-path --json",
+      "flags": [
+        {
+          "spec": "--json",
+          "flags": [
+            "--json"
+          ],
+          "primary": "--json",
+          "type": "",
+          "help": "Output as JSON.",
+          "default": null,
+          "slug": "json",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "config-path",
+      "ready": false
+    },
+    {
+      "name": "init-wizard",
+      "summary": "interactive init flow",
+      "usage": "bernstein init-wizard [OPTIONS]",
+      "description": "[Deprecated] Use 'bernstein init --wizard' instead.",
+      "flags": [
+        {
+          "spec": "--dir",
+          "flags": [
+            "--dir"
+          ],
+          "primary": "--dir",
+          "type": "TEXT",
+          "help": "Directory to initialise.  [default: .]",
+          "default": ".",
+          "slug": "dir",
+          "ready": false
+        },
+        {
+          "spec": "--non-interactive",
+          "flags": [
+            "--non-interactive"
+          ],
+          "primary": "--non-interactive",
+          "type": "",
+          "help": "Use defaults without prompting.",
+          "default": null,
+          "slug": "non-interactive",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "init-wizard",
+      "ready": false
+    },
+    {
+      "name": "aliases",
+      "summary": "list short command aliases",
+      "usage": "bernstein aliases [OPTIONS]",
+      "description": "Show command aliases and shortcuts. Bernstein supports short aliases for common commands: bernstein s  ->  bernstein status bernstein r  ->  bernstein run bernstein d  ->  bernstein doctor etc.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "aliases",
+      "ready": false
+    },
+    {
+      "name": "debug-bundle",
+      "summary": "build a debug bundle",
+      "usage": "bernstein debug-bundle [OPTIONS]",
+      "description": "[Deprecated] Generate a diagnostic bundle for bug reports (use 'bernstein debug bundle').",
+      "flags": [
+        {
+          "spec": "-y, --yes",
+          "flags": [
+            "-y",
+            "--yes"
+          ],
+          "primary": "--yes",
+          "type": "",
+          "help": "Skip confirmation prompt",
+          "default": null,
+          "slug": "yes",
+          "ready": false
+        },
+        {
+          "spec": "-o, --output",
+          "flags": [
+            "-o",
+            "--output"
+          ],
+          "primary": "--output",
+          "type": "PATH",
+          "help": "Output zip path",
+          "default": null,
+          "slug": "output",
+          "ready": false
+        },
+        {
+          "spec": "--extended",
+          "flags": [
+            "--extended"
+          ],
+          "primary": "--extended",
+          "type": "",
+          "help": "Include full logs (not truncated)",
+          "default": null,
+          "slug": "extended",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "debug-bundle",
+      "ready": false
+    },
+    {
+      "name": "approve-tool",
+      "summary": "approve a pending tool call",
+      "usage": "bernstein approve-tool [OPTIONS]",
+      "description": "Approve a pending tool-call approval. Pops the oldest pending approval from ``.sdd/runtime/approvals/`` and records an ``allow`` decision. Pass ``--latest`` to resolve the most recent entry instead, ``--id`` to target a specific approval, or ``--always`` to promote the matched pattern into the user's always-allow rules so future calls never block. Examples: bernstein approve-tool bernstein approve-tool --always bernstein approve-tool --id ap-1a2b3c4d5e6f",
+      "flags": [
+        {
+          "spec": "--latest",
+          "flags": [
+            "--latest"
+          ],
+          "primary": "--latest",
+          "type": "",
+          "help": "Resolve the newest pending approval instead of the oldest.",
+          "default": null,
+          "slug": "latest",
+          "ready": false
+        },
+        {
+          "spec": "--id",
+          "flags": [
+            "--id"
+          ],
+          "primary": "--id",
+          "type": "TEXT",
+          "help": "Resolve a specific approval by id.",
+          "default": null,
+          "slug": "id",
+          "ready": false
+        },
+        {
+          "spec": "--always",
+          "flags": [
+            "--always"
+          ],
+          "primary": "--always",
+          "type": "",
+          "help": "Allow and promote the pattern into always-allow rules.",
+          "default": null,
+          "slug": "always",
+          "ready": false
+        },
+        {
+          "spec": "--workdir",
+          "flags": [
+            "--workdir"
+          ],
+          "primary": "--workdir",
+          "type": "PATH",
+          "help": "Project root directory.",
+          "default": null,
+          "slug": "workdir",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "approve-tool",
+      "ready": false
+    },
+    {
+      "name": "reject-tool",
+      "summary": "reject a pending tool call",
+      "usage": "bernstein reject-tool [OPTIONS]",
+      "description": "Reject a pending tool-call approval. Records a ``reject`` decision so the blocked agent surfaces a permission error. With no flags the oldest pending approval is resolved. Examples: bernstein reject-tool bernstein reject-tool --id ap-1a2b3c4d5e6f",
+      "flags": [
+        {
+          "spec": "--latest",
+          "flags": [
+            "--latest"
+          ],
+          "primary": "--latest",
+          "type": "",
+          "help": "Resolve the newest pending approval instead of the oldest.",
+          "default": null,
+          "slug": "latest",
+          "ready": false
+        },
+        {
+          "spec": "--id",
+          "flags": [
+            "--id"
+          ],
+          "primary": "--id",
+          "type": "TEXT",
+          "help": "Resolve a specific approval by id.",
+          "default": null,
+          "slug": "id",
+          "ready": false
+        },
+        {
+          "spec": "--workdir",
+          "flags": [
+            "--workdir"
+          ],
+          "primary": "--workdir",
+          "type": "PATH",
+          "help": "Project root directory.",
+          "default": null,
+          "slug": "workdir",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "reject-tool",
+      "ready": false
+    },
+    {
+      "name": "chat",
+      "summary": "chat-control bridge",
+      "usage": "bernstein chat [OPTIONS] COMMAND [ARGS]...",
+      "description": "Drive Bernstein agents from Telegram, Discord, Slack, or Microsoft Teams.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "logout",
+          "help": "Drop cached bindings for PLATFORM."
+        },
+        {
+          "name": "serve",
+          "help": "Run the chat bridge for PLATFORM until Ctrl-C."
+        },
+        {
+          "name": "status",
+          "help": "Print active chat<->session bindings."
+        }
+      ],
+      "slug": "chat",
+      "ready": false
+    },
+    {
+      "name": "acp",
+      "summary": "Agent Client Protocol (ACP) bridge",
+      "usage": "bernstein acp [OPTIONS] COMMAND [ARGS]...",
+      "description": "Agent Client Protocol (ACP) bridge: IDE integration surface.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "serve",
+          "help": "Run the ACP server using the requested transport."
+        }
+      ],
+      "slug": "acp",
+      "ready": false
+    },
+    {
+      "name": "notify",
+      "summary": "notification driver commands",
+      "usage": "bernstein notify [OPTIONS] COMMAND [ARGS]...",
+      "description": "Outbound notification commands (release 1.9).",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "list",
+          "help": "List configured sinks from ``bernstein.yaml``."
+        },
+        {
+          "name": "test",
+          "help": "Fire a synthetic event end-to-end through ``--sink``."
+        }
+      ],
+      "slug": "notify",
+      "ready": false
+    },
+    {
+      "name": "lineage",
+      "summary": "per-artefact lineage trail",
+      "usage": "bernstein lineage [OPTIONS] [COMMAND] [ARGS]...",
+      "description": "Per-artifact lineage trail (output -> producer + inputs). Records are signed with the customer-supplied Ed25519 key (RFC 8037). Use ``bernstein lineage verify`` in CI to fail any run whose chain breaks; cite: docs/compliance/lineage-export.md. Examples: bernstein lineage src/foo.py:42 bernstein lineage walk src/foo.py:42 bernstein lineage export <run_id> --format html --output /tmp/x.html bernstein lineage verify <run_id> --public-key /etc/customer-pub.pem",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "chain",
+          "help": "Verify the chain for a single artefact (ADR-009 §5.3)."
+        },
+        {
+          "name": "conflicts",
+          "help": "List unresolved lineage forks in a human-readable,..."
+        },
+        {
+          "name": "export",
+          "help": "Export the lineage chain for *run_id* as a regulator..."
+        },
+        {
+          "name": "forks",
+          "help": "Report all unresolved forks in the lineage log."
+        },
+        {
+          "name": "gate",
+          "help": "Run the lineage v1 CI gate."
+        },
+        {
+          "name": "merge",
+          "help": "Manually resolve a lineage fork via operator-chosen..."
+        },
+        {
+          "name": "reindex",
+          "help": "Rebuild by-artefact + tips projections from log.jsonl..."
+        },
+        {
+          "name": "replay",
+          "help": "Replay the lineage spine for *run_id* in append order."
+        },
+        {
+          "name": "resolve",
+          "help": "Resolve one unresolved fork using a named ``MergePolicy``."
+        },
+        {
+          "name": "tracker-audit",
+          "help": "Signed audit log of tracker state moves."
+        },
+        {
+          "name": "v2",
+          "help": "Lineage v2 - two-layer storage (parent refs + detached..."
+        },
+        {
+          "name": "verify",
+          "help": "Verify the lineage spine for *run_id*."
+        },
+        {
+          "name": "walk",
+          "help": "Walk the lineage chain backwards from ``<file>[:<line>]``."
+        }
+      ],
+      "slug": "lineage",
+      "ready": false
+    },
+    {
+      "name": "agents-md",
+      "summary": "AGENTS.md generator + cross-CLI rewrite",
+      "usage": "bernstein agents-md [OPTIONS] [COMMAND] [ARGS]...",
+      "description": "Canonical AGENTS.md generator with cross-CLI rewrite. Follows the canonical agents.md spec (\"AGENTS.md is just standard Markdown\" -- agents.md/) and the AAIF AGENTS.md project profile. Derives one canonical IR from the repo, then renders to five target shapes: canonical AGENTS.md, Cursor ``.cursor/rules/*.mdc``, Claude ``CLAUDE.md``, Aider ``CONVENTIONS.md``, and Goose ``.goosehints``. Examples: bernstein agents-md generate            # print canonical AGENTS.md bernstein agents-md sync                # write all 5 target files bernstein agents-md write --target cursor bernstein agents-md verify              # exit 1 if any file is stale bernstein agents-md diff --target claude Cite: agents.md/ (canonical spec), aaif.io/projects/agents-md/ (AAIF profile).",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "diff",
+          "help": "Print unified diff between on-disk and generated for each..."
+        },
+        {
+          "name": "generate",
+          "help": "Print one target's content to stdout."
+        },
+        {
+          "name": "sync",
+          "help": "Write all target formats so all five files agree."
+        },
+        {
+          "name": "verify",
+          "help": "Exit 1 if any on-disk file diverges from the generated content."
+        },
+        {
+          "name": "write",
+          "help": "Write one target's files to disk."
+        }
+      ],
+      "slug": "agents-md",
+      "ready": false
+    },
+    {
+      "name": "wheelhouse",
+      "summary": "air-gap wheel bundle build/verify",
+      "usage": "bernstein wheelhouse [OPTIONS] COMMAND [ARGS]...",
+      "description": "Build and verify the air-gap wheel bundle. Examples: bernstein wheelhouse build --version 1.9.4 bernstein wheelhouse verify dist/airgap-wheelhouse/1.9.4 bernstein wheelhouse verify <path> --verifier gpg --keyring keys.gpg",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "build",
+          "help": "Build an air-gap wheel bundle for offline installs."
+        },
+        {
+          "name": "countersign",
+          "help": "Append a customer Ed25519 countersignature to an existing..."
+        },
+        {
+          "name": "verify",
+          "help": "Verify an air-gap wheelhouse: sha256s + signatures, every..."
+        }
+      ],
+      "slug": "wheelhouse",
+      "ready": false
+    },
+    {
+      "name": "routine",
+      "summary": "Claude Code Routine bridge",
+      "usage": "bernstein routine [OPTIONS] COMMAND [ARGS]...",
+      "description": "[Deprecated] Use 'bernstein schedule routine' instead.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "bindings",
+          "help": "List known Routine trigger -> scenario bindings."
+        },
+        {
+          "name": "export",
+          "help": "Export SCENARIO_ID as a Routine config bundle."
+        },
+        {
+          "name": "provision",
+          "help": "Interactive wizard: pick a scenario, export it, then..."
+        },
+        {
+          "name": "register",
+          "help": "Register an existing Routine trigger id against a scenario."
+        },
+        {
+          "name": "scenarios",
+          "help": "List all scenarios in the library."
+        }
+      ],
+      "slug": "routine",
+      "ready": false
+    },
+    {
+      "name": "cluster",
+      "summary": "cluster lifecycle helpers (mTLS bootstrap)",
+      "usage": "bernstein cluster [OPTIONS] COMMAND [ARGS]...",
+      "description": "Cluster lifecycle helpers. bernstein cluster bootstrap-ca   # generate self-signed CA + server/node certs",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "bootstrap-ca",
+          "help": "Generate a self-signed CA, server cert, and node cert..."
+        },
+        {
+          "name": "claims",
+          "help": "Read and verify the signed MESH claim journal."
+        },
+        {
+          "name": "nodes",
+          "help": "List registered cluster nodes with heartbeat age and..."
+        },
+        {
+          "name": "status",
+          "help": "Show cluster topology: online/offline counts and the node..."
+        }
+      ],
+      "slug": "cluster",
+      "ready": false
+    },
+    {
+      "name": "handoff",
+      "summary": "session handoff between surfaces",
+      "usage": "bernstein handoff [OPTIONS] COMMAND [ARGS]...",
+      "description": "Move a live session between terminal, chat and dashboard.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "claim",
+          "help": "Claim TOKEN, print session info, and replay the recent stream..."
+        },
+        {
+          "name": "emit",
+          "help": "Freeze SESSION and print a short-lived resume token (5 min TTL)."
+        },
+        {
+          "name": "status",
+          "help": "List live (non-expired) handoff tokens."
+        }
+      ],
+      "slug": "handoff",
+      "ready": false
+    },
+    {
+      "name": "identity",
+      "summary": "install-rev identity helpers",
+      "usage": "bernstein identity [OPTIONS] COMMAND [ARGS]...",
+      "description": "Operator-side install-rev fingerprint helpers. The install-rev token is a 16-character base32 string embedded in artefacts the user voluntarily publishes (yaml configs, trace JSONL, role-prompt md footers).  No network egress, ever - operator-side discovery uses public GitHub code search (``gh search code 'bernstein-rev:'``). Examples: bernstein identity show bernstein identity decode c4j2k7n8p3q5r9s7 bernstein identity verify c4j2k7n8p3q5r9s7 \\ --nonce 0123456789abcdef0123 --version-major 1 bernstein identity disable",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "decode",
+          "help": "Confirm a token came from a real install (shape + sentinel..."
+        },
+        {
+          "name": "disable",
+          "help": "Print the environment line that suppresses every emit site."
+        },
+        {
+          "name": "keydir",
+          "help": "Print the install-identity key directory (JWKS) as JSON."
+        },
+        {
+          "name": "show",
+          "help": "Print the current install's token (or the disabled sentinel)."
+        },
+        {
+          "name": "verify",
+          "help": "Verify a token at HMAC strength when the operator has the..."
+        }
+      ],
+      "slug": "identity",
+      "ready": false
+    },
+    {
+      "name": "changelog",
+      "summary": "show CHANGELOG.md",
+      "usage": "bernstein changelog [OPTIONS] [COMMAND] [ARGS]...",
+      "description": "Changelog generation. With no subcommand, ``bernstein changelog`` summarises what Bernstein agents actually changed during a run (the previous ``run-changelog`` command). Use ``bernstein changelog conventional`` to generate a changelog from conventional commits in the project history. Examples: bernstein changelog                  # agent-produced diffs, last 24 h bernstein changelog --hours 48       # wider window bernstein changelog conventional     # from conventional commits bernstein changelog conventional --since v1.0.0",
+      "flags": [
+        {
+          "spec": "--since",
+          "flags": [
+            "--since"
+          ],
+          "primary": "--since",
+          "type": "REF",
+          "help": "Git ref (tag or SHA) marking the start of the run window. Only commits after this ref are included.",
+          "default": null,
+          "slug": "since",
+          "ready": false
+        },
+        {
+          "spec": "--hours",
+          "flags": [
+            "--hours"
+          ],
+          "primary": "--hours",
+          "type": "N",
+          "help": "Limit to tasks completed in the last N hours (default: 24). Ignored when --since is provided.",
+          "default": null,
+          "slug": "hours",
+          "ready": false
+        },
+        {
+          "spec": "--format",
+          "flags": [
+            "--format"
+          ],
+          "primary": "--format",
+          "type": "",
+          "help": "[console|markdown]  Output format.  [default: console]",
+          "default": "console",
+          "slug": "format",
+          "ready": false
+        },
+        {
+          "spec": "-o, --output",
+          "flags": [
+            "-o",
+            "--output"
+          ],
+          "primary": "--output",
+          "type": "FILE",
+          "help": "Write Markdown output to this file (implies",
+          "default": null,
+          "slug": "output",
+          "ready": false
+        },
+        {
+          "spec": "--format",
+          "flags": [
+            "--format"
+          ],
+          "primary": "--format",
+          "type": "",
+          "help": "markdown).",
+          "default": null,
+          "slug": "format",
+          "ready": false
+        },
+        {
+          "spec": "--repo-url",
+          "flags": [
+            "--repo-url"
+          ],
+          "primary": "--repo-url",
+          "type": "URL",
+          "help": "Repository URL used to generate task links in Markdown output.",
+          "default": null,
+          "slug": "repo-url",
+          "ready": false
+        },
+        {
+          "spec": "--include-no-commits",
+          "flags": [
+            "--include-no-commits"
+          ],
+          "primary": "--include-no-commits",
+          "type": "",
+          "help": "Include tasks that have no matching git commits (useful to surface tasks that completed without committing).",
+          "default": null,
+          "slug": "include-no-commits",
+          "ready": false
+        },
+        {
+          "spec": "--server-url",
+          "flags": [
+            "--server-url"
+          ],
+          "primary": "--server-url",
+          "type": "URL",
+          "help": "Bernstein task server URL (default: $BERNSTEIN_SERVER_URL or http://localhost:8052).",
+          "default": null,
+          "slug": "server-url",
+          "ready": false
+        },
+        {
+          "spec": "--workdir",
+          "flags": [
+            "--workdir"
+          ],
+          "primary": "--workdir",
+          "type": "DIRECTORY",
+          "help": "Project root (git repository).  [default: .]",
+          "default": ".",
+          "slug": "workdir",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "conventional",
+          "help": "Auto-generate a changelog from conventional commits."
+        }
+      ],
+      "slug": "changelog",
+      "ready": false
+    },
+    {
+      "name": "run-changelog",
+      "summary": "show changelog for a single run",
+      "usage": "bernstein run-changelog [OPTIONS]",
+      "description": "Generate a changelog from what Bernstein agents actually changed. [Deprecated, removed in a later release] The command name changed in v4.0.0 to free up ``bernstein changelog`` for the orchestration-specific changelog (#3142): it now lives at ``bernstein changelog`` (same behaviour, same flags including ``--hours``). The ``run- changelog`` name stays registered as a deprecated alias with this deprecation notice so existing scripts print a warning rather than silently changing meaning; it is removed in a release after the 4.0 line that introduced it. Examples: bernstein run-changelog                          # last 24 h, console bernstein run-changelog --hours 48               # last 48 h bernstein run-changelog --since v1.2.0           # since a tag bernstein run-changelog --format markdown        # markdown to stdout",
+      "flags": [
+        {
+          "spec": "--since",
+          "flags": [
+            "--since"
+          ],
+          "primary": "--since",
+          "type": "REF",
+          "help": "Git ref (tag or SHA) marking the start of the run window. Only commits after this ref are included.",
+          "default": null,
+          "slug": "since",
+          "ready": false
+        },
+        {
+          "spec": "--hours",
+          "flags": [
+            "--hours"
+          ],
+          "primary": "--hours",
+          "type": "N",
+          "help": "Limit to tasks completed in the last N hours (default: 24). Ignored when --since is provided.",
+          "default": null,
+          "slug": "hours",
+          "ready": false
+        },
+        {
+          "spec": "--format",
+          "flags": [
+            "--format"
+          ],
+          "primary": "--format",
+          "type": "",
+          "help": "[console|markdown]  Output format.  [default: console]",
+          "default": "console",
+          "slug": "format",
+          "ready": false
+        },
+        {
+          "spec": "-o, --output",
+          "flags": [
+            "-o",
+            "--output"
+          ],
+          "primary": "--output",
+          "type": "FILE",
+          "help": "Write Markdown output to this file (implies",
+          "default": null,
+          "slug": "output",
+          "ready": false
+        },
+        {
+          "spec": "--format",
+          "flags": [
+            "--format"
+          ],
+          "primary": "--format",
+          "type": "",
+          "help": "markdown).",
+          "default": null,
+          "slug": "format",
+          "ready": false
+        },
+        {
+          "spec": "--repo-url",
+          "flags": [
+            "--repo-url"
+          ],
+          "primary": "--repo-url",
+          "type": "URL",
+          "help": "Repository URL used to generate task links in Markdown output.",
+          "default": null,
+          "slug": "repo-url",
+          "ready": false
+        },
+        {
+          "spec": "--include-no-commits",
+          "flags": [
+            "--include-no-commits"
+          ],
+          "primary": "--include-no-commits",
+          "type": "",
+          "help": "Include tasks that have no matching git commits (useful to surface tasks that completed without committing).",
+          "default": null,
+          "slug": "include-no-commits",
+          "ready": false
+        },
+        {
+          "spec": "--server-url",
+          "flags": [
+            "--server-url"
+          ],
+          "primary": "--server-url",
+          "type": "URL",
+          "help": "Bernstein task server URL (default: $BERNSTEIN_SERVER_URL or http://localhost:8052).",
+          "default": null,
+          "slug": "server-url",
+          "ready": false
+        },
+        {
+          "spec": "--workdir",
+          "flags": [
+            "--workdir"
+          ],
+          "primary": "--workdir",
+          "type": "DIRECTORY",
+          "help": "Project root (git repository).  [default: .]",
+          "default": ".",
+          "slug": "workdir",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "run-changelog",
+      "ready": false
+    },
+    {
+      "name": "dr",
+      "summary": "disaster recovery commands",
+      "usage": "bernstein dr [OPTIONS] COMMAND [ARGS]...",
+      "description": "Disaster recovery: backup and restore commands.",
+      "flags": [
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "backup",
+          "help": "Backup persistent .sdd/ state to a file."
+        },
+        {
+          "name": "restore",
+          "help": "Restore .sdd/ state from a backup file."
+        }
+      ],
+      "slug": "dr",
+      "ready": false
+    },
+    {
+      "name": "profile",
+      "summary": "performance profile",
+      "usage": "bernstein profile [OPTIONS]",
+      "description": "Display the latest orchestrator cProfile report. Reads the most recent .prof file from .sdd/runtime/profiles/ and prints the top functions by cumulative time.  Use --markdown for a table suitable for pasting into issues or docs.",
+      "flags": [
+        {
+          "spec": "-n, --top",
+          "flags": [
+            "-n",
+            "--top"
+          ],
+          "primary": "--top",
+          "type": "INTEGER",
+          "help": "Number of top functions to display.  [default: 20]",
+          "default": "20",
+          "slug": "top",
+          "ready": false
+        },
+        {
+          "spec": "-m, --markdown",
+          "flags": [
+            "-m",
+            "--markdown"
+          ],
+          "primary": "--markdown",
+          "type": "",
+          "help": "Output as Markdown table.",
+          "default": null,
+          "slug": "markdown",
+          "ready": false
+        },
+        {
+          "spec": "-f, --file",
+          "flags": [
+            "-f",
+            "--file"
+          ],
+          "primary": "--file",
+          "type": "FILE",
+          "help": "Path to a specific .prof file (default: latest in .sdd/runtime/profiles/).",
+          "default": null,
+          "slug": "file",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "profile",
+      "ready": false
+    },
+    {
+      "name": "slo",
+      "summary": "service-level objective commands",
+      "usage": "bernstein slo [OPTIONS]",
+      "description": "Show SLO burn-down rate and error budget status. Displays: • Current SLO compliance % vs. target (default 90%) • Error budget consumption and remaining fraction • Burn rate (1.0 = consuming at exactly the allowed rate) • Linear projection of days until the SLO is breached • ASCII sparkline of error budget over recent history Examples: bernstein slo                  # formatted dashboard bernstein slo --json           # raw JSON bernstein slo --watch          # refresh every 30s bernstein slo --watch --interval 10",
+      "flags": [
+        {
+          "spec": "--workdir",
+          "flags": [
+            "--workdir"
+          ],
+          "primary": "--workdir",
+          "type": "PATH",
+          "help": "Project root directory.",
+          "default": null,
+          "slug": "workdir",
+          "ready": false
+        },
+        {
+          "spec": "--json",
+          "flags": [
+            "--json"
+          ],
+          "primary": "--json",
+          "type": "",
+          "help": "Output raw JSON instead of formatted table.",
+          "default": null,
+          "slug": "json",
+          "ready": false
+        },
+        {
+          "spec": "--watch",
+          "flags": [
+            "--watch"
+          ],
+          "primary": "--watch",
+          "type": "",
+          "help": "Refresh every N seconds until interrupted.",
+          "default": null,
+          "slug": "watch",
+          "ready": false
+        },
+        {
+          "spec": "--interval",
+          "flags": [
+            "--interval"
+          ],
+          "primary": "--interval",
+          "type": "INTEGER",
+          "help": "Refresh interval in seconds (--watch mode).  [default: 30]",
+          "default": null,
+          "slug": "interval",
+          "ready": false
+        },
+        {
+          "spec": "--compact",
+          "flags": [
+            "--compact"
+          ],
+          "primary": "--compact",
+          "type": "",
+          "help": "Compact output without sparkline.",
+          "default": null,
+          "slug": "compact",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "slo",
+      "ready": false
+    },
+    {
+      "name": "man-pages",
+      "summary": "generate man pages",
+      "usage": "bernstein man-pages [OPTIONS]",
+      "description": "Generate troff man pages for all Bernstein CLI commands.",
+      "flags": [
+        {
+          "spec": "--output-dir",
+          "flags": [
+            "--output-dir"
+          ],
+          "primary": "--output-dir",
+          "type": "PATH",
+          "help": "Directory to write man page files into.  [default: docs/man]",
+          "default": null,
+          "slug": "output-dir",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "man-pages",
+      "ready": false
+    },
+    {
+      "name": "undo",
+      "summary": "undo the last run's merge",
+      "usage": "bernstein undo [OPTIONS] [TASK_ID]",
+      "description": "Revert changes made by an agent. bernstein undo task-123    # revert changes from a specific task bernstein undo --all       # revert all changes in current session",
+      "flags": [
+        {
+          "spec": "--all",
+          "flags": [
+            "--all"
+          ],
+          "primary": "--all",
+          "type": "",
+          "help": "Revert all changes from the current session.",
+          "default": null,
+          "slug": "all",
+          "ready": false
+        },
+        {
+          "spec": "-y, --yes",
+          "flags": [
+            "-y",
+            "--yes"
+          ],
+          "primary": "--yes",
+          "type": "",
+          "help": "Skip confirmation prompt.",
+          "default": null,
+          "slug": "yes",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "undo",
+      "ready": false
+    },
+    {
+      "name": "worker",
+      "summary": "join a cluster as a remote worker node",
+      "usage": "bernstein worker [OPTIONS]",
+      "description": "Join a Bernstein cluster as a worker node. The worker connects to a central Bernstein server, registers itself, and starts pulling tasks to execute locally. Use this to distribute work across multiple machines. Cluster mode requires a bearer token: pass --token (or set BERNSTEIN_AUTH_TOKEN) to the value the central node was started with. Examples: bernstein worker --server http://central:8052 --token SECRET bernstein worker --server http://central:8052 --token SECRET --name gpu-box --slots 8 bernstein worker --server http://central:8052 --token SECRET --label gpu=true bernstein worker --server http://central:8052 --token SECRET --poll-interval-ms 2000 BERNSTEIN_SERVER_URL=http://central:8052 BERNSTEIN_AUTH_TOKEN=SECRET bernstein worker",
+      "flags": [
+        {
+          "spec": "--server",
+          "flags": [
+            "--server"
+          ],
+          "primary": "--server",
+          "type": "TEXT",
+          "help": "URL of the central Bernstein task server (e.g. http://central:8052).  [required]",
+          "default": null,
+          "slug": "server",
+          "ready": false
+        },
+        {
+          "spec": "--name",
+          "flags": [
+            "--name"
+          ],
+          "primary": "--name",
+          "type": "TEXT",
+          "help": "Worker node name (default: hostname).",
+          "default": null,
+          "slug": "name",
+          "ready": false
+        },
+        {
+          "spec": "--slots",
+          "flags": [
+            "--slots"
+          ],
+          "primary": "--slots",
+          "type": "INTEGER",
+          "help": "Maximum concurrent agents on this worker. [default: 6]",
+          "default": null,
+          "slug": "slots",
+          "ready": false
+        },
+        {
+          "spec": "--roles",
+          "flags": [
+            "--roles"
+          ],
+          "primary": "--roles",
+          "type": "TEXT",
+          "help": "Comma-separated roles this worker accepts. [default: backend,qa,security,frontend]",
+          "default": null,
+          "slug": "roles",
+          "ready": false
+        },
+        {
+          "spec": "--label",
+          "flags": [
+            "--label"
+          ],
+          "primary": "--label",
+          "type": "TEXT",
+          "help": "Node labels as key=value (can repeat:",
+          "default": null,
+          "slug": "label",
+          "ready": false
+        },
+        {
+          "spec": "--label",
+          "flags": [
+            "--label"
+          ],
+          "primary": "--label",
+          "type": "",
+          "help": "gpu=true --label region=us-east).",
+          "default": null,
+          "slug": "label",
+          "ready": false
+        },
+        {
+          "spec": "--token",
+          "flags": [
+            "--token"
+          ],
+          "primary": "--token",
+          "type": "TEXT",
+          "help": "Bearer token for cluster auth.",
+          "default": null,
+          "slug": "token",
+          "ready": false
+        },
+        {
+          "spec": "--adapter",
+          "flags": [
+            "--adapter"
+          ],
+          "primary": "--adapter",
+          "type": "",
+          "help": "[agy|aichat|aider|amp|antigravity|auggie|auto|autohand|charm|claude|cline|clm|codebuff|codex|cody|composio|computer_use|continue|copilot|cursor|devin_terminal|droid|forge|gemini|generic|goose|gptme|hermes|iac|junie|kilo|kimchi|kimi|kiro|letta_code|mistral|muse|ollama|open_interpreter|openai_agents|opencode|openhands|pi|plandex|pydantic_ai|python_runtime|q_dev|qwen|ralphex|rovo] CLI agent adapter (default: auto-detect).",
+          "default": null,
+          "slug": "adapter",
+          "ready": false
+        },
+        {
+          "spec": "--model",
+          "flags": [
+            "--model"
+          ],
+          "primary": "--model",
+          "type": "TEXT",
+          "help": "Default model for tasks that carry no explicit model (default: the adapter's own default).",
+          "default": null,
+          "slug": "model",
+          "ready": false
+        },
+        {
+          "spec": "--poll-interval",
+          "flags": [
+            "--poll-interval"
+          ],
+          "primary": "--poll-interval",
+          "type": "INTEGER",
+          "help": "Seconds between task polling cycles (ignored if --poll-interval-ms is set).  [default: 10]",
+          "default": null,
+          "slug": "poll-interval",
+          "ready": false
+        },
+        {
+          "spec": "--poll-interval-ms",
+          "flags": [
+            "--poll-interval-ms"
+          ],
+          "primary": "--poll-interval-ms",
+          "type": "INTEGER",
+          "help": "Milliseconds between task polling cycles (overrides --poll-interval).",
+          "default": null,
+          "slug": "poll-interval-ms",
+          "ready": false
+        },
+        {
+          "spec": "--heartbeat-interval-ms",
+          "flags": [
+            "--heartbeat-interval-ms"
+          ],
+          "primary": "--heartbeat-interval-ms",
+          "type": "",
+          "help": "INTEGER Milliseconds between heartbeats to the central server.  [default: 15000]",
+          "default": null,
+          "slug": "heartbeat-interval-ms",
+          "ready": false
+        },
+        {
+          "spec": "--pool",
+          "flags": [
+            "--pool"
+          ],
+          "primary": "--pool",
+          "type": "TEXT",
+          "help": "Named sandbox pool to enrol into (signs an Ed25519 enrolment receipt).",
+          "default": null,
+          "slug": "pool",
+          "ready": false
+        },
+        {
+          "spec": "--pool-hash",
+          "flags": [
+            "--pool-hash"
+          ],
+          "primary": "--pool-hash",
+          "type": "TEXT",
+          "help": "Explicit pool hash to enrol against (overrides --pool name resolution).",
+          "default": null,
+          "slug": "pool-hash",
+          "ready": false
+        },
+        {
+          "spec": "--help",
+          "flags": [
+            "--help"
+          ],
+          "primary": "--help",
+          "type": "",
+          "help": "Show this message and exit.",
+          "default": null,
+          "slug": "help",
+          "ready": false
+        }
+      ],
+      "subcommands": [],
+      "slug": "worker",
+      "ready": false
+    }
+  ]
+}

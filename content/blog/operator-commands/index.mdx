@@ -1,0 +1,75 @@
+---
+title: "Four commands that turn the orchestrator into a service"
+description: "1.8.15 ships a chat bridge, mid-run approval, a tunnel wrapper, and a daemon installer. Less script you sit next to, more thing you install once."
+date: "2026-04-24"
+dateModified: "2026-08-10"
+tags: ["multi-agent orchestration", "developer experience", "AI coding agents", "Telegram", "SSH", "systemd", "launchd", "cloudflared", "ngrok"]
+schemaType: "HowTo"
+howToSteps:
+  - name: "bernstein chat serve --platform=telegram"
+    text: "Start the chat bridge so the orchestrator runs as a Telegram bot; /run dispatches tasks, /approve gates destructive actions, /stop halts the session."
+  - name: "bernstein approve-tool"
+    text: "Approve destructive actions mid-run from the TUI, dashboard, or a second terminal. Pick 'always' to persist the pattern into always_allow."
+  - name: "bernstein tunnel start <port>"
+    text: "Expose the dashboard or chat bridge over HTTPS; picks the first available provider (cloudflared, bore, ngrok, tailscale) and tracks tunnels in .sdd/runtime/tunnels.json."
+  - name: "bernstein daemon install"
+    text: "Persist a Bernstein command as a systemd user unit (Linux) or launchd plist (macOS) so the chat bridge survives reboots. Env inheritance is whitelisted to PATH, HOME, BERNSTEIN_*."
+---
+
+<Lead>
+1.8.14 made Bernstein do more things. 1.8.15 makes it feel less like a script you babysit. Four commands: chat bridge, approval prompt, tunnel wrapper, daemon installer.
+</Lead>
+
+## `bernstein chat serve --platform=telegram`
+
+The orchestrator runs as a chat bot. Send `/run "migrate auth to JWT"` in a Telegram thread; Bernstein creates the task, dispatches it, streams progress as live edits to a single message, so the chat doesn't fill with twenty "agent-2 finished step 3 of 7" updates. Mid-run, if an agent wants to do something destructive, the message sprouts `/approve` and `/reject` buttons. `/switch claude-code` swaps adapters. `/status`, `/stop`.
+
+```bash
+BERNSTEIN_TELEGRAM_BOT_TOKEN=... bernstein chat serve --platform=telegram
+```
+
+Discord and Slack ship as conformant stubs: same protocol, same commands, different transport.
+
+*Update, 2026-08-10: not stubs anymore. Telegram, Discord, Slack, and Teams all run as real platforms in v3.14.159. Slack takes two tokens: the bot token in `BERNSTEIN_SLACK_TOKEN` and the Socket Mode app token in `BERNSTEIN_SLACK_APP_TOKEN`.*
+
+## `bernstein approve-tool`
+
+Before this release, gating destructive actions meant pre-writing `always_allow` rules in your config and hoping you'd anticipated the right patterns. Wrong posture for a laptop tool. Now the approval lives wherever you are: TUI prompt, web dashboard button, or CLI from a second terminal.
+
+```
+$ bernstein run plan.yaml
+[agent-1] wants to run: rm -rf node_modules
+        approve? (y/n/always)
+```
+
+Pick `always` and Bernstein writes the pattern into `always_allow` so the same call doesn't ask again. From another shell, `bernstein approve-tool --latest` clears whatever's pending. Useful when you've stepped away from the TUI and want to unblock from your phone over SSH.
+
+## `bernstein tunnel start <port>`
+
+Web dashboard and chat bridge both want a public URL. Dashboard so GitHub/Linear/Slack webhooks can hit it; chat bridge because most platforms only deliver over HTTPS. Either way you end up running the same tunnel command a dozen times a day.
+
+```bash
+bernstein dashboard &
+bernstein tunnel start 8052
+# -> https://random-name.trycloudflare.com
+```
+
+Tunnel command picks the first provider on PATH: `cloudflared`, `bore`, `ngrok`, `tailscale`. No config, no account flags. Active tunnels are tracked ControlMaster-style in `.sdd/runtime/tunnels.json`, so `bernstein stop` cleans them up with a real SIGTERM instead of leaving orphans. `tunnel list`, `tunnel stop <name>`, `tunnel stop --all`.
+
+## `bernstein daemon install`
+
+If you're going to run a chat bridge, you want it up after a reboot. One command writes a systemd user unit on Linux or a launchd plist on macOS:
+
+```bash
+bernstein daemon install --user \
+  --command="chat serve --platform=telegram" \
+  --env BERNSTEIN_TELEGRAM_BOT_TOKEN=...
+```
+
+Env inheritance is whitelisted - `PATH`, `HOME`, `BERNSTEIN_*`. Your shell's `AWS_SECRET_ACCESS_KEY` and `GITHUB_TOKEN` don't silently leak into a persistent service definition. `daemon start/stop/restart/status/uninstall` wraps `systemctl --user` on Linux and `launchctl` on macOS so you don't have to remember which is which. `daemon status` prints the same fields on both platforms.
+
+## why they compose
+
+All four sit on top of the existing `.sdd/` state. A `/run` from Telegram creates a task like any other, which means `bernstein pr` can later turn it into a GitHub PR with the gate results and the cost breakdown attached. The whole pipeline lives inside a `daemon install`-ed service - chat bridge up on boot, tunnel running, dashboard reachable - and you never open a terminal for routine runs. The [operator-pack post](/blog/operator-pack) covers the `pr`, `from-ticket`, `remote`, `hooks` half of the same story.
+
+Install with the [one-liner](/blog/frictionless-install), then `bernstein chat serve --platform=telegram`, then `bernstein daemon install`.

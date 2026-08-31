@@ -1,0 +1,81 @@
+---
+title: Four commands that take the glue out of multi-agent runs
+description: >-
+  1.8.14 ships pr, from-ticket, remote, hooks. The four shell snippets every
+  team ends up writing by hand.
+date: '2026-04-24'
+url: 'https://bernstein.run/blog/operator-pack'
+tags:
+  - summary
+  - developer experience
+  - GitHub integration
+source_post: operator-pack
+summary_modes:
+  quick:
+    title: four new commands cut glue in multi-agent workflows
+    items:
+      - >-
+        bernstein pr now creates pull requests directly from session results
+        with inferred commit messages.
+      - >-
+        from-ticket, remote, and hooks streamline task ingestion, remote runs,
+        and lifecycle automation.
+    whyItMatters: >-
+      teams save time and reduce errors by replacing custom scripts with
+      reliable built-in commands.
+  takeaways:
+    title: four new commands cut glue in multi-agent workflows
+    items:
+      - >-
+        bernstein pr creates a github pr with session results using
+        conventional-commit prefixes based on goal and role.
+      - >-
+        bernstein from-ticket pulls work descriptions from linear, github
+        issues, or jira and stashes metadata for downstream use.
+      - >-
+        bernstein remote runs tasks over ssh with connection reuse, timeout
+        handling, and error translation for remote sandboxes.
+      - >-
+        bernstein hooks enables pre- and post- lifecycle scripting with
+        environment whitelisting and event abortion on failure.
+    whyItMatters: >-
+      teams can now standardize common automation patterns without writing and
+      maintaining fragile shell scripts.
+  technical:
+    title: four built-in commands replace custom scripts in multi-agent workflows
+    items:
+      - >-
+        bernstein pr reads .sdd/sessions/-wrapup.json to generate a github pr
+        with conventional-commit titles and supports flags like --base, --draft,
+        and --session-id.
+      - >-
+        bernstein from-ticket integrates with linear, github issues, and jira
+        cloud using api keys and rest or graphql to import ticket details and
+        set task scope based on labels.
+      - >-
+        bernstein remote uses openssh with controlmaster to reuse connections,
+        reducing per-call overhead from ~500ms to ~30ms and handling network
+        timeouts gracefully.
+      - >-
+        bernstein hooks supports six lifecycle events with shell scripts or
+        python callables, passing structured json input and filtering
+        environment variables to prevent credential leaks.
+    whyItMatters: >-
+      teams eliminate error-prone glue scripts by using shared state and
+      composable commands that integrate seamlessly across their toolchain.
+---
+
+## summary
+
+every team running bernstein daily ends up with a `scripts/` directory full of wrappers: a `post-run.sh` that opens a PR with a hand-rolled summary, a one-liner that reads a Linear webhook, an `ssh-run.sh` that rsyncs to a build box, a pre-commit hook that checks gate results. bernstein 1.8.14 replaces those four patterns with first-class commands. `bernstein pr` reads `.sdd/sessions/<id>-wrapup.json` and opens a GitHub PR with a conventional-commit title and a body that includes the diff summary, quality gate results (lint, types, tests, security), and a cost breakdown. `bernstein from-ticket <url>` pulls a Linear, GitHub Issue, or Jira Cloud ticket and maps its labels to bernstein role and scope. `bernstein remote` wraps SSH access with ControlMaster reuse (per-call overhead drops from ~500ms to ~30ms). `bernstein hooks` provides six lifecycle events (`pre_task`, `post_task`, `pre_merge`, `post_merge`, `pre_spawn`, `post_spawn`) with whitelisted env inheritance.
+
+## key takeaways
+
+- `bernstein pr` attaches verified gate results and exact cost ($0.38 · 182,410 tokens in the example) to each PR body automatically.
+- `bernstein from-ticket` supports Linear (GraphQL), GitHub Issues (gh CLI or REST), and Jira Cloud (REST v3); labels drive role and scope mapping.
+- SSH ControlMaster reuse in `bernstein remote` drops per-command overhead from ~500ms to ~30ms.
+- shell hooks receive a JSON payload on stdin plus four env vars; a non-zero exit from any `pre_*` hook aborts the event - useful for "don't spawn if working tree is dirty."
+
+## when to read this
+
+for teams who want to close the loop from ticket to PR to Slack notification without a `scripts/` directory full of one-off wrappers.

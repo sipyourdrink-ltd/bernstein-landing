@@ -1,0 +1,480 @@
+/* ============================================================================
+   ux-conv.css — sticky CTA, sponsor strip, social proof, watch CTA, RSS.
+   Scoped classes:
+     .pricing-peek            — sticky `view pricing →` CTA on `/`.
+     .sponsor-strip-fold      — compact in-fold sponsor logo row.
+     .social-proof-strip      — `as featured in` badge row.
+     .watch-cta               — github star+watch CTA near hero.
+     .rss-subscribe-link      — visible RSS subscribe links.
+     .cost-headline-ab        — A/B variant heading wrapper.
+     .beta-notice             — slim dismissible beta status strip on `/`.
+
+   No collisions with .v2-*, .cost-*, .sponsor-wall, or legacy classes.
+   ============================================================================ */
+
+/* ----- 1. PricingPeekCta — sticky bottom-right pill ----- */
+
+.pricing-peek {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: stretch;
+  background: var(--ink, #0A0A0A);
+  color: var(--bg-paper, #f4ecdc);
+  border-radius: 999px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  /* The component renders nothing in flow when dismissed; this
+     element's fixed positioning means no surrounding layout reserves
+     space for it. */
+}
+
+.pricing-peek__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px 10px 18px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 999px 0 0 999px;
+}
+.pricing-peek__link:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pricing-peek__label {
+  text-transform: lowercase;
+  font-weight: 500;
+}
+.pricing-peek__arrow {
+  font-size: 14px;
+  transition: transform 160ms ease;
+}
+.pricing-peek__link:hover .pricing-peek__arrow {
+  transform: translateX(2px);
+}
+
+.pricing-peek__close {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  padding: 8px 14px 8px 8px;
+  font-size: 18px;
+  line-height: 1;
+  border-radius: 0 999px 999px 0;
+  opacity: 0.6;
+}
+.pricing-peek__close:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+.pricing-peek__close:focus-visible {
+  outline: 2px solid var(--bg-paper, #f4ecdc);
+  outline-offset: -2px;
+}
+
+@media (max-width: 640px) {
+  .pricing-peek {
+    /* full-width pill anchored at bottom, 12px gutter */
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    justify-content: space-between;
+  }
+  .pricing-peek__link {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* ----- 2. CostHeadlineAb wrapper ----- */
+
+.cost-headline-ab {
+  /* Inherit the H1 styles from .cost-page-header h1 — the wrapper is
+     just the A/B variant carrier. No new sizing here on purpose. */
+  text-transform: lowercase;
+}
+
+/* ----- 3. SponsorStrip — compact in-fold row ----- */
+
+.sponsor-strip-fold {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid var(--rule, rgba(0, 0, 0, 0.08));
+  border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.08));
+  background: var(--bg-paper-2, #efe6d2);
+}
+
+.sponsor-strip-fold__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft, #707078);
+}
+
+.sponsor-strip-fold__row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sponsor-strip-fold__cell {
+  display: flex;
+  align-items: center;
+}
+
+.sponsor-strip-fold__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  color: var(--ink-soft, #707078);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  filter: grayscale(1);
+  opacity: 0.78;
+  transition: opacity 140ms ease, filter 140ms ease, color 140ms ease;
+}
+.sponsor-strip-fold__link:hover,
+.sponsor-strip-fold__link:focus-visible {
+  filter: grayscale(0);
+  opacity: 1;
+  color: var(--ink, #0A0A0A);
+}
+
+.sponsor-strip-fold__avatar {
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.sponsor-strip-fold__login {
+  font-weight: 500;
+}
+
+@media (max-width: 720px) {
+  .sponsor-strip-fold {
+    padding: 14px 20px;
+  }
+  .sponsor-strip-fold__row {
+    gap: 14px;
+    justify-content: center;
+  }
+}
+
+/* ----- 4. SocialProofStrip — `as featured in` row ----- */
+
+.social-proof-strip {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 64px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.social-proof-strip__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft, #707078);
+}
+
+.social-proof-strip__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.social-proof-strip__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft, #707078);
+  text-decoration: none;
+}
+.social-proof-strip__item:hover {
+  color: var(--ink, #0A0A0A);
+}
+
+.social-proof-strip__count {
+  font-weight: 600;
+  color: var(--ink, #0A0A0A);
+}
+
+@media (max-width: 720px) {
+  .social-proof-strip {
+    padding: 12px 20px 16px;
+  }
+}
+
+/* ----- 5. WatchCta — star + watch combined CTA near hero ----- */
+
+.watch-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--bg-paper-2, #efe6d2);
+  border: 1px solid var(--rule, rgba(0, 0, 0, 0.12));
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--ink, #0A0A0A);
+  text-decoration: none;
+  transition: background 140ms ease;
+}
+.watch-cta:hover {
+  background: var(--bg-paper, #f4ecdc);
+}
+.watch-cta__icon {
+  display: inline-block;
+  font-size: 13px;
+}
+.watch-cta__count {
+  font-weight: 600;
+}
+.watch-cta__sep {
+  opacity: 0.4;
+}
+
+/* ---- BLOG digest one-liner — footer subscribe prompt ----
+   Appears in the bottom chrome of every blog post. The anchor carries
+   `data-umami-event="digest-signup-impression"` so the existing event
+   taxonomy is reused (no new event names). Sized to read as a quiet
+   one-line invitation, not a CTA strip. */
+.blog-digest-line {
+  margin-top: var(--space-6, 24px);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-soft, #707078);
+  max-width: 720px;
+}
+.blog-digest-line a {
+  color: var(--ink, #0A0A0A);
+  border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.2));
+  text-decoration: none;
+  transition: color 140ms ease, border-bottom-color 140ms ease;
+}
+.blog-digest-line a:hover {
+  color: var(--accent, #b45a2a);
+  border-bottom-color: var(--accent, #b45a2a);
+}
+
+/* ----- 6. RSS subscribe links ----- */
+
+.rss-subscribe-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  text-decoration: none;
+}
+.rss-subscribe-link:hover {
+  color: var(--ink, #0A0A0A);
+}
+.rss-subscribe-link__icon {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+}
+
+/* ----- 7. BetaNotice — slim dismissible status strip under the hero ----- */
+
+.beta-notice {
+  max-width: 1200px;
+  margin: 0 auto;
+  /* Reserved height: the strip is server-rendered in flow; min-height
+     keeps the single-line case stable across the web-font swap so
+     nothing below it shifts. */
+  min-height: 42px;
+  padding: 11px 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-top: 1px solid var(--rule, rgba(0, 0, 0, 0.08));
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  color: var(--ink-soft, #707078);
+}
+
+.beta-notice__text {
+  margin: 0;
+  text-align: center;
+}
+
+.beta-notice__link {
+  color: var(--ink, #0A0A0A);
+  border-bottom: 1px solid var(--rule-strong, rgba(0, 0, 0, 0.2));
+  text-decoration: none;
+  transition: color 140ms ease, border-bottom-color 140ms ease;
+}
+
+.beta-notice__link:hover {
+  color: var(--accent, #b45a2a);
+  border-bottom-color: var(--accent, #b45a2a);
+}
+
+.beta-notice__close {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 2px 6px;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--ink-faint, #9a9aa2);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.beta-notice__close:hover {
+  color: var(--ink, #0A0A0A);
+}
+
+.beta-notice__close:focus-visible {
+  outline: 2px solid var(--accent, #b45a2a);
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .beta-notice {
+    padding: 10px 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beta-notice__link {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------
+   ReadTheCode — "read the code: github · ask deepwiki · docs"
+
+   Reuses the BetaNotice type scale and colour tokens (mono face,
+   --ink-soft label, --ink link, --rule-strong underline, --accent on
+   hover). No new colours. Sized a step below the CTAs above it so it
+   reads as a footnote to them, never as a fourth button.
+
+   `flex-wrap` + the separator living inside each item is what makes
+   the row wrap cleanly on narrow screens: a link never separates from
+   the dot that precedes it.
+   --------------------------------------------------------------- */
+.read-the-code {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+  color: var(--ink-soft, #707078);
+}
+
+.read-the-code__label {
+  color: var(--ink-faint, #9a9aa2);
+}
+
+.read-the-code__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.read-the-code__sep {
+  color: var(--ink-faint, #9a9aa2);
+}
+
+.read-the-code__link {
+  color: var(--ink, #0a0a0a);
+  border-bottom: 1px solid var(--rule-strong, rgba(0, 0, 0, 0.2));
+  text-decoration: none;
+  transition: color 140ms ease, border-bottom-color 140ms ease;
+}
+
+.read-the-code__link:hover {
+  color: var(--accent, #b45a2a);
+  border-bottom-color: var(--accent, #b45a2a);
+}
+
+.read-the-code__link:focus-visible {
+  outline: 2px solid var(--accent, #b45a2a);
+  outline-offset: 2px;
+}
+
+/* Hero: sits under the CTA cluster in the evidence rail. Dampened to
+   match the rail's own supporting-evidence opacity so it does not
+   out-shout the install block. */
+.read-the-code--hero {
+  margin-top: 12px;
+  font-size: 11.5px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease-out;
+}
+
+.read-the-code--hero:hover {
+  opacity: 1;
+}
+
+/* Footer: inside the Resources column, one notch under the stacked
+   links above it. `.footer-col a` sets display:block on every anchor in
+   the column; the strip is a row, so the links are reset to inline. */
+.read-the-code--footer {
+  margin-top: var(--space-2, 8px);
+  padding-top: 3px;
+  font-size: 11.5px;
+}
+
+.footer-col .read-the-code__link {
+  display: inline;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: inherit;
+  color: var(--ink-soft, #707078);
+}
+
+.footer-col .read-the-code__link:hover {
+  color: var(--accent, #b45a2a);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .read-the-code__link,
+  .read-the-code--hero {
+    transition: none;
+  }
+}

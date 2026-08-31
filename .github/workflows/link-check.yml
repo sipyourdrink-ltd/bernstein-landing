@@ -1,0 +1,61 @@
+name: link check
+
+# A marketing and documentation site is mostly links, and a link that
+# 404s is invisible to every other check in this directory: it type-
+# checks, it builds, it renders. This walks the built output and the
+# markdown sources and reports what no longer resolves.
+#
+# Scheduled rather than blocking: most breakage here is somebody else's
+# site moving, which is not a reason to refuse an unrelated pull request.
+
+on:
+  schedule:
+    - cron: "13 8 * * 4"  # Weekly, Thursday 08:13 UTC
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "content/**"
+      - "**/*.md"
+
+concurrency:
+  group: link-check-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  lychee:
+    name: lychee
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8  # v2.9.0
+        with:
+          # `--no-progress` keeps the log readable; the accept list lets
+          # through the codes a bot hits on sites that rate-limit rather
+          # than genuinely 404 (429 too many requests, 403 forbidden).
+          args: >-
+            --no-progress
+            --accept 200,204,206,429,403
+            --exclude-path node_modules
+            --exclude '^https?://localhost'
+            --exclude '^https?://127\.0\.0\.1'
+            content/**/*.mdx
+            *.md
+          fail: false
+          output: lychee-report.md
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: lychee-report
+          path: lychee-report.md
+          if-no-files-found: ignore

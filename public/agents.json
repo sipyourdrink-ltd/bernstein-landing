@@ -1,0 +1,54 @@
+{
+  "$comment": "No $schema key on purpose. The URL this file used to point at does not resolve, and no published schema matches this document's shape, so a pointer here would only dangle. Re-add one when a schema this file actually validates against is hosted somewhere stable.",
+  "info": {
+    "title": "Bernstein API",
+    "version": "3.15.1",
+    "description": "Deterministic orchestrator for CLI coding agents (Claude Code, Codex, Gemini CLI, +40 more). No model in the coordination loop, so parallel runs in per-task git worktrees replay byte-identically. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy. The task server is operator-hosted - it runs on the machine where Bernstein is installed - so the servers entry below is a URL template, not a hosted endpoint."
+  },
+  "servers": [
+    {
+      "url": "http://{host}:{port}",
+      "description": "Task server started by the Bernstein CLI on the operator's own machine. There is no hosted instance; substitute the host and port of your install.",
+      "variables": {
+        "host": {
+          "default": "127.0.0.1",
+          "description": "Interface the task server binds to. Loopback by default."
+        },
+        "port": {
+          "default": "8052",
+          "description": "Task server port. Override with BERNSTEIN_PORT."
+        }
+      }
+    }
+  ],
+  "flows": [
+    {
+      "name": "create-and-monitor-task",
+      "description": "Create a coding task and monitor its progress until completion",
+      "steps": [
+        {
+          "action": "POST /tasks",
+          "description": "Create a new task with a goal",
+          "input": {
+            "goal": "string",
+            "role": "string",
+            "priority": "number"
+          }
+        },
+        {
+          "action": "GET /status",
+          "description": "Check orchestration status and agent activity"
+        },
+        {
+          "action": "POST /tasks/{id}/complete",
+          "description": "Mark task as completed when verified"
+        }
+      ]
+    }
+  ],
+  "links": {
+    "documentation": "https://bernstein.readthedocs.io/",
+    "openapi": "https://bernstein.run/openapi.yaml",
+    "github": "https://github.com/sipyourdrink-ltd/bernstein"
+  }
+}

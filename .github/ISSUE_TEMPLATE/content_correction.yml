@@ -1,0 +1,34 @@
+name: Content correction
+description: A claim on the site is wrong, stale, or unsupported.
+labels: [content]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The site makes factual claims about software, and some of them
+        go stale. A correction with a source is the most useful issue
+        this repository receives.
+
+  - type: input
+    id: url
+    attributes:
+      label: URL
+      placeholder: https://bernstein.run/...
+    validations:
+      required: true
+
+  - type: textarea
+    id: claim
+    attributes:
+      label: The claim, quoted
+      description: Paste the sentence as it currently reads.
+    validations:
+      required: true
+
+  - type: textarea
+    id: correction
+    attributes:
+      label: What it should say, and why
+      description: A link to a primary source - a repo, a doc, a release note - is worth more than an argument.
+    validations:
+      required: true

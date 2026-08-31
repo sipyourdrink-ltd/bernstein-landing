@@ -1,0 +1,80 @@
+---
+title: The install we should have shipped at launch
+description: >-
+  Three months in we got a real curl | sh one-liner. It only happened because
+  someone else picked up the issue.
+date: '2026-04-24'
+url: 'https://bernstein.run/blog/frictionless-install'
+tags:
+  - summary
+  - developer experience
+  - onboarding
+source_post: frictionless-install
+summary_modes:
+  quick:
+    title: bernstein install improvements and community contributions
+    items:
+      - Bernstein added a one-liner install script three months after launch.
+      - >-
+        A community contributor implemented the install script, addressing
+        multiple edge cases.
+    whyItMatters: >-
+      This update ensures that users with varying Python environments can easily
+      install Bernstein, reducing the likelihood of installation failures.
+  takeaways:
+    title: key points from bernstein's one-liner install script post
+    items:
+      - >-
+        The author details the initial install instructions for Bernstein, which
+        required Python 3.12+, pipx, and a specific install command.
+      - >-
+        A community contributor created a one-liner install script to address
+        issues faced by users with different Python versions or setups.
+      - >-
+        The script handles various edge cases, such as different Python
+        installations and PATH issues, to ensure a smooth installation process.
+      - >-
+        The post highlights the collaborative process between the maintainer and
+        contributor, leading to a successful implementation of the one-liner
+        install script.
+    whyItMatters: >-
+      This post is valuable for understanding the importance of community
+      contributions in addressing real-world user issues and improving software
+      installation processes.
+  technical:
+    title: berstein install script improvements after launch
+    items:
+      - >-
+        The initial install instructions required Python 3.12+, pipx, which
+        excluded 60% of users who lacked these dependencies.
+      - >-
+        A community contributor implemented a one-liner install script that
+        detects OS, checks for Python 3.12+, installs pipx if missing, and fixes
+        the PATH for the current shell.
+      - >-
+        The script handles edge cases such as brew Python on Apple Silicon,
+        Windows py -3 launcher fallback, and pip install --user directory
+        issues.
+      - >-
+        The script is 67 lines long and was developed through a collaborative
+        open-source process involving a contributor and reviewers.
+    whyItMatters: >-
+      Understanding this process can help engineers appreciate the value of
+      community contributions and clear issue documentation in open-source
+      projects.
+---
+
+## summary
+
+for the first three months bernstein's install instructions were `pipx install bernstein`, which silently fails for the 60% of new users who have Python 3.10 from Homebrew, no pipx, or a broken PATH from the Windows Microsoft Store installer. a contributor ([@vedangit](https://github.com/vedangit)) picked up a backlogged issue and wrote a 67-line shell script and a PowerShell equivalent that detect Python 3.12+, run `ensurepip` if needed, install pipx, fix the current-shell PATH, and install or upgrade bernstein. the PR also handled Apple Silicon Homebrew environments and the Windows `py -3` launcher fallback. the same release (1.8.14) also brought the adapter list to 31 and shipped four new operator-pack commands.
+
+## key takeaways
+
+- `curl -fsSL https://bernstein.run/install.sh | sh` handles Python 3.12+ detection, pipx install, and PATH fixup in one pass; `irm https://bernstein.run/install.ps1 | iex` does the same on Windows.
+- the script fixes PATH for the current shell session - not just after a restart.
+- edge cases handled: brew Python on Apple Silicon, the Windows `py -3` launcher fallback, `pip install --user` binaries on a non-PATH directory.
+- the post is explicitly about the open-source process: a founder filing the issue and a contributor owning the implementation without micromanagement.
+
+## when to read this
+
+for developers who hit `command not found: pipx` or want to understand what the one-liner install does before piping it to `sh`.

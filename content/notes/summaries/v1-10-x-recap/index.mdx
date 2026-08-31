@@ -1,0 +1,91 @@
+---
+title: '1.10.1 through 1.10.6: the shipped things'
+description: >-
+  Five point releases in five days: AGENTS.md cross-CLI sync, run-time cost
+  guards, A2A v1.0 signed agent cards, and four new adapters.
+date: '2026-05-10'
+url: 'https://bernstein.run/blog/v1-10-x-recap'
+tags:
+  - summary
+  - release
+  - AGENTS.md
+source_post: v1-10-x-recap
+summary_modes:
+  quick:
+    title: 'five point releases, one clear trajectory'
+    items:
+      - >-
+        bernstein now syncs agent configs from a single source of truth to
+        prevent drift across tools.
+      - >-
+        cost guards and signed agent cards bring budget control and verifiable
+        trust to multi-agent workflows.
+    whyItMatters: >-
+      these changes reduce operational friction and prevent costly errors in
+      real-world agent deployments.
+  takeaways:
+    title: 'bernstein 1.10.x: config sync, cost controls, a2a v1.0, and adapter growth'
+    items:
+      - >-
+        bernstein agents-md syncs one canonical AGENTS.md into vendor-specific
+        config files to eliminate drift across agents.
+      - >-
+        per-turn budget banners and a --max-cost-usd flag enforce hard cost
+        limits and improve spend visibility.
+      - >-
+        a2a v1.0 introduces signed agent cards with jws signatures, key
+        rotation, and a standalone verifier for compliance.
+      - >-
+        four new cli adapters for devin, junie, aws q, and deepseek add support
+        for enterprise and self-hosted agents.
+    whyItMatters: >-
+      these changes reduce operational friction in multi-agent workflows by
+      standardizing config, enforcing budgets, and improving compliance.
+  technical:
+    title: 'bernstein 1.10.x: sync, cost controls, a2a v1.0, and new adapters'
+    items:
+      - >-
+        agents-md sync enforces a single source of truth by generating AGENTS.md
+        and translating it into four vendor-specific formats including
+        .cursor/rules/, CLAUDE.md, CONVENTIONS.md, and .goosehints with a
+        schema-free IR that prevents configuration drift across agents. the
+        verify subcommand acts as a CI gate that fails when generated files
+        diverge from the canonical state.
+      - >-
+        per-turn budget banners in bernstein run display remaining dollars and
+        tokens against task budgets, with prompt-caching enabled by default for
+        Anthropic models. the --max-cost-usd flag enforces a hard cap on
+        cumulative routed-model spend, aborting runs cleanly when exceeded.
+      - >-
+        a2a v1.0 implements signed agent cards at /.well-known/agent.json using
+        JWS detached signatures over JCS-canonicalized bytes with Ed25519 keys
+        rotated every 24 hours. verification keys are published at
+        /.well-known/jwks.json with O_EXCL file semantics and resource indicator
+        audience binding per RFC 8707.
+      - >-
+        four new cli adapters were added: devin terminal (558 contract test
+        lines), jetbrains junie (multi-provider BYOK), aws q developer
+        (non-interactive trusted routing), and deepseek v4-flash/pro
+        (ollama-compatible with eu-residency dns rebinding guards). the cursor
+        adapter was rewritten to target the real cursor-agent cli with 242 new
+        contract tests.
+    whyItMatters: >-
+      these changes reduce operational friction in multi-agent workflows by
+      aligning configurations, enforcing cost limits, enabling verifiable peer
+      identity, and expanding adapter coverage with robust integration tests.
+---
+
+## summary
+
+five point releases between 1.10.1 and 1.10.6 addressed the friction most visible once bernstein was used on a real polyglot codebase. `bernstein agents-md` generates a canonical AAIF AGENTS.md as the single source of truth and rewrites it into four vendor-specific formats (Cursor `.cursor/rules/*.mdc`, Claude Code `CLAUDE.md`, Aider `CONVENTIONS.md`, Goose `.goosehints`) in one `sync` command, with a `verify` CI gate that fails on drift. cost legibility got two patches: a per-turn budget countdown and a `--max-cost-usd` hard cap. A2A v1.0 now ships JWS-signed agent cards at `/.well-known/agent.json` with Ed25519, RFC 8707 audience binding, 24-hour key rotation grace, and a standalone verifier (`tools/verify_audit_dsse.py`) with no bernstein dependency. the adapter count grew from 31 to 44, with notable additions for Devin for Terminal, JetBrains Junie, AWS Q Developer, and DeepSeek V4-Flash/V4-Pro (the DeepSeek adapter ships an EU-residency guard that pins the endpoint host).
+
+## key takeaways
+
+- `bernstein agents-md sync` produces five files in one pass; `bernstein agents-md verify` fails CI on any drift between the canonical IR and the vendor-specific copies.
+- `--max-cost-usd` aborts a run cleanly at a hard dollar ceiling and merges or rolls back partial results the same way a normal cancel does.
+- the standalone audit verifier asserts that `import bernstein` raises `ModuleNotFoundError` inside its own venv - the property an external auditor wants.
+- the Cursor adapter was rewritten from scratch after the previous version shelled a non-existent binary; the new version has 242 lines of contract tests targeting the real `cursor-agent` CLI flags.
+
+## when to read this
+
+for operators upgrading from 1.10.0 who want to know what changed in the patch releases, or for teams evaluating AGENTS.md synchronization, A2A compliance, or the new adapter additions.

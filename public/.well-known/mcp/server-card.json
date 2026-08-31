@@ -1,0 +1,56 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schemas/server-card/v1.0",
+  "version": "1.0",
+  "protocolVersion": "2025-06-18",
+  "serverInfo": {
+    "name": "Bernstein MCP Server",
+    "version": "3.15.1",
+    "description": "Deterministic orchestrator for CLI coding agents. No model in the coordination loop, so parallel runs in per-task git worktrees replay byte-identically, and an opt-in HMAC audit chain verifies offline. Create tasks, monitor agents, check status, and track costs via MCP tools. Run locally via stdio transport after pipx install bernstein.",
+    "homepage": "https://bernstein.run",
+    "documentation": "https://bernstein.readthedocs.io/",
+    "repository": "https://github.com/sipyourdrink-ltd/bernstein"
+  },
+  "capabilities": {
+    "tools": true,
+    "resources": true,
+    "prompts": false
+  },
+  "tools": [
+    {
+      "name": "bernstein_run",
+      "description": "Start an orchestration run with a goal"
+    },
+    {
+      "name": "bernstein_status",
+      "description": "Get current orchestration status"
+    },
+    {
+      "name": "bernstein_tasks",
+      "description": "List all tasks and their states"
+    },
+    {
+      "name": "bernstein_cost",
+      "description": "Get cost breakdown for current run"
+    },
+    {
+      "name": "bernstein_stop",
+      "description": "Stop the current orchestration"
+    },
+    {
+      "name": "bernstein_approve",
+      "description": "Approve a task that needs human review"
+    },
+    {
+      "name": "bernstein_health",
+      "description": "Check system health"
+    },
+    {
+      "name": "bernstein_create_subtask",
+      "description": "Create a child task scoped to the current orchestration run"
+    },
+    {
+      "name": "load_skill",
+      "description": "Progressively load a role skill pack on demand (backend, qa, security, etc.) - keeps system prompts small"
+    }
+  ]
+}

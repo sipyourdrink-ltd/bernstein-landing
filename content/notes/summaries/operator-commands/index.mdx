@@ -1,0 +1,85 @@
+---
+title: Four commands that turn the orchestrator into a service
+description: >-
+  1.8.15 ships a chat bridge, mid-run approval, a tunnel wrapper, and a daemon
+  installer. Less script you sit next to, more thing you install once.
+date: '2026-04-24'
+url: 'https://bernstein.run/blog/operator-commands'
+tags:
+  - summary
+  - multi-agent orchestration
+  - Telegram
+source_post: operator-commands
+summary_modes:
+  quick:
+    title: four commands that turn the orchestrator into a service
+    items:
+      - >-
+        bernstein now runs as a chat bot with live updates and approval buttons
+        for seamless workflows.
+      - >-
+        one-command setup for tunneling, daemon installation, and approvals
+        makes it run like a real service.
+    whyItMatters: >-
+      it reduces manual oversight and turns ad hoc scripts into reliable,
+      always-on automation.
+  takeaways:
+    title: four commands that make the orchestrator run like a service
+    items:
+      - >-
+        the chat bridge turns the orchestrator into a chat bot that runs tasks
+        from telegram and supports live updates and approvals.
+      - >-
+        the approval prompt moves destructive action gating to the user's
+        current context, including tui, cli, or web dashboard.
+      - >-
+        the tunnel wrapper automates public url exposure using available tools
+        and manages lifecycle without config or orphaned processes.
+      - >-
+        the daemon installer sets up a persistent service on linux or mac with
+        secure env inheritance and unified control commands.
+    whyItMatters: >-
+      it transforms a manual script into a reliable background service that
+      integrates with modern workflows.
+  technical:
+    title: four commands that turn the orchestrator into a service
+    items:
+      - >-
+        bernstein chat serve --platform=telegram runs the orchestrator as a chat
+        bot, streaming task progress as live edits to a single message in
+        Telegram; it uses the .sdd/state to track active tasks and supports
+        /approve and /reject buttons for mid-run approvals.
+      - >-
+        bernstein approve-tool enables runtime approval of destructive actions
+        via TUI, CLI, or web dashboard, and writes approved patterns into the
+        config's always allow list; pending approvals are tracked in
+        .sdd/runtime/approvals.json.
+      - >-
+        bernstein tunnel start creates a public HTTPS endpoint using
+        cloudflared, bore, ngrok, or tailscale, selected from PATH without
+        config; active tunnels are recorded in .sdd/runtime/tunnels.json and
+        terminated cleanly with bernstein tunnel stop.
+      - >-
+        bernstein daemon install configures a persistent service using systemd
+        on Linux or launchd on macOS, whitelisting only PATH, HOME, and
+        BERNSTEIN in environment inheritance; the service unit is written to
+        ~/.config/systemd/user/ or ~/Library/LaunchAgents/.
+    whyItMatters: >-
+      it transforms a manual workflow into a self-contained service that runs
+      reliably across reboots and user sessions.
+---
+
+## summary
+
+bernstein 1.8.15 adds four commands that turn the orchestrator from a script you watch into a persistent service. `bernstein chat serve --platform=telegram` runs bernstein as a Telegram bot (Discord and Slack ship as conformant stubs) where `/run "<goal>"` dispatches tasks, progress streams as live edits to a single message, and destructive actions surface as `/approve`/`/reject` buttons. `bernstein approve-tool` gates any destructive action at runtime and writes approved patterns to `always_allow` so repeated calls don't prompt again. `bernstein tunnel start <port>` wraps the first tunnel provider on PATH (`cloudflared`, `bore`, `ngrok`, `tailscale`) and tracks active tunnels in `.sdd/runtime/tunnels.json` for clean SIGTERM teardown. `bernstein daemon install` writes a systemd user unit on Linux or a launchd plist on macOS so the chat bridge survives reboots, with whitelisted env inheritance that keeps shell credentials out of persistent service definitions.
+
+## key takeaways
+
+- the Telegram chat bridge streams progress as live message edits - one message per task, not a flood of per-step updates.
+- `bernstein tunnel start` picks the first available tunnel provider automatically; no config, no account flags required.
+- daemon env inheritance is whitelisted (`PATH`, `HOME`, `BERNSTEIN_*`); `AWS_SECRET_ACCESS_KEY` and `GITHUB_TOKEN` do not leak into the service definition.
+- all four commands read and write the same `.sdd/` state, so a `/run` from Telegram produces a task that `bernstein pr` can later turn into a GitHub PR.
+
+## when to read this
+
+for operators who want to run bernstein as a persistent background service reachable from a phone or second terminal, rather than a terminal session they have to stay next to.

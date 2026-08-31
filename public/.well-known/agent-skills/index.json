@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "docs-ask",
+      "type": "skill-md",
+      "description": "Ask questions against the Bernstein documentation and blog, answered with citations by the site's retrieval-pinned assistant over A2A JSON-RPC or SSE.",
+      "url": "https://bernstein.run/skills/docs-ask/SKILL.md",
+      "digest": "sha256:0c9e5ce3a9c9880a35d32b115b666e31709644a3432fbe6d95773a8c3f518531"
+    },
+    {
+      "name": "run-bernstein",
+      "type": "skill-md",
+      "description": "Install Bernstein locally and drive an orchestration run - parallel CLI coding agents in isolated git worktrees with a deterministic, replayable coordination loop.",
+      "url": "https://bernstein.run/skills/run-bernstein/SKILL.md",
+      "digest": "sha256:b41ec3a9684225b1c4839e3f5f215157001e53c9627b56dacdeed63b2c6df372"
+    }
+  ]
+}

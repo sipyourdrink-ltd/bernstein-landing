@@ -1,0 +1,60 @@
+---
+title: "bernstein 3.14.159: the stranger's ninety minutes"
+seo_title: "bernstein 3.14.159: the stranger's ninety minutes"
+description: "A first-use report described ninety minutes of setup that ended in nothing. v3.14.159 answers it: the plan loader raises named errors instead of swallowing malformed fields, five commands are removed and the rest fold with deprecation windows, the reference docs are CI-gated against the registered CLI, and the README says beta. Also new: a Muse Code adapter, Agent Plugins v1.0.0 manifests, a signed run receipt that verifies offline, and bernstein audit diagnose."
+date: "2026-08-10"
+draft: false
+featured: true
+tags:
+  - "multi-agent orchestration"
+  - "release"
+  - "CLI"
+  - "plan validation"
+  - "documentation"
+  - "adapters"
+  - "audit log"
+schemaType: "TechArticle"
+techDependencies:
+  - "Python 3.12+ with `pipx install --upgrade bernstein` (or `uv tool upgrade bernstein`)"
+  - "Anything that parses plan files: plan loading got stricter in this release, and malformed fields now raise `PlanLoadError` at load"
+  - "Scripts calling `postmortem`, `incident`, `commit-stats`, `consensus`, or `issue-to-pr`: the first three moved under `bernstein report ...`, the last two are removed"
+---
+
+<Lead>
+A first-use report arrived as [discussion #3514](https://github.com/sipyourdrink-ltd/bernstein/discussions/3514). Someone I have never met installed bernstein, followed the docs, and spent ninety minutes getting nowhere. Then they did the generous thing and wrote down exactly how.
+</Lead>
+
+Three failures, in order. An error message that recommended `--adapter`, a flag that exists only for an internal subprocess. A run that produced no plan and said nothing about why. And a command surface too large to hold in one head, so every wrong turn offered plenty of further wrong turns.
+
+A report like that costs more to read than to write. Every line is something the maintainer half-knew and had filed under later. [v3.14.159](https://github.com/sipyourdrink-ltd/bernstein/releases/tag/v3.14.159) is what happened when later arrived.
+
+A note on the number before the substance: the minor landed on 14, so the version is pi to three digits. If this line of releases ever needs a patch, it will append digits the way TeX does — 3.14.1592. That is the whimsy budget for this post, fully spent.
+
+## what shipped because of it
+
+**The plan loader stopped swallowing.** A run that starts, produces no plan, and says nothing was possible because the loader accepted malformed fields quietly — an out-of-range enum, a scalar where `files` expects a list, an explicit `null` — and loaded them as defaults. It now raises named errors, `PlanLoadError` with the field identified, and validation enforces the same types and ranges the schema declares ([#3534](https://github.com/sipyourdrink-ltd/bernstein/issues/3534), [#3539](https://github.com/sipyourdrink-ltd/bernstein/issues/3539)). A plan file that has been silently wrong for months now fails loudly at load. That is the intended behaviour, not a regression.
+
+**Five commands are gone, without a deprecation window.** `postmortem`, `incident` and `commit-stats` moved under `bernstein report ...` — `commit-stats` is now `report commits` — and the old invocations fail with "No such command". The `consensus` and `issue-to-pr` groups are removed outright. The other folds in this release kept warning aliases for the documented window, so scripts get a notice before they get a break. But the only real answer to "too big to hold in one head" is fewer commands, and a beta is the time to delete them.
+
+**The reference docs are gated against the CLI.** CI now fails when a command or flag exists in the registry but not the docs, or the other way around. Before the gate went in, twenty-three commands were documenting flags the parser rejects. The error message that started all this was the same defect class — text drifting from code with nothing to catch it. The fatal now names `--cli`, and a test resolves every flag in that message against the live CLI so it cannot drift back ([#3530](https://github.com/sipyourdrink-ltd/bernstein/issues/3530)).
+
+**The README says beta ([#3543](https://github.com/sipyourdrink-ltd/bernstein/issues/3543)).** Solo-maintained, version numbers count releases rather than maturity, pin the version you depend on. It said none of that before.
+
+## new, since a release was going out anyway
+
+Not everything in v3.14.159 traces back to the report. There is a Muse Code adapter, Agent Plugins v1.0.0 manifests at the repo root, a signed run receipt that verifies fully offline, and `bernstein audit diagnose`, which reads the signed per-step journal and names the first faulty step instead of leaving you to bisect. The [release notes](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/release-notes/v3.14.159.md) have the full list.
+
+## still broken, and tracked
+
+A release that answers a report about silent failure should not be quiet about its own gaps.
+
+- `bernstein dry-run --plan` still converts a load error into an empty result and exits 0 ([#3550](https://github.com/sipyourdrink-ltd/bernstein/issues/3550)). The loader got strict; this one caller eats the exception.
+- Both verifiers still load the event journal leniently, so a malformed journal row is skipped rather than failing the verdict ([#3549](https://github.com/sipyourdrink-ltd/bernstein/issues/3549)).
+- One absence case still diverges between the two verifiers: removed audit evidence exits 0 in one and 1 in the other ([#3551](https://github.com/sipyourdrink-ltd/bernstein/issues/3551)).
+- The docs gate covers the reference pages. The narrative docs can still drift; a gate for them is tracked ([#3527](https://github.com/sipyourdrink-ltd/bernstein/issues/3527)).
+- The TUI panes still do not scroll ([#3529](https://github.com/sipyourdrink-ltd/bernstein/issues/3529)).
+- And the original failure: the reporter's no-plan run is still unreproduced ([#3528](https://github.com/sipyourdrink-ltd/bernstein/issues/3528)). The loader fixes close the most plausible cause. Plausible is not confirmed, so the issue stays open.
+
+What comes after this is on the [milestones page](https://github.com/sipyourdrink-ltd/bernstein/milestones). I am not listing it here, because lists in blog posts go stale and nobody gates those.
+
+If you hit your own ninety minutes, [write it down and send it in](https://github.com/sipyourdrink-ltd/bernstein/issues/new/choose). The issue templates now run the commands they tell you to run, which was not previously the case.

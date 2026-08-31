@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bernstein.run/spec/agent-failure-taxonomy/v0.1.json",
+  "title": "CLI Coding Agent Failure Taxonomy",
+  "description": "A closed-set vocabulary for classifying outcomes of CLI coding agent tasks. Designed for evaluation harnesses, audit logs, and regression dashboards. Cross-referenced with NIST AI RMF (validity, robustness, privacy, fairness, security) and ISO/IEC 42001 governance concepts.",
+  "version": "0.1.0",
+  "publishedAt": "2026-05-19",
+  "license": "CC-BY-4.0",
+  "maintainer": "Alex Chernysh",
+  "canonical": "https://bernstein.run/spec/agent-failure-taxonomy/v0.1",
+  "type": "object",
+  "required": ["task_id", "category", "severity"],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "description": "Stable identifier for the task whose outcome is being recorded. Should be unique within the harness run."
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "orientation_miss",
+        "scope_creep",
+        "test_regression",
+        "incomplete",
+        "timeout",
+        "conflict",
+        "context_miss",
+        "hallucination"
+      ],
+      "description": "Closed set of failure categories. See spec section 'Categories' for definitions and NIST AI RMF mapping."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"],
+      "description": "Severity tier for triage. Does not affect whether the task is counted as failed."
+    },
+    "details": {
+      "type": "string",
+      "description": "Human-readable explanation. One sentence. Cite a concrete part of the agent's output or trace."
+    },
+    "files_involved": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Repository-relative paths the failure touched. Empty if the failure is not localised to specific files."
+    },
+    "agent": {
+      "type": "string",
+      "description": "Identifier of the CLI agent that produced the outcome (e.g. claude-code, codex, gemini-cli). Optional but recommended for cross-agent comparison."
+    },
+    "model": {
+      "type": "string",
+      "description": "Underlying model name plus version, if known. Optional."
+    },
+    "trace_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Pointer to a stored trace of the agent run. Optional. Recommended for audit-grade deployments."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the outcome was recorded. ISO 8601."
+    }
+  },
+  "$defs": {
+    "category_definitions": {
+      "orientation_miss": {
+        "description": "Agent spent a disproportionate share of its turns on exploration without producing output. Typical operational signal: more than half of turns spent reading the codebase or asking clarifying questions.",
+        "rmf_mapping": ["validity"],
+        "severity_default": "medium"
+      },
+      "scope_creep": {
+        "description": "Agent modified files outside the scope it was assigned (owned_files, allowed paths). The change may be technically correct but violates the operating contract.",
+        "rmf_mapping": ["validity", "security"],
+        "severity_default": "high"
+      },
+      "test_regression": {
+        "description": "Agent broke at least one existing test that was passing before its run. Highest-priority failure category; usually a hard gate.",
+        "rmf_mapping": ["validity", "robustness"],
+        "severity_default": "critical"
+      },
+      "incomplete": {
+        "description": "Agent stopped before fulfilling the completion signals declared in the task brief. Often pairs with 'context_miss' but is logged separately because the remediation differs.",
+        "rmf_mapping": ["validity"],
+        "severity_default": "medium"
+      },
+      "timeout": {
+        "description": "Agent hit its wall-clock or max-turns budget. Distinct from 'incomplete': the agent might have finished given more budget; with 'incomplete' it would not.",
+        "rmf_mapping": ["validity", "robustness"],
+        "severity_default": "high"
+      },
+      "conflict": {
+        "description": "Agent's changes collide with a concurrent agent's changes in a way that requires reconciliation. Specific to multi-agent orchestration.",
+        "rmf_mapping": ["robustness"],
+        "severity_default": "high"
+      },
+      "context_miss": {
+        "description": "Agent had everything it needed to operate (budget, scope) but lacked the contextual knowledge to complete the task. Often signals a documentation gap rather than an agent defect.",
+        "rmf_mapping": ["validity"],
+        "severity_default": "medium"
+      },
+      "hallucination": {
+        "description": "Agent produced output that references APIs, files, or facts that do not exist in the codebase or its dependencies. Includes uncompilable code and fabricated identifiers.",
+        "rmf_mapping": ["validity", "security"],
+        "severity_default": "high"
+      }
+    },
+    "priority_order": [
+      "test_regression",
+      "timeout",
+      "scope_creep",
+      "conflict",
+      "hallucination",
+      "orientation_miss",
+      "incomplete",
+      "context_miss"
+    ],
+    "priority_order_note": "When more than one category applies, the classifier assigns the one nearest the top of this list. The order reflects severity for downstream gating, not statistical frequency."
+  },
+  "examples": [
+    {
+      "task_id": "T-2026-05-19-001",
+      "category": "test_regression",
+      "severity": "critical",
+      "details": "Agent removed the null check in `process_input` to satisfy a different test; existing test 'test_handles_null_input' now fails.",
+      "files_involved": ["src/processor.py", "tests/test_processor.py"],
+      "agent": "claude-code",
+      "model": "claude-sonnet-4-6",
+      "timestamp": "2026-05-19T14:23:00Z"
+    },
+    {
+      "task_id": "T-2026-05-19-002",
+      "category": "scope_creep",
+      "severity": "high",
+      "details": "Agent reformatted three files outside owned_files; reformat was correct but unauthorised.",
+      "files_involved": ["src/utils/legacy_helpers.py"],
+      "agent": "codex",
+      "timestamp": "2026-05-19T14:31:00Z"
+    },
+    {
+      "task_id": "T-2026-05-19-003",
+      "category": "hallucination",
+      "severity": "high",
+      "details": "Agent imported `bernstein.core.does_not_exist`; module is absent from the installed package.",
+      "files_involved": ["src/feature_x.py"],
+      "agent": "gemini-cli",
+      "timestamp": "2026-05-19T14:35:00Z"
+    }
+  ]
+}

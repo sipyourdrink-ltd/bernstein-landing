@@ -1,0 +1,46 @@
+---
+title: "Picking a cheaper model when the task allows"
+description: "Bernstein's epsilon-greedy bandit picks a model per task. Internal runs cut roughly in half. Measure your own with bernstein cost."
+date: "2026-04-07"
+url: "https://bernstein.run/blog/cost-aware-routing"
+tags: ["summary", "AI cost optimization", "contextual bandit"]
+source_post: "cost-aware-routing"
+summary_modes:
+  quick:
+    title: "epsilon-greedy bandit picks a cheaper model per task, with measurable savings"
+    items:
+      - "A heuristic classifier maps task complexity and role to an opening model guess, then an epsilon-greedy bandit refines the pick over time."
+      - "Internal multi-agent runs landed at roughly half the bill versus sending every task to Sonnet, with completion rate within a couple of percent."
+    whyItMatters: "Most agent frameworks ignore that a docstring task and an architecture task do not need the same model; this one does not."
+  takeaways:
+    title: "What the cost-aware router actually does, and what it does not"
+    items:
+      - "Routing docstrings or test writing to Haiku or Sonnet while reserving Opus for architecture and security tasks is the dominant learned pattern across internal runs."
+      - "Bandit epsilon is 0.2 by default (configurable); the cascade ordering is cheapest-to-strongest, and high-complexity tasks never get sent to Haiku."
+      - "Rewards are measured as task completed, tests green, and no retries; this is the real success signal, not a proxy metric."
+      - "The bandit is default-on once .sdd/metrics/ exists; disable with bandit_enabled: false in .sdd/config.yaml."
+    whyItMatters: "Operators get a routing layer they can audit by reading .sdd/metrics, not a black-box scheduler."
+  technical:
+    title: "cost-aware routing layers: heuristic classifier, epsilon-greedy bandit, cold-start seed"
+    items:
+      - "Layer one is a heuristic classifier that maps task complexity (low/medium/high) and role (backend, qa, security, docs) to an opening model guess; this is the only state a fresh repo needs to make routing decisions."
+      - "Layer two is an epsilon-greedy bandit that exploits the best-known model 80% of the time and explores 20%; rewards are observed at the task boundary (completed, tests green, no retries), so the proxy-metric trap does not apply."
+      - "Layer three is cold-start effectiveness data seeded from .sdd/metrics/, so a repo with prior runs starts from informed priors rather than uniform random; the cascade ordering is cheapest-to-strongest and high-complexity tasks never get sent to Haiku."
+      - "Across bernstein's own self-development sessions, bandit routing cut the bill roughly in half versus Sonnet-for-everything; a 10-agent / 50-task session that used to run $15-20 lands at $7-10, with completion rate within a couple of percent."
+    whyItMatters: "Every layer is auditable on disk, so the operator can answer why a task got routed to a specific model without running the orchestrator."
+---
+
+## summary
+
+most agent frameworks send every task to the same model regardless of complexity - routing a docstring task to Opus instead of Haiku is roughly 30x overspend at current pricing. bernstein's cost-aware router uses three layers: a heuristic classifier that maps task `complexity` (low/medium/high) and `role` (backend, qa, security, docs, etc.) to an opening model guess; an epsilon-greedy bandit that exploits the best-known model 80% of the time and explores 20%; and cold-start effectiveness data seeded from `.sdd/metrics/`. across bernstein's own self-development sessions, bandit routing cut the bill roughly in half versus Sonnet-for-everything, with completion rate staying within a couple of percent. a 10-agent / 50-task session that used to run $15-20 lands at $7-10.
+
+## key takeaways
+
+- routing docstrings or test writing to Haiku or Sonnet while reserving Opus for architecture and security tasks is the dominant learned pattern.
+- bandit epsilon is 0.2 by default (configurable); the cascade ordering is cheapest-to-strongest - high-complexity tasks never get sent to Haiku.
+- rewards are measured as: task completed, tests green, no retries - not a proxy metric.
+- bandit is default-on once `.sdd/metrics/` exists; disable with `bandit_enabled: false` in `.sdd/config.yaml`.
+
+## when to read this
+
+for operators trying to reduce per-session LLM spend without sacrificing completion rate, or for teams wanting to understand how bernstein selects models across a multi-agent run.

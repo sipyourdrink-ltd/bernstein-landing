@@ -1,0 +1,117 @@
+---
+title: "why bernstein"
+description: "decision-support faq for engineers and compliance teams evaluating bernstein vs claude-flow, archon, vibe-kanban, claude-squad. honest who-it's-NOT-for sections, real numbers, no marketing voice."
+date: "2026-05-12"
+tags: ["multi-agent orchestration", "comparison", "claude code", "claude-flow", "archon", "vibe-kanban", "compliance", "decision support"]
+---
+
+<Lead>
+this is the page you land on when you've already read the docs and you're trying to decide: is this thing actually for me, or am i better off staying with what i've got. honest answers below - including the cases where the answer is "stay where you are".
+</Lead>
+
+<h2 id="why-not-claude-flow-archon">why bernstein over claude-flow, archon, vibe-kanban, or claude-squad</h2>
+
+same shape - multi-agent cli orchestration in git worktrees - but bernstein has fewer stars than claude-flow, vibe-kanban, or archon. bernstein is not winning the star race in this category and is not going to. what it owns is a different column.
+
+the auditability surface: hmac-chained audit log (every routing decision tamper-evident), signed agent cards (detached jws over jcs-canonicalized payloads with ed25519 keys), per-artefact lineage with customer-key signing (for dora / nis2 / eu ai act article 12 evidence), an air-gap deploy profile (`--profile airgap`), and python-library shape (the others are cli or desktop apps). that column is empty in every one of the bigger projects' readmes.
+
+bernstein is the right pick when: your compliance team has to sign off on the deployment, you're shipping into a regulated environment (banking, health, gov, eu ai act high-risk), you need a regulator-ready audit export, or you want to import the orchestrator as a python library into a bigger system.
+
+bernstein is the wrong pick when: you want the polished tui for parallel claude on your mac (claude-squad), the swarm framing with a large mcp tool catalog (claude-flow), a kanban board ui (vibe-kanban), or the workflow-yaml primitive with web ui and chat integration (archon). those are real, good products. they just don't carry the audit chain.
+
+<h2 id="why-not-crewai-autogen">why bernstein over crewai, autogen, or langgraph (previous generation)</h2>
+
+different shape entirely. their orchestrator is an llm driving python tool-calls; bernstein's orchestrator is plain python driving terminal coding agents (claude code, codex, aider, gemini cli) with one git worktree per agent. crewai / autogen / langgraph are good shapes for free-form research-style swarms where "let the model figure out who does what" is the whole point. they're the wrong shape if you want a deterministic plan that replays the same task graph twice. kept here for completeness because some teams still benchmark against them; the closer comparison is the cli-orchestrator section above.
+
+<h2 id="why-not-claude-code">why bernstein over claude code alone</h2>
+
+claude code can spawn sub-agents on its own; bernstein does the same thing across 48 different cli agents at once and verifies their output against your tests instead of trusting it - claude code included as one of the 48, wired through the same adapter interface as every other agent.
+
+the multi-agent shape matters when: you have ≥3 independent tasks that could run in parallel (one task per cli agent in its own worktree, no merge conflicts during execution), you want a regulated review path (cross-model verifier passes a diff to a second model before the merge queue lands it), or you're paying for compute by the parallel task and want throughput rather than depth on a single thread.
+
+the multi-agent shape is overkill when: you're a single dev on a small repo doing one task at a time. claude code alone is faster, simpler, and the orchestration overhead is wasted ceremony. bernstein adds a state machine, a task store, a merge queue - value when you're running 5 agents, dead weight when you're running 1.
+
+short test: if your last week of claude code sessions had any moment where you wished you could split the work, bernstein helps. if every session was naturally one focused thread, you don't need it.
+
+<h2 id="production-ready">is it production-ready</h2>
+
+yes, with specific caveats - not the marketing kind.
+
+what works: the scheduler is deterministic, the merge queue lands what passes the gates, the audit log is hmac-signed and replays cleanly, there are 48 adapters in the registry, the install is one `pipx install bernstein`.
+
+what to know before you commit: the team is one person (alex, the operator). the project is in beta - the version number counts releases, not maturity, and minor versions may change interfaces, so pin the version for anything you depend on. the audit format is hmac-signed but the vendor binary format is not yet a published standard, so cross-tool replay is bernstein-only for now. the cloudflare workers integration is solid for edge sandboxing, but the agents you wrap (claude code, codex) still call their own apis, so api outages upstream knock those agents out individually.
+
+production-ready in the "this is solid open-source code i'd run on a real repo" sense. not production-ready in the "saas vendor with a soc 2 report and a 24/7 oncall rotation" sense. those are different things; pick the one that matches your situation.
+
+<h2 id="whats-the-catch">what's the catch</h2>
+
+solo dev, free time funded, openrouter token spend on the operator's own card. apache 2.0 repo, $0 to install, no signup, no forced telemetry, no premium tier. but expect to pay your own model api fees if you actually run it - claude code calls anthropic, codex calls openai, aider calls whichever provider you wired up. those costs are not bernstein's; bernstein just orchestrates the agents.
+
+the docs bot on this site is also a real cost. every answer goes through the operator's own ai gateway, which routes to free openrouter models when it can. that's why github sponsors helps: github.com/sponsors/chernistry. it stays free either way.
+
+if you're looking for a 12-person team, vc backing, and a roadmap meeting twice a quarter, this is not that project. it's "engineer scratching their own itch and shipping the result".
+
+<h2 id="who-its-for">who is bernstein for</h2>
+
+specific shapes where the value lands:
+
+- engineering teams running ≥3 cli coding agents in parallel - each agent gets its own git worktree, the merge queue serialises landings, no race conditions
+- regulated or on-prem environments - every routing decision is in plain text, the audit log is hmac-signed and tamper-evident, no saas hop, no third-party data plane
+- platform teams that need an audit log of agent decisions - the orchestrator writes one row per scheduling decision, you can grep it
+- anyone burning more than $1k/mo on cursor/aider/claude-max who wants determinism - you can replay yesterday's plan and get yesterday's task graph
+- forward-deployed engineers dropping into a client repo - credentials stay in your env, not the client's; agents you spawn are whichever cli tool the client already trusts
+
+if you nodded at two of those bullets, this fits.
+
+<h3 id="common-workflows">common workflows operators reach for</h3>
+
+mirrored from upstream `docs/use-cases.md` so the list stays accurate as commands move.
+
+{/* DRIFT-SYNC:start key=why-bernstein-use-cases */}
+- **Parallel test generation with AI agents** - good fit when you want broad coverage quickly, but still need janitor verification before anything lands.
+- **CI failure repair that opens a follow-up fix** - good fit when the painful part is not finding failures, but paying the context-switch tax every time lint, typing, or a focused test failure breaks a PR.
+- **PR review follow-up from inline comments** - good fit when your team already does human review but wants the "please rename this / add a guard / update the test" loop to close faster.
+- **Large-scale codebase modernization** - good fit when the change is spread across many files and the main risk is merge conflict churn or uneven follow-through.
+- **Ticket-to-run execution from GitHub, Jira, or Linear** - good fit when you want issue trackers to stay as the source of truth instead of copying requirements into a separate agent tool.
+- **API-change safety checks before merge** - good fit when you are doing refactors in shared libraries or internal platforms and want a fast, concrete answer to "what else does this break?"
+
+## Submit your workflow
+
+If you use Bernstein for something real, open a PR and add it here.
+{/* DRIFT-SYNC:end */}
+
+<h2 id="who-its-not-for">who is bernstein NOT for</h2>
+
+equally specific. these are the cases where you should pick something else:
+
+- "i want one pair-programmer to chat with about my code" - claude code or cursor alone. bernstein adds orchestration overhead you don't need
+- prototypes where merge gates are overkill - the lint/types/tests/cross-model-review pipeline is value when the cost of a bad merge is real, friction when you're throwing the repo away on friday
+- non-coding tasks (research, writing, data analysis pipelines) - bernstein wraps cli coding agents specifically, not generic llm workflows. crewai, autogen, or langgraph are the right shape there
+- anyone who wants a fully-managed saas with a credit card form, no infra to think about - bernstein gives you cloud-runtime options (cloudflare workers, kubernetes cluster, sandbox-execution mode) but doesn't host them for you. the runtime is yours; if you want someone else to operate it, this is the wrong project, not the wrong fit
+- teams that need a vendor with a support sla and a contract - solo open-source project. github issues are how support happens
+- research-shape "let the agents collaborate emergently" use cases - the deterministic scheduler is a hard wall there
+
+<h2 id="where-it-runs">where bernstein runs</h2>
+
+wherever you point it. four shapes that operators actually pick:
+
+- **laptop** - `pipx install bernstein && bernstein init`. the deterministic scheduler, audit log, and adapters all run locally. easiest way to feel the shape.
+- **on-prem behind a firewall** - air-gapped repos and internal CI runners. bernstein writes state to disk you own, no signup, no forced telemetry, no third-party data plane.
+- **cloudflare workers cloud runtime** - bernstein-spawned agents run inside cloudflare sandbox containers, paid through your cloudflare account. zero ssh, zero VPS to manage. the orchestrator can stay local while execution lives in the cloud, or both can sit on workers.
+- **multi-node cluster** - kubernetes-shaped fanout when one box can't hold the parallel agent count. queue + state in shared storage, agents spin up per-task pods.
+
+your repo is the input. your tests are the gate. bernstein adapts to the host instead of forcing one. if your code can't leave the network it lives in - pick laptop or on-prem; if you want it elastic - pick workers or cluster.
+
+this is also why there's no signup and no forced telemetry. the orchestrator runs where you run it, talks to the model apis you configure, writes state to disk you own. opt-in observability is audit-grade - hmac-chained run trail, per-task tool calls, model usage, token cost, latency percentiles, exportable to your own otel collector / datadog / splunk / s3. nothing leaves your box without your config.
+
+<h2 id="real-costs">what does it cost to actually run</h2>
+
+specific numbers, not round ones.
+
+the orchestrator itself: $0. apache 2.0, `pipx install bernstein`, no license fee.
+
+the cli agents bernstein wraps cost what they cost - check the vendor's current pricing page, since plan tiers move. claude code on a max plan is a flat monthly subscription. codex cli on chatgpt plus rolls into the chatgpt subscription. aider with sonnet on a heavy day adds up in api spend. gemini cli is free up to a quota. running all four together is what bernstein optimizes - the cost-aware bandit routes each task to the model that's been passing tasks in that shape.
+
+the operator's own gateway (the thing answering this docs bot) runs on a small ovh vps at roughly $80/yr including hosting, qdrant, and the openrouter free-tier middleware. a self-hosted bernstein run is cheaper than that - you're not paying the openrouter middle hop, you're calling the model apis directly with your own keys.
+
+bernstein adds no license cost on top of those model fees. what it changes is the shape of the spend: parallel tasks saturate the api budget you already have instead of queueing behind one agent at a time. cap a run with the `budget` block in `bernstein.yaml` if you want a hard ceiling.

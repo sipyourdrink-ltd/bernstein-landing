@@ -1,0 +1,205 @@
+/* =========================================================================
+   ux-cards.css — audience fork and compare table.
+   Single accent (terracotta-bronze), low-weight rules, generous whitespace.
+   ========================================================================= */
+
+/* ---- Audience fork (3 cards: indie / FDE / enterprise) ---- */
+.audience {
+  max-width: var(--container-w);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-5);
+}
+.audience-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+.audience-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--bg-paper-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.2s ease-out, transform 0.2s ease-out;
+}
+.audience-card:hover {
+  border-color: var(--rule-strong);
+  transform: translateY(-1px);
+}
+.audience-card-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.audience-card-eyebrow::before {
+  content: '';
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: inline-block;
+}
+.audience-card h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.5rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.audience-card h3 em { font-style: italic; color: var(--accent); font-weight: 400; }
+.audience-card p {
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+.audience-card pre {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: var(--bg-paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  color: var(--ink);
+  overflow-x: auto;
+  margin: 0;
+}
+.audience-card-link {
+  margin-top: auto;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: gap 0.15s ease-out;
+}
+.audience-card-link:hover { gap: 8px; color: var(--accent); }
+
+@media (max-width: 900px) {
+  .audience-grid { grid-template-columns: 1fr; }
+}
+
+/* ---- Compare table ---- */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--bg-paper-2);
+}
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+.compare-table th,
+.compare-table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--rule);
+}
+.compare-table thead th {
+  background: var(--bg-paper);
+  color: var(--ink-soft);
+  font-weight: 500;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.compare-table tbody td:first-child {
+  font-weight: 500;
+  color: var(--ink);
+}
+.compare-table tbody tr:last-child td { border-bottom: none; }
+.compare-table tbody tr {
+  transition: background 0.1s ease-out;
+}
+.compare-table tbody tr:hover { background: color-mix(in oklch, var(--accent) 6%, transparent); }
+.compare-table thead th:nth-child(2) {
+  color: var(--accent);
+  font-weight: 500;
+}
+.compare-table tbody td:nth-child(2) {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.check { color: var(--ok); }
+.cross { color: var(--ink-faint); }
+.partial { color: var(--ink-soft); }
+
+.compare-row-label { display: inline-block; }
+.compare-only {
+  display: inline-block;
+  margin-left: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  vertical-align: middle;
+}
+
+.compare-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.compare-header-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+.compare-verified {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.compare-footnote {
+  margin-top: var(--space-5);
+  font-size: 14px;
+  color: var(--ink-soft);
+  max-width: 64ch;
+}
+.compare-footnote a {
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent);
+}
+
+/* Compare table row reveal animation — keep minimal for redesign. */
+.table-row-reveal { opacity: 0; }
+.table-row-reveal.revealed {
+  animation: compareFadeIn 0.3s ease-out forwards;
+}
+@keyframes compareFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .compare-table td:first-child,
+  .compare-table th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--bg-paper-2);
+  }
+  .compare-table thead th:first-child { background: var(--bg-paper); }
+  .compare-table { font-size: 13px; }
+}

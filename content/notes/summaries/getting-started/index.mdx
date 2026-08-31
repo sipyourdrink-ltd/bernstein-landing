@@ -1,0 +1,79 @@
+---
+title: 'First multi-agent run, five minutes'
+description: 'Install Bernstein, point it at Claude Code, run a goal, read the TUI.'
+date: '2026-04-14'
+url: 'https://bernstein.run/blog/getting-started'
+tags:
+  - summary
+  - getting started
+  - Claude Code tutorial
+source_post: getting-started
+summary_modes:
+  quick:
+    title: get started with multi-agent coding in minutes
+    items:
+      - >-
+        install bernstein and point it at claude code to run parallel tasks in
+        under five minutes.
+      - >-
+        tasks auto-decompose, run in isolated worktrees, and merge results with
+        clear tui feedback.
+    whyItMatters: >-
+      it streamlines complex coding workflows by automating task distribution
+      across agents.
+  takeaways:
+    title: quickstart guide for running multi-agent coding tasks with bernstein
+    items:
+      - >-
+        installs bernstein via pip and requires python 3.12 and a compatible cli
+        agent like claude code.
+      - >-
+        automatically detects installed agents and decomposes goals into
+        parallel tasks with assigned roles.
+      - >-
+        runs tasks in isolated worktrees and merges completed work through a
+        central queue.
+      - >-
+        provides a tui interface to monitor progress and handles failures by
+        rolling back and logging to dead letter json.
+    whyItMatters: >-
+      it enables developers to quickly set up and manage multi-agent coding
+      workflows with clear visibility and error handling.
+  technical:
+    title: first multi-agent claude run in 5 minutes with bernstein
+    items:
+      - >-
+        bernstein auto-detects installed cli agents and requires at least one,
+        such as claude code, on path. eighteen adapters are included by default,
+        with detection handled at runtime.
+      - >-
+        goals are decomposed into tasks, each assigned a role and model, then
+        executed in isolated worktrees. completed tasks merge through a central
+        queue, while failures are logged to .sdd/dead_letter.json.
+      - >-
+        the tui displays task status as ✓ merged, ► running, or ○ waiting, with
+        q for graceful shutdown and ctrl+c for immediate termination. heartbeats
+        and stdout streams are parsed in real time for monitoring.
+      - >-
+        each agent produces one commit, merged sequentially through the queue,
+        enabling traceable multi-agent output. yaml plans support stages,
+        dependencies, roles, and complexity settings per task.
+    whyItMatters: >-
+      this enables reproducible, observable multi-agent workflows with minimal
+      setup and clear failure handling.
+---
+
+## summary
+
+this is the hands-on quickstart for bernstein: `pip install bernstein`, point it at Claude Code (or any of the 18 auto-detected adapters), run `bernstein run --goal "<task>"`, and read the TUI that shows task status, agent count, and a live cost ticker. goals get decomposed into tasks, each task gets a role and a model, agents spawn into isolated worktrees, and completed work merges back through the queue. failed tasks roll back into `.sdd/dead_letter.json`. the post also shows the `bernstein cost` output and explains YAML plan files for multi-stage projects.
+
+## key takeaways
+
+- `bernstein run --goal "Add type hints to all functions in src/utils.py"` produces one commit per agent, all merged through the same queue.
+- the TUI symbols: `✓` = merged, `►` = running, `○` = pending; `q` is a graceful stop, `Ctrl+C` is a hard stop.
+- the task server runs on port 8052 while a session is live, so it can be scripted against.
+- `bernstein cost` shows per-session and per-model spend; in the example a 3-task run costs $0.47 split across haiku, sonnet, and opus.
+
+## when to read this
+
+for developers installing bernstein for the first time who want to go from `pip install` to a working multi-agent session in under five minutes.

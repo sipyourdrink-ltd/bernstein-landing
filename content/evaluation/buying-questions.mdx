@@ -1,0 +1,128 @@
+---
+title: "buying questions about bernstein"
+description: "answers to the concrete feature questions engineers ask before evaluating bernstein. claude code subscription, cascade reviewers, merge gates, filesystem policy, scheduling policy, scale."
+date: "2026-05-11"
+tags: ["bernstein", "claude code", "codex", "gemini", "cascade", "merge queue", "security", "FAQ", "decision support"]
+---
+
+<Lead>
+the docs cover everything below, but spread across multiple pages. this is the consolidated version: one section per question the discovery-call template asks. every claim links to the doc that explains it.
+</Lead>
+
+<h2 id="claude-code-subscription">can bernstein run claude code through the official local claude cli using my claude subscription, without api keys?</h2>
+
+yes. bernstein wraps the **official `claude` cli** as one of its adapters (`src/bernstein/adapters/claude.py`). it spawns the cli in your shell with whatever auth that cli already has - your max / pro subscription, your local oauth, your `ANTHROPIC_API_KEY` env var. bernstein itself does **not** require an anthropic api key. if `claude --version` works in your terminal, bernstein can drive it.
+
+the same is true for codex (`adapters/codex.py` → official `codex` cli), gemini cli, aider, cursor agent, copilot cli, etc. every adapter delegates auth to the underlying cli. you bring whatever subscription or key that cli already accepts; bernstein never sees the credential.
+
+<h2 id="cascade-reviewers">can i configure codex as the builder, claude code as mid-build reviewer, and gemini or kimi as final reviewers?</h2>
+
+yes - this is the cascade pattern, and it is the canonical bernstein layout. roles are assigned per task in `bernstein.yaml`:
+
+```yaml
+roles:
+  backend:    { adapter: codex }
+  reviewer:   { adapter: claude }
+  qa:         { adapter: gemini }
+```
+
+at task time, `templates/roles/{role}.md` selects the prompt and the scheduler routes builds through codex first, then claude for mid-build review, then gemini for a final pass before the merge queue. the role list is in `agents/orchestrator.md`. you can chain three, four, or five reviewers - each is a separate adapter invocation with its own auth.
+
+mixing kimi or qwen at the end is the same pattern: add `final_reviewer: { adapter: kimi }` and reference it in the role rotation. no special wiring beyond the yaml.
+
+<h2 id="merge-gates">can it block merge if review notes, changelog, schema audit, or custom files are not updated?</h2>
+
+yes. the merge queue runs a configurable gate suite before any worktree lands on `main`. out of the box the gates are: lint, type-check, tests, cross-model review. you add custom gates by dropping a script under `quality_gates/` or by extending `bernstein.yaml`:
+
+```yaml
+quality_gates:
+  - command: "test -f .sdd/review-notes/${TASK_ID}.md"
+    fail_message: "review notes missing for task ${TASK_ID}"
+  - command: "grep -q ${TASK_ID} CHANGELOG.md"
+    fail_message: "changelog not updated"
+  - command: "scripts/validate_schema_audit.sh"
+```
+
+gate failures block the merge and route the task back to the builder with the `fail_message` as feedback. evidence trail is in the hmac-signed audit log under `.sdd/audit/`. the quality pipeline doc has the full schema.
+
+<h2 id="builder-filesystem-policy">can builders be prevented from pushing, deleting files, or modifying workflow config?</h2>
+
+yes. bernstein has a credential-scoping layer (`src/bernstein/core/credential_scoping.py`) and a sandbox abstraction (`src/bernstein/core/sandbox/`). per-role policy lives in `bernstein.yaml`:
+
+```yaml
+roles:
+  backend:
+    sandbox: bubblewrap        # or firejail, docker, none
+    deny_paths:
+      - ".github/workflows/**"
+      - ".bernstein/**"
+      - "scripts/manage.py"
+    deny_commands:
+      - "git push"
+      - "rm -rf"
+      - "git rebase -i"
+```
+
+the sandbox enforces filesystem denylists; the command policy intercepts shell invocations before they reach the agent's worktree. builders run inside an isolated git worktree anyway, so pushing to `main` is structurally impossible - only the merge queue (a separate process with a separate credential) can land.
+
+air-gap deployments tighten this further: the `--profile airgap` flag denies all outbound network by default and you allow-list specific destinations.
+
+<h2 id="scheduling-policy">can i force sequential execution for risky repos and parallel only for independent tasks?</h2>
+
+yes. the scheduler reads two signals per task: `parallel_safe: false` (declared in the task spec) and the dependency dag (declared inline or auto-extracted from `depends_on:`). tasks marked `parallel_safe: false` are scheduled serially even when they have no declared dependencies - useful for migrations, secret rotations, or files with global state.
+
+independent tasks (no shared paths, no `depends_on`, `parallel_safe: true`) fan out across as many worktrees as your `max_parallel` budget allows. you set the cap globally in `bernstein.yaml`:
+
+```yaml
+scheduler:
+  max_parallel: 1   # sequential mode - safe for production migrations
+  # or
+  max_parallel: 8   # full parallelism for independent task graphs
+```
+
+per-repo profiles let you keep both: `bernstein run --profile risky` flips `max_parallel: 1`, regular runs stay at 8.
+
+<h2 id="scale-to-100-agents">can it scale to 100 concurrent agents?</h2>
+
+the scheduler itself is plain python - the loop that decides "agent A gets task 17 next" runs in O(n) per scheduling tick and handles thousands of pending tasks without breaking a sweat. the real cap is your local resources: each agent needs a git worktree (one disk inode tree per task), a sandbox, and an api / cli session. at 100 agents on one box you'll hit fd limits and disk IOPS before bernstein's own loop sweats.
+
+the cluster mode (`bernstein.cluster`) is the answer for that scale: distribute the orchestrator across multiple nodes, each running ~16-32 agents, sharing the `.sdd/` store over an nfs / s3 bucket. the cloudflare bridges adapter (`adapters/cloudflare_agents.py`) takes this further by spawning each agent as a durable object on cloudflare workers.
+
+honest disclaimer: i've personally run 8-16 agents in parallel on a single workstation. 100 is documented and the code path exists; if you are evaluating that scale, the cluster doc covers the layout and i'll happily set up a call.
+
+<h2 id="merge-queue-failures">how does the merge queue handle failures?</h2>
+
+three failure modes, three responses:
+
+1. **gate failure (lint / tests / review)** - the merge queue rejects the worktree, writes the failure reason into `.sdd/runtime/queue.jsonl`, and the task goes back to the builder with the failure log attached as feedback. the builder gets one retry by default (configurable per task) before the orchestrator escalates to a different adapter.
+
+2. **conflict on rebase** - the queue serialises landings on `main`, so two tasks can't conflict during execution. if the queue head conflicts with a fresh `main` push from outside bernstein, the queue runner rebases, re-runs the gate suite, and only lands on a clean rebase.
+
+3. **adapter timeout / process crash** - the orchestrator's circuit breaker (`src/bernstein/core/safety/circuit_breaker.py`) records the failure, surfaces it in `bernstein status`, and either retries with the next adapter in the cascade or marks the task for operator review. nothing partially merges - the worktree is destroyed.
+
+every transition is in the audit log; replaying yesterday's `.sdd/audit/log.jsonl` reproduces yesterday's task graph and merge order.
+
+<h2 id="handoff-artifacts">can it require a structured handoff artifact after every agent task?</h2>
+
+yes. the per-artefact lineage subsystem (`bernstein lineage`) writes one record per file mutation: producer adapter, model, prompt sha, input files, output diff, cost. by default the lineage is implicit; you make it a hard requirement by adding a gate:
+
+```yaml
+quality_gates:
+  - command: "test -f .sdd/handoff/${TASK_ID}.md"
+    fail_message: "handoff artifact missing"
+```
+
+the `templates/roles/{role}.md` prompts can include a `handoff:` block that the agent must produce; the gate above enforces the file exists. evidence is signed with hmac-sha256 and queryable via `bernstein lineage verify <run_id>`.
+
+<h2 id="validate-against-running-app">can this perform a validation step against a running dev app?</h2>
+
+yes - via `bernstein preview`. the preview subsystem (`src/bernstein/core/preview/`) spawns a sandboxed dev server with a public tunnel link after a task completes, before the merge queue takes the worktree. the quality pipeline can include a smoke gate that hits the tunnel URL:
+
+```yaml
+quality_gates:
+  - command: "curl -fsS ${BERNSTEIN_PREVIEW_URL}/healthz"
+    fail_message: "preview app did not become healthy"
+  - command: "scripts/playwright_smoke.sh ${BERNSTEIN_PREVIEW_URL}"
+```
+
+for richer integration tests, the `bernstein preview --persist` flag keeps the tunnel alive after the run so an operator can validate manually, then the merge happens behind a `bernstein preview approve` command.

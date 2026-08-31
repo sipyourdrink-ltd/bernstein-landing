@@ -1,0 +1,18 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "Bernstein",
+  "name_for_model": "bernstein",
+  "description_for_human": "Deterministic orchestrator for CLI coding agents (Claude Code, Codex, Gemini CLI, +40 more).",
+  "description_for_model": "Bernstein is a deterministic orchestrator for CLI coding agents (Claude Code, Codex, Gemini CLI, and 40+ more). It takes a goal, decomposes it into tasks, and runs them in parallel in isolated git worktrees or pluggable cloud sandboxes (Docker, E2B, Modal, Blaxel, Cloudflare, Daytona, Runloop, Vercel), gating every merge on lint, types, tests, and security. Scheduling is plain Python with no LLM in the coordination loop, so no tokens are spent on coordination and runs are reproducible end to end. An always-on lineage spine and replay journal record what happened; an opt-in HMAC-chained audit log and signed receipts make results independently verifiable, offline if needed. Also supports contextual bandit model routing, cost tracking, cloud artifact sinks (S3, GCS, Azure Blob, Cloudflare R2), progressive-disclosure skill packs with the load_skill MCP tool, MCP server mode, the A2A protocol, and an air-gap install profile. Install: pipx install bernstein. License: Apache 2.0.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://bernstein.run/openapi.yaml",
+    "is_user_authenticated": false
+  },
+  "logo_url": "https://bernstein.run/favicon.svg",
+  "contact_email": "alex@alexchernysh.com",
+  "legal_info_url": "https://github.com/sipyourdrink-ltd/bernstein/blob/main/LICENSE"
+}

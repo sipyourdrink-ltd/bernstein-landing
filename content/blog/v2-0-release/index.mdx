@@ -1,0 +1,82 @@
+---
+title: "bernstein 2.0.0: a web UI ships in the wheel, CLI unchanged"
+description: "Bernstein 2.0 ships a FastAPI + React web UI inside the wheel. CLI and TUI surfaces are unchanged, configs do not move, agents and adapters keep working."
+date: "2026-05-17"
+tags: ["multi-agent orchestration", "release", "web UI", "FastAPI", "React", "SPA"]
+schemaType: "TechArticle"
+techDependencies:
+  - "Python 3.12+ with `pipx install --upgrade bernstein` (or `pip install --upgrade bernstein`)"
+  - "A modern browser to reach the SPA at `http://127.0.0.1:8052/ui/` (Chrome / Firefox / Safari current)"
+  - "An existing `bernstein.yaml` from a 1.10.x install; configs and plans run unchanged"
+---
+
+<Lead>
+Bernstein now ships a web interface. By popular demand. The CLI / TUI surface is unchanged, configs don't move, agents and adapters work as before. The major-version bump is signalling the new operator surface, not a breaking API change.
+</Lead>
+
+## `bernstein gui serve`
+
+One command boots a FastAPI server with the SPA mounted at `/ui` and the full `/api/v1/*` surface attached. Default `http://127.0.0.1:8052/ui/`. The Vite bundle is committed under `src/bernstein/gui/static/`, so wheel installs work without a Node toolchain.
+
+```bash
+bernstein gui serve               # http://127.0.0.1:8052/ui/
+bernstein gui serve --dev         # expects `npm run dev` on :5173
+bernstein gui serve --minimal     # skip the full /api/v1/* surface
+```
+
+Tabs: **Tasks**, **Agents**, **Approvals**, **Audit**, **Costs**, **Fleet** (scaffold), **Settings** (placeholder).
+
+## Per-task drawer
+
+Click a task row, side drawer with six tabs:
+
+- **Summary** - KPIs (tokens, cost, branch, approvals), plan steps from `progress_log`.
+- **Logs** - SSE-streamed live logs with ANSI rendering, virtualised list, search, level filters, keyboard shortcuts, throughput stats.
+- **Diff** - `git diff <base>...<branch>` rendered split or unified, syntax-highlighted, copy + `.patch` download.
+- **Gates** - quality-gate report with status buckets (passing / failing / pending / skipped), auto-expand on failures, polling that pauses on terminal tasks.
+- **Deps** - upstream / downstream task graph for `depends_on`.
+- **Trace** - timeline from `.sdd/traces/{task_id}.jsonl` with filter chips and search.
+
+<img src="/screens/webui-agents-diffs.png" alt="Tasks page with the Diff drawer open showing a split-view git diff." />
+
+## Agents
+
+Live grid of running agent sessions. Each card shows status, current task, and a four-metric strip (duration, tokens in, tokens out, cost). Side drawer opens with a stacked token meter (prompt / context / tools), live log tail with INFO / PLAN / PASS / WARN / WAIT / LIVE colouring, and a kill-session action.
+
+<img src="/screens/webui-agents-panel.png" alt="Agents grid with token meter and selected-agent drawer open." />
+
+## Why this is shipped intentionally minimal
+
+This is a solo project. The core orchestrator is already a stretch to keep up with on one set of hands. The web UI is here because operators asked for it and the core was ready for it - **not because it's on the immediate roadmap**.
+
+What that means in practice:
+
+- A11y audit, dark / light theme toggle, mobile-responsive pass, Settings screen wiring, Fleet UI, front-end test suite, Playwright e2e - all open, all contributor-welcome.
+- House rule: no new heavy front-end deps without a strong reason. The current stack is intentionally small (React + React Router + React Query + Tailwind + `sse-starlette`). No Redux, MUI, Recharts.
+- Backend is the source of truth. The SPA should never make a decision the backend can't replay.
+
+If you want to pick something up, the canonical pointer is [issue #1262](https://github.com/sipyourdrink-ltd/bernstein/issues/1262) - list of contributor-scoped items, run-it-locally instructions, and the house rules.
+
+## Fixes that came in the same cut
+
+Three orchestrator bugs landed alongside the UI, found while integrating it:
+
+- **Per-step `cli:` / `model:` directives were silently collapsing onto the role default** in plan-driven runs. Three dispatch-pipeline bugs (POST payload dropping `model` / `effort`, role config.yaml clobbering per-task pin, merge gate ignoring `cli` mismatch). Pinned by `tests/unit/test_per_step_routing.py`. [#1259](https://github.com/sipyourdrink-ltd/bernstein/pull/1259).
+- **Startup banner had regressed.** `bernstein run` / `bernstein conduct` regained the banner - an earlier commit had silently dropped it under a false "already printed" comment. Pinned by `tests/unit/cli/test_run_banner.py`. [#1257](https://github.com/sipyourdrink-ltd/bernstein/pull/1257).
+- **Manager → task-server auth was failing in nested-process spawn** ([#1261](https://github.com/sipyourdrink-ltd/bernstein/issues/1261)). Operator reported a manager that posted seed tasks but never created children; root cause was a stripped bearer token in the spawn env. Fixed in [#1266](https://github.com/sipyourdrink-ltd/bernstein/pull/1266), watchdog detector in [#1267](https://github.com/sipyourdrink-ltd/bernstein/pull/1267), regression test in [#1265](https://github.com/sipyourdrink-ltd/bernstein/pull/1265).
+
+## Upgrade path
+
+```bash
+pip install --upgrade bernstein
+bernstein gui serve
+```
+
+That's the entire upgrade. v1.10.x configs and plans run unchanged. `bernstein` (no args), `bernstein run`, `bernstein conduct`, `bernstein live`, `bernstein dashboard` - all unchanged.
+
+Full release notes (with the wave-4 PR table): [`docs/release-notes/v2.0.0.md`](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/release-notes/v2.0.0.md).
+
+## related
+
+- [v1.10.x recap](/blog/v1-10-x-recap) for the cycle this release closes out.
+- [community spotlight, april 2026](/blog/community-spotlight-april-2026) for the contributor stories that fed the wave-4 wishlist.

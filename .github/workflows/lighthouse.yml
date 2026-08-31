@@ -1,0 +1,56 @@
+name: lighthouse
+
+# Performance and accessibility budget for the rendered homepage, run
+# against a real production build rather than the dev server. Assertions
+# in lighthouserc.json warn rather than fail: a lab run on a shared
+# runner is noisy enough that gating merges on it would train people to
+# ignore it. The trend is what the report is for.
+
+on:
+  pull_request:
+    paths:
+      - "app/**"
+      - "components/**"
+      - "styles/**"
+      - "public/**"
+      - "next.config.mjs"
+      - "package-lock.json"
+      - "lighthouserc.json"
+  schedule:
+    - cron: "37 7 * * 1"  # Weekly, Monday 07:37 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  lhci:
+    name: lighthouse ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Build
+        run: npm run build
+
+      - name: Run Lighthouse CI
+        run: npx --yes @lhci/cli@0.15.x autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ""
