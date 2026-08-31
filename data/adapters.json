@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "builtAt": "2026-08-16T13:15:27.554Z",
+  "builtAt": "2026-08-31T21:09:11.082Z",
   "bernsteinRepoPath": "../bernstein",
   "adapters": [
     {
@@ -592,6 +592,27 @@
       "ready": false
     },
     {
+      "slug": "holmesgpt",
+      "name": "holmesgpt",
+      "cls": "HolmesGPTAdapter",
+      "displayName": "HolmesGPT",
+      "docstring": "HolmesGPT adapter for Bernstein.\n\nFronts the HolmesGPT CLI for read-only investigation tasks. This adapter\ncontent-addresses every consulted data source, binds them to conclusions,\nand produces inconclusive receipts when appropriate.",
+      "install": "",
+      "verified": null,
+      "category": "cli-family",
+      "sourceFile": "src/bernstein/adapters/holmesgpt.py",
+      "license": null,
+      "auth": null,
+      "parallelSafe": null,
+      "mcpSupport": null,
+      "auditChain": false,
+      "homepage": null,
+      "summary": null,
+      "whenToChoose": null,
+      "whenToChooseBernstein": null,
+      "ready": false
+    },
+    {
       "slug": "iac",
       "name": "iac",
       "cls": "IaCAdapter",
@@ -851,7 +872,7 @@
       "name": "opencode",
       "cls": "OpenCodeAdapter",
       "displayName": "OpenCode",
-      "docstring": "OpenCode CLI adapter.\n\nLast verified against upstream OpenCode (anomalyco/opencode) 1.18.16 on 2026-08-12.\nInstall: ``curl -fsSL https://opencode.ai/install | bash`` (fastest),\n``brew install anomalyco/tap/opencode``, or ``npm i -g opencode-ai@latest``.",
+      "docstring": "OpenCode CLI adapter.\n\nLast verified against upstream OpenCode (anomalyco/opencode) 1.18.16 on 2026-08-12.\nInstall: ``curl -fsSL https://opencode.ai/install | bash`` (fastest),\n``brew install anomalyco/tap/opencode``, or ``npm i -g opencode-ai@latest``.\n\nPermission posture is pinned by this adapter rather than inherited. OpenCode\nresolves tool permissions from the operator's own config unless something\noverrides it, so an un-pinned spawn means two operators running the same plan\nget different agent behaviour. Every spawn therefore carries an explicit\n``OPENCODE_PERMISSION`` policy derived from the adapter's declared\n:class:`~bernstein.adapters._contract.DangerousModeStrategy`, which is what\nkeeps that declaration load-bearing instead of descriptive.\n\nNeither policy resolves to ``ask``: a headless run whose permission resolves\nthat way waits forever (upstream ``anomalyco/opencode#36762``), and the only\nbackstop would be the timeout watchdog, which reports a timeout rather than a\nblocked permission.",
       "install": "curl -fsSL https://opencode.ai/install | bash (fastest),",
       "verified": {
         "upstream": "OpenCode (anomalyco/opencode) 1.18.16",

@@ -3,7 +3,7 @@
   "comment": "Seed catalog for the CLI glossary generated catalogue pages. Used when `bernstein` is not on PATH at build time. Hand-picked subset of the commands people reach for first, derived from `bernstein --help-all` output captured 2026-05-05. Re-extract to `data/cli.json` when bernstein is installed; the live catalog wins.",
   "root": {
     "usage": "bernstein [OPTIONS] COMMAND [ARGS]...",
-    "description": "Declarative agent orchestration for engineering teams. Deterministic Python scheduler for CLI coding agents — 48 adapters, parallel git worktrees, HMAC-SHA256 audit chain (RFC 2104).",
+    "description": "Declarative agent orchestration for engineering teams. Deterministic Python scheduler for CLI coding agents — 49 adapters, parallel git worktrees, HMAC-SHA256 audit chain (RFC 2104).",
     "flags": [
       { "spec": "--goal, -g", "flags": ["--goal", "-g"], "primary": "--goal", "type": "TEXT", "help": "Inline goal (no seed file needed).", "default": null },
       { "spec": "--budget", "flags": ["--budget"], "primary": "--budget", "type": "FLOAT", "help": "Cost cap in USD; stop spawning agents when reached (0=unlimited).", "default": "0.0" },

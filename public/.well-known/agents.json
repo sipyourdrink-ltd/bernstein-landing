@@ -2,7 +2,7 @@
   "$comment": "No $schema key on purpose. The URL this file used to point at does not resolve, and no published schema matches this document's shape, so a pointer here would only dangle. Re-add one when a schema this file actually validates against is hosted somewhere stable.",
   "info": {
     "title": "Bernstein API",
-    "version": "3.15.1",
+    "version": "3.18.2",
     "description": "The open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, +40 more). No model in the coordination loop, so parallel runs in per-task git worktrees replay byte-identically. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy. The task server is operator-hosted - it runs on the machine where Bernstein is installed - so the servers entry below is a URL template, not a hosted endpoint."
   },
   "servers": [

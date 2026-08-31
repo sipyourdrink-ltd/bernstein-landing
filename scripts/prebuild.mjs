@@ -21,6 +21,8 @@ const STEPS = [
   'scripts/extract-adapters.mjs',
   'scripts/extract-cli.mjs',
   'scripts/gen-compare-data.mjs',
+  'scripts/sync-mcp-catalog.mjs',
+  'scripts/sync-openapi.mjs',
   'scripts/sync-adapter-count.mjs',
   'scripts/sync-version.mjs',
   'scripts/build-source-mtimes.mjs',

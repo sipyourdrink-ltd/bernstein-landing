@@ -4,7 +4,7 @@
   "protocolVersion": "2025-06-18",
   "serverInfo": {
     "name": "Bernstein MCP Server",
-    "version": "3.15.1",
+    "version": "3.18.2",
     "description": "The open-source governance layer for AI agents. No model in the coordination loop, so parallel runs in per-task git worktrees replay byte-identically, and an opt-in HMAC audit chain verifies offline. Create tasks, monitor agents, check status, and track costs via MCP tools. Run locally via stdio transport after pipx install bernstein.",
     "homepage": "https://bernstein.run",
     "documentation": "https://bernstein.readthedocs.io/",

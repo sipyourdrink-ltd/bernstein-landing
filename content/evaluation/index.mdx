@@ -25,7 +25,7 @@ different shape entirely. in those frameworks the orchestrator is an llm driving
 
 <h2 id="why-not-claude-code">why bernstein over claude code alone</h2>
 
-claude code can spawn sub-agents on its own; bernstein does the same thing across 48 different cli agents at once and verifies their output against your tests instead of trusting it - claude code included as one of the 48, wired through the same adapter interface as every other agent.
+claude code can spawn sub-agents on its own; bernstein does the same thing across 49 different cli agents at once and verifies their output against your tests instead of trusting it - claude code included as one of the 49, wired through the same adapter interface as every other agent.
 
 the multi-agent shape matters when: you have ≥3 independent tasks that could run in parallel (one task per cli agent in its own worktree, no merge conflicts during execution), you want a regulated review path (cross-model verifier passes a diff to a second model before the merge queue lands it), or you're paying for compute by the parallel task and want throughput rather than depth on a single thread.
 
@@ -37,7 +37,7 @@ short test: if your last week of claude code sessions had any moment where you w
 
 yes, with specific caveats - not the marketing kind.
 
-what works: the scheduler is deterministic, the merge queue lands what passes the gates, the audit log is hmac-signed and replays cleanly, there are 48 adapters in the registry, the install is one `pipx install bernstein`.
+what works: the scheduler is deterministic, the merge queue lands what passes the gates, the audit log is hmac-signed and replays cleanly, there are 49 adapters in the registry, the install is one `pipx install bernstein`.
 
 what to know before you commit: the team is one person (alex, the operator). the project is in beta - the version number counts releases, not maturity, and minor versions may change interfaces, so pin the version for anything you depend on. the audit format is hmac-signed but the vendor binary format is not yet a published standard, so cross-tool replay is bernstein-only for now. the cloudflare workers integration is solid for edge sandboxing, but the agents you wrap (claude code, codex) still call their own apis, so api outages upstream knock those agents out individually.
 

@@ -3,9 +3,9 @@
   "schema_version": "0.1",
   "name": "bernstein",
   "display_name": "Bernstein",
-  "version": "3.15.1",
+  "version": "3.18.2",
   "protocol_version": "2025-03-26",
-  "description": "Deterministic Python orchestrator for a crew of CLI coding agents (Claude Code, Codex, Gemini CLI, Aider, Cursor, and 40+ more). Scheduling is plain Python with no LLM in the coordination loop, so runs are reproducible end to end; every task runs in its own git worktree behind lint/type/test gates. Bernstein exposes its task server as MCP tools so any MCP client can spawn, monitor, approve, or stop multi-agent runs.",
+  "description": "The open-source governance layer for AI agents, exposed as MCP tools. A deterministic Python scheduler with no model in the coordination loop runs agents in parallel, gates what they produce, and records every step, so a run replays byte-identically and can be verified afterwards from the artifacts alone. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, Aider, Cursor and 40+ more); every task runs in its own git worktree behind lint/type/test gates. Any MCP client can spawn, monitor, approve or stop a run.",
   "summary": "The open-source governance layer for AI agents, exposed as MCP tools. No model in the coordination loop, so runs replay byte-identically and a reviewer checks the record offline.",
   "author": {
     "name": "Alex Chernysh",
@@ -119,40 +119,217 @@
   },
   "tools": [
     {
-      "name": "bernstein_health",
-      "description": "Liveness check; returns {\"status\":\"ok\"} when the MCP server is reachable.",
+      "name": "bernstein_approve",
+      "description": "Sign off a finished result only when the task is in pending_approval; every other status is refused. This completes the task on the Bernstein server. Host effects: makes network requests.",
       "input_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "task_id"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 8192
+          }
+        }
       }
     },
     {
-      "name": "bernstein_run",
-      "description": "Start an orchestration run by posting a task to the Bernstein task server.",
+      "name": "bernstein_cancel",
+      "description": "Cancel one task and its subtask tree; the orchestrator keeps running. Cancellable statuses: open, claimed, in_progress, blocked, waiting_for_subtasks, planned. An already-terminal task is reported, not treated as an error. This changes task state on the Bernstein server. Host effects: makes network requests.",
       "input_schema": {
         "type": "object",
+        "additionalProperties": false,
         "required": [
+          "task_id"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_claim",
+      "description": "Claim the next eligible task for an agent. This changes task assignment state on the Bernstein server. Host effects: makes network requests.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "claimer_id"
+        ],
+        "properties": {
+          "claimer_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
+          "role": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 64
+          },
+          "project": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 256
+          },
+          "capability": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 256
+          },
+          "completed_ids": {
+            "type": "array",
+            "maxItems": 4096,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "pattern": "^[A-Za-z0-9_.:-]+$"
+            }
+          },
+          "max_attempts": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "claimer_card_fingerprint": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 256
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_complete",
+      "description": "Report a task result only from a worker-held state: open, claimed, or in_progress; every other status is refused. This completes the task on the Bernstein server. Host effects: makes network requests.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id",
+          "result_summary"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
+          "result_summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_context",
+      "description": "Deprecated alias of bernstein_task_capsule. Reads a task capsule and its local journal and audit evidence; verify=true may create the install audit key if it is absent. Host effects: reads files; writes files.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
+          "workdir": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "verify": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_cost",
+      "description": "Deprecated alias folded into bernstein_status. Retrieves cost data from the Bernstein server without changing it. Host effects: makes network requests.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      }
+    },
+    {
+      "name": "bernstein_create_subtask",
+      "description": "Deprecated alias folded into bernstein_run. Queues a subtask that writes orchestration state and starts agent work; the call returns before that work finishes. Host effects: writes files; spawns agent processes; makes network requests.",
+      "input_schema": {
+        "timeoutSeconds": 30,
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "parent_task_id",
           "goal"
         ],
         "properties": {
+          "parent_task_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
           "goal": {
             "type": "string",
-            "description": "What you want Bernstein to accomplish."
+            "minLength": 1,
+            "maxLength": 8192
           },
           "role": {
             "type": "string",
-            "default": "backend",
-            "description": "Specialist role (backend, frontend, qa, security, devops, docs, architect, ml-engineer, ...)."
+            "minLength": 1,
+            "maxLength": 64
           },
           "priority": {
             "type": "integer",
-            "default": 2,
-            "description": "1=critical, 2=normal, 3=nice-to-have."
+            "minimum": 1,
+            "maximum": 3
           },
           "scope": {
             "type": "string",
-            "default": "medium",
             "enum": [
               "small",
               "medium",
@@ -161,7 +338,292 @@
           },
           "complexity": {
             "type": "string",
-            "default": "medium",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "estimated_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100000
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_health",
+      "description": "Deprecated process-local liveness probe folded into bernstein_status. It returns a constant response without contacting the task server. Host effects: none.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      }
+    },
+    {
+      "name": "bernstein_post_artifact",
+      "description": "Post a versioned artifact to a task on the Bernstein server. Host effects: makes network requests.",
+      "input_schema": {
+        "timeoutSeconds": 30,
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id",
+          "key",
+          "artifact_type",
+          "poster"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"
+          },
+          "artifact_type": {
+            "type": "string",
+            "enum": [
+              "report",
+              "table",
+              "link",
+              "finding"
+            ]
+          },
+          "poster": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60000
+          },
+          "columns": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 64,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          "rows": {
+            "type": "array",
+            "maxItems": 4096,
+            "items": {
+              "type": "array",
+              "maxItems": 64,
+              "items": {
+                "type": "string",
+                "maxLength": 4096
+              }
+            }
+          },
+          "url": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "link_kind": {
+            "type": "string",
+            "enum": [
+              "preview",
+              "dashboard",
+              "document"
+            ]
+          },
+          "sarif_result": {
+            "type": "object"
+          },
+          "tool": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "tool_version": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "pinned_ruleset_or_feed_digest": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "invocation_argv_hash": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "target": {
+            "type": "string",
+            "maxLength": 4096
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "artifact_type": {
+                  "const": "report"
+                }
+              },
+              "required": [
+                "artifact_type"
+              ]
+            },
+            "then": {
+              "required": [
+                "body"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "artifact_type": {
+                  "const": "table"
+                }
+              },
+              "required": [
+                "artifact_type"
+              ]
+            },
+            "then": {
+              "required": [
+                "columns",
+                "rows"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "artifact_type": {
+                  "const": "link"
+                }
+              },
+              "required": [
+                "artifact_type"
+              ]
+            },
+            "then": {
+              "required": [
+                "url",
+                "link_kind"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "artifact_type": {
+                  "const": "finding"
+                }
+              },
+              "required": [
+                "artifact_type"
+              ]
+            },
+            "then": {
+              "required": [
+                "sarif_result"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "bernstein_post_message",
+      "description": "Post a progress message to a task mailbox on the Bernstein server. Host effects: makes network requests.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id",
+          "body",
+          "sender"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "sender": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "finding",
+              "artefact_ref",
+              "question"
+            ]
+          },
+          "sender_card_fingerprint": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 256
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_run",
+      "description": "Start an orchestration run. A run does real work and takes minutes to hours; the call returns once the run is queued, not when it finishes. Do not re-issue it while waiting, that starts a second run. Follow the run with bernstein_run_status, passing either the returned task_id or the returned run_id, after waiting the returned poll_after_ms. Pass parent_task_id to create the run as a subtask of an existing task. The queued orchestration writes project state and starts agent work. Host effects: writes files; spawns agent processes; makes network requests.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "goal"
+        ],
+        "properties": {
+          "goal": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "small",
+              "medium",
+              "large"
+            ]
+          },
+          "complexity": {
+            "type": "string",
             "enum": [
               "low",
               "medium",
@@ -170,182 +632,435 @@
           },
           "estimated_minutes": {
             "type": "integer",
-            "default": 30
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "parent_task_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
           }
         }
       }
     },
     {
-      "name": "bernstein_status",
-      "description": "Summary of total/open/claimed/done/failed task counts plus per-role breakdown.",
+      "name": "bernstein_run_status",
+      "description": "Poll a verifiable handle for a run started with bernstein_run. Accepts either identifier that call returned: the task_id or the run_id. Reads the local run journal and audit evidence without changing them. Host effects: reads files.",
       "input_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
-      }
-    },
-    {
-      "name": "bernstein_tasks",
-      "description": "List tasks with optional status filter (open, claimed, in_progress, done, failed, blocked, cancelled).",
-      "input_schema": {
-        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id"
+        ],
         "properties": {
-          "status": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    {
-      "name": "bernstein_cost",
-      "description": "Cost summary: total USD spent across the run plus per-role breakdown.",
-      "input_schema": {
-        "type": "object",
-        "properties": {},
-        "additionalProperties": false
-      }
-    },
-    {
-      "name": "bernstein_stop",
-      "description": "Graceful shutdown via .sdd/runtime/signals/SHUTDOWN signal file.",
-      "input_schema": {
-        "type": "object",
-        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "description": "The run to project. Either the task_id or the run_id returned by bernstein_run. Resolved journal run id first, then the task id slugified into a journal run id, so both forms reach one journal."
+          },
           "workdir": {
             "type": "string",
-            "default": ".",
-            "description": "Project root directory."
+            "minLength": 1,
+            "maxLength": 4096
           }
         }
       }
     },
     {
-      "name": "bernstein_approve",
-      "description": "Approve a pending or blocked task at an approval gate; marks it complete.",
+      "name": "bernstein_scenario",
+      "description": "List, run, or poll Bernstein scenarios. action=list reads packaged scenario definitions; action=run queues file-writing agent work and returns the same pollable handle shape as bernstein_run; action=status queries the task server and needs orchestration_id. Host effects: reads files; writes files; spawns agent processes; makes network requests.",
       "input_schema": {
         "type": "object",
-        "required": [
-          "task_id"
-        ],
+        "additionalProperties": false,
         "properties": {
-          "task_id": {
-            "type": "string"
-          },
-          "note": {
+          "action": {
             "type": "string",
-            "default": "Approved via MCP"
+            "enum": [
+              "list",
+              "run",
+              "status"
+            ]
+          },
+          "scenario_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
+          "context": {
+            "type": "string",
+            "maxLength": 16384
+          },
+          "pr_number": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1000000000
+          },
+          "branch": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 256
+          },
+          "orchestration_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "run"
+                }
+              },
+              "required": [
+                "action"
+              ]
+            },
+            "then": {
+              "required": [
+                "scenario_id"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "action": {
+                  "const": "status"
+                }
+              },
+              "required": [
+                "action"
+              ]
+            },
+            "then": {
+              "required": [
+                "orchestration_id"
+              ]
+            }
+          },
+          {
+            "if": {
+              "not": {
+                "required": [
+                  "action"
+                ]
+              }
+            },
+            "then": {
+              "required": [
+                "scenario_id"
+              ]
+            }
+          }
+        ]
       }
     },
     {
-      "name": "bernstein_create_subtask",
-      "description": "Create a subtask linked to a parent task. Parent transitions to WAITING_FOR_SUBTASKS.",
+      "name": "bernstein_scenario_status",
+      "description": "Deprecated status action folded into bernstein_scenario. Retrieves orchestration status from the Bernstein server without changing it. Host effects: makes network requests.",
       "input_schema": {
         "type": "object",
+        "additionalProperties": false,
         "required": [
-          "parent_task_id",
-          "goal"
+          "orchestration_id"
         ],
         "properties": {
-          "parent_task_id": {
-            "type": "string"
-          },
-          "goal": {
-            "type": "string"
-          },
-          "role": {
+          "orchestration_id": {
             "type": "string",
-            "default": "auto"
-          },
-          "priority": {
-            "type": "integer",
-            "default": 2
-          },
-          "scope": {
-            "type": "string",
-            "default": "medium"
-          },
-          "complexity": {
-            "type": "string",
-            "default": "medium"
-          },
-          "estimated_minutes": {
-            "type": "integer"
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
           }
         }
       }
     },
     {
       "name": "bernstein_scenarios",
-      "description": "List Bernstein scenario templates (id, name, description, tags, task_count, roles).",
+      "description": "Deprecated list action folded into bernstein_scenario. Lists packaged scenario definitions without running them. Host effects: reads files.",
       "input_schema": {
         "type": "object",
-        "properties": {},
-        "additionalProperties": false
+        "additionalProperties": false,
+        "properties": {}
       }
     },
     {
-      "name": "bernstein_scenario",
-      "description": "Invoke a scenario by id. Spawns one task per template. Returns orchestration_id.",
+      "name": "bernstein_shutdown_orchestrator",
+      "description": "Shut down the ENTIRE Bernstein orchestrator for this project, including every run and worker; use bernstein_cancel to stop one task while the orchestrator keeps running. Writes the local SHUTDOWN signal file. Host effects: writes files.",
       "input_schema": {
         "type": "object",
-        "required": [
-          "scenario_id"
-        ],
+        "additionalProperties": false,
         "properties": {
-          "scenario_id": {
+          "workdir": {
             "type": "string",
-            "description": "e.g. \"pr-review-comprehensive\"."
-          },
-          "context": {
-            "type": "string",
-            "default": ""
-          },
-          "pr_number": {
-            "type": "integer"
-          },
-          "branch": {
-            "type": "string"
+            "minLength": 1,
+            "maxLength": 4096
           }
         }
       }
     },
     {
-      "name": "bernstein_scenario_status",
-      "description": "Aggregate the status of every task belonging to a running scenario orchestration.",
+      "name": "bernstein_status",
+      "description": "Liveness, task counts, and cost in one read. Pass status to include the matching tasks; pass detail=true for full per-role and per-task rows. Retrieves data from the Bernstein server without changing it. Host effects: makes network requests.",
       "input_schema": {
         "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              null,
+              "open",
+              "claimed",
+              "in_progress",
+              "done",
+              "failed",
+              "blocked",
+              "cancelled"
+            ]
+          },
+          "detail": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_stop",
+      "description": "Deprecated alias of bernstein_shutdown_orchestrator. Requests a local orchestrator stop by writing its SHUTDOWN signal file. Host effects: writes files.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "workdir": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_task_capsule",
+      "description": "Read a task capsule together with its local journal and audit evidence. With verify=true, verification may create the install audit key if it is absent. Host effects: reads files; writes files.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
         "required": [
-          "orchestration_id"
+          "task_id"
         ],
         "properties": {
-          "orchestration_id": {
-            "type": "string"
+          "task_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
+          "workdir": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "verify": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_task_handle",
+      "description": "Deprecated alias of bernstein_run_status. Polls a verifiable run handle by reading the local run journal and audit evidence without changing them. Host effects: reads files.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "description": "The run to project. Either the task_id or the run_id returned by bernstein_run. Resolved journal run id first, then the task id slugified into a journal run id, so both forms reach one journal."
+          },
+          "workdir": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_tasks",
+      "description": "Deprecated task-list action folded into bernstein_status. Retrieves tasks from the Bernstein server without changing them. Host effects: makes network requests.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              null,
+              "open",
+              "claimed",
+              "in_progress",
+              "done",
+              "failed",
+              "blocked",
+              "cancelled"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_update",
+      "description": "Deprecated alias of bernstein_post_message. Posts a progress message to a task mailbox on the Bernstein server. Host effects: makes network requests.",
+      "input_schema": {
+        "timeoutSeconds": 30,
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id",
+          "body",
+          "sender"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "sender": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "finding",
+              "artefact_ref",
+              "question"
+            ]
+          },
+          "sender_card_fingerprint": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 256
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_verify_lineage",
+      "description": "Verify one artifact's lineage chain by reading its local lineage log without changing it. Host effects: reads files.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "artefact_path"
+        ],
+        "properties": {
+          "artefact_path": {
+            "type": "string",
+            "maxLength": 4096
           }
         }
       }
     },
     {
       "name": "load_skill",
-      "description": "Progressive-disclosure loader for skill packs. Fetches the SKILL.md body and optional reference/script files from templates/roles.",
+      "description": "List available skills when name is omitted, or load a named skill body, reference, or script file contents. Returns file contents as text; executes nothing. Host effects: reads files.",
       "input_schema": {
+        "timeoutSeconds": 30,
         "type": "object",
-        "required": [
-          "name"
-        ],
+        "additionalProperties": false,
+        "dependencies": {
+          "reference": [
+            "name"
+          ],
+          "script": [
+            "name"
+          ]
+        },
         "properties": {
           "name": {
             "type": "string",
-            "description": "Skill name; matches the index entry, e.g. \"backend\"."
+            "description": "Skill to load. Omit to return the compact skill index.",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.-]+$"
           },
           "reference": {
-            "type": "string",
-            "description": "Optional filename under references/."
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_./-]+$"
           },
           "script": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_./-]+$"
+          }
+        }
+      }
+    },
+    {
+      "name": "verify_chain",
+      "description": "Deprecated alias of bernstein_verify_lineage. Verifies one artifact's lineage chain by reading its local lineage log without changing it. Host effects: reads files.",
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "artefact_path"
+        ],
+        "properties": {
+          "artefact_path": {
             "type": "string",
-            "description": "Optional filename under scripts/."
+            "maxLength": 4096
           }
         }
       }

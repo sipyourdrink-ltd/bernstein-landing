@@ -4,7 +4,7 @@
   "source": "live",
   "root": {
     "usage": "bernstein [OPTIONS] COMMAND [ARGS]...",
-    "description": "Declarative agent orchestration for engineering teams. Deterministic Python scheduler for CLI coding agents — 48 adapters, parallel git worktrees, HMAC-SHA256 audit chain (RFC 2104).",
+    "description": "Declarative agent orchestration for engineering teams. Deterministic Python scheduler for CLI coding agents — 49 adapters, parallel git worktrees, HMAC-SHA256 audit chain (RFC 2104).",
     "flags": [
       {
         "spec": "--goal, -g",

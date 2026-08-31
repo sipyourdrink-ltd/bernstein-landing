@@ -12,7 +12,7 @@
       "operatingSystem": "macOS, Linux, Windows",
       "programmingLanguage": "Python",
       "runtimePlatform": "Python 3.12+",
-      "softwareVersion": "3.15.1",
+      "softwareVersion": "3.18.2",
       "license": "https://www.apache.org/licenses/LICENSE-2.0",
       "isAccessibleForFree": true,
       "offers": {

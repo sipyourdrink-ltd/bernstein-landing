@@ -112,6 +112,27 @@ const nextConfig = {
        remaining old-Chromium tail the auditor is itself a cross-site
        information-leak vector. The CSP below is the mitigation that
        actually applies. Do not reintroduce it. */
+    /* `next dev` compiles modules with `eval`, and the HMR client
+       opens a websocket back to the dev server. Production must not
+       allow either, so the two extra sources are added only when the
+       dev server is the one answering - otherwise the CSP that ships is
+       the one nobody can develop against, which is how it goes stale.
+       `next build` and `next start` both leave NODE_ENV at production,
+       so this cannot leak into a deployed header. */
+    const isDev = process.env.NODE_ENV !== 'production';
+    const scriptSrc = [
+      "'self'",
+      "'unsafe-inline'",
+      ...(isDev ? ["'unsafe-eval'"] : []),
+      'https://analytics.bernstein.run',
+    ].join(' ');
+    const connectSrc = [
+      "'self'",
+      ...(isDev ? ['ws://localhost:*', 'ws://127.0.0.1:*'] : []),
+      'https://app.kit.com',
+      'https://analytics.bernstein.run',
+    ].join(' ');
+
     const pageSecurityHeaders = [
       { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
       { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -120,7 +141,7 @@ const nextConfig = {
       { key: 'Reporting-Endpoints', value: reportingEndpoints },
       {
         key: 'Content-Security-Policy',
-        value: `default-src 'self'; script-src 'self' 'unsafe-inline' https://analytics.bernstein.run; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://app.kit.com https://analytics.bernstein.run; frame-src 'none'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://app.kit.com; report-uri ${cspReportPath}; report-to csp-endpoint;`,
+        value: `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src ${connectSrc}; frame-src 'none'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://app.kit.com; report-uri ${cspReportPath}; report-to csp-endpoint;`,
       },
       {
         key: 'X-Robots-Tag',
