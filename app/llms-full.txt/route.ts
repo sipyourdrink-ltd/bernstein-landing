@@ -12,8 +12,8 @@ import { getAllSeedItems } from '@/lib/ask-seed';
 const BASE_CONTENT = `# Bernstein - Complete Technical Reference
 
 > The open-source governance layer for AI agents (Claude Code, Codex, Gemini
-> CLI, +40 more). No model in the coordination loop, so parallel runs in
-> per-task git worktrees replay byte-identically. Signed lineage plus an opt-in
+> CLI, +40 more). No model in the coordination loop, so replaying a plan
+> reproduces its task graph byte-identically. Signed lineage plus an opt-in
 > HMAC audit chain a reviewer checks offline, without rerunning it. Cluster
 > mode, air-gap deploy.
 > Orchestrate any CLI coding agent. Any model. One command.
@@ -622,10 +622,10 @@ Bernstein can run agents on Cloudflare's edge network:
 ## FAQ
 
 ### What is Bernstein?
-Bernstein is the open-source governance layer for AI agents (Claude Code, Codex, Gemini CLI and 40+ more) that runs them in parallel on your codebase. It decomposes goals into tasks, assigns each to an agent in its own git worktree, and verifies results through lint, type, and test gates before merging. The scheduler is plain Python with no model in the coordination loop, so a run replays byte-identically.
+Bernstein is the open-source governance layer for AI agents (Claude Code, Codex, Gemini CLI and 40+ more) that runs them in parallel on your codebase. It decomposes goals into tasks, assigns each to an agent in its own git worktree, and verifies results through lint, type, and test gates before merging. The scheduler is plain Python with no model in the coordination loop, so replaying a plan reproduces its task graph byte-identically.
 
 ### How does it differ from an LLM-driven orchestrator?
-The orchestrator is deterministic Python code - no model tokens are spent on coordination, and the same inputs replay byte-identically. It drives real CLI coding agents rather than API-only models, and each one gets a git worktree, quality gates, and cost tracking without extra wiring.
+The orchestrator is deterministic Python code - no model tokens are spent on coordination, and the same plan replays to the same task graph. It drives real CLI coding agents rather than API-only models, and each one gets a git worktree, quality gates, and cost tracking without extra wiring.
 
 ### What agents does Bernstein support?
 Bernstein ships 40+ adapters for popular coding agents including Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Ollama, GitHub Copilot, Droid, Crush, and more. It also has a generic adapter for wrapping any CLI tool.

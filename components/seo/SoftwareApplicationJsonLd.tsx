@@ -41,7 +41,7 @@ export const SOFTWARE_APPLICATION_JSON_LD: JsonLdData = {
      SERP terms from the May-2026 keyword snapshot - see
      .sdd/backlog/open/2026-05-14-seo-keyword-bump.md. */
   keywords:
-    'open-source governance layer for AI agents, ai governance, agent governance, deterministic orchestration, parallel git worktrees, byte-identical replay, offline audit verification, HMAC audit chain, signed lineage, claude code parallel, MCP server, A2A protocol, air-gap agent orchestration, reproducible agent runs',
+    'open-source governance layer for AI agents, ai governance, agent governance, deterministic orchestration, parallel git worktrees, byte-identical run receipts, offline audit verification, HMAC audit chain, signed lineage, claude code parallel, MCP server, A2A protocol, air-gap agent orchestration, reproducible agent runs',
   operatingSystem: 'Cross-platform',
   programmingLanguage: 'Python',
   softwareRequirements: 'Python 3.12+',
