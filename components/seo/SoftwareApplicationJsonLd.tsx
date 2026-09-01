@@ -1,6 +1,7 @@
 import { JsonLd, type JsonLdData } from './JsonLd';
 import { SITE_URL, AUTHOR } from '@/lib/seo';
 import versionData from '@/data/bernstein-version.json';
+import { PROJECT_ALTERNATE_NAME } from '@/lib/project-description';
 
 /**
  * SoftwareApplication JSON-LD for the landing page.
@@ -27,7 +28,7 @@ export const SOFTWARE_APPLICATION_JSON_LD: JsonLdData = {
   '@id': `${SITE_URL}/#software`,
   name: 'Bernstein',
   alternateName: [
-    'Bernstein Orchestrator',
+    PROJECT_ALTERNATE_NAME,
     'Bernstein multi-agent CLI orchestrator',
     'Bernstein AI coding agent manager',
   ],
@@ -41,7 +42,7 @@ export const SOFTWARE_APPLICATION_JSON_LD: JsonLdData = {
      SERP terms from the May-2026 keyword snapshot - see
      .sdd/backlog/open/2026-05-14-seo-keyword-bump.md. */
   keywords:
-    'open-source governance layer for AI agents, ai governance, agent governance, deterministic orchestration, parallel git worktrees, byte-identical run receipts, offline audit verification, HMAC audit chain, signed lineage, claude code parallel, MCP server, A2A protocol, air-gap agent orchestration, reproducible agent runs',
+    'open-source governance layer for AI agents, ai governance, agent governance, deterministic orchestration, parallel git worktrees, offline-verifiable run receipts, offline audit verification, HMAC audit chain, signed lineage, claude code parallel, MCP server, A2A protocol, air-gap agent orchestration, reproducible agent runs',
   operatingSystem: 'Cross-platform',
   programmingLanguage: 'Python',
   softwareRequirements: 'Python 3.12+',

@@ -6,9 +6,15 @@
  * docs/agents.txt the bernstein repo ships, plus pointers to the richer
  * machine surfaces this site already serves.
  */
+import {
+  PROJECT_CATEGORIES,
+  PROJECT_DESCRIPTION,
+  PROJECT_TAGS,
+} from '@/lib/project-description';
+
 const CONTENT = `User-agent: *
 Name: Bernstein
-Description: The open-source governance layer for AI agents - no model in the coordination loop, so replaying a plan reproduces its task graph byte-identically; signed lineage and an opt-in HMAC audit chain, air-gap friendly
+Description: ${PROJECT_DESCRIPTION}
 Status: beta (solo-maintained; pin the version you depend on)
 Homepage: https://bernstein.run
 Repository: https://github.com/sipyourdrink-ltd/bernstein
@@ -18,8 +24,8 @@ API: https://bernstein.readthedocs.io/en/latest/openapi-reference/
 Author: Alex Chernysh <https://alexchernysh.com>
 Author-X: https://x.com/alex_chernysh
 License: Apache-2.0
-Category: DeveloperTool, AIOrchestration, MultiAgent
-Tags: multi-agent, orchestration, ai-coding, deterministic-scheduling, cli-agents, replay, lineage, provenance, audit
+Category: ${PROJECT_CATEGORIES.join(', ')}
+Tags: ${PROJECT_TAGS.join(', ')}
 
 # Machine-readable surfaces on this host
 LLM-summary: https://bernstein.run/llms.txt

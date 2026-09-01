@@ -59,6 +59,10 @@ import { ReadingProgress } from '@/components/blog/ReadingProgress';
 import { fetchAdapterCount } from '@/lib/adapter-count';
 import { fetchPublicSponsors } from '@/lib/sponsors';
 import { fetchPackageStats } from '@/lib/pkg-stats';
+import {
+  PROJECT_ALTERNATE_NAME,
+  PROJECT_SITE_DESCRIPTION,
+} from '@/lib/project-description';
 import { getFeaturedPosts, getPostCount } from '@/lib/mdx';
 /* Client-only mount: the bot uses `window` + `performance.mark` and a
    useReducer that never matches SSR. Next 15 forbids `next/dynamic`
@@ -95,9 +99,9 @@ const WEBSITE_JSON_LD = {
   '@type': 'WebSite',
   '@id': 'https://bernstein.run/#website',
   name: 'Bernstein',
-  alternateName: 'Bernstein Orchestrator',
+  alternateName: PROJECT_ALTERNATE_NAME,
   url: 'https://bernstein.run',
-  description: 'The open-source governance layer for AI agents. Deterministic task graphs replay byte-identically; byte-identical run receipts verify offline.',
+  description: PROJECT_SITE_DESCRIPTION,
   inLanguage: 'en',
   /* publisher references the canonical Organization node from the
      site-wide layout instead of redefining it. Graph edge keeps the KG

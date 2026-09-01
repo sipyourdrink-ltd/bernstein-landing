@@ -23,6 +23,10 @@ import { StaticPageBreadcrumb } from '@/components/seo/BreadcrumbListJsonLd';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { personLD } from '@/lib/jsonld';
 import { SITE_URL, AUTHOR } from '@/lib/seo';
+import {
+  PROJECT_MAINTAINER_DESCRIPTION,
+  PROJECT_TAGLINE_LOWER,
+} from '@/lib/project-description';
 
 const LAST_UPDATED = '2026-05-21';
 const PAGE_URL = `${SITE_URL}/about`;
@@ -56,9 +60,6 @@ export const metadata: Metadata = {
 /* Static page - no per-request data. */
 export const dynamic = 'force-static';
 
-const PERSON_DESCRIPTION =
-  'solo maintainer of bernstein, a deterministic python orchestrator for cli ai coding agents. apache 2.0, self-bootstrapped, no vc funding.';
-
 export default function AboutPage() {
   return (
     <>
@@ -84,9 +85,9 @@ export default function AboutPage() {
               >
                 bernstein
               </a>
-              , an open-source orchestrator for cli coding agents (claude
-              code, codex, cursor, aider, gemini cli, and the rest of the
-              adapter registry). it is
+              , {PROJECT_TAGLINE_LOWER} (claude code, codex,
+              cursor, aider, gemini cli, and the rest of the adapter
+              registry work out of the box). it is
               built and maintained by{' '}
               <a href="https://alexchernysh.com" rel="me author">
                 alex chernysh
@@ -232,7 +233,7 @@ export default function AboutPage() {
       </main>
       <Footer />
       <StaticPageBreadcrumb name="About" slug="/about" />
-      <JsonLd data={personLD({ url: PAGE_URL, description: PERSON_DESCRIPTION, jobTitle: 'maintainer, bernstein' })} />
+      <JsonLd data={personLD({ url: PAGE_URL, description: PROJECT_MAINTAINER_DESCRIPTION, jobTitle: 'maintainer, bernstein' })} />
     </>
   );
 }

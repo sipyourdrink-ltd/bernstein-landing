@@ -15,6 +15,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { PROJECT_ALTERNATE_NAME } from '../lib/project-description.ts';
+
 import {
   articleLD,
   breadcrumbLD,
@@ -93,11 +95,17 @@ const SITE_ORG_FILE = path.resolve(
 
 /* Bind imported identifiers used by the ORGANIZATION_JSON_LD literal to
  * lightweight stand-ins lifted from lib/seo.ts. If new imports land,
- * extend this map. */
+ * extend this map.
+ *
+ * PROJECT_ALTERNATE_NAME is the real export rather than a stand-in:
+ * lib/project-description.ts is dependency-free, so it imports cleanly
+ * here, and a stand-in would reintroduce in this file the second copy
+ * that module exists to eliminate. */
 const SITE_ORG_WIRES = {
   AUTHOR: 'Alex Chernysh',
   SITE_URL: 'https://bernstein.run',
   SITE_NAME: 'Bernstein',
+  PROJECT_ALTERNATE_NAME,
 };
 
 function extractObjectLiteral(source: string, name: string): string | null {
