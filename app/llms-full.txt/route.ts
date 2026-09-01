@@ -1,6 +1,7 @@
 import { getAllPosts } from '@/lib/mdx';
 import { SITE_URL } from '@/lib/seo';
 import { getAllSeedItems } from '@/lib/ask-seed';
+import { PROJECT_ONE_LINER, PROJECT_OVERVIEW } from '@/lib/project-description';
 
 /* Invariant for everything rendered below: an absolute URL appears once
    in the finished document. The crawler that reads this file counts a
@@ -16,11 +17,11 @@ const BASE_CONTENT = `# Bernstein - Complete Technical Reference
 > reproduces its task graph byte-identically. Signed lineage plus an opt-in
 > HMAC audit chain a reviewer checks offline, without rerunning it. Cluster
 > mode, air-gap deploy.
-> Orchestrate any CLI coding agent. Any model. One command.
+> ${PROJECT_ONE_LINER}
 
 ## Overview
 
-Bernstein is a Python-based orchestration system that coordinates multiple AI coding agents working in parallel on a single codebase. It decomposes goals into tasks, assigns them to the most appropriate agents and models, isolates work in git worktrees, verifies results through quality gates, and merges verified output.
+${PROJECT_OVERVIEW}
 
 State lives in \`.sdd/\` - no server to provision. Per-agent credential scoping keeps each agent's keys out of the others' environments. The 40+ adapter spread means it runs on whichever CLI agent you already trust (Claude Code, Codex, Gemini CLI, Aider, and more). A lineage spine and replay journal are always on, so any run can be reconstructed step by step; enable the HMAC-chained audit log and every step becomes a signed record a reviewer who did not execute the run can check offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Cluster mode and an air-gap install profile are included.
 
