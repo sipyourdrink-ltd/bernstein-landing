@@ -92,7 +92,7 @@
       "@id": "https://bernstein.run/#website",
       "url": "https://bernstein.run",
       "name": "Bernstein",
-      "description": "The open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, +40 more). No model in the coordination loop, so parallel runs in per-task git worktrees replay byte-identically. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy.",
+      "description": "The open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, +40 more). No model in the coordination loop, so replaying a plan reproduces its task graph byte-identically. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy.",
       "publisher": {
         "@id": "https://bernstein.run/#org"
       }
@@ -118,7 +118,7 @@
           "name": "What is Bernstein?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Bernstein is the open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI and 40+ more), run in parallel on your codebase. It decomposes goals into tasks, assigns each to an agent in its own git worktree, and verifies results through lint, type, and test gates before merging. The scheduler is plain Python with no model in the coordination loop, so a run replays byte-identically."
+            "text": "Bernstein is the open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI and 40+ more), run in parallel on your codebase. It decomposes goals into tasks, assigns each to an agent in its own git worktree, and verifies results through lint, type, and test gates before merging. The scheduler is plain Python with no model in the coordination loop, so replaying a plan reproduces its task graph byte-identically."
           }
         },
         {

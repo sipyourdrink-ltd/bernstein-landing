@@ -97,7 +97,7 @@ const WEBSITE_JSON_LD = {
   name: 'Bernstein',
   alternateName: 'Bernstein Orchestrator',
   url: 'https://bernstein.run',
-  description: 'The open-source governance layer for AI agents. Deterministic runs in per-task git worktrees replay byte-identically; signed receipts verify offline.',
+  description: 'The open-source governance layer for AI agents. Deterministic task graphs replay byte-identically; byte-identical run receipts verify offline.',
   inLanguage: 'en',
   /* publisher references the canonical Organization node from the
      site-wide layout instead of redefining it. Graph edge keeps the KG

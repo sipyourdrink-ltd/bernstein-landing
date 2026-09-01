@@ -5,8 +5,8 @@
   "display_name": "Bernstein",
   "version": "3.18.2",
   "protocol_version": "2025-03-26",
-  "description": "The open-source governance layer for AI agents, exposed as MCP tools. A deterministic Python scheduler with no model in the coordination loop runs agents in parallel, gates what they produce, and records every step, so a run replays byte-identically and can be verified afterwards from the artifacts alone. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, Aider, Cursor and 40+ more); every task runs in its own git worktree behind lint/type/test gates. Any MCP client can spawn, monitor, approve or stop a run.",
-  "summary": "The open-source governance layer for AI agents, exposed as MCP tools. No model in the coordination loop, so runs replay byte-identically and a reviewer checks the record offline.",
+  "description": "The open-source governance layer for AI agents, exposed as MCP tools. A deterministic Python scheduler with no model in the coordination loop runs agents in parallel, gates what they produce, and records every step, so replaying a plan reproduces its task graph byte-identically and can be verified afterwards from the artifacts alone. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, Aider, Cursor and 40+ more); every task runs in its own git worktree behind lint/type/test gates. Any MCP client can spawn, monitor, approve or stop a run.",
+  "summary": "The open-source governance layer for AI agents, exposed as MCP tools. No model in the coordination loop, so replaying a plan reproduces its task graph byte-identically and a reviewer checks the record offline.",
   "author": {
     "name": "Alex Chernysh",
     "email": "alex@alexchernysh.com",

@@ -3,7 +3,7 @@
   "info": {
     "title": "Bernstein API",
     "version": "3.18.2",
-    "description": "The open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, +40 more). No model in the coordination loop, so parallel runs in per-task git worktrees replay byte-identically. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy. The task server is operator-hosted - it runs on the machine where Bernstein is installed - so the servers entry below is a URL template, not a hosted endpoint."
+    "description": "The open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, +40 more). No model in the coordination loop, so replaying a plan reproduces its task graph byte-identically. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy. The task server is operator-hosted - it runs on the machine where Bernstein is installed - so the servers entry below is a URL template, not a hosted endpoint."
   },
   "servers": [
     {

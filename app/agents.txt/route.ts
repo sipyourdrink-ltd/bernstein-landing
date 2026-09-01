@@ -8,7 +8,7 @@
  */
 const CONTENT = `User-agent: *
 Name: Bernstein
-Description: The open-source governance layer for AI agents - no model in the coordination loop, so parallel runs in per-task git worktrees replay byte-identically; signed lineage and an opt-in HMAC audit chain, air-gap friendly
+Description: The open-source governance layer for AI agents - no model in the coordination loop, so replaying a plan reproduces its task graph byte-identically; signed lineage and an opt-in HMAC audit chain, air-gap friendly
 Status: beta (solo-maintained; pin the version you depend on)
 Homepage: https://bernstein.run
 Repository: https://github.com/sipyourdrink-ltd/bernstein
