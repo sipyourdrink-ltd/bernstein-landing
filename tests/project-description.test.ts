@@ -119,6 +119,8 @@ const LITERAL_SURFACES: string[] = [
   'public/manifest.json',
   'components/seo/SoftwareApplicationJsonLd.tsx',
   'components/seo/OrganizationJsonLd.tsx',
+  'app/why-bernstein/page.tsx',
+  'app/vs/page.tsx',
 ];
 
 /** Every surface that carries a description of the project. */

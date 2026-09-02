@@ -55,9 +55,9 @@ const mdxComponents = {
    the site; ISR isn't needed for a 6-section faq. */
 export const dynamic = 'force-static';
 
-const PAGE_TITLE = 'why bernstein - deterministic multi-agent CLI orchestrator';
+const PAGE_TITLE = 'why bernstein - open-source governance layer for AI agents';
 const PAGE_DESC =
-  'Decision-support FAQ for engineers evaluating Bernstein: a deterministic Python orchestrator that runs Claude Code, Codex, Aider, and Gemini CLI in parallel.';
+  'FAQ for engineers evaluating Bernstein, the open-source governance layer for AI agents: Claude Code, Codex, Aider and Gemini CLI, deterministically scheduled.';
 const PAGE_URL = `${SITE_URL}/why-bernstein`;
 
 export const metadata: Metadata = {
@@ -197,7 +197,7 @@ const SOFTWARE_SOURCE_CODE_JSONLD = {
   operatingSystem: 'macOS, Linux, Windows (WSL)',
   applicationCategory: 'DeveloperApplication',
   description:
-    'deterministic python orchestrator for cli ai coding agents (claude code, codex, cursor, aider, gemini cli, 40+ more) running in parallel git worktrees behind lint, type, and test gates, with an always-on lineage spine and replay journal, and an opt-in hmac-chained audit trail a reviewer checks offline',
+    'the open-source governance layer for ai agents: a deterministic python scheduler runs cli coding agents (claude code, codex, cursor, aider, gemini cli, 40+ more) in parallel git worktrees behind lint, type, and test gates, with an always-on lineage spine and replay journal, and an opt-in hmac-chained audit trail a reviewer checks offline',
   author: {
     '@type': 'Person',
     name: AUTHOR,

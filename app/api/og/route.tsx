@@ -1,5 +1,6 @@
 import { ImageResponse } from '@vercel/og';
 import type { NextRequest } from 'next/server';
+import adapterCount from '@/data/adapter-count.json';
 
 export const runtime = 'edge';
 
@@ -26,7 +27,7 @@ const OG_CACHE_CONTROL =
 // the API is unavailable. revalidate:3600 keeps cost trivial - one
 // upstream call per cache region per hour.
 async function fetchLiveStats(): Promise<{ stars: number; adapters: number }> {
-  const FALLBACK = { stars: 693, adapters: 44 };
+  const FALLBACK = { stars: 693, adapters: adapterCount.count };
   try {
     const r = await fetch(
       'https://api.github.com/repos/sipyourdrink-ltd/bernstein',
