@@ -37,6 +37,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import {
+  OVERSTATED_RECEIPT_CLAIM,
   PROJECT_ALTERNATE_NAME,
   PROJECT_CATEGORIES,
   PROJECT_DESCRIPTION,
@@ -47,6 +48,7 @@ import {
   PROJECT_TAGLINE,
   PROJECT_TAGLINE_LOWER,
   PROJECT_TAGS,
+  RETIRED_DESCRIPTION_PHRASES,
 } from '../lib/project-description.ts';
 
 const REPO_ROOT = process.cwd();
@@ -93,21 +95,6 @@ const DERIVED_SURFACES: Array<{ file: string; bindings: string[] }> = [
 ];
 
 /**
- * Phrases the project description moved off. Each one described the
- * previous, narrower scope, and each is specific enough that a correct
- * reference to the orchestrator process or the engine repository cannot
- * trip it.
- */
-const RETIRED_PHRASES: string[] = [
-  'Bernstein Orchestrator',
-  'AIOrchestration',
-  'orchestration system',
-  'Orchestrate any CLI coding agent',
-  'orchestrator for cli coding agents',
-  'orchestrator for cli ai coding agents',
-];
-
-/**
  * Surfaces that still spell the description out, because the string
  * they need is longer or differently shaped than any shared export.
  * They are not required to import the module, but they are required to
@@ -116,9 +103,11 @@ const RETIRED_PHRASES: string[] = [
  * `app/vs/page.tsx` and `app/vs/[slug]/page.tsx` are deliberately not
  * listed here: the /vs hub and per-adapter pages are generated and
  * deployed straight to the host, outside this git tree, so a checkout
- * never has them on disk and a source-text read can only ENOENT. That
- * also means this suite cannot guard their copy - see the drift-guard
- * gap this leaves, tracked separately from this fix.
+ * never has them on disk and a source-text read can only ENOENT. Their
+ * copy is guarded instead by `tests/vs-pages-live.test.ts`, which runs
+ * the same three assertions against the deployed HTML. That suite is
+ * opt-in, so when it does not run the /vs pages are unguarded and it
+ * says so in its skip reason.
  */
 const LITERAL_SURFACES: string[] = [
   'app/layout.tsx',
@@ -155,7 +144,7 @@ test('the four drift-prone surfaces derive their description from the shared mod
 test('no surface reintroduces the retired project description', () => {
   for (const file of DESCRIBING_SURFACES) {
     const src = read(file);
-    for (const phrase of RETIRED_PHRASES) {
+    for (const phrase of RETIRED_DESCRIPTION_PHRASES) {
       assert.ok(
         !src.includes(phrase),
         `${file} carries the retired phrase "${phrase}"`,
@@ -172,7 +161,7 @@ test('receipts are described as offline-verifiable, not byte-identical', () => {
      general, which is not a property this project has. */
   for (const file of DESCRIBING_SURFACES) {
     assert.ok(
-      !read(file).includes('byte-identical run receipts'),
+      !read(file).includes(OVERSTATED_RECEIPT_CLAIM),
       `${file} overstates the receipt guarantee; receipts are offline-verifiable, and it is the run that replays byte-identically`,
     );
   }

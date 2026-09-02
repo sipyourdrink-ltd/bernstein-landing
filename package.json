@@ -15,7 +15,8 @@
     "postbuild:indexnow": "node scripts/submit-indexnow.mjs",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\""
+    "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\"",
+    "test:vs-live": "VS_LIVE_CHECK=1 node --test --experimental-strip-types tests/vs-pages-live.test.ts"
   },
   "dependencies": {
     "@react-email/components": "^1.0.12",
