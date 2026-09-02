@@ -193,7 +193,9 @@ export async function HeroV2({
           bernstein is the open-source governance layer for ai agents:
           a deterministic python scheduler runs them in parallel, with
           no model in the coordination loop, so the same plan replays
-          byte-identically.
+          byte-identically. it runs on policy as code: you write the
+          policy, bernstein enforces it, and produces the verifiable
+          record.
         </p>
 
         <p className="v2-sub">

@@ -32,7 +32,7 @@ const SITE_URL = "https://bernstein.run";
    Twitter card. Kept as a single const so the three can never drift
    apart again - they had, and each carried a different agent count. */
 const SITE_DESCRIPTION =
-  "The open-source governance layer for AI agents. Runs Claude Code, Codex, Gemini CLI and 40+ agents in parallel worktrees with no model in the coordination loop.";
+  "The open-source governance layer for AI agents. Policy as code for approvals and records, enforced around Claude Code, Codex, Gemini CLI and 40+ more.";
 
 export const viewport: Viewport = {
   /* Cream paper background - matches --bg-paper. Hex fallback for browsers
