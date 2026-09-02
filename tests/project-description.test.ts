@@ -112,6 +112,13 @@ const RETIRED_PHRASES: string[] = [
  * they need is longer or differently shaped than any shared export.
  * They are not required to import the module, but they are required to
  * agree with it, which is what the tests below check.
+ *
+ * `app/vs/page.tsx` and `app/vs/[slug]/page.tsx` are deliberately not
+ * listed here: the /vs hub and per-adapter pages are generated and
+ * deployed straight to the host, outside this git tree, so a checkout
+ * never has them on disk and a source-text read can only ENOENT. That
+ * also means this suite cannot guard their copy - see the drift-guard
+ * gap this leaves, tracked separately from this fix.
  */
 const LITERAL_SURFACES: string[] = [
   'app/layout.tsx',
@@ -120,7 +127,6 @@ const LITERAL_SURFACES: string[] = [
   'components/seo/SoftwareApplicationJsonLd.tsx',
   'components/seo/OrganizationJsonLd.tsx',
   'app/why-bernstein/page.tsx',
-  'app/vs/page.tsx',
 ];
 
 /** Every surface that carries a description of the project. */
