@@ -1,20 +1,20 @@
 {
   "version": 1,
-  "builtAt": "2026-08-31",
+  "builtAt": "2026-09-18",
   "mtimes": {
-    "app/page.tsx": "2026-08-31",
-    "app/cli-quickstart/page.tsx": "2026-08-31",
-    "app/why-bernstein/page.tsx": "2026-08-31",
+    "app/page.tsx": "2026-09-18",
+    "app/cli-quickstart/page.tsx": "2026-09-18",
+    "app/why-bernstein/page.tsx": "2026-09-02",
     "app/cost/page.tsx": "2026-08-31",
     "app/sponsors/page.tsx": "2026-08-31",
     "app/ask/page.tsx": "2026-08-31",
     "app/tools/agent-md-bench/page.tsx": "2026-08-31",
     "app/tools/orchestra/page.tsx": "2026-08-31",
-    "data/ask-seed.json": "2026-08-31",
+    "data/ask-seed.json": "2026-09-02",
     "app/q/page.tsx": "2026-08-31",
     "app/spec-driven/page.tsx": "2026-08-31",
     "data/adapters.json": "2026-08-31",
-    "app/vs/page.tsx": "2026-08-31",
+    "app/vs/page.tsx": "2026-09-02",
     "lib/compare/data.ts": "2026-08-31",
     "app/compare/page.tsx": "2026-08-31"
   }
