@@ -74,6 +74,8 @@ export const initialState: DocsBotState = {
   pendingQuery: null,
   declineSuggestions: [],
   declineReplaced: false,
+  statusPhase: null,
+  statusExpectedMs: null,
   previewText: '',
   previewCitations: new Map(),
   previewDeclined: null,
@@ -86,6 +88,13 @@ export const initialState: DocsBotState = {
  */
 function applyEvent(state: DocsBotState, event: SseEvent): DocsBotState {
   switch (event.type) {
+    case 'status':
+      /* Progress only - no phase change. The gateway sends these while
+         it is still retrieving or waiting on the repository wiki, i.e.
+         before `meta`; they let the waiting indicator say what is
+         happening instead of guessing from elapsed time. */
+      return { ...state, statusPhase: event.phase, statusExpectedMs: event.expectedMs };
+
     case 'meta':
       /* meta is the start-of-response signal. We move into 'streaming'
          and stamp the responseId / model so the UI can pin them in

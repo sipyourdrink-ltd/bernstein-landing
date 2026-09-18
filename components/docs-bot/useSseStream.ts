@@ -309,6 +309,15 @@ function normalizeEvent(eventName: string | null, data: Record<string, unknown>)
       };
     case 'token':
       return { type: 'token', delta: String(data.delta ?? '') };
+    case 'status': {
+      const expected = Number(data.expected_ms ?? data.expectedMs);
+      return {
+        type: 'status',
+        phase: String(data.phase ?? ''),
+        elapsedMs: Number(data.elapsed_ms ?? data.elapsedMs ?? 0),
+        expectedMs: Number.isFinite(expected) && expected > 0 ? expected : null,
+      };
+    }
     case 'citation': {
       /* Gateway wraps the Citation under `data.citation` per
          schemas.py::StreamCitation. Older shape (flat) supported

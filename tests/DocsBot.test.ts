@@ -253,3 +253,29 @@ test('decline does NOT push into transcript', () => {
   assert.equal(s.phase, 'declined');
   assert.equal(s.transcript.length, 0);
 });
+
+/* Gateway `status` frames arrive before `meta` (retrieval, then the
+   repository-wiki wait). They must not move the phase - only record
+   what is running so the waiting indicator can say so. */
+test('status frames record the gateway phase without changing the state phase', () => {
+  let state: DocsBotState = reducer(initialState, { kind: 'ASK', query: 'how does it work?' });
+  state = reducer(state, {
+    kind: 'EVENT',
+    event: { type: 'status', phase: 'retrieve', elapsedMs: 3, expectedMs: null },
+  });
+  assert.equal(state.phase, 'idle');
+  assert.equal(state.statusPhase, 'retrieve');
+  assert.equal(state.statusExpectedMs, null);
+
+  state = reducer(state, {
+    kind: 'EVENT',
+    event: { type: 'status', phase: 'wiki', elapsedMs: 5053, expectedMs: 15000 },
+  });
+  assert.equal(state.phase, 'idle');
+  assert.equal(state.statusPhase, 'wiki');
+  assert.equal(state.statusExpectedMs, 15000);
+
+  /* A fresh ask clears the last phase. */
+  state = reducer(state, { kind: 'ASK', query: 'next' });
+  assert.equal(state.statusPhase, null);
+});

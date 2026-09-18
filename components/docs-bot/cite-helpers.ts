@@ -80,3 +80,16 @@ export function chipHrefState(
   if (safe === '#' || safe === '') return { href: '', isLinkable: false };
   return { href: safe, isLinkable: true };
 }
+
+/** Where a citation leads, in words: the popover's open link reads
+   "bernstein docs — <title>" (bernstein.run, GitHub) or "bernstein
+   wiki — <title>" (the repository wiki). Unparseable URL ⇒ docs. */
+export function sourceLabel(url: string): string {
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    if (host === 'deepwiki.com' || host.endsWith('.deepwiki.com')) return 'bernstein wiki';
+  } catch {
+    /* relative or malformed href - treat as our own docs */
+  }
+  return 'bernstein docs';
+}

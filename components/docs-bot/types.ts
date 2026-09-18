@@ -55,6 +55,10 @@ export type Citation = {
  */
 export type SseEvent =
   | { type: 'meta'; responseId: string; model: string }
+  /** Progress while the gateway is still working (before `meta`):
+      `phase` is `retrieve` or `wiki`; `expectedMs` is how long that
+      phase usually takes, when the gateway knows. */
+  | { type: 'status'; phase: string; elapsedMs: number; expectedMs: number | null }
   | { type: 'token'; delta: string }
   | { type: 'citation'; n: number; title: string; url: string; excerpt: string; score?: number; chunkId?: string; section?: string }
   | {
@@ -173,6 +177,13 @@ export type DocsBotState = {
    * older clients so they don't append onto the replaced copy.
    */
   declineReplaced: boolean;
+  /**
+   * Last `status` frame of the in-flight request: which gateway phase
+   * is running and how long it usually takes. Drives the waiting
+   * indicator's status line; cleared on the next ASK.
+   */
+  statusPhase: string | null;
+  statusExpectedMs: number | null;
   /**
    * research-006 - running concatenation of preview-token deltas.
    * Cleared whenever a fresh ASK lands. Stays populated even after the

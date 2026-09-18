@@ -27,7 +27,7 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { Citation } from './types.ts';
-import { chipHrefState } from './cite-helpers.ts';
+import { chipHrefState, sourceLabel } from './cite-helpers.ts';
 
 interface CitationChipProps {
   n: number;
@@ -35,6 +35,7 @@ interface CitationChipProps {
 }
 
 const TITLE_CAP = 32;
+
 /* Width matches the CSS .docs-bot-cite-popover { width: 320px }.
    Kept as a constant here so the clamp math doesn't have to read
    the popover element after first paint. */
@@ -193,9 +194,14 @@ export function CitationChip({ n, citation }: CitationChipProps) {
     if (citation) trackCiteClick(n, citation.url);
   }, [citation, n]);
 
-  const truncatedTitle = citation && citation.title.length > TITLE_CAP
-    ? citation.title.slice(0, TITLE_CAP - 1) + '…'
-    : citation?.title ?? '';
+  /* The popover has room for the whole title; an ellipsised one hid
+     which wiki section a chip pointed at. `TITLE_CAP` still bounds the
+     open-link label below so a runaway title cannot stretch the card. */
+  const fullTitle = citation?.title ?? '';
+  const linkTitle = fullTitle.length > TITLE_CAP * 2
+    ? fullTitle.slice(0, TITLE_CAP * 2 - 1) + '…'
+    : fullTitle;
+  const openLabel = `${sourceLabel(citation?.url ?? '')} — ${linkTitle}`;
 
   const popoverNode = open && hasCitation && pos && mounted
     ? createPortal(
@@ -217,7 +223,7 @@ export function CitationChip({ n, citation }: CitationChipProps) {
           <div className="docs-bot-cite-popover-header">
             <span className="docs-bot-cite-popover-num">[{n}]</span>
             <span className="docs-bot-cite-popover-title" title={citation!.title}>
-              {truncatedTitle}
+              {fullTitle}
             </span>
             {typeof citation!.score === 'number' ? (
               /* Post-rerank relevance hint. Two decimals is enough
@@ -242,7 +248,7 @@ export function CitationChip({ n, citation }: CitationChipProps) {
               rel="noopener noreferrer"
               onClick={onClick}
             >
-              open doc →
+              {openLabel} →
             </a>
           ) : (
             <span className="docs-bot-cite-popover-open docs-bot-cite-popover-open--unavailable">
