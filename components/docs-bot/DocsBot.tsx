@@ -396,7 +396,6 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
 
   return (
     <section
-      id="ask"
       className={`docs-bot docs-bot--${variant}`}
       aria-labelledby="docs-bot-heading"
     >
