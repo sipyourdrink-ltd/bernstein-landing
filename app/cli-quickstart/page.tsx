@@ -306,6 +306,26 @@ bernstein stop          # graceful shutdown of the running orchestra`}</code>
               other LLMs the same way as this page).
             </p>
 
+            <h2 id="mcp-agents" className="cliqs-step-heading">connect an agent over mcp</h2>
+            <p>
+              Bernstein also ships a small remote MCP server for checking
+              run receipts from any MCP-aware client, separate from the{' '}
+              <code>bernstein mcp</code> orchestration server described
+              above. It is read-only, anonymous, and served over
+              Streamable HTTP - no install, no API key.
+            </p>
+            <pre className="cliqs-code">
+              <code>{`claude mcp add --transport http bernstein https://mcp.bernstein.run/mcp`}</code>
+            </pre>
+            <p>
+              Endpoint: <code>https://mcp.bernstein.run/mcp</code>. Tools:{' '}
+              <code>verify_receipt</code>, <code>explain_receipt</code>,{' '}
+              <code>verify_chain</code>, <code>list_presets</code>,{' '}
+              <code>get_preset</code>, and <code>list_adapters</code>. To
+              check a single receipt without wiring up a client, use{' '}
+              <a href="https://mcp.bernstein.run/verify">the verify page</a>.
+            </p>
+
             <h2 id="faq" className="cliqs-step-heading">faq</h2>
             <p>
               Five common operator questions about the install path,

@@ -222,8 +222,8 @@ export default async function LandingPage() {
         <SocialProofStrip stars={pkgStats.stars ?? null} />
         {/* The four-stage view of a run. Sole presentation of the
             pipeline on this page, and the only remaining on-page anchor
-            (`#how`) - the Nav scroll-spy and the /#how links from
-            /spec-driven both resolve here. */}
+            (`#how`) - the footer's "How it works" entry and the /#how
+            links from /spec-driven both resolve here. */}
         <PipelineRailMini />
         {/* "from the blog" strip - internal links from the home page to
             /blog/<slug>. Sits above AuditLogEvidence so a reader meets

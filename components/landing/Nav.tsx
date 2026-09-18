@@ -3,13 +3,15 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { trackOutbound } from '@/components/site/track-outbound';
-import { track, UmamiEvent, emitFunnelStep } from '@/lib/analytics/events';
+import { emitFunnelStep } from '@/lib/analytics/events';
 import { withUtm } from '@/lib/utm';
 
-/* Section ids the redesigned homepage renders for scroll-spy. Compare moved
-   to the /compare route and the under-the-hood section was removed in the
-   2026-05-21 redesign, so "how" is the only remaining on-page anchor. */
-const SECTION_IDS = ['how'] as const;
+/* Primary nav is one entry point per job: Install, Verify, Docs, Ask, plus
+   GitHub. Everything else (how it works, cost, blog, the code-map
+   shortcuts) lives in the footer or inline in page copy instead - see
+   Footer.tsx. There is no on-page scroll-spy anymore: none of the five
+   entries point at a same-page anchor, so the previous IntersectionObserver
+   wiring for `#how` was removed along with the nav link that used it. */
 
 function formatStars(stars: number): string {
   if (stars >= 1000) {
@@ -21,37 +23,9 @@ function formatStars(stars: number): string {
 }
 
 export function Nav() {
-  const [active, setActive] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [stars, setStars] = useState<number | null>(null);
   const pathname = usePathname();
-  const isHome = pathname === '/';
-
-  const sectionHref = (id: string) => (isHome ? `#${id}` : `/#${id}`);
-
-  /* Scroll spy via IntersectionObserver */
-  useEffect(() => {
-    const entries = new Map<string, boolean>();
-    const observer = new IntersectionObserver(
-      (observed) => {
-        for (const entry of observed) {
-          entries.set(entry.target.id, entry.isIntersecting);
-        }
-        for (const id of SECTION_IDS) {
-          if (entries.get(id)) {
-            setActive(id);
-            return;
-          }
-        }
-      },
-      { rootMargin: '-64px 0px -40% 0px', threshold: 0 },
-    );
-    for (const id of SECTION_IDS) {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    }
-    return () => observer.disconnect();
-  }, []);
 
   /* Nav background transition on scroll */
   useEffect(() => {
@@ -87,11 +61,26 @@ export function Nav() {
       <header className={scrolled ? 'nav-scrolled' : 'nav-top'}>
         {/* Mobile-only quick-links strip - its own row above the logo line so
             it gets full viewport width and never collides with the logo or
-            anything else. Hidden ≥769 px via CSS. No hamburger: the three
-            links here ARE the mobile nav. */}
+            anything else. Hidden ≥769 px via CSS. No hamburger: the five
+            links here ARE the mobile nav, mirroring the desktop list below. */}
         <nav className="nav-mobile-strip" aria-label="Quick links">
-          <a href="/blog" className={pathname?.startsWith('/blog') ? 'nav-active' : undefined}>
-            Blog
+          <a
+            href="/cli-quickstart"
+            className={pathname?.startsWith('/cli-quickstart') ? 'nav-active' : undefined}
+            data-umami-event="click-install-internal"
+            data-umami-event-source="nav-mobile"
+          >
+            Install
+          </a>
+          <a
+            href="https://mcp.bernstein.run/verify"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Verify a run receipt"
+            data-umami-event="click-verify-out"
+            data-umami-event-source="nav-mobile"
+          >
+            Verify
           </a>
           <a
             href="https://bernstein.readthedocs.io/"
@@ -101,6 +90,14 @@ export function Nav() {
             data-umami-event-source="nav-mobile"
           >
             Docs
+          </a>
+          <a
+            href="/ask"
+            className={pathname?.startsWith('/ask') ? 'nav-active' : undefined}
+            data-umami-event="click-ask-internal"
+            data-umami-event-source="nav-mobile"
+          >
+            Ask
           </a>
           <a
             href={withUtm('https://github.com/sipyourdrink-ltd/bernstein', {
@@ -124,77 +121,30 @@ export function Nav() {
           >
             GitHub
           </a>
-          {/* Skip-to-repo pill - mobile mirror of the desktop pill
-              (action-003, 2026-05-10). Distinct event from the generic
-              github-click so the SERP-cohort lift is measurable. */}
-          <a
-            href={withUtm('https://github.com/sipyourdrink-ltd/bernstein', {
-              source: 'bernstein.run',
-              medium: 'outbound-link',
-              campaign: 'nav-mobile-pill',
-            })}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-umami-event="outbound-github"
-            data-umami-event-surface="nav-mobile-pill"
-            onClick={() => {
-              track(UmamiEvent.GhSkipToRepoClick, { source: 'nav' });
-              emitFunnelStep('ghClick', { source: 'nav-mobile-pill', repeatable: true });
-            }}
-          >
-            → repo
-          </a>
         </nav>
         <div className="nav-inner">
           <a href="/" className="nav-logo" aria-label="Bernstein home">
             bernstein<span className="run">.run</span>
           </a>
           <nav className="nav-links" aria-label="Primary">
-            {!isHome && <a href="/">Home</a>}
             <a
-              href={sectionHref('how')}
-              className={active === 'how' ? 'nav-active' : undefined}
-            >
-              How it works
-            </a>
-            <a
-              href="/compare"
-              className={pathname?.startsWith('/compare') ? 'nav-active' : undefined}
-            >
-              Compare
-            </a>
-            <a
-              href="/cost"
-              className={pathname?.startsWith('/cost') ? 'nav-active' : undefined}
-              data-umami-event="click-cost-internal"
+              href="/cli-quickstart"
+              className={pathname?.startsWith('/cli-quickstart') ? 'nav-active' : undefined}
+              data-umami-event="click-install-internal"
               data-umami-event-source="nav-desktop"
             >
-              Cost
+              Install
             </a>
-            {/* Skip-to-repo pill (action-003, 2026-05-10) - one-click
-                escape for the "bernstein github" SERP cohort. */}
             <a
-              href={withUtm('https://github.com/sipyourdrink-ltd/bernstein', {
-                source: 'bernstein.run',
-                medium: 'outbound-link',
-                campaign: 'nav-desktop-pill',
-              })}
+              href="https://mcp.bernstein.run/verify"
               target="_blank"
               rel="noopener noreferrer"
-              data-umami-event="outbound-github"
-              data-umami-event-surface="nav-desktop-pill"
-              onClick={() => {
-                track(UmamiEvent.GhSkipToRepoClick, { source: 'nav' });
-                emitFunnelStep('ghClick', { source: 'nav-desktop-pill', repeatable: true });
-              }}
+              aria-label="Verify a run receipt"
+              data-umami-event="click-verify-out"
+              data-umami-event-source="nav-desktop"
             >
-              → repo
+              Verify
             </a>
-            {/* The /sponsors entry point lives in the footer only (see
-                components/landing/Footer.tsx). It keeps the same
-                ``click-sponsors-internal`` event name there, so the
-                taxonomy is unchanged - only the surface moved. */}
-            <a href="/blog" className={pathname?.startsWith('/blog') ? 'nav-active' : undefined}>Blog</a>
             <a
               href="https://bernstein.readthedocs.io/"
               target="_blank"
@@ -203,6 +153,14 @@ export function Nav() {
               data-umami-event-source="nav-desktop"
             >
               Docs
+            </a>
+            <a
+              href="/ask"
+              className={pathname?.startsWith('/ask') ? 'nav-active' : undefined}
+              data-umami-event="click-ask-internal"
+              data-umami-event-source="nav-desktop"
+            >
+              Ask
             </a>
             <a
               href={withUtm('https://github.com/sipyourdrink-ltd/bernstein', {
