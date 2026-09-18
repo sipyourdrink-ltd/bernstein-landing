@@ -69,7 +69,7 @@ export function Footer() {
           </div>
           <div className="footer-col">
             <h4>Resources</h4>
-            <a href="/ask" data-umami-event="click-ask-internal" data-umami-event-source="footer">Ask the docs</a>
+            <a href="/#ask" data-umami-event="click-ask-internal" data-umami-event-source="footer">Ask the docs</a>
             <a href="https://mcp.bernstein.run/verify" target="_blank" rel="noopener noreferrer" data-umami-event="click-verify-out" data-umami-event-source="footer">Verify a run receipt</a>
             {/* Was a top-level Nav entry before the nav was trimmed to
                 Install / Verify / Docs / Ask; kept reachable here since

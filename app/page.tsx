@@ -107,15 +107,15 @@ const WEBSITE_JSON_LD = {
      site-wide layout instead of redefining it. Graph edge keeps the KG
      consolidated. */
   publisher: { '@id': 'https://bernstein.run/#organization' },
-  /* SearchAction surfaces the Google sitelinks search box. Pointing at
-     /ask (live DocsBot) rather than /blog?q= gives engines a real
-     query interface; the Search Console rich-results validator prefers
-     a working search endpoint. */
+  /* SearchAction surfaces the Google sitelinks search box. It points
+     at the homepage question box (`?q=` prefills and submits it) so
+     engines get a real query interface; the Search Console
+     rich-results validator prefers a working search endpoint. */
   potentialAction: {
     '@type': 'SearchAction',
     target: {
       '@type': 'EntryPoint',
-      urlTemplate: 'https://bernstein.run/ask?q={search_term_string}',
+      urlTemplate: 'https://bernstein.run/?q={search_term_string}#ask',
     },
     'query-input': 'required name=search_term_string',
   },

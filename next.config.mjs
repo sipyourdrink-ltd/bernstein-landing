@@ -42,6 +42,15 @@ const nextConfig = {
         destination: '/sponsors',
         permanent: true,
       },
+      /* /ask was a second question box on its own page, above a BM25
+         blog search and the full FAQ text. One box on the homepage
+         answers the same questions; the FAQ entries keep their own
+         /q/<slug> pages. Permanent so `?q=` reaches the homepage box. */
+      {
+        source: '/ask',
+        destination: '/#ask',
+        permanent: true,
+      },
       /* /blog/v2-0-0-release was an auto-generated changelog-mirror stub
          that duplicated the hand-written canonical post at
          /blog/v2-0-release. The stub's slug is derived from the full

@@ -143,7 +143,7 @@ export default async function WhyBernsteinPage() {
 
           <div className="blog-post-chrome blog-post-chrome--bottom" data-nosnippet>
             <p className="blog-post-meta" style={{ marginTop: 'var(--space-4)' }}>
-              still deciding? <a href="/ask">ask the bot</a> -{' '}
+              still deciding? <a href="/#ask">ask the bot</a> -{' '}
               comparison-shaped questions get a comparison-shaped answer with
               citations back to this page.
             </p>

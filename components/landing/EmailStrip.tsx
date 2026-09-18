@@ -117,6 +117,7 @@ export function EmailStrip() {
 
   return (
     <section
+      id="subscribe"
       ref={sectionRef}
       className="v2-email"
       aria-labelledby="email-strip-heading"

@@ -5,9 +5,9 @@
  * answer body to AnswerStream / DeclineCard.
  *
  * Variants:
- *   - 'hero' : embedded in the homepage panel (replaces the legacy
- *              AskSummary slot). Compact layout, no heading.
- *   - 'page' : full-width on /ask, sits above the BM25 fallback list.
+ *   - 'hero' : embedded in the homepage panel; the site's one question
+ *              box (`/#ask`, `/?q=` prefills it). Compact, no heading.
+ *   - 'page' : full-width with its own heading; no route uses it today.
  *   - 'modal' : inside the SlashCommand dialog; same content tree
  *               but a cancel-on-ESC behaviour the dialog wraps.
  *
@@ -367,6 +367,20 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
     fireAsk(q);
   }, [fireAsk]);
 
+  /* `/?q=<question>#ask` is the site's search entry point (the sitelinks
+     SearchAction and the old /ask?q= links redirect here). Read it once
+     on mount, client-side, so the page stays statically rendered; the
+     hash scrolls the box into view and the ask fires like a chip tap. */
+  const firedFromUrl = useRef(false);
+  useEffect(() => {
+    if (firedFromUrl.current || initialQuery) return;
+    firedFromUrl.current = true;
+    const q = new URLSearchParams(window.location.search).get('q')?.trim() ?? '';
+    if (!q) return;
+    setQuery(q);
+    fireAsk(q);
+  }, [fireAsk, initialQuery]);
+
   /* Body switch. The shell stays the same; only the answer region
      changes shape per phase. research-006: hide the shimmer while the
      preview is showing - the preview block IS the loading affordance. */
@@ -382,6 +396,7 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
 
   return (
     <section
+      id="ask"
       className={`docs-bot docs-bot--${variant}`}
       aria-labelledby="docs-bot-heading"
     >

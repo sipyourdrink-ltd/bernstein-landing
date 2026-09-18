@@ -344,7 +344,7 @@ export default async function BlogPost({ params }: Props) {
             <p className="blog-digest-line">
               Prefer a weekly recap?{' '}
               <a
-                href="/ask"
+                href="/#subscribe"
                 data-umami-event="digest-signup-impression"
                 data-umami-event-source="blog-footer"
               >

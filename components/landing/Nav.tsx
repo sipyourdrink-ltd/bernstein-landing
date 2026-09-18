@@ -92,8 +92,7 @@ export function Nav() {
             Docs
           </a>
           <a
-            href="/ask"
-            className={pathname?.startsWith('/ask') ? 'nav-active' : undefined}
+            href="/#ask"
             data-umami-event="click-ask-internal"
             data-umami-event-source="nav-mobile"
           >
@@ -155,8 +154,7 @@ export function Nav() {
               Docs
             </a>
             <a
-              href="/ask"
-              className={pathname?.startsWith('/ask') ? 'nav-active' : undefined}
+              href="/#ask"
               data-umami-event="click-ask-internal"
               data-umami-event-source="nav-desktop"
             >
