@@ -2,11 +2,13 @@
  * ReadTheCode — quiet "read the code:" strip of links to the browsable
  * views of the source.
  *
- * Two mount points, one component:
- *   - `hero`   — directly under the hero CTA cluster in RightRail, for
- *                the visitor deciding how to look deeper before they
- *                install anything.
- *   - `footer` — mirrored in the footer's Resources group.
+ * One mount point today — `footer`, in the footer's Resources group.
+ * A `hero` variant used to sit directly under the RightRail CTA cluster
+ * too; it was dropped 2026-09-18 so the hero column carries one Docs
+ * mention (via Nav) instead of stacking a second one right under it. The
+ * `surface` prop and its CSS modifier stay in case a non-footer mount
+ * point is needed again - see read-the-code-data.ts for what still
+ * renders.
  *
  * Deliberately NOT a badge. Service badges are GitHub-README vernacular
  * and read as foreign on an editorial page; this renders in the site's
