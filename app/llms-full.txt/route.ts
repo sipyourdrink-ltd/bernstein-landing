@@ -675,6 +675,8 @@ Bernstein ships its role guidance (backend, frontend, QA, security, DevOps, arch
 - Issues: https://github.com/sipyourdrink-ltd/bernstein/issues
 - Agent Card (A2A): https://bernstein.run/.well-known/agent-card.json
 - MCP Server Card: https://bernstein.run/.well-known/mcp/server-card.json
+- MCP (remote, read-only): https://mcp.bernstein.run/mcp - verify run receipts, list presets and adapters
+- Verify a run receipt: https://mcp.bernstein.run/verify
 - Contact: forte@bernstein.run
 
 ## About the Author
