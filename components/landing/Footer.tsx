@@ -33,6 +33,16 @@ export function Footer() {
               GitHub
             </a>
             <a
+              href="https://www.linkedin.com/company/bernstein-run/"
+              aria-label="LinkedIn"
+              data-umami-event="outbound-linkedin"
+              data-umami-event-surface="footer-product"
+              data-umami-event-source="footer"
+              onClick={() => trackOutbound('linkedin.com', 'site-footer', 'product-li')}
+            >
+              LinkedIn
+            </a>
+            <a
               href="https://pypi.org/project/bernstein/"
               data-umami-event="click-pypi-out"
               data-umami-event-source="footer"
