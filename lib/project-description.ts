@@ -117,3 +117,37 @@ export const PROJECT_OVERVIEW = `${PROJECT_NAME} is ${PROJECT_TAGLINE_MID}. CLI 
 
 /** `Person` JSON-LD on /about. Lowercase to match that page's voice. */
 export const PROJECT_MAINTAINER_DESCRIPTION = `solo maintainer of bernstein, ${PROJECT_TAGLINE_LOWER}. deterministic python scheduler, cli coding agents out of the box. apache 2.0, self-bootstrapped, no vc funding.`;
+
+/**
+ * Phrases the project description moved off.
+ *
+ * Each one described the previous, narrower scope, and each is specific
+ * enough that a correct reference to the orchestrator process or the
+ * engine repository cannot trip it. That is why the list names whole
+ * phrases and not the substring "orchestrat": the scheduler is still an
+ * orchestrator, and pointers labelled "the orchestrator" that resolve to
+ * the engine repository are correct as they stand.
+ *
+ * Exported rather than kept next to the guard that first used it,
+ * because there is now more than one guard: the source-text suite reads
+ * the surfaces in this checkout, and the live suite reads the /vs pages,
+ * which are generated and deployed outside this git tree. A second
+ * hand-maintained copy of this list is the same failure mode the module
+ * itself exists to prevent.
+ */
+export const RETIRED_DESCRIPTION_PHRASES = [
+  'Bernstein Orchestrator',
+  'AIOrchestration',
+  'orchestration system',
+  'Orchestrate any CLI coding agent',
+  'orchestrator for cli coding agents',
+  'orchestrator for cli ai coding agents',
+] as const;
+
+/**
+ * The receipt claim no surface may make; see `PROJECT_SITE_DESCRIPTION`
+ * above for why. Receipt bytes are identical across independent builds
+ * of the same run, and two different runs produce different receipts, as
+ * they must. Offline verifiability is the property this project has.
+ */
+export const OVERSTATED_RECEIPT_CLAIM = 'byte-identical run receipts';
