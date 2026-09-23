@@ -148,11 +148,23 @@ export async function getPost(slug: string): Promise<PostResult | null> {
        posts must be clustered. */
     return null;
   }
-  /* Per-slug cluster guard, fired AFTER we know the file exists. The
-     build-time invariant (every published post belongs to ≥ 1 cluster)
-     would otherwise turn into a silent 404, which is what action-004
-     (2026-05-12) was trying to prevent. Lives OUTSIDE the parse/compile
-     try/catch below so a missing cluster entry fails the build loudly. */
+  /* Draft posts are exempt from the cluster guard below, the same way
+     getAllPosts() skips drafts before its own cluster assertion - a
+     draft has no RelatedPosts strip to populate, so it does not need a
+     cluster entry yet. A parse failure here falls through silently:
+     the full parse in the try block below re-parses the same file and
+     is the one that reports the real error. */
+  try {
+    if (Frontmatter.parse(matter(raw).data).draft) return null;
+  } catch {
+    /* fall through to the guard and the real parse below */
+  }
+  /* Per-slug cluster guard, fired AFTER we know the file exists and is
+     not a draft. The build-time invariant (every published post
+     belongs to ≥ 1 cluster) would otherwise turn into a silent 404,
+     which is what action-004 (2026-05-12) was trying to prevent. Lives
+     OUTSIDE the parse/compile try/catch below so a missing cluster
+     entry fails the build loudly. */
   if (!primaryClusterFor(slug)) {
     throw new Error(
       `post "${slug}" is not listed in any cluster. Add it to content/blog/_clusters.yaml.`,
