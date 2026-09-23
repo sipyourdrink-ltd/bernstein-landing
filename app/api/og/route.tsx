@@ -1,6 +1,7 @@
 import { ImageResponse } from '@vercel/og';
 import type { NextRequest } from 'next/server';
 import adapterCount from '@/data/adapter-count.json';
+import { PROJECT_TAGLINE, PROJECT_ONE_LINER } from '@/lib/project-description';
 
 export const runtime = 'edge';
 
@@ -183,12 +184,12 @@ export async function GET(request: NextRequest) {
             }}
           >
             {isDefault
-              ? 'Orchestrate parallel AI agents on your codebase'
+              ? PROJECT_TAGLINE
               : title}
           </div>
           {isDefault && (
             <div style={{ display: 'flex', fontSize: 20, color: '#6e6e80', marginTop: 20, maxWidth: '700px', lineHeight: 1.5 }}>
-              Run Claude Code, Codex, and Gemini CLI simultaneously. Deterministic scheduling. Quality gates. Any model.
+              {PROJECT_ONE_LINER}
             </div>
           )}
         </div>

@@ -92,6 +92,14 @@ const DERIVED_SURFACES: Array<{ file: string; bindings: string[] }> = [
       '{PROJECT_TAGLINE_LOWER}',
     ],
   },
+  {
+    /* The homepage's default social-share card (no ?title= query param).
+       Went stale once already: it hand-typed a description of the old,
+       narrower scope, so the image everyone actually sees on a shared
+       link contradicted the page it linked to (audit 2026-09-23, DES-5). */
+    file: 'app/api/og/route.tsx',
+    bindings: ['? PROJECT_TAGLINE', '{PROJECT_ONE_LINER}'],
+  },
 ];
 
 /**
