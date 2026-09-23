@@ -68,6 +68,7 @@ const TRACKED_PATHS = [
   'data/ask-seed.json',
   'app/q/page.tsx',
   'app/spec-driven/page.tsx',
+  'app/benchmarks/page.tsx',
   'data/adapters.json',
   'app/vs/page.tsx',
   'lib/compare/data.ts',
