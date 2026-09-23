@@ -2,8 +2,32 @@ import { ImageResponse } from '@vercel/og';
 import type { NextRequest } from 'next/server';
 import adapterCount from '@/data/adapter-count.json';
 import { PROJECT_TAGLINE, PROJECT_ONE_LINER } from '@/lib/project-description';
+import { renderableOgText } from '@/lib/og-text';
 
 export const runtime = 'edge';
+
+// The card renders with a font that ships in the repo. Without an explicit
+// `fonts` list @vercel/og draws with its built-in font and, for every glyph
+// that font lacks (the star below, emoji, non-Latin titles), downloads a
+// fallback font from fonts.googleapis.com or an emoji image from jsdelivr
+// while the request is being served. That download failed intermittently
+// ("Failed to download dynamic font") and made cold renders slow. Bundled
+// here, the font is resolved at build time; the promise is memoised for the
+// life of the isolate and cleared on failure so one bad read is not cached.
+// lib/og-text.ts keeps user-supplied titles inside what this font can draw.
+let fontData: Promise<ArrayBuffer> | undefined;
+function loadFont(): Promise<ArrayBuffer> {
+  fontData ??= fetch(new URL('../../../assets/og/Geist-Regular.ttf', import.meta.url))
+    .then((r) => {
+      if (!r.ok) throw new Error(`og font: HTTP ${r.status}`);
+      return r.arrayBuffer();
+    })
+    .catch((e) => {
+      fontData = undefined;
+      throw e;
+    });
+  return fontData;
+}
 
 // @vercel/og defaults every ImageResponse to
 // `public, immutable, no-transform, max-age=31536000`. That is correct
@@ -62,9 +86,9 @@ function formatStarsBadge(n: number): string {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const raw = searchParams.get('title') ?? '';
-  const title = raw.slice(0, 200) || 'Bernstein';
+  const title = renderableOgText(raw.slice(0, 200)) || 'Bernstein';
   const isDefault = !searchParams.get('title');
-  const stats = await fetchLiveStats();
+  const [stats, font] = await Promise.all([fetchLiveStats(), loadFont()]);
   const starsLabel = `${formatStarsBadge(stats.stars)} stars`;
   const adaptersLabel = `${stats.adapters} adapters`;
 
@@ -80,7 +104,7 @@ export async function GET(request: NextRequest) {
           padding: '60px 80px',
           background: '#131316',
           color: '#f0f0f2',
-          fontFamily: 'Inter, system-ui, sans-serif',
+          fontFamily: 'Geist',
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -150,7 +174,14 @@ export async function GET(request: NextRequest) {
                 color: '#c0c0d0',
               }}
             >
-              <span style={{ color: '#ffcc00' }}>&#9733;</span> {starsLabel}
+              {/* Inline SVG, not a U+2605 glyph: the bundled font has no star. */}
+              <svg width="14" height="14" viewBox="0 0 24 24">
+                <path
+                  d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                  fill="#ffcc00"
+                />
+              </svg>
+              {starsLabel}
             </div>
             <div
               style={{
@@ -219,6 +250,7 @@ export async function GET(request: NextRequest) {
     {
       width: 1200,
       height: 630,
+      fonts: [{ name: 'Geist', data: font, weight: 400, style: 'normal' }],
       headers: { 'cache-control': OG_CACHE_CONTROL },
     },
   );
