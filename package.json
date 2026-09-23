@@ -20,7 +20,7 @@
   "dependencies": {
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.0.8",
-    "@vercel/og": "^0.11.1",
+    "@vercel/og": "^1.0.2",
     "gray-matter": "^4.0.3",
     "mermaid": "^11.16.1",
     "minisearch": "^7.2.0",
