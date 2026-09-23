@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "builtAt": "2026-09-18T14:58:59.332Z",
-  "bernsteinRepoPath": "../bernstein",
+  "builtAt": "2026-09-23T12:31:52.396Z",
+  "bernsteinRepoPath": "../../../../../../private/tmp/claude-501/-Users-sasha/7a963ee2-c30d-4f91-866a-5703ed71f375/scratchpad/bernstein-v3.20.0-src",
   "adapters": [
     {
       "slug": "agy",

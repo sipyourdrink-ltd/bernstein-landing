@@ -22,8 +22,8 @@
       "x": "https://x.com/alex_chernysh"
     }
   },
-  "version": "3.18.2",
-  "agentVersion": "3.18.2",
+  "version": "3.20.0",
+  "agentVersion": "3.20.0",
   "homepage": "https://bernstein.run",
   "repository": "https://github.com/sipyourdrink-ltd/bernstein",
   "package": "https://pypi.org/project/bernstein/",
