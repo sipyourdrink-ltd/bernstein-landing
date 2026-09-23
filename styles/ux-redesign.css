@@ -817,11 +817,14 @@
     gap: 24px;
     padding: 28px 20px;
   }
-  /* Promote the right rail above the ask block so install + github come right
-     after the H1 on mobile — see variant-2 README §5. */
-  .v2-hero-lede { order: 2; }
+  /* Natural DOM order on mobile: the H1 and lede render first, the
+     install/github rail follows. A prior mobile-only promotion put the
+     whole right column (install block, github row, mini-stats, fact
+     list) ahead of the lede, which pushed the H1 and both lede
+     paragraphs below the first viewport (measured ~1047px on a 375x812
+     screen, well past the fold) - see variant-2 README §5 for the
+     original intent this replaces. */
   .v2-right-col {
-    order: 1;
     padding: 18px;
     gap: 18px;
     /* Without min-width:0 a grid item with monospace content (the install

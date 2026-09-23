@@ -253,7 +253,17 @@ body > header.nav-scrolled {
   .nav-mobile-strip {
     display: flex;
     align-items: center;
-    justify-content: center;
+    /* flex-start, not center: a centered flex container clips content
+       before its start edge when the row overflows, so scrolling left
+       could never reach it. overflow-x:auto is a safety net under the
+       tightened spacing below - content that still does not fit at a
+       given width scrolls instead of clipping against the viewport
+       edge (measured at 375px: "Install" and "LinkedIn", the first and
+       last links, lost ~5px each - axe/Lighthouse audit 2026-09-23). */
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
     gap: var(--space-2);
     height: 44px;
     border-bottom: 1px solid var(--rule);
@@ -262,14 +272,16 @@ body > header.nav-scrolled {
     margin: 0;
     padding: 0 var(--space-3);
   }
+  .nav-mobile-strip::-webkit-scrollbar { display: none; }
 }
 
-/* Tighten further on the smallest viewports (≤360 px) so Blog · Docs ·
-   GitHub stay on one line. */
-@media (max-width: 360px) {
-  .nav-mobile-strip { gap: var(--space-1); }
+/* Tighten further on narrow phones (≤480 px, covers the common 375-
+   390px widths) so Install · Verify · Docs · Ask · GitHub · LinkedIn
+   fit on one line without relying on the overflow-x scroll above. */
+@media (max-width: 480px) {
+  .nav-mobile-strip { gap: var(--space-1); padding: 0 var(--space-1); }
   .nav-mobile-strip a { font-size: 12px; padding: 0 var(--space-1); }
-  .nav-mobile-strip a:not(:last-child)::after { margin-left: var(--space-2); }
+  .nav-mobile-strip a:not(:last-child)::after { margin-left: var(--space-1); }
 }
 
 /* Safe-area insets */

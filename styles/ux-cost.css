@@ -14,7 +14,12 @@
 .cost-page-inner {
   max-width: 980px;
   margin: 0 auto;
-  padding: 32px 32px 0;
+  /* --header-h changes at the 768px breakpoint (ux-layout.css); calc()
+     keeps this clearing the fixed nav at every width instead of only
+     the one the hardcoded value happened to match. Shared by /cost,
+     /cli-quickstart, and /tools/agent-md-bench (same header markup),
+     matching the pattern already used in ux-blog.css and ux-hero.css. */
+  padding: calc(var(--header-h) + var(--space-6)) 32px 0;
 }
 
 .cost-page-header {
@@ -100,7 +105,7 @@
 @media (max-width: 720px) {
   .cost-calc-grid { grid-template-columns: 1fr; gap: 24px; }
   .cost-calc { padding: 24px; }
-  .cost-page-inner { padding: 16px 16px 0; }
+  .cost-page-inner { padding: calc(var(--header-h) + var(--space-4)) 16px 0; }
 }
 
 /* INPUT FIELDSET */

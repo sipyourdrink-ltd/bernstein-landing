@@ -7,7 +7,10 @@
    Warm cream paper background, monochrome ink, single muted bronze accent.
    Saturation deliberately low (≤0.10 chroma) — JCR luxury-status study
    correlation: lower saturation reads as higher heritage / continuity.
-   Contrast targets verified manually against --bg-paper before ship.
+   --ink-faint and --accent are set to clear 4.5:1 against both
+   --bg-paper and --bg-paper-2 (checked 2026-09-23 after an axe/
+   Lighthouse audit found the prior values did not); re-check both
+   backgrounds, not just one, if either token moves again.
    ============================================================================ */
 
 :root {
@@ -19,10 +22,16 @@
   /* Ink (text) */
   --ink:         oklch(20% 0.005 60);
   --ink-soft:    oklch(45% 0.005 60);
-  --ink-faint:   oklch(60% 0.005 60);
+  /* Was 60% L (~3.3-3.5:1 on --bg-paper/--bg-paper-2, below the 4.5:1
+     WCAG AA text minimum - axe/Lighthouse audit 2026-09-23). 50% L
+     clears 4.5:1 against both paper tokens with margin. */
+  --ink-faint:   oklch(50% 0.005 60);
 
   /* Accent — single muted terracotta-bronze */
-  --accent:      oklch(55% 0.10 35);
+  /* Was 55% L: 4.51:1 on --bg-paper (barely) but 4.25:1 on --bg-paper-2
+     (fails) - same audit as --ink-faint above. 50% L clears 4.5:1 on
+     both. */
+  --accent:      oklch(50% 0.10 35);
   --accent-soft: oklch(70% 0.06 35);
 
   /* Rules / staff lines */
