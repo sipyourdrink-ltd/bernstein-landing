@@ -343,7 +343,7 @@ export function RightRail({ adapterCount, closedPrs, contributors }: RightRailPr
               type="button"
               className={`v2-install-copy ${copiedId === tab.id ? 'is-copied' : ''} !text-[12px] !py-2 !px-3 !font-semibold !bg-[color:var(--accent)] !text-[color:var(--bg-paper)] !border-[color:var(--accent)] hover:!bg-[color:var(--ink)] hover:!border-[color:var(--ink)]`.trim()}
               onClick={() => onCopy(tab.id, tab.cmd, 'install-snippet-copy')}
-              aria-label={`copy ${tab.label} install command`}
+              aria-label={`Copy command: ${tab.cmd}`}
             >
               {copiedId === tab.id ? 'copied' : 'Copy command'}
             </button>
@@ -411,11 +411,14 @@ export function RightRail({ adapterCount, closedPrs, contributors }: RightRailPr
             emitFunnelStep('ghStar', { source: 'hero-rail', repeatable: true });
             trackOutbound('github.com', 'hero', 'star');
           }}
-          aria-label={
-            stars === null
-              ? 'star bernstein on github'
-              : `star bernstein on github · ${formatStars(stars)} stars`
-          }
+          /* No custom aria-label: the visible content (star icon is
+             aria-hidden below, "star on github", the live count, and the
+             7-day delta chip when shown) already reads as a complete
+             accessible name. A previous custom label inserted "bernstein"
+             between "star" and "on github", so the accessible name no
+             longer contained the visible text verbatim - a WCAG 2.5.3
+             label-in-name failure (axe/Lighthouse audit 2026-09-23) - and
+             it dropped the delta chip the visible row shows. */
         >
           <div className="v2-gh-left">
             <span className="v2-gh-star" aria-hidden="true">

@@ -133,7 +133,7 @@ export function Nav() {
           </a>
         </nav>
         <div className="nav-inner">
-          <a href="/" className="nav-logo" aria-label="Bernstein home">
+          <a href="/" className="nav-logo" aria-label="bernstein.run home">
             bernstein<span className="run">.run</span>
           </a>
           <nav className="nav-links" aria-label="Primary">
