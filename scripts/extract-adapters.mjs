@@ -282,7 +282,11 @@ async function main() {
   const out = {
     version: 1,
     builtAt: new Date().toISOString(),
-    bernsteinRepoPath: path.relative(ROOT, BERNSTEIN_REPO),
+    /* Sanitise: when BERNSTEIN_REPO was overridden (CI, temp worktree),
+       path.relative() produces a long absolute-looking traversal that
+       leaks the session path into the committed JSON.  Record only
+       the canonical sibling layout or an opaque marker. */
+    bernsteinRepoPath: process.env.BERNSTEIN_REPO ? '(env)' : '../bernstein',
     adapters,
   };
   await fs.writeFile(OUT_FILE, JSON.stringify(out, null, 2), 'utf8');
