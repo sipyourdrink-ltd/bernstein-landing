@@ -20,7 +20,7 @@ export const ORGANIZATION_JSON_LD: JsonLdData = {
   '@type': 'Organization',
   '@id': `${SITE_URL}/#organization`,
   name: SITE_NAME,
-  alternateName: [PROJECT_ALTERNATE_NAME, 'Bernstein multi-agent CLI orchestrator'],
+  alternateName: [PROJECT_ALTERNATE_NAME],
   description:
     'The open-source governance layer for AI agents. Coordinates Claude Code, Codex, Gemini CLI, and 40+ more coding agents under a plain-Python scheduler with no model in the coordination loop, git worktree isolation, quality gates, MCP server mode, A2A protocol, an always-on lineage spine and replay journal, and an opt-in HMAC-chained audit log a reviewer checks offline.',
   url: SITE_URL,

@@ -142,6 +142,13 @@ export const RETIRED_DESCRIPTION_PHRASES = [
   'Orchestrate any CLI coding agent',
   'orchestrator for cli coding agents',
   'orchestrator for cli ai coding agents',
+  /* Retired from the machine-readable surfaces (JSON-LD alternateName /
+     applicationSubCategory, agent-discovery files): earlier category
+     labels for the same narrower, pre-governance-layer scope. */
+  'CLI Agent Orchestration',
+  'multi-agent CLI orchestrator',
+  'AI coding agent manager',
+  'Multi-Agent Orchestration Platform',
 ] as const;
 
 /**

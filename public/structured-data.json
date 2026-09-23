@@ -8,7 +8,7 @@
       "description": "Bernstein is the open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, and 40+ more). Scheduling is plain Python - no LLM in the coordination loop - so runs are reproducible end to end. Every task runs in its own git worktree behind lint/type/test gates. An always-on lineage spine and replay journal record what happened; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Air-gap install profile included. Apache-2.0.",
       "url": "https://bernstein.run",
       "applicationCategory": "DeveloperApplication",
-      "applicationSubCategory": "CLI Agent Orchestration",
+      "applicationSubCategory": "AI Agent Governance",
       "operatingSystem": "macOS, Linux, Windows",
       "programmingLanguage": "Python",
       "runtimePlatform": "Python 3.12+",
