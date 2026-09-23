@@ -176,7 +176,6 @@ export async function buildSitemapUrls(
     whyBernsteinLastMod,
     costLastMod,
     sponsorsLastMod,
-    askLastMod,
     toolsAgentMdBenchLastMod,
     toolsOrchestraLastMod,
     qLastMod,
@@ -188,7 +187,6 @@ export async function buildSitemapUrls(
     lastModFromSource(['app/why-bernstein/page.tsx']),
     lastModFromSource(['app/cost/page.tsx']),
     lastModFromSource(['app/sponsors/page.tsx']),
-    lastModFromSource(['app/ask/page.tsx']),
     lastModFromSource(['app/tools/agent-md-bench/page.tsx']),
     lastModFromSource(['app/tools/orchestra/page.tsx']),
     /* /q index + /q/<slug> leaves share one mtime: the seed file is
@@ -246,12 +244,6 @@ export async function buildSitemapUrls(
       lastmod: sponsorsLastMod,
       changefreq: 'weekly',
       priority: 0.6,
-    },
-    {
-      loc: `${SITEMAP_SITE_URL}/ask`,
-      lastmod: askLastMod,
-      changefreq: 'weekly',
-      priority: 0.7,
     },
     {
       loc: `${SITEMAP_SITE_URL}/tools/agent-md-bench`,

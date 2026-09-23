@@ -17,6 +17,10 @@ featured: true
 Bernstein 1.0 is up on PyPI today. It's an orchestrator for CLI coding agents - Claude Code, Codex, Gemini CLI, anything that talks over a terminal - with a plain-Python scheduler and a worktree per agent so they don't trample each other.
 </Lead>
 
+<Callout title="Editor's note">
+Written for 1.0 in March 2026. Bernstein has since grown into the open-source governance layer for AI agents; see the docs for the current surface.
+</Callout>
+
 ## why
 
 I started the project after a 47-hour weekend running twelve Claude Code sessions in parallel and watching them race for the same files. The full story is on my [personal blog](https://alexchernysh.com/blog/bernstein-multi-agent-orchestration). The short version is that twelve agents with no coordination produce a merge horror show; twelve with worktrees and a scheduler produce a working codebase.
