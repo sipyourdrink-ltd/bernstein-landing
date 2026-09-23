@@ -159,9 +159,8 @@ const FIXTURE_MTIMES: Record<string, string> = {
   'app/why-bernstein/page.tsx': '2026-04-10',
   'app/cost/page.tsx': '2026-04-12',
   'app/sponsors/page.tsx': '2026-04-15',
-  'app/ask/page.tsx': '2026-04-18',
   'app/tools/agent-md-bench/page.tsx': '2026-04-20',
-  'app/tools/orchestra/page.tsx': '2026-04-22',
+  'app/benchmarks/page.tsx': '2026-04-22',
   'data/ask-seed.json': '2026-04-25',
   'app/q/page.tsx': '2026-04-26',
   'app/spec-driven/page.tsx': '2026-04-28',
@@ -199,7 +198,6 @@ test('blog entries lastmod comes from frontmatter, not build date', async () => 
     seedItems: [],
     readyAdapters: [],
     compareEntries: [],
-    benchmarkSuite: null,
     lastModFromSource,
     buildAt: FIXTURE_BUILD_AT,
   });
@@ -246,7 +244,6 @@ test('sitemap has at least one entry with lastmod older than today', async () =>
     seedItems: [],
     readyAdapters: [],
     compareEntries: [],
-    benchmarkSuite: null,
     lastModFromSource,
     buildAt: FIXTURE_BUILD_AT,
   });
@@ -273,7 +270,6 @@ test('sitemap entries carry varied lastmod values (no single-date collapse)', as
     seedItems: [{ slug: 'q-one' }, { slug: 'q-two' }],
     readyAdapters: [{ slug: 'aider' }, { slug: 'cursor' }],
     compareEntries: [{ slug: 'aider' }, { slug: 'cursor' }],
-    benchmarkSuite: { dateModified: '2026-05-10' },
     lastModFromSource: fixtureLastModResolver(),
     buildAt: FIXTURE_BUILD_AT,
   });
@@ -285,6 +281,30 @@ test('sitemap entries carry varied lastmod values (no single-date collapse)', as
   );
 });
 
+test('/benchmarks is always present, independent of any benchmark-suite data file', async () => {
+  /* The benchmarks index page renders regardless of whether the
+     operator-host benchmark-suite data file exists (lib/benchmarks/data.ts
+     returns null rather than throwing when it is absent), so the sitemap
+     entry must not be gated on that file either. This call passes no
+     benchmark-suite input at all. */
+  const urls = await buildSitemapUrls({
+    posts: [],
+    seedItems: [],
+    readyAdapters: [],
+    compareEntries: [],
+    lastModFromSource: fixtureLastModResolver(),
+    buildAt: FIXTURE_BUILD_AT,
+  });
+
+  const benchmarks = urls.find((u) => u.loc === 'https://bernstein.run/benchmarks');
+  assert.ok(benchmarks, '/benchmarks entry must always be present');
+  assert.equal(
+    benchmarks!.lastmod,
+    FIXTURE_MTIMES['app/benchmarks/page.tsx'],
+    '/benchmarks lastmod must come from app/benchmarks/page.tsx, not the build date',
+  );
+});
+
 /* ---------- noindex URLs are excluded (issue #42) ---------- */
 
 test('sitemap output does NOT list noindex discovery files', async () => {
@@ -293,7 +313,6 @@ test('sitemap output does NOT list noindex discovery files', async () => {
     seedItems: [],
     readyAdapters: [],
     compareEntries: [],
-    benchmarkSuite: null,
     lastModFromSource: fixtureLastModResolver(),
     buildAt: FIXTURE_BUILD_AT,
   });

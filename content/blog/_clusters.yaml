@@ -49,7 +49,6 @@ clusters:
     posts:
       - introducing-bernstein
       - getting-started
-      - orchestrator-vs-desktop-ade
       - module-decomposition
       - autofix-daemon
       - operator-pack

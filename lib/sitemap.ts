@@ -45,10 +45,6 @@ export type SitemapCompareEntry = {
   verified?: { date: string } | null;
 };
 
-export type SitemapBenchmarkSuite = {
-  dateModified: string;
-};
-
 export type LastModResolver = (
   candidates: readonly string[],
 ) => Promise<string>;
@@ -75,7 +71,6 @@ export type SitemapInputs = {
   seedItems: SitemapSeedItem[];
   readyAdapters: SitemapAdapterRef[];
   compareEntries: SitemapCompareEntry[];
-  benchmarkSuite: SitemapBenchmarkSuite | null;
   lastModFromSource: LastModResolver;
   /* Last-resort lastmod (typically the source-mtimes manifest's
      `builtAt`). Used when frontmatter is unparseable or a data file
@@ -156,7 +151,6 @@ export async function buildSitemapUrls(
     seedItems,
     readyAdapters,
     compareEntries,
-    benchmarkSuite,
     lastModFromSource,
     buildAt,
   } = inputs;
@@ -177,7 +171,7 @@ export async function buildSitemapUrls(
     costLastMod,
     sponsorsLastMod,
     toolsAgentMdBenchLastMod,
-    toolsOrchestraLastMod,
+    benchmarksLastMod,
     qLastMod,
     specDrivenLastMod,
   ] = await Promise.all([
@@ -188,7 +182,7 @@ export async function buildSitemapUrls(
     lastModFromSource(['app/cost/page.tsx']),
     lastModFromSource(['app/sponsors/page.tsx']),
     lastModFromSource(['app/tools/agent-md-bench/page.tsx']),
-    lastModFromSource(['app/tools/orchestra/page.tsx']),
+    lastModFromSource(['app/benchmarks/page.tsx']),
     /* /q index + /q/<slug> leaves share one mtime: the seed file is
        the canonical content surface; the index page is the route
        fallback. */
@@ -248,12 +242,6 @@ export async function buildSitemapUrls(
     {
       loc: `${SITEMAP_SITE_URL}/tools/agent-md-bench`,
       lastmod: toolsAgentMdBenchLastMod,
-      changefreq: 'monthly',
-      priority: 0.5,
-    },
-    {
-      loc: `${SITEMAP_SITE_URL}/tools/orchestra`,
-      lastmod: toolsOrchestraLastMod,
       changefreq: 'monthly',
       priority: 0.5,
     },
@@ -325,27 +313,12 @@ export async function buildSitemapUrls(
     }
   }
 
-  if (benchmarkSuite) {
-    const benchmarkLastmod = benchmarkSuite.dateModified;
-    urls.push({
-      loc: `${SITEMAP_SITE_URL}/benchmarks`,
-      lastmod: benchmarkLastmod,
-      changefreq: 'monthly',
-      priority: 0.7,
-    });
-    urls.push({
-      loc: `${SITEMAP_SITE_URL}/benchmarks/cli-agent-orchestrators`,
-      lastmod: benchmarkLastmod,
-      changefreq: 'monthly',
-      priority: 0.7,
-    });
-    urls.push({
-      loc: `${SITEMAP_SITE_URL}/benchmarks/cli-agent-orchestrators/methodology`,
-      lastmod: benchmarkLastmod,
-      changefreq: 'monthly',
-      priority: 0.5,
-    });
-  }
+  urls.push({
+    loc: `${SITEMAP_SITE_URL}/benchmarks`,
+    lastmod: benchmarksLastMod,
+    changefreq: 'monthly',
+    priority: 0.7,
+  });
 
   return urls;
 }
