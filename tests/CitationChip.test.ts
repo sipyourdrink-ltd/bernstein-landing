@@ -19,7 +19,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import type { Citation } from '../components/docs-bot/types.ts';
-import { safeHref, chipHrefState } from '../components/docs-bot/cite-helpers.ts';
+import { safeHref, chipHrefState, sourceLabel } from '../components/docs-bot/cite-helpers.ts';
 
 /* Title truncation is still inline-only (used inside the React
    component's render path). Keep a copy here while the rest of the
@@ -145,4 +145,26 @@ test('safeHref: relative paths are preserved', () => {
 test('safeHref: empty / whitespace collapses to "#"', () => {
   assert.equal(safeHref(''), '#');
   assert.equal(safeHref('   '), '#');
+});
+
+/* The popover's open link names where it leads: our docs (bernstein.run,
+   GitHub) or the repository wiki. */
+test('sourceLabel: bernstein.run and GitHub read as docs', () => {
+  assert.equal(sourceLabel('https://bernstein.run/docs/operations/compare'), 'bernstein docs');
+  assert.equal(
+    sourceLabel('https://github.com/sipyourdrink-ltd/bernstein/blob/main/README.md'),
+    'bernstein docs',
+  );
+});
+
+test('sourceLabel: deepwiki reads as the wiki', () => {
+  assert.equal(
+    sourceLabel('https://deepwiki.com/wiki/sipyourdrink-ltd/bernstein#1.1'),
+    'bernstein wiki',
+  );
+});
+
+test('sourceLabel: an unparseable href falls back to docs', () => {
+  assert.equal(sourceLabel('#'), 'bernstein docs');
+  assert.equal(sourceLabel(''), 'bernstein docs');
 });

@@ -5,9 +5,9 @@
  * answer body to AnswerStream / DeclineCard.
  *
  * Variants:
- *   - 'hero' : embedded in the homepage panel (replaces the legacy
- *              AskSummary slot). Compact layout, no heading.
- *   - 'page' : full-width on /ask, sits above the BM25 fallback list.
+ *   - 'hero' : embedded in the homepage panel; the site's one question
+ *              box (`/#ask`, `/?q=` prefills it). Compact, no heading.
+ *   - 'page' : full-width with its own heading; no route uses it today.
  *   - 'modal' : inside the SlashCommand dialog; same content tree
  *               but a cancel-on-ESC behaviour the dialog wraps.
  *
@@ -204,19 +204,6 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
      about visible content. */
   const firstTokenMarkedRef = useRef(false);
   const [shimmerHeld, setShimmerHeld] = useState(false);
-  /* Wall-clock when the current stream started. Drives the
-     ThinkingShimmer's two-phase animation: bars (0-2s) → folder (2s+).
-     Reset to null whenever no stream is active. */
-  const [streamStartedAt, setStreamStartedAt] = useState<number | null>(null);
-  useEffect(() => {
-    if (state.phase === 'streaming' && state.text === '') {
-      /* Latch on entry - don't reset on every re-render while still
-         in this state, otherwise the elapsed counter never grows. */
-      setStreamStartedAt((cur) => cur ?? Date.now());
-    } else {
-      setStreamStartedAt(null);
-    }
-  }, [state.phase, state.text]);
 
   /* Bridge SSE events into reducer + side effects. */
   const onEvent = useCallback((event: SseEvent) => {
@@ -260,6 +247,26 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
   }, []);
 
   const { ask, stop, isStreaming } = useSseStream(onEvent, onAborted, onError);
+
+  /* Wall-clock when the current request went out. Drives the
+     ThinkingShimmer's two-phase animation: bars (0-200ms) → folder.
+     Latched on the request itself (`isStreaming`), not on the reducer
+     entering `streaming`: the reducer only gets there on `meta`, which
+     the gateway sends after retrieval - and, on the repository-wiki
+     path, only after the whole 15-20 s wait - so keying on the phase
+     left the indicator blank for exactly the requests that needed it
+     and showed it only in the short gap between `meta` and the first
+     token. Reset to null once text arrives or the request ends. */
+  const [streamStartedAt, setStreamStartedAt] = useState<number | null>(null);
+  useEffect(() => {
+    if (isStreaming && state.text === '') {
+      /* Latch on entry - don't reset on every re-render while still
+         in this state, otherwise the elapsed counter never grows. */
+      setStreamStartedAt((cur) => cur ?? Date.now());
+    } else {
+      setStreamStartedAt(null);
+    }
+  }, [isStreaming, state.text]);
 
   /* Sync query → URL (?q=) so a refresh keeps the conversation handle.
      Out of scope: full snapshot rehydration; only the last typed query
@@ -366,6 +373,20 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
     setQuery(q);
     fireAsk(q);
   }, [fireAsk]);
+
+  /* `/?q=<question>#ask` is the site's search entry point (the sitelinks
+     SearchAction and the old /ask?q= links redirect here). Read it once
+     on mount, client-side, so the page stays statically rendered; the
+     hash scrolls the box into view and the ask fires like a chip tap. */
+  const firedFromUrl = useRef(false);
+  useEffect(() => {
+    if (firedFromUrl.current || initialQuery) return;
+    firedFromUrl.current = true;
+    const q = new URLSearchParams(window.location.search).get('q')?.trim() ?? '';
+    if (!q) return;
+    setQuery(q);
+    fireAsk(q);
+  }, [fireAsk, initialQuery]);
 
   /* Body switch. The shell stays the same; only the answer region
      changes shape per phase. research-006: hide the shimmer while the
@@ -505,7 +526,11 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
           /* Two-phase shimmer. <2s = sliding bars; ≥2s = the macintosh
              folder + status line. ThinkingShimmer owns the timing; we
              just hand it the wall-clock when this stream began. */
-          <ThinkingShimmer startedAt={streamStartedAt} />
+          <ThinkingShimmer
+            startedAt={streamStartedAt}
+            phase={state.statusPhase}
+            expectedMs={state.statusExpectedMs}
+          />
         ) : null}
 
         {/* research-006 - preview block. Renders above the main answer

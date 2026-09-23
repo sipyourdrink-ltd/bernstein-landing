@@ -4836,7 +4836,12 @@ paths:
         The request body must echo the ``nonce`` the gate issued when the
         approval was queued. Mismatches return ``409 NONCE_MISMATCH``; a
         nonce replayed against an already-resolved or evicted approval
-        returns ``410 NONCE_EXPIRED``.
+        returns ``410 NONCE_EXPIRED``. The resolution is attributed to the
+        principal the request authenticated as. When scoped tokens are
+        configured and the request presents none, the call is refused with
+        ``401`` rather than recorded against an unnamed caller; when no scoped
+        tokens are configured the server is in its loopback posture and the
+        decision is attributed to the loopback operator.
       operationId: resolve_queued_approval_approvals__approval_id__resolve_post
       parameters:
         - name: approval_id
@@ -4863,6 +4868,8 @@ paths:
                 title: Response Resolve Queued Approval Approvals  Approval Id  Resolve Post
         "400":
           description: Invalid approval id or decision
+        "401":
+          description: No authenticated principal to attribute the decision to
         "404":
           description: No pending approval with that id
         "409":
@@ -5334,6 +5341,185 @@ paths:
                 $ref: "#/components/schemas/SBOMListResponse"
         "503":
           description: Server workdir not configured
+  /scim/v2/ServiceProviderConfig:
+    get:
+      tags:
+        - scim
+      summary: SCIM 2.0 service provider configuration
+      description: |-
+        Return the RFC 7643 §5 discovery document for this service provider.
+
+        Everything reported here is what the mounted surface actually does. The
+        write operations are absent rather than advertised-and-unimplemented, and
+        the deletion semantics a client will eventually meet are stated now.
+      operationId: service_provider_config_scim_v2_ServiceProviderConfig_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /scim/v2/Schemas:
+    get:
+      tags:
+        - scim
+      summary: SCIM 2.0 schema resources
+      description: List the schema resources this server serves (RFC 7643 §7).
+      operationId: list_schemas_scim_v2_Schemas_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /scim/v2/Schemas/{schema_id}:
+    get:
+      tags:
+        - scim
+      summary: Fetch a single SCIM schema resource
+      description: Fetch one schema resource by its URN.
+      operationId: get_schema_scim_v2_Schemas__schema_id__get
+      parameters:
+        - name: schema_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: Schema Id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        "404":
+          description: Unknown schema URN
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /scim/v2/ResourceTypes:
+    get:
+      tags:
+        - scim
+      summary: SCIM 2.0 resource types
+      description: List the resource types this server serves (RFC 7643 §6).
+      operationId: list_resource_types_scim_v2_ResourceTypes_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /scim/v2/ResourceTypes/{resource_type_id}:
+    get:
+      tags:
+        - scim
+      summary: Fetch a single SCIM resource type
+      description: Fetch one resource type by id.
+      operationId: get_resource_type_scim_v2_ResourceTypes__resource_type_id__get
+      parameters:
+        - name: resource_type_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: Resource Type Id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        "404":
+          description: Unknown resource type
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /scim/v2/Users:
+    get:
+      tags:
+        - scim
+      summary: List agent principals as SCIM users
+      description: |-
+        Return the agent principals this orchestrator knows about.
+
+        ``ServiceProviderConfig`` reports ``filter.supported = false``, so a
+        ``filter`` query is refused rather than ignored: silently returning the
+        unfiltered list would hand a client more principals than it asked for and
+        look like a successful narrow query.
+      operationId: list_users_scim_v2_Users_get
+      parameters:
+        - name: startIndex
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            title: Startindex
+        - name: count
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: integer
+              - type: "null"
+            title: Count
+        - name: filter
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            title: Filter
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+        "501":
+          description: Filtering is not supported by this provider
+  /scim/v2/Users/{user_id}:
+    get:
+      tags:
+        - scim
+      summary: Fetch one agent principal as a SCIM user
+      description: Fetch a single agent principal by its SCIM ``id``.
+      operationId: get_user_scim_v2_Users__user_id__get
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: User Id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        "404":
+          description: Unknown principal
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
   /hooks/{session_id}:
     post:
       summary: Receive Hook
@@ -6064,6 +6250,49 @@ paths:
               schema: {}
         "422":
           description: Invalid graduation stage
+  /governance/coverage:
+    get:
+      tags:
+        - governance
+      summary: Governance Coverage
+      description: Return the canonical coverage document for ``?run_id=``.
+      operationId: governance_coverage_governance_coverage_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /governance/verify-receipt:
+    post:
+      tags:
+        - governance
+      summary: Verify Receipt
+      description: |-
+        Verify the posted receipt file and return the verdict document.
+
+        The request body is the receipt verbatim -- whatever the operator dropped,
+        of whatever content type. Nothing under ``.sdd`` and no key material is
+        read: the verifier works from the file's own bytes, so this endpoint
+        answers about the upload and not about the installation serving it.
+
+        The status is always 200 for a request that carried a body. A tampered
+        receipt, a file that is not a receipt, and an empty drop are all verdicts
+        about the evidence rather than failed requests, and each is the answer an
+        operator dropped the file to get.
+
+        No key can be pinned through this endpoint, so the pass it reports is
+        always the integrity-only tier and always carries the caveat saying so.
+        A key arriving in the same request as the receipt is not an out-of-band
+        anchor -- it is the same channel, and treating it as one would report
+        provenance on the strength of the upload rather than of any evidence.
+      operationId: verify_receipt_governance_verify_receipt_post
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
   /handoff/{token}:
     get:
       summary: Claim Handoff Token
@@ -11580,7 +11809,12 @@ paths:
         The request body must echo the ``nonce`` the gate issued when the
         approval was queued. Mismatches return ``409 NONCE_MISMATCH``; a
         nonce replayed against an already-resolved or evicted approval
-        returns ``410 NONCE_EXPIRED``.
+        returns ``410 NONCE_EXPIRED``. The resolution is attributed to the
+        principal the request authenticated as. When scoped tokens are
+        configured and the request presents none, the call is refused with
+        ``401`` rather than recorded against an unnamed caller; when no scoped
+        tokens are configured the server is in its loopback posture and the
+        decision is attributed to the loopback operator.
       operationId: resolve_queued_approval_api_v1_approvals__approval_id__resolve_post
       parameters:
         - name: approval_id
@@ -11607,6 +11841,8 @@ paths:
                 title: Response Resolve Queued Approval Api V1 Approvals  Approval Id  Resolve Post
         "400":
           description: Invalid approval id or decision
+        "401":
+          description: No authenticated principal to attribute the decision to
         "404":
           description: No pending approval with that id
         "409":
@@ -12078,6 +12314,185 @@ paths:
                 $ref: "#/components/schemas/SBOMListResponse"
         "503":
           description: Server workdir not configured
+  /api/v1/scim/v2/ServiceProviderConfig:
+    get:
+      tags:
+        - scim
+      summary: SCIM 2.0 service provider configuration
+      description: |-
+        Return the RFC 7643 §5 discovery document for this service provider.
+
+        Everything reported here is what the mounted surface actually does. The
+        write operations are absent rather than advertised-and-unimplemented, and
+        the deletion semantics a client will eventually meet are stated now.
+      operationId: service_provider_config_api_v1_scim_v2_ServiceProviderConfig_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/scim/v2/Schemas:
+    get:
+      tags:
+        - scim
+      summary: SCIM 2.0 schema resources
+      description: List the schema resources this server serves (RFC 7643 §7).
+      operationId: list_schemas_api_v1_scim_v2_Schemas_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/scim/v2/Schemas/{schema_id}:
+    get:
+      tags:
+        - scim
+      summary: Fetch a single SCIM schema resource
+      description: Fetch one schema resource by its URN.
+      operationId: get_schema_api_v1_scim_v2_Schemas__schema_id__get
+      parameters:
+        - name: schema_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: Schema Id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        "404":
+          description: Unknown schema URN
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /api/v1/scim/v2/ResourceTypes:
+    get:
+      tags:
+        - scim
+      summary: SCIM 2.0 resource types
+      description: List the resource types this server serves (RFC 7643 §6).
+      operationId: list_resource_types_api_v1_scim_v2_ResourceTypes_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/scim/v2/ResourceTypes/{resource_type_id}:
+    get:
+      tags:
+        - scim
+      summary: Fetch a single SCIM resource type
+      description: Fetch one resource type by id.
+      operationId: get_resource_type_api_v1_scim_v2_ResourceTypes__resource_type_id__get
+      parameters:
+        - name: resource_type_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: Resource Type Id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        "404":
+          description: Unknown resource type
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+  /api/v1/scim/v2/Users:
+    get:
+      tags:
+        - scim
+      summary: List agent principals as SCIM users
+      description: |-
+        Return the agent principals this orchestrator knows about.
+
+        ``ServiceProviderConfig`` reports ``filter.supported = false``, so a
+        ``filter`` query is refused rather than ignored: silently returning the
+        unfiltered list would hand a client more principals than it asked for and
+        look like a successful narrow query.
+      operationId: list_users_api_v1_scim_v2_Users_get
+      parameters:
+        - name: startIndex
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            title: Startindex
+        - name: count
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: integer
+              - type: "null"
+            title: Count
+        - name: filter
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: "null"
+            title: Filter
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+        "501":
+          description: Filtering is not supported by this provider
+  /api/v1/scim/v2/Users/{user_id}:
+    get:
+      tags:
+        - scim
+      summary: Fetch one agent principal as a SCIM user
+      description: Fetch a single agent principal by its SCIM ``id``.
+      operationId: get_user_api_v1_scim_v2_Users__user_id__get
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: User Id
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        "404":
+          description: Unknown principal
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
   /api/v1/hooks/{session_id}:
     post:
       summary: Receive Hook
@@ -12808,6 +13223,49 @@ paths:
               schema: {}
         "422":
           description: Invalid graduation stage
+  /api/v1/governance/coverage:
+    get:
+      tags:
+        - governance
+      summary: Governance Coverage
+      description: Return the canonical coverage document for ``?run_id=``.
+      operationId: governance_coverage_api_v1_governance_coverage_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/v1/governance/verify-receipt:
+    post:
+      tags:
+        - governance
+      summary: Verify Receipt
+      description: |-
+        Verify the posted receipt file and return the verdict document.
+
+        The request body is the receipt verbatim -- whatever the operator dropped,
+        of whatever content type. Nothing under ``.sdd`` and no key material is
+        read: the verifier works from the file's own bytes, so this endpoint
+        answers about the upload and not about the installation serving it.
+
+        The status is always 200 for a request that carried a body. A tampered
+        receipt, a file that is not a receipt, and an empty drop are all verdicts
+        about the evidence rather than failed requests, and each is the answer an
+        operator dropped the file to get.
+
+        No key can be pinned through this endpoint, so the pass it reports is
+        always the integrity-only tier and always carries the caveat saying so.
+        A key arriving in the same request as the receipt is not an out-of-band
+        anchor -- it is the same channel, and treating it as one would report
+        provenance on the strength of the upload rather than of any evidence.
+      operationId: verify_receipt_api_v1_governance_verify_receipt_post
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
   /api/v1/handoff/{token}:
     get:
       summary: Claim Handoff Token

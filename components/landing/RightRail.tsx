@@ -31,7 +31,6 @@ import { useEffect, useState } from 'react';
 import { trackOutbound } from '@/components/site/track-outbound';
 import { UmamiEvent, emitFunnelStep, track } from '@/lib/analytics/events';
 import { withUtm } from '@/lib/utm';
-import { ReadTheCode } from './ReadTheCode';
 
 /**
  * day-2-return + gh-star-confirmed detection.
@@ -462,45 +461,13 @@ export function RightRail({ adapterCount, closedPrs, contributors }: RightRailPr
         </a>
       </div>
 
-      {/* DOCS LINK - secondary to the GitHub row. Added because the home
-          page otherwise rendered no link to the docs at all.
-
-          Points straight at readthedocs, matching the Nav callsite
-          (same href, same target/rel). It used to point at the internal
-          /docs/cli, which is a server-side redirect to exactly this URL
-          - so every click paid a redirect hop, and the same intent had
-          two different behaviours on one page (Nav opened a new tab,
-          this row replaced the landing). Reuses the existing
-          `read-the-docs-click` Umami event; the `hero-rail` source
-          discriminator is what separates this row from Nav in reports.
-          Styled quieter than the GitHub black row. */}
-      <a
-        href="https://bernstein.readthedocs.io/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="v2-gh-row !bg-transparent !text-[color:var(--ink)] !shadow-none border border-[color:var(--rule)] hover:!bg-[color:var(--bg-paper-2)]"
-        data-umami-event="read-the-docs-click"
-        data-umami-event-source="hero-rail"
-        onClick={() => trackUmami('read-the-docs-click', { source: 'hero-rail' })}
-      >
-        <div className="v2-gh-left">
-          <span className="v2-gh-star !text-[color:var(--ink-soft)]" aria-hidden="true">
-            §
-          </span>
-          <span>read the docs</span>
-        </div>
-        <div className="v2-gh-right">
-          <span className="v2-gh-count !text-[color:var(--ink-soft)]">
-            readthedocs.io →
-          </span>
-        </div>
-      </a>
-
-      {/* "read the code" - the browsable views of the source, directly
-          under the CTA cluster because this is where a visitor decides
-          how to look deeper. Driven by an array in
-          read-the-code-data.ts; adding a surface is a one-line change. */}
-      <ReadTheCode surface="hero" />
+      {/* The standalone "read the docs" row and the "read the code" strip
+          that used to sit here were removed 2026-09-18: Nav already
+          carries one canonical Docs entry, and stacking two more
+          read-the-docs CTAs directly under the install block just
+          repeated it twice in the same fold. The code-map links (github /
+          deepwiki / docs) still render once, in the footer - see
+          Footer.tsx. */}
 
       {/* MINI STATS - opacity dampens the 4-tile grid + sponsor + /cost
           row so they read as supporting evidence rather than competing

@@ -152,6 +152,8 @@ Cloud artifact sinks, progressive skill packs, and Cloudflare cloud execution ar
 - [OpenAPI Spec](${SITE_URL}/openapi.yaml): REST API specification
 - [Agent Card (A2A)](${SITE_URL}/.well-known/agent-card.json): A2A protocol manifest
 - [MCP Server Card](${SITE_URL}/.well-known/mcp/server-card.json): MCP server discovery card
+- [MCP (remote, read-only)](https://mcp.bernstein.run/mcp): Streamable HTTP endpoint, anonymous - verify run receipts, list presets and adapters
+- [Verify a run receipt](https://mcp.bernstein.run/verify): Run-receipt verifier
 - [Authentication](${SITE_URL}/auth.md): There is none. What is public, which write endpoints are anonymous, and why the OpenAPI document's server is the reader's own machine rather than this host
 - [RSS Feed](${SITE_URL}/rss.xml): Blog updates
 

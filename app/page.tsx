@@ -107,15 +107,15 @@ const WEBSITE_JSON_LD = {
      site-wide layout instead of redefining it. Graph edge keeps the KG
      consolidated. */
   publisher: { '@id': 'https://bernstein.run/#organization' },
-  /* SearchAction surfaces the Google sitelinks search box. Pointing at
-     /ask (live DocsBot) rather than /blog?q= gives engines a real
-     query interface; the Search Console rich-results validator prefers
-     a working search endpoint. */
+  /* SearchAction surfaces the Google sitelinks search box. It points
+     at the homepage question box (`?q=` prefills and submits it) so
+     engines get a real query interface; the Search Console
+     rich-results validator prefers a working search endpoint. */
   potentialAction: {
     '@type': 'SearchAction',
     target: {
       '@type': 'EntryPoint',
-      urlTemplate: 'https://bernstein.run/ask?q={search_term_string}',
+      urlTemplate: 'https://bernstein.run/?q={search_term_string}#ask',
     },
     'query-input': 'required name=search_term_string',
   },
@@ -222,8 +222,8 @@ export default async function LandingPage() {
         <SocialProofStrip stars={pkgStats.stars ?? null} />
         {/* The four-stage view of a run. Sole presentation of the
             pipeline on this page, and the only remaining on-page anchor
-            (`#how`) - the Nav scroll-spy and the /#how links from
-            /spec-driven both resolve here. */}
+            (`#how`) - the footer's "How it works" entry and the /#how
+            links from /spec-driven both resolve here. */}
         <PipelineRailMini />
         {/* "from the blog" strip - internal links from the home page to
             /blog/<slug>. Sits above AuditLogEvidence so a reader meets

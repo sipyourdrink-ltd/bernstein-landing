@@ -220,7 +220,10 @@ export async function HeroV2({
           <span>cited</span>
         </div>
 
-        <h2 className="v2-ask-h">
+        {/* `#ask` lives on the server-rendered heading: the bot itself
+            mounts client-side, so a hash on the section would not be in
+            the HTML the browser scrolls on load. */}
+        <h2 id="ask" className="v2-ask-h">
           ask <em>anything</em>.
         </h2>
 

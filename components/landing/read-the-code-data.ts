@@ -21,6 +21,11 @@ export type ReadTheCodeEntry = {
 
 export const READ_THE_CODE_LABEL = 'read the code';
 
+/* No "docs" entry here on purpose: the footer's Product column already
+   carries the single canonical Docs link (see Footer.tsx), and this strip
+   only ever renders in the footer now - see the removal note in
+   RightRail.tsx. Repeating readthedocs a second time in the same footer
+   would recreate the duplication this strip was trimmed to avoid. */
 export const READ_THE_CODE_ENTRIES: readonly ReadTheCodeEntry[] = [
   {
     label: 'github',
@@ -31,11 +36,6 @@ export const READ_THE_CODE_ENTRIES: readonly ReadTheCodeEntry[] = [
     label: 'ask deepwiki',
     href: 'https://deepwiki.com/sipyourdrink-ltd/bernstein',
     event: 'read-the-code-deepwiki',
-  },
-  {
-    label: 'docs',
-    href: 'https://bernstein.readthedocs.io/',
-    event: 'read-the-code-docs',
   },
 ] as const;
 

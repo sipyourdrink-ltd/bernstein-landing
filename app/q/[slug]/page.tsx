@@ -215,8 +215,8 @@ export default async function QPage({ params }: Props) {
               ))}
             </ul>
             <p className="ask-seeds-foot">
-              browse the full index at <a href="/q">/q</a> or search the blog
-              at <a href="/ask">/ask</a>.
+              browse the full index at <a href="/q">/q</a> or ask on the
+              <a href="/#ask">homepage</a>.
             </p>
           </section>
         ) : null}

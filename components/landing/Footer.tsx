@@ -33,6 +33,16 @@ export function Footer() {
               GitHub
             </a>
             <a
+              href="https://www.linkedin.com/company/bernstein-run/"
+              aria-label="LinkedIn"
+              data-umami-event="outbound-linkedin"
+              data-umami-event-surface="footer-product"
+              data-umami-event-source="footer"
+              onClick={() => trackOutbound('linkedin.com', 'site-footer', 'product-li')}
+            >
+              LinkedIn
+            </a>
+            <a
               href="https://pypi.org/project/bernstein/"
               data-umami-event="click-pypi-out"
               data-umami-event-source="footer"
@@ -41,6 +51,11 @@ export function Footer() {
               PyPI
             </a>
             <a href="https://bernstein.readthedocs.io/" data-umami-event="click-docs-out" data-umami-event-source="footer">Docs</a>
+            {/* /#how used to have its own Nav entry; it moved here when
+                the primary nav was trimmed to Install / Verify / Docs /
+                Ask (plus GitHub) - the section itself still lives on the
+                home page, unchanged. */}
+            <a href="/#how" data-umami-event="click-how-it-works" data-umami-event-source="footer">How it works</a>
             <a href="/blog" data-umami-event="click-blog-internal" data-umami-event-source="footer">Blog</a>
             {/* RSS subscribe - surfaced as a primary subscribe option
                 (conv-003, 2026-05-17). The <link rel="alternate"> in
@@ -64,15 +79,22 @@ export function Footer() {
           </div>
           <div className="footer-col">
             <h4>Resources</h4>
+            <a href="/#ask" data-umami-event="click-ask-internal" data-umami-event-source="footer">Ask the docs</a>
+            <a href="https://mcp.bernstein.run/verify" target="_blank" rel="noopener noreferrer" data-umami-event="click-verify-out" data-umami-event-source="footer">Verify a run receipt</a>
+            {/* Was a top-level Nav entry before the nav was trimmed to
+                Install / Verify / Docs / Ask; kept reachable here since
+                it is a real per-adapter comparison surface, not a link
+                to prune. */}
+            <a href="/compare" data-umami-event="click-compare-internal" data-umami-event-source="footer">compare adapters</a>
             <a href="/why-bernstein" data-umami-event="click-why-bernstein" data-umami-event-source="footer">why this over X</a>
             <a href="/benchmarks" data-umami-event="click-benchmarks-internal" data-umami-event-source="footer">benchmarks</a>
             <a href="/cost" data-umami-event="click-cost-internal" data-umami-event-source="footer">cost calculator</a>
             <a href="/llms-full.txt" data-umami-event="click-llms-full" data-umami-event-source="footer">llms-full.txt</a>
             <a href="/ai.txt" data-umami-event="click-ai-txt" data-umami-event-source="footer">ai.txt</a>
             <a href="/sitemap.xml" data-umami-event="click-sitemap" data-umami-event-source="footer">Sitemap</a>
-            {/* Mirrors the hero strip - the browsable views of the
-                source. Same array, same component; see
-                read-the-code-data.ts. */}
+            {/* Browsable views of the source - github / deepwiki. See
+                read-the-code-data.ts; this is the strip's only mount
+                point now (RightRail's hero copy was removed). */}
             <ReadTheCode surface="footer" />
           </div>
           <div className="footer-col">

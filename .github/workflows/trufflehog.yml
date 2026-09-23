@@ -38,7 +38,7 @@ jobs:
           persist-credentials: false
 
       - name: Run trufflehog
-        uses: trufflesecurity/trufflehog@bcfcf73aaf4759d4dadc2783177c245a02792318  # v3.97.0
+        uses: trufflesecurity/trufflehog@f714bf454f350590f4a24c3ddb1aef02c35bf5b6  # v3.97.5
         with:
           # The pinned `uses:` SHA is a shell wrapper; it runs the image
           # named by `version`, which defaults to `latest`. Left unpinned,

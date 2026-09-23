@@ -52,3 +52,6 @@ scratch/
 # IndexNow snapshot — deploy-local sitemap diff state. Regenerated on
 # every postbuild; per-environment (CI vs prod), so don't commit.
 data/last-sitemap-snapshot.json
+
+# Retired pages kept on disk for reference; never tracked, never deployed.
+.archive/

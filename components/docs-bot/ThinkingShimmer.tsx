@@ -28,6 +28,11 @@ interface ThinkingShimmerProps {
   /** Wall-clock ms when the stream started - used to compute elapsed.
       null means "no stream in flight"; the component renders nothing. */
   startedAt: number | null;
+  /** Gateway phase from its `status` frames (`retrieve`, `wiki`), or
+      null before the first one arrives. */
+  phase?: string | null;
+  /** How long the current phase usually takes, when the gateway says. */
+  expectedMs?: number | null;
 }
 
 /* Folder appears almost immediately. Operator's call: at the previous
@@ -45,7 +50,21 @@ const STATUS_LINES = [
   'drafting an answer…',
 ];
 
-export function ThinkingShimmer({ startedAt }: ThinkingShimmerProps): ReactElement | null {
+/* The repository-wiki phase is a single long wait (the gateway reports
+   ~15 s); cycling retrieval lines through it would read as progress
+   that is not happening. One honest line, with the usual duration. */
+function wikiStatusLine(expectedMs: number | null | undefined): string {
+  const secs = expectedMs && expectedMs > 0 ? Math.round(expectedMs / 1000) : null;
+  return secs
+    ? `asking the repository wiki, usually ~${secs} s…`
+    : 'asking the repository wiki…';
+}
+
+export function ThinkingShimmer({
+  startedAt,
+  phase = null,
+  expectedMs = null,
+}: ThinkingShimmerProps): ReactElement | null {
   const [now, setNow] = useState<number>(() => Date.now());
   const [statusIndex, setStatusIndex] = useState<number>(0);
 
@@ -90,7 +109,9 @@ export function ThinkingShimmer({ startedAt }: ThinkingShimmerProps): ReactEleme
   return (
     <div className="docs-bot-thinking" role="status" aria-live="polite">
       <FolderArt />
-      <p className="docs-bot-thinking-status">{STATUS_LINES[statusIndex]}</p>
+      <p className="docs-bot-thinking-status" data-phase={phase ?? undefined}>
+        {phase === 'wiki' ? wikiStatusLine(expectedMs) : STATUS_LINES[statusIndex]}
+      </p>
     </div>
   );
 }
