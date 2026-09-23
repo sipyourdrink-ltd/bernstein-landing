@@ -27,16 +27,12 @@ export const SOFTWARE_APPLICATION_JSON_LD: JsonLdData = {
   '@type': 'SoftwareApplication',
   '@id': `${SITE_URL}/#software`,
   name: 'Bernstein',
-  alternateName: [
-    PROJECT_ALTERNATE_NAME,
-    'Bernstein multi-agent CLI orchestrator',
-    'Bernstein AI coding agent manager',
-  ],
+  alternateName: [PROJECT_ALTERNATE_NAME],
   description:
     'The open-source governance layer for AI agents. A plain-Python scheduler with no model in the coordination loop runs Claude Code, Codex, Gemini CLI, and 40+ more CLI coding agents in parallel git worktrees behind lint, type, and test gates. An always-on lineage spine and replay journal record every run; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. MCP multi-agent server and A2A protocol support included.',
   url: SITE_URL,
   applicationCategory: 'DeveloperApplication',
-  applicationSubCategory: 'CLI Agent Orchestration',
+  applicationSubCategory: 'AI Agent Governance',
   /* Schema.org `keywords` is a free-text field Google's rich-results
      validator accepts as a comma-separated list. Lifts the 13 tracked
      SERP terms from the May-2026 keyword snapshot - see

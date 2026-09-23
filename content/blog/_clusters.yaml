@@ -49,7 +49,6 @@ clusters:
     posts:
       - introducing-bernstein
       - getting-started
-      - orchestrator-vs-desktop-ade
       - module-decomposition
       - autofix-daemon
       - operator-pack
@@ -61,7 +60,6 @@ clusters:
       - v3-14-159-pi
       - v3-x-recap
       - output-economy-and-agent-lifecycle
-      - v2-16-recap
       - v2-x-recap
       - v2-0-release
       - v1-9-release

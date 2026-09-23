@@ -67,7 +67,7 @@ info:
     | 429 | Rate limited - respect the `Retry-After` header |
 
     | 500 | Internal server error |
-  version: 3.18.2
+  version: 3.20.0
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0

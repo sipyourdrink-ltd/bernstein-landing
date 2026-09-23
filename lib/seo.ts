@@ -137,11 +137,10 @@ Cloud artifact sinks, progressive skill packs, and Cloudflare cloud execution ar
 - [Cost calculator](${SITE_URL}/cost): Token-bill estimator for a Bernstein run with the contextual bandit router enabled; shows the per-model cost band against an unrouted baseline
 - [Adapter comparisons](${SITE_URL}/vs): Index of side-by-side feature matrices for every supported CLI agent (Aider, Claude Code, Codex, Cursor, Gemini, OpenAI Agents SDK, and more)
 - [CLI quickstart](${SITE_URL}/cli-quickstart): Minimal walkthrough. Installing pipx, running the first task, reading the audit log
-- [Ask the docs](${SITE_URL}/ask): DocsBot question surface backed by the readthedocs index plus blog content; cite-style answers with source chips
+- [Ask the docs](${SITE_URL}/#ask): DocsBot question surface backed by the readthedocs index plus blog content; cite-style answers with source chips
 - [Sponsors](${SITE_URL}/sponsors): Public sponsors wall (GitHub Sponsors / OpenCollective integrations) and the sponsorship tier breakdown
 - [Tools - agent.md bench](${SITE_URL}/tools/agent-md-bench): Free utility. Paste a project's agent file and get a token-cost estimate per supported model
-- [Tools - orchestra picker](${SITE_URL}/tools/orchestra): Free utility. Pick an agent line-up for a stack and budget combination
-- [Benchmark - cli agent orchestrators](${SITE_URL}/benchmarks/cli-agent-orchestrators): Reproducible 10-task eval across several tools. Published scores; bernstein loses 4 of the 10. Methodology and repro script linked.
+- [Benchmarks](${SITE_URL}/benchmarks): Simulated parallel-scheduling speedup model plus a community cost benchmark, each labelled by source
 
 ## Resources
 

@@ -29,8 +29,8 @@ npm run build
 throws fails there and passes everything else.
 
 Some parts of the site are supplied by the host and are absent from this
-repository — the retrieval service behind `/ask`, the mailing-list routes,
-comparison datasets. `scripts/prebuild.mjs` prints each step it skips. A skipped
+repository — the retrieval service behind `/#ask`, the mailing-list routes,
+comparison pages and datasets. `scripts/prebuild.mjs` prints each step it skips. A skipped
 step is expected; a failing one is not.
 
 ## Voice

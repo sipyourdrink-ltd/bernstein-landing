@@ -140,7 +140,7 @@ export default function AboutPage() {
             <h2>what qualifies the voice</h2>
             <p>
               concrete signals rather than years-of-experience filler.
-              bernstein ships 49 cli adapters (claude code, codex, cursor,
+              bernstein ships 51 cli adapters (claude code, codex, cursor,
               aider, gemini, openai agents sdk, and the rest - see{' '}
               <a href="/vs">/vs</a> for the comparison index), an
               hmac-signed audit log, sigstore-style lineage records per
@@ -175,10 +175,11 @@ export default function AboutPage() {
               project&apos;s own documentation as the source of feature
               claims wherever the claim is about the other tool. where i
               test a claim myself, i publish the test command in the post
-              body so you can re-run it. benchmark numbers come
-              from a reproducible eval harness (the{' '}
-              <a href="/benchmarks/cli-agent-orchestrators">benchmark page</a>{' '}
-              includes the methodology and a re-run script). model prices
+              body so you can re-run it. numbers on the{' '}
+              <a href="/benchmarks">benchmark page</a>{' '}
+              are labelled by source - a simulation with its model and
+              reproduction command linked, or a community-submitted{' '}
+              <code>bernstein cost --json</code> run. model prices
               on <a href="/cost">/cost</a> link to the upstream price
               page and carry the date the table was captured.
             </p>
@@ -187,9 +188,9 @@ export default function AboutPage() {
               claim on this site about bernstein vs another tool is
               biased by that authorship. i try to keep the bias visible
               rather than hidden: the{' '}
-              <a href="/benchmarks/cli-agent-orchestrators">benchmark page</a>{' '}
-              publishes a 10-task suite where bernstein loses 4 of 10
-              against the comparison set, the{' '}
+              <a href="/benchmarks">benchmark page</a>{' '}
+              labels its scheduling figures as a simulation, not measured
+              runs, the{' '}
               <a href="/why-bernstein">/why-bernstein</a> page includes
               explicit &ldquo;who this is not for&rdquo; sections, and
               the comparison source memo is the{' '}

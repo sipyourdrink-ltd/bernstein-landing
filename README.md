@@ -22,7 +22,7 @@ This repository is the website, not the software it describes.
 governance layer for AI agents: a deterministic scheduler with no model in the
 coordination loop, running agents in parallel, gating what they produce, and
 recording every step so a run can be verified afterwards, offline, from the
-artifacts alone. CLI coding agents work out of the box — 49 adapters ship with
+artifacts alone. CLI coding agents work out of the box — 51 adapters ship with
 it — and the same layer governs any agent workload. Bugs and features in *that*
 belong in
 [its tracker](https://github.com/sipyourdrink-ltd/bernstein/issues).
@@ -37,9 +37,9 @@ without scraping HTML.
 Two reasons, both practical.
 
 A site that argues for auditability and cannot be audited is an odd thing. Every
-number rendered here — the adapter count, the version, the benchmark scores —
-comes from a checked-in data file with a generator next to it, and you can now
-read both.
+number this tree renders — the adapter count, the version — comes from a
+checked-in data file with a generator next to it, regenerated at build time
+from upstream release data, and you can read both.
 
 And corrections get cheaper. Claims about software go stale; opening a pull
 request against the sentence is faster than describing it in an issue. The
@@ -50,7 +50,8 @@ exists for exactly that.
 
 Some of what bernstein.run serves is supplied by the host and is deliberately
 absent from this repository: the retrieval and summarisation service behind
-`/ask`, the mailing-list plumbing, comparison datasets, and the deploy units.
+`/#ask`, the mailing-list plumbing, comparison pages and datasets, and the
+deploy units.
 
 This is not a stripped build. `npm run build` completes on a fresh clone and
 prerenders the whole site; the routes that need a host service are the ones you

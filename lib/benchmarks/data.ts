@@ -1,13 +1,11 @@
 /**
  * Typed accessor for the cli-agent-orchestrators benchmark suite.
  *
- * Source of truth: data/benchmarks/cli-agent-orchestrators-2026-05.json
- *
- * The data file is committed to the repo so a fresh checkout can render
- * the page without re-running the eval. Scores are operator-verified per
- * the methodology block (3 trials per task, median score, fixed model).
- * Refresh quarterly; the dated suite id keeps the URL stable while
- * historical runs stay under data/benchmarks/.
+ * Source of truth: data/benchmarks/cli-agent-orchestrators-2026-05.json,
+ * an operator-host file outside this git tree (unlike most data/ files,
+ * it never shipped in the tracked repo). `getBenchmarkSuite()` returns
+ * `null` rather than throwing when the file is absent, so a checkout
+ * without it - or a run after the suite is retired - still builds.
  *
  * Winrates and the honesty gate are computed at render time. No prose
  * fields are interpolated from an LLM.
@@ -72,12 +70,25 @@ const DATA_PATH = path.resolve(
 );
 
 let _cache: BenchmarkSuite | null = null;
+let _checkedMissing = false;
 
-export async function getBenchmarkSuite(): Promise<BenchmarkSuite> {
+/**
+ * Returns `null`, rather than throwing, when the suite data file is
+ * absent - the suite is refreshed on its own cadence and a caller (the
+ * benchmarks index, the sitemap route) must keep rendering the rest of
+ * the page around a gap instead of failing the whole request or build.
+ */
+export async function getBenchmarkSuite(): Promise<BenchmarkSuite | null> {
   if (_cache) return _cache;
-  const raw = await fs.readFile(DATA_PATH, 'utf8');
-  _cache = JSON.parse(raw) as BenchmarkSuite;
-  return _cache;
+  if (_checkedMissing) return null;
+  try {
+    const raw = await fs.readFile(DATA_PATH, 'utf8');
+    _cache = JSON.parse(raw) as BenchmarkSuite;
+    return _cache;
+  } catch {
+    _checkedMissing = true;
+    return null;
+  }
 }
 
 /**

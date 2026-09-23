@@ -5,13 +5,11 @@ import { getAllPosts } from '@/lib/mdx';
 import { getReadyAdapters } from '@/lib/catalog/adapters';
 import { getCompareEntries } from '@/lib/compare/data';
 import { getAllSeedItems } from '@/lib/ask-seed';
-import { getBenchmarkSuite } from '@/lib/benchmarks/data';
 import {
   buildSitemapUrls,
   buildSitemapXml,
   toW3CDate,
   type SitemapAdapterRef,
-  type SitemapBenchmarkSuite,
   type SitemapCompareEntry,
   type SitemapPost,
   type SitemapSeedItem,
@@ -129,11 +127,11 @@ async function gatherInputs() {
     fm: { date: p.fm.date, dateModified: p.fm.dateModified },
   }));
 
-  /* The catalogue + ask-seed + benchmark data files are each behind a
-     try/catch: missing or unparseable files degrade gracefully to an
-     empty URL slice rather than breaking the whole sitemap. The
-     prebuild step regenerates them; this only triggers on a fresh
-     checkout with no prebuild yet. */
+  /* The catalogue + ask-seed data files are each behind a try/catch:
+     missing or unparseable files degrade gracefully to an empty URL
+     slice rather than breaking the whole sitemap. The prebuild step
+     regenerates them; this only triggers on a fresh checkout with no
+     prebuild yet. */
   let seedItems: SitemapSeedItem[] = [];
   try {
     seedItems = (await getAllSeedItems()).map((i) => ({ slug: i.slug }));
@@ -161,20 +159,11 @@ async function gatherInputs() {
     /* adapters-meta.json missing or unreadable; skip /compare/* entries. */
   }
 
-  let benchmarkSuite: SitemapBenchmarkSuite | null = null;
-  try {
-    const suite = await getBenchmarkSuite();
-    benchmarkSuite = { dateModified: suite.dateModified };
-  } catch {
-    /* Benchmark data file missing; skip /benchmarks/* entries. */
-  }
-
   return {
     posts: sitemapPosts,
     seedItems,
     readyAdapters,
     compareEntries,
-    benchmarkSuite,
     lastModFromSource,
     buildAt: manifest.builtAt,
   };

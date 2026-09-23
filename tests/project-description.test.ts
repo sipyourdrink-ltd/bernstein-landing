@@ -116,6 +116,16 @@ const LITERAL_SURFACES: string[] = [
   'components/seo/SoftwareApplicationJsonLd.tsx',
   'components/seo/OrganizationJsonLd.tsx',
   'app/why-bernstein/page.tsx',
+  /* Agent-discovery and structured-data surfaces: no crawler or agent
+     reads two of these side by side, which is exactly why they are the
+     ones that drift. */
+  'public/structured-data.json',
+  'public/.well-known/agent-card.json',
+  'public/agents.json',
+  'public/.well-known/agents.json',
+  'public/.well-known/mcp/server-card.json',
+  'public/mcp-catalog.json',
+  'public/openapi.yaml',
 ];
 
 /** Every surface that carries a description of the project. */
