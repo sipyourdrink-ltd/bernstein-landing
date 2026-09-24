@@ -65,6 +65,21 @@ const nextConfig = {
         destination: '/blog/v2-0-release',
         permanent: true,
       },
+      {
+        source: '/.well-known/agent.json',
+        destination: '/.well-known/agent-card.json',
+        permanent: true,
+      },
+      {
+        source: '/v1/models',
+        destination: '/mcp-catalog.json',
+        permanent: false,
+      },
+      {
+        source: '/trace/verifier',
+        destination: '/',
+        permanent: false,
+      },
     ];
   },
   async headers() {
