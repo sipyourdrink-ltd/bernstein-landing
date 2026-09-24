@@ -3,6 +3,8 @@ node_modules/
 out/
 *.tsbuildinfo
 next-env.d.ts
+test-results/
+playwright-report/
 
 # Secrets — never commit. .env.local is the source of truth for
 # `scripts/manage.py env-sync`; .env on the VPS is generated from it.

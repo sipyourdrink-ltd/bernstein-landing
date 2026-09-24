@@ -124,6 +124,12 @@ const LITERAL_SURFACES: string[] = [
   'components/seo/SoftwareApplicationJsonLd.tsx',
   'components/seo/OrganizationJsonLd.tsx',
   'app/why-bernstein/page.tsx',
+  /* The homepage hero H1/sub - the first copy a human visitor reads,
+     and the one surface in this list nobody runs a crawler-parity
+     check against. It hand-types the phrase rather than importing it
+     (the component is lowercase-voice prose, not a data binding), so
+     it belongs in this list rather than DERIVED_SURFACES. */
+  'components/landing/HeroV2.tsx',
   /* Agent-discovery and structured-data surfaces: no crawler or agent
      reads two of these side by side, which is exactly why they are the
      ones that drift. */
