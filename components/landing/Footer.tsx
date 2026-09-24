@@ -4,6 +4,7 @@ import { track, UmamiEvent, emitFunnelStep } from '@/lib/analytics/events';
 import { trackOutbound } from '@/components/site/track-outbound';
 import { withUtm } from '@/lib/utm';
 import { ReadTheCode } from './ReadTheCode';
+import { PageSeal } from './PageSeal';
 
 export function Footer() {
   return (
@@ -181,6 +182,7 @@ export function Footer() {
           </div>
         </div>
         <div className="footer-bottom">
+          <PageSeal />
           <p>
             Built by{' '}
             <a
