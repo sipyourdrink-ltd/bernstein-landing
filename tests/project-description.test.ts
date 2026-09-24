@@ -138,7 +138,7 @@ const LITERAL_SURFACES: string[] = [
   'public/agents.json',
   'public/.well-known/agents.json',
   'public/.well-known/mcp/server-card.json',
-  'public/mcp-catalog.json',
+  'public/mcp-server.json',
   'public/openapi.yaml',
 ];
 
