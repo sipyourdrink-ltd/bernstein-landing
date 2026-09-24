@@ -92,7 +92,7 @@ export function GET() {
     'Standards: HTML5, CSS3, TypeScript',
     NEXT_VERSION ? `Framework: Next.js ${NEXT_VERSION} (App Router)` : null,
     'Language: TypeScript, Python',
-    'Hosting: OVH VPS, Caddy, Docker',
+    'Hosting: Netcup VPS, Caddy, Docker',
     'CDN: Cloudflare',
     'Email: Kit (ConvertKit)',
     'Design: OKLCH color space, Inter + JetBrains Mono',

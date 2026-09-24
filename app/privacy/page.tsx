@@ -4,7 +4,7 @@ import { Footer } from '@/components/landing/Footer';
 import { StaticPageBreadcrumb } from '@/components/seo/BreadcrumbListJsonLd';
 
 const SITE_URL = 'https://bernstein.run';
-const LAST_UPDATED = '2026-05-08';
+const LAST_UPDATED = '2026-09-24';
 
 export const metadata: Metadata = {
   title: 'Privacy',
@@ -46,9 +46,12 @@ export default function PrivacyPage() {
                   analytics.bernstein.run
                 </a>{' '}
                 to count page visits and outbound link clicks. Umami is
-                cookieless and does not collect IP addresses, device
-                fingerprints, or personal identifiers. Aggregated counts are
-                kept for at most 24 months, then dropped.
+                cookieless and does not store IP addresses, device
+                fingerprints, or personal identifiers; the IP address is used
+                only at the moment of the visit to look up country and city.
+                A visit record holds the page, time, referring site, browser,
+                operating system, device type, language, country and city.
+                Records older than 24 months are deleted.
               </li>
               <li>
                 <strong>Email, if you opt in.</strong> If you submit your email
@@ -58,9 +61,12 @@ export default function PrivacyPage() {
               </li>
               <li>
                 <strong>Server logs.</strong> Our reverse proxy keeps short
-                access logs (URL, status, response size, user agent) for at
-                most 14 days, used to debug outages and abuse. We do not join
-                these logs to any other identifier.
+                access logs for at most 14 days, used to debug outages and
+                abuse: URL, status, response size, user agent, and the IP
+                address shortened to its network (the last 8 bits of an IPv4
+                address and the last 80 bits of an IPv6 address are removed).
+                The referring page is not logged. We do not join these logs
+                to any other identifier.
               </li>
             </ul>
 
@@ -83,11 +89,12 @@ export default function PrivacyPage() {
 
             <h2>Third parties</h2>
             <p>
-              Three external services receive data when you use this site:
-              GitHub (when you click GitHub links), Resend (when you subscribe
-              to email), and the OVH/Hetzner data centre that hosts our
-              servers. None of them get analytics events; only the request
-              they directly need to serve.
+              Four external services receive data when you use this site:
+              Cloudflare (the CDN and proxy in front of the site, so it
+              handles every request), GitHub (when you click GitHub links),
+              Resend (when you subscribe to email), and Netcup, the data
+              centre that hosts our servers. None of them get analytics
+              events; only the request they directly need to serve.
             </p>
 
             <h2>Changes</h2>
