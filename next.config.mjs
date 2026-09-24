@@ -1,3 +1,5 @@
+import { publishedRedirects, publishedSchemaHeaders } from './lib/published-urls.mjs';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
@@ -75,11 +77,16 @@ const nextConfig = {
         destination: '/mcp-catalog.json',
         permanent: false,
       },
+      /* Inbound links name the cost page /pricing. */
       {
-        source: '/trace/verifier',
-        destination: 'https://mcp.bernstein.run/verify',
-        permanent: false,
+        source: '/pricing',
+        destination: '/cost',
+        statusCode: 301,
       },
+      /* Every identifier the bernstein package publishes that is defined
+         by a docs section rather than served as a file. See
+         lib/published-urls.mjs. */
+      ...publishedRedirects(),
     ];
   },
   async headers() {
@@ -191,6 +198,9 @@ const nextConfig = {
         source: '/((?!api/).*)',
         headers: pageSecurityHeaders,
       },
+      /* Published JSON Schemas: schema media type, readable cross-origin
+         by validators. See lib/published-urls.mjs. */
+      ...publishedSchemaHeaders(),
       /* API surfaces — minimal defence-in-depth headers only. */
       {
         source: '/api/:path*',
