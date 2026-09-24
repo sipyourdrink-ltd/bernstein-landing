@@ -1,8 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <!-- Conductor's baton -->
-  <line x1="12" y1="52" x2="52" y2="12" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
-  <!-- Baton tip -->
-  <circle cx="52" cy="12" r="4" fill="#60a5fa"/>
-  <!-- Baton grip -->
-  <ellipse cx="12" cy="52" rx="6" ry="4" fill="#3b82f6" transform="rotate(-45 12 52)"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="80 80 640 640">
+  <!-- Bernstein mark. Source: sipyourdrink-ltd/bernstein docs/assets/brand/bernstein-mark.svg -->
+  <defs>
+    <mask id="hex" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="800">
+      <path d="M 375.00 116.70 A 50 50 0 0 1 425.00 116.70 L 632.85 236.70 A 50 50 0 0 1 657.85 280.00 L 657.85 520.00 A 50 50 0 0 1 632.85 563.30 L 425.00 683.30 A 50 50 0 0 1 375.00 683.30 L 167.15 563.30 A 50 50 0 0 1 142.15 520.00 L 142.15 280.00 A 50 50 0 0 1 167.15 236.70 Z" fill="#fff"/>
+      <path d="M 216 290 L 433 400 L 216 510 L 216 450 L 315 400 L 216 350 Z M 453 452 H 583 V 510 H 453 Z" fill="#000"/>
+    </mask>
+  </defs>
+  <g mask="url(#hex)">
+    <rect width="800" height="800" fill="#F5A524"/>
+    <polygon points="452,70 88,280 110.5,319 474.5,109" fill="#FFC96A"/>
+  </g>
 </svg>

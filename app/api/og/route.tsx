@@ -2,6 +2,7 @@ import { ImageResponse } from '@vercel/og';
 import type { NextRequest } from 'next/server';
 import adapterCount from '@/data/adapter-count.json';
 import { PROJECT_TAGLINE, PROJECT_ONE_LINER } from '@/lib/project-description';
+import { MARK_PATH, MARK_VIEWBOX } from '@/lib/brand';
 import { renderableOgText } from '@/lib/og-text';
 
 export const runtime = 'edge';
@@ -102,8 +103,8 @@ export async function GET(request: NextRequest) {
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '60px 80px',
-          background: '#131316',
-          color: '#f0f0f2',
+          background: '#13130F',
+          color: '#F2EFE6',
           fontFamily: 'Geist',
           position: 'relative',
           overflow: 'hidden',
@@ -114,7 +115,7 @@ export async function GET(request: NextRequest) {
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: 'radial-gradient(circle, rgba(110,110,128,0.15) 1px, transparent 1px)',
+            backgroundImage: 'radial-gradient(circle, rgba(163,157,140,0.18) 1px, transparent 1px)',
             backgroundSize: '32px 32px',
             maskImage: 'radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 100%)',
             WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 100%)',
@@ -130,31 +131,20 @@ export async function GET(request: NextRequest) {
             width: '400px',
             height: '400px',
             borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(100,100,180,0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(245,165,36,0.10) 0%, transparent 70%)',
           }}
         />
 
         {/* Top bar with logo and stats */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Terminal icon */}
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '8px',
-                background: 'rgba(110,110,180,0.15)',
-                border: '1px solid rgba(110,110,180,0.25)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '18px',
-                color: '#8888bb',
-              }}
-            >
-              &gt;_
-            </div>
-            <span style={{ fontSize: 22, color: '#a0a0b0', fontWeight: 500, letterSpacing: '-0.01em' }}>
+            {/* The Bernstein mark: docs/assets/brand/bernstein-mark.svg in the
+                main repository, drawn as one even-odd path because Satori
+                renders paths but not <mask>. */}
+            <svg width="40" height="40" viewBox={MARK_VIEWBOX}>
+              <path fill="#F5A524" fillRule="evenodd" d={MARK_PATH} />
+            </svg>
+            <span style={{ fontSize: 22, color: '#A39D8C', fontWeight: 500, letterSpacing: '-0.01em' }}>
               bernstein.run
             </span>
           </div>
@@ -168,17 +158,17 @@ export async function GET(request: NextRequest) {
                 gap: '6px',
                 padding: '6px 14px',
                 borderRadius: '20px',
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                background: '#1A1A15',
+                border: '1px solid #33332B',
                 fontSize: 14,
-                color: '#c0c0d0',
+                color: '#F2EFE6',
               }}
             >
               {/* Inline SVG, not a U+2605 glyph: the bundled font has no star. */}
               <svg width="14" height="14" viewBox="0 0 24 24">
                 <path
                   d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                  fill="#ffcc00"
+                  fill="#F5A524"
                 />
               </svg>
               {starsLabel}
@@ -190,10 +180,10 @@ export async function GET(request: NextRequest) {
                 gap: '6px',
                 padding: '6px 14px',
                 borderRadius: '20px',
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                background: '#1A1A15',
+                border: '1px solid #33332B',
                 fontSize: 14,
-                color: '#c0c0d0',
+                color: '#F2EFE6',
               }}
             >
               {adaptersLabel}
@@ -219,7 +209,7 @@ export async function GET(request: NextRequest) {
               : title}
           </div>
           {isDefault && (
-            <div style={{ display: 'flex', fontSize: 20, color: '#6e6e80', marginTop: 20, maxWidth: '700px', lineHeight: 1.5 }}>
+            <div style={{ display: 'flex', fontSize: 20, color: '#A39D8C', marginTop: 20, maxWidth: '700px', lineHeight: 1.5 }}>
               {PROJECT_ONE_LINER}
             </div>
           )}
@@ -232,8 +222,8 @@ export async function GET(request: NextRequest) {
               style={{
                 padding: '8px 20px',
                 borderRadius: '6px',
-                background: '#3a3a5c',
-                color: '#e0e0f0',
+                background: '#F5A524',
+                color: '#181614',
                 fontSize: 15,
                 fontWeight: 600,
               }}
@@ -241,7 +231,7 @@ export async function GET(request: NextRequest) {
               pipx install bernstein
             </div>
           </div>
-          <div style={{ fontSize: 14, color: '#6e6e80' }}>
+          <div style={{ fontSize: 14, color: '#A39D8C' }}>
             Open source &middot; Apache 2.0
           </div>
         </div>
