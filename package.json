@@ -16,6 +16,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\"",
+    "test:e2e": "playwright test",
     "test:vs-live": "VS_LIVE_CHECK=1 node --test --experimental-strip-types tests/vs-pages-live.test.ts"
   },
   "dependencies": {
@@ -38,6 +39,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "^26.6.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
