@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { trackOutbound } from '@/components/site/track-outbound';
 import { emitFunnelStep } from '@/lib/analytics/events';
 import { withUtm } from '@/lib/utm';
+import { MARK_AMBER, MARK_PATH, MARK_VIEWBOX } from '@/lib/brand';
 
 /* Primary nav is one entry point per job: Install, Verify, Docs, Ask, plus
    GitHub. Everything else (how it works, cost, blog, the code-map
@@ -134,6 +135,9 @@ export function Nav() {
         </nav>
         <div className="nav-inner">
           <a href="/" className="nav-logo" aria-label="bernstein.run home">
+            <svg className="nav-mark" viewBox={MARK_VIEWBOX} aria-hidden="true" focusable="false">
+              <path fill={MARK_AMBER} fillRule="evenodd" d={MARK_PATH} />
+            </svg>
             bernstein<span className="run">.run</span>
           </a>
           <nav className="nav-links" aria-label="Primary">

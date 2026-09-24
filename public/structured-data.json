@@ -76,7 +76,7 @@
       "@id": "https://bernstein.run/#org",
       "name": "Bernstein",
       "url": "https://bernstein.run",
-      "logo": "https://bernstein.run/favicon.svg",
+      "logo": "https://bernstein.run/android-chrome-512x512.png",
       "sameAs": [
         "https://github.com/sipyourdrink-ltd/bernstein",
         "https://pypi.org/project/bernstein/",

@@ -12,7 +12,7 @@
     "url": "https://bernstein.run/openapi.yaml",
     "is_user_authenticated": false
   },
-  "logo_url": "https://bernstein.run/favicon.svg",
+  "logo_url": "https://bernstein.run/android-chrome-512x512.png",
   "contact_email": "alex@alexchernysh.com",
   "legal_info_url": "https://github.com/sipyourdrink-ltd/bernstein/blob/main/LICENSE"
 }
