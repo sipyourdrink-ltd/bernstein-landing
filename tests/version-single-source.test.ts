@@ -100,7 +100,7 @@ test('every static discovery surface synced by scripts/sync-version.mjs carries 
   const openapi = read('public/openapi.yaml');
   assert.match(
     openapi,
-    new RegExp(`^\\s{2}version:\\s*${version.replace(/\./g, '\\.')}\\s*$`, 'm'),
+    new RegExp(`^\\s{2}version:\\s*${version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, 'm'),
     `public/openapi.yaml info.version has drifted from data/bernstein-version.json (${version})`,
   );
 });
