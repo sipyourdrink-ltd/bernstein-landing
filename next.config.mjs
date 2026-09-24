@@ -77,7 +77,7 @@ const nextConfig = {
       },
       {
         source: '/trace/verifier',
-        destination: '/',
+        destination: 'https://mcp.bernstein.run/verify',
         permanent: false,
       },
     ];
