@@ -91,7 +91,7 @@ test('the fixed card copy renders without a network fetch', async () => {
 
 test('the un-filtered inputs do reach the network (guards the probe itself)', async () => {
   const seen = await fetchesWhileRendering('★');
-  assert.ok(seen.some((u) => u.includes('fonts.googleapis.com')), 'expected a font fetch for U+2605');
+  assert.ok(seen.some((u) => new URL(u).hostname === 'fonts.googleapis.com'), 'expected a font fetch for U+2605');
 });
 
 test('route passes the bundled font and draws no glyph the font lacks', () => {
