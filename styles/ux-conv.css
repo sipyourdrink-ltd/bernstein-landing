@@ -36,7 +36,7 @@
 
 .sponsor-strip-fold__label {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink-soft);
@@ -65,10 +65,10 @@
   color: var(--ink-soft);
   text-decoration: none;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   filter: grayscale(1);
   opacity: 0.78;
-  transition: opacity 140ms ease, filter 140ms ease, color 140ms ease;
+  transition: opacity var(--dur-2) ease, filter var(--dur-2) ease, color var(--dur-2) ease;
 }
 .sponsor-strip-fold__link:hover,
 .sponsor-strip-fold__link:focus-visible {
@@ -112,7 +112,7 @@
 
 .social-proof-strip__label {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink-soft);
@@ -134,7 +134,7 @@
   align-items: center;
   gap: 8px;
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: var(--text-sm);
   letter-spacing: 0.04em;
   color: var(--ink-soft);
   text-decoration: none;
@@ -161,22 +161,22 @@
   align-items: center;
   gap: 10px;
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--bg-paper-2);
   border: 1px solid var(--rule);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   letter-spacing: 0.02em;
   color: var(--ink);
   text-decoration: none;
-  transition: background 140ms ease;
+  transition: background var(--dur-2) ease;
 }
 .watch-cta:hover {
   background: var(--bg-paper);
 }
 .watch-cta__icon {
   display: inline-block;
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 .watch-cta__count {
   font-weight: 600;
@@ -193,7 +193,7 @@
 .blog-digest-line {
   margin-top: var(--space-6, 24px);
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--text-sm);
   line-height: 1.55;
   color: var(--ink-soft);
   max-width: 720px;
@@ -202,7 +202,7 @@
   color: var(--ink);
   border-bottom: 1px solid var(--rule);
   text-decoration: none;
-  transition: color 140ms ease, border-bottom-color 140ms ease;
+  transition: color var(--dur-2) ease, border-bottom-color var(--dur-2) ease;
 }
 .blog-digest-line a:hover {
   color: var(--accent);
@@ -243,7 +243,7 @@
   gap: 10px;
   border-top: 1px solid var(--rule);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   letter-spacing: 0.02em;
   line-height: 1.5;
   color: var(--ink-soft);
@@ -258,7 +258,7 @@
   color: var(--ink);
   border-bottom: 1px solid var(--rule-strong);
   text-decoration: none;
-  transition: color 140ms ease, border-bottom-color 140ms ease;
+  transition: color var(--dur-2) ease, border-bottom-color var(--dur-2) ease;
 }
 
 .beta-notice__link:hover {
@@ -272,11 +272,11 @@
   border: 0;
   padding: 2px 6px;
   font: inherit;
-  font-size: 15px;
+  font-size: var(--text-base);
   line-height: 1;
   color: var(--ink-faint);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .beta-notice__close:hover {
@@ -343,7 +343,7 @@
   color: var(--ink);
   border-bottom: 1px solid var(--rule-strong);
   text-decoration: none;
-  transition: color 140ms ease, border-bottom-color 140ms ease;
+  transition: color var(--dur-2) ease, border-bottom-color var(--dur-2) ease;
 }
 
 .read-the-code__link:hover {
@@ -361,9 +361,9 @@
    out-shout the install block. */
 .read-the-code--hero {
   margin-top: 12px;
-  font-size: 11.5px;
+  font-size: var(--text-xs);
   opacity: 0.8;
-  transition: opacity 0.2s ease-out;
+  transition: opacity var(--dur-3) ease-out;
 }
 
 .read-the-code--hero:hover {
@@ -376,7 +376,7 @@
 .read-the-code--footer {
   margin-top: var(--space-2, 8px);
   padding-top: 3px;
-  font-size: 11.5px;
+  font-size: var(--text-xs);
 }
 
 .footer-col .read-the-code__link {

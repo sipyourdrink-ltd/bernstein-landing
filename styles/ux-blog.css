@@ -35,7 +35,7 @@
 
 .blog-index-eyebrow {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -46,7 +46,7 @@
 .blog-index-title {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2rem, 4.4vw, 3.25rem);
+  font-size: var(--text-article-h1);
   line-height: 1.05;
   letter-spacing: -0.02em;
   color: var(--ink);
@@ -61,7 +61,7 @@
 
 .blog-index-lede {
   font-family: var(--font-body);
-  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  font-size: var(--text-lead);
   line-height: 1.65;
   color: var(--ink-soft);
   max-width: 60ch;
@@ -95,7 +95,7 @@
   border-top: 1px solid var(--rule);
   text-decoration: none;
   color: inherit;
-  transition: color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out;
 }
 .blog-card:hover {
   color: var(--accent);
@@ -110,7 +110,7 @@
   align-items: center;
   gap: var(--space-2);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-faint);
@@ -131,18 +131,18 @@
 .blog-card-title {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.25rem, 2.4vw, 1.625rem);
+  font-size: var(--text-lg);
   line-height: 1.2;
   letter-spacing: -0.01em;
   color: var(--ink);
   margin: 0 0 var(--space-3);
   text-wrap: balance;
-  transition: color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out;
 }
 
 .blog-card-desc {
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: var(--text-base);
   line-height: 1.65;
   color: var(--ink-soft);
   max-width: 64ch;
@@ -161,7 +161,7 @@
   display: inline-flex;
   align-items: center;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: var(--text-xs);
   letter-spacing: 0.06em;
   text-transform: lowercase;
   color: var(--ink-soft);
@@ -169,7 +169,7 @@
   border: 1px solid var(--rule);
   border-radius: var(--radius);
   background: var(--bg-paper-2);
-  transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out, background var(--dur-2) ease-out;
 }
 
 .blog-card:hover .blog-tag-chip {
@@ -185,7 +185,7 @@
   border: 1px solid var(--rule);
   border-radius: var(--radius-lg);
   background: var(--bg-paper-2);
-  transition: border-color 0.15s ease-out, transform 0.15s ease-out;
+  transition: border-color var(--dur-2) ease-out, transform var(--dur-2) ease-out;
 }
 .blog-card--featured:hover {
   border-color: var(--accent);
@@ -198,7 +198,7 @@
 
 .blog-card-eyebrow {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -207,11 +207,11 @@
 }
 
 .blog-card--featured .blog-card-title {
-  font-size: clamp(1.625rem, 3.2vw, 2.125rem);
+  font-size: var(--text-xl);
   line-height: 1.1;
 }
 .blog-card--featured .blog-card-desc {
-  font-size: 16px;
+  font-size: var(--text-base);
   color: var(--ink-soft);
 }
 
@@ -229,16 +229,16 @@
 
 .blog-tag-filter-chip {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.06em;
   text-transform: lowercase;
   color: var(--ink-faint);
   padding: 5px 11px;
   border: 1px solid var(--rule);
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: transparent;
   cursor: pointer;
-  transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out, background var(--dur-2) ease-out;
 }
 .blog-tag-filter-chip:hover {
   color: var(--ink);
@@ -309,13 +309,13 @@
   align-items: center;
   gap: 6px;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   letter-spacing: 0.06em;
   color: var(--ink-faint);
   margin-bottom: var(--space-6);
   text-decoration: none;
   border-bottom: 1px solid transparent;
-  transition: color 0.15s ease-out, border-color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out;
 }
 .blog-back:hover {
   color: var(--accent);
@@ -361,7 +361,7 @@
 }
 .prose .lead > p {
   font-family: var(--font-body);
-  font-size: 1.125rem;
+  font-size: var(--text-lead);
   line-height: 1.6;
   color: var(--ink-soft);
   margin: 0;
@@ -371,7 +371,7 @@
 .blog-post-header h1 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2rem, 4.4vw, 3rem);
+  font-size: var(--text-article-h1);
   line-height: 1.08;
   letter-spacing: -0.02em;
   color: var(--ink);
@@ -388,7 +388,7 @@
   flex-wrap: wrap;
   gap: var(--space-3);
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: var(--text-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-faint);
@@ -400,7 +400,7 @@
 /* ---- PROSE (MDX body) ---- */
 .prose {
   font-family: var(--font-body);
-  font-size: 16.5px;
+  font-size: var(--text-base);
   line-height: 1.75;
   color: var(--ink);
   max-width: 68ch;
@@ -421,19 +421,19 @@
   text-wrap: balance;
 }
 .prose h2 {
-  font-size: clamp(1.5rem, 2.6vw, 1.875rem);
+  font-size: var(--text-xl);
   line-height: 1.2;
   margin-top: var(--space-7);
   margin-bottom: var(--space-3);
 }
 .prose h3 {
-  font-size: clamp(1.2rem, 1.9vw, 1.375rem);
+  font-size: var(--text-lg);
   line-height: 1.25;
   margin-top: var(--space-6);
   margin-bottom: var(--space-3);
 }
 .prose h4 {
-  font-size: 1.0625rem;
+  font-size: var(--text-base);
   margin-top: var(--space-5);
   margin-bottom: var(--space-2);
 }
@@ -442,7 +442,7 @@
   color: var(--ink);
   text-decoration: none;
   border-bottom: 1px solid var(--rule-strong);
-  transition: color 0.15s ease-out, border-color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out;
 }
 .prose a:hover {
   color: var(--accent);
@@ -466,7 +466,7 @@
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 400;
-  font-size: 1.0625rem;
+  font-size: var(--text-base);
   line-height: 1.55;
   color: var(--ink);
 }
@@ -479,11 +479,11 @@
 
 .prose code {
   font-family: var(--font-mono);
-  font-size: 0.88em;
+  font-size: var(--text-code);
   background: var(--code-paper);
   border: 1px solid var(--rule);
   padding: 1px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   color: var(--ink);
 }
 .prose pre {
@@ -494,7 +494,7 @@
   padding: var(--space-4);
   overflow-x: auto;
   font-family: var(--font-mono);
-  font-size: 13.5px;
+  font-size: var(--text-sm);
   line-height: 1.6;
   color: var(--ink);
 }
@@ -518,7 +518,7 @@
 }
 .prose figcaption {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--ink-faint);
   margin-top: var(--space-2);
   text-align: center;
@@ -529,7 +529,7 @@
   width: 100%;
   border-collapse: collapse;
   margin: var(--space-5) 0;
-  font-size: 14.5px;
+  font-size: var(--text-sm);
 }
 .prose th,
 .prose td {
@@ -539,7 +539,7 @@
 }
 .prose th {
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--ink-faint);
@@ -556,7 +556,7 @@
 }
 .share-buttons .share-label {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-faint);
@@ -568,10 +568,10 @@
   width: 32px;
   height: 32px;
   border: 1px solid var(--rule-strong);
-  border-radius: 999px;
+  border-radius: 50%;
   color: var(--ink-soft);
   background: transparent;
-  transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out, background var(--dur-2) ease-out;
 }
 .share-buttons .share-btn:hover {
   color: var(--bg-paper);
@@ -591,7 +591,7 @@
   gap: var(--space-3);
 }
 .share-buttons--large .share-label {
-  font-size: 12px;
+  font-size: var(--text-xs);
   letter-spacing: 0.16em;
   color: var(--ink-soft);
   margin-right: var(--space-2);
@@ -604,7 +604,7 @@
   padding: var(--space-5) 0 0;
   border-top: 1px solid var(--rule);
   font-family: var(--font-body);
-  font-size: 14.5px;
+  font-size: var(--text-sm);
   line-height: 1.65;
   color: var(--ink-soft);
 }
@@ -615,7 +615,7 @@
 .blog-author a {
   color: var(--ink);
   border-bottom: 1px solid var(--rule-strong);
-  transition: color 0.15s ease-out, border-color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out;
 }
 .blog-author a:hover {
   color: var(--accent);
@@ -653,7 +653,7 @@
 }
 .blog-nextprev-eyebrow-row {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink-faint);
@@ -675,7 +675,7 @@
   background: var(--bg-paper-2);
   color: var(--ink);
   text-decoration: none;
-  transition: border-color 0.15s ease-out, transform 0.15s ease-out;
+  transition: border-color var(--dur-2) ease-out, transform var(--dur-2) ease-out;
 }
 .blog-nextprev-card:hover {
   border-color: var(--accent);
@@ -693,7 +693,7 @@
 }
 .blog-nextprev-eyebrow {
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: var(--text-xs);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--accent);
@@ -702,7 +702,7 @@
 .blog-nextprev-title {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: 1.0625rem;
+  font-size: var(--text-base);
   line-height: 1.3;
   letter-spacing: -0.005em;
   color: var(--ink);
@@ -710,7 +710,7 @@
 }
 .blog-nextprev-date {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-faint);
@@ -762,7 +762,7 @@
 }
 [data-rehype-pretty-code-title] {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--ink-faint);
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--rule);
@@ -799,7 +799,7 @@
   height: 18px;
   color: var(--ink-faint);
   opacity: 0;
-  transition: opacity 0.15s ease-out, color 0.15s ease-out;
+  transition: opacity var(--dur-2) ease-out, color var(--dur-2) ease-out;
   border-bottom: none !important;
 }
 .prose .mdx-heading:hover .anchor-link,
@@ -812,7 +812,7 @@
   top: 50%;
   transform: translateY(-50%);
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: var(--text-xs);
   letter-spacing: 0.06em;
   color: var(--accent);
   white-space: nowrap;
@@ -941,16 +941,16 @@
   align-items: center;
   gap: 4px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.08em;
   text-transform: lowercase;
   color: var(--ink-soft);
   background: transparent;
   border: 1px solid var(--rule);
-  border-radius: 999px;
+  border-radius: var(--radius);
   padding: 6px 12px;
   cursor: pointer;
-  transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out, background var(--dur-2) ease-out;
 }
 .blog-compress-trigger:hover:not(:disabled) {
   color: var(--accent);
@@ -976,7 +976,7 @@
 .blog-compress-original-wrap > .is-compressing {
   filter: blur(4px);
   opacity: 0.3;
-  transition: filter 0.18s ease-out, opacity 0.18s ease-out;
+  transition: filter var(--dur-3) ease-out, opacity var(--dur-3) ease-out;
   pointer-events: none;
   user-select: none;
 }
@@ -988,13 +988,13 @@
   max-width: 26rem;
   padding: var(--space-4);
   border: 1px solid var(--rule);
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-lg);
   background: var(--bg-paper-2);
   text-align: center;
 }
 .blog-compress-loading-detail {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--ink-faint);
   margin-top: var(--space-2);
 }
@@ -1002,7 +1002,7 @@
 .blog-compress-progress {
   height: 2px;
   overflow: hidden;
-  border-radius: 999px;
+  border-radius: 50%;
   background: var(--rule);
   margin-bottom: var(--space-3);
 }
@@ -1010,9 +1010,9 @@
   display: block;
   width: 42%;
   height: 100%;
-  border-radius: 999px;
+  border-radius: 50%;
   background: linear-gradient(90deg, var(--accent-soft) 0%, var(--accent) 100%);
-  animation: blog-compress-slide 1.2s ease-in-out infinite;
+  animation: blog-compress-slide var(--dur-spin) ease-in-out infinite;
 }
 @keyframes blog-compress-slide {
   0% { transform: translateX(-100%); }
@@ -1025,7 +1025,7 @@
 .blog-compress-card {
   position: relative;
   border: 1px solid var(--rule);
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-lg);
   background: var(--bg-paper-2);
   padding: var(--space-5);
   margin: 0 0 var(--space-5);
@@ -1046,16 +1046,16 @@
   display: inline-flex;
   align-items: center;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.08em;
   text-transform: lowercase;
   color: var(--ink-faint);
   padding: 5px 12px;
   border: 1px solid var(--rule);
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: var(--bg-paper);
   cursor: pointer;
-  transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out, background var(--dur-2) ease-out;
 }
 .blog-compress-pill:hover,
 .blog-compress-pill:focus-visible,
@@ -1071,7 +1071,7 @@
 
 .blog-compress-kicker {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -1082,7 +1082,7 @@
 .blog-compress-title {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.4rem, 2.6vw, 1.75rem);
+  font-size: var(--text-xl);
   line-height: 1.15;
   letter-spacing: -0.01em;
   color: var(--ink);
@@ -1102,7 +1102,7 @@
   position: relative;
   padding-left: var(--space-4);
   font-family: var(--font-body);
-  font-size: 15.5px;
+  font-size: var(--text-base);
   line-height: 1.65;
   color: var(--ink);
 }
@@ -1113,7 +1113,7 @@
   top: 0.7em;
   width: 6px;
   height: 6px;
-  border-radius: 999px;
+  border-radius: 50%;
   background: var(--accent-soft);
 }
 
@@ -1125,7 +1125,7 @@
 }
 .blog-compress-paragraph {
   font-family: var(--font-body);
-  font-size: 15.5px;
+  font-size: var(--text-base);
   line-height: 1.7;
   color: var(--ink);
   margin: 0;
@@ -1140,7 +1140,7 @@
 }
 .blog-compress-why p:not(.blog-compress-kicker) {
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: var(--text-base);
   line-height: 1.65;
   color: var(--ink);
   margin: 0;
@@ -1148,7 +1148,7 @@
 
 .blog-compress-attribution {
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: var(--text-xs);
   letter-spacing: 0.06em;
   color: var(--ink-faint);
   margin: var(--space-4) 0 0;
@@ -1173,20 +1173,20 @@
   gap: var(--space-3);
   flex-wrap: wrap;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--ink-soft);
 }
 .blog-compress-error button {
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: var(--text-xs);
   letter-spacing: 0.06em;
   color: var(--accent);
   background: transparent;
   border: 1px solid var(--accent-soft);
-  border-radius: 999px;
+  border-radius: var(--radius);
   padding: 4px 12px;
   cursor: pointer;
-  transition: border-color 0.15s ease-out;
+  transition: border-color var(--dur-2) ease-out;
 }
 .blog-compress-error button:hover:not(:disabled) {
   border-color: var(--accent);
