@@ -21,7 +21,11 @@
   align-items: start;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 56px 64px 36px;
+  /* Top padding clears the fixed header (ux-layout.css `body > header`,
+     position: fixed, does not reserve layout space) - same
+     calc(var(--header-h) + gap) pattern as ux-hero.css/ux-blog.css/
+     ux-cost.css. 56px is the gap below the bar the section already had. */
+  padding: calc(var(--header-h) + 56px) 64px 36px;
   /* Anchors the absolute-positioned <InViewTracker> sentinel to the
      section instead of the viewport so the IntersectionObserver fires
      on scroll-into-view, not on initial paint. */
@@ -815,7 +819,9 @@
   .v2-hero {
     grid-template-columns: 1fr;
     gap: 24px;
-    padding: 28px 20px;
+    /* --header-h switches to 104px at 768px (ux-layout.css); calc()
+       re-reads the custom property at each breakpoint. */
+    padding: calc(var(--header-h) + 28px) 20px 28px;
   }
   /* Natural DOM order on mobile: the H1 and lede render first, the
      install/github rail follows. A prior mobile-only promotion put the
@@ -897,7 +903,7 @@
   .v2-hero {
     grid-template-columns: 1.4fr 1fr;
     gap: 36px;
-    padding: 40px 28px 24px;
+    padding: calc(var(--header-h) + 40px) 28px 24px;
   }
   .v2-hero h1 { font-size: 46px; }
   .v2-section { padding: 64px 28px; }
