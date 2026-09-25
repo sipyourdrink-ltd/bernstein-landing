@@ -5,7 +5,6 @@ import { OPERATOR_EXCLUDE_INLINE_SCRIPT } from "@/lib/analytics/disable";
 import "@/styles/globals.css";
 import "@/styles/ux-typography.css";
 import "@/styles/ux-layout.css";
-import "@/styles/ux-hero.css";
 import "@/styles/ux-cards.css";
 import "@/styles/ux-editorial.css";
 import "@/styles/ux-blog.css";
@@ -21,9 +20,9 @@ import "@/styles/ux-cost.css";
 /* /tools/* (agent-md-bench + orchestra picker).
    Scoped under .amd-* / .orch-* - never collides with cost-*, v2-*. */
 import "@/styles/ux-tools.css";
-/* Sticky pricing CTA, sponsor strip, social proof, watch CTA, RSS links.
-   Scoped under .pricing-peek / .sponsor-strip-fold / .social-proof-strip /
-   .watch-cta / .rss-subscribe-link / .cost-headline-ab. */
+/* Sponsor strip, social proof, watch CTA, RSS links, and status strips.
+   Scoped under .sponsor-strip-fold / .social-proof-strip /
+   .watch-cta / .rss-subscribe-link / .cost-headline-ab / .beta-notice. */
 import "@/styles/ux-conv.css";
 
 const SITE_URL = "https://bernstein.run";

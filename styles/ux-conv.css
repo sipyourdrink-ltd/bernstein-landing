@@ -1,7 +1,6 @@
 /* ============================================================================
-   ux-conv.css — sticky CTA, sponsor strip, social proof, watch CTA, RSS.
+   ux-conv.css — sponsor strip, social proof, watch CTA, RSS, and status strips.
    Scoped classes:
-     .pricing-peek            — sticky `view pricing →` CTA on `/`.
      .sponsor-strip-fold      — compact in-fold sponsor logo row.
      .social-proof-strip      — `as featured in` badge row.
      .watch-cta               — github star+watch CTA near hero.
@@ -12,87 +11,7 @@
    No collisions with .v2-*, .cost-*, .sponsor-wall, or legacy classes.
    ============================================================================ */
 
-/* ----- 1. PricingPeekCta — sticky bottom-right pill ----- */
-
-.pricing-peek {
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
-  z-index: 40;
-  display: inline-flex;
-  align-items: stretch;
-  background: var(--ink, #0A0A0A);
-  color: var(--bg-paper, #f4ecdc);
-  border-radius: 999px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
-  font-family: var(--font-mono);
-  font-size: 13px;
-  letter-spacing: 0.02em;
-  /* The component renders nothing in flow when dismissed; this
-     element's fixed positioning means no surrounding layout reserves
-     space for it. */
-}
-
-.pricing-peek__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px 10px 18px;
-  color: inherit;
-  text-decoration: none;
-  border-radius: 999px 0 0 999px;
-}
-.pricing-peek__link:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.pricing-peek__label {
-  text-transform: lowercase;
-  font-weight: 500;
-}
-.pricing-peek__arrow {
-  font-size: 14px;
-  transition: transform 160ms ease;
-}
-.pricing-peek__link:hover .pricing-peek__arrow {
-  transform: translateX(2px);
-}
-
-.pricing-peek__close {
-  background: transparent;
-  border: 0;
-  color: inherit;
-  cursor: pointer;
-  padding: 8px 14px 8px 8px;
-  font-size: 18px;
-  line-height: 1;
-  border-radius: 0 999px 999px 0;
-  opacity: 0.6;
-}
-.pricing-peek__close:hover {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.08);
-}
-.pricing-peek__close:focus-visible {
-  outline: 2px solid var(--bg-paper, #f4ecdc);
-  outline-offset: -2px;
-}
-
-@media (max-width: 640px) {
-  .pricing-peek {
-    /* full-width pill anchored at bottom, 12px gutter */
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
-    justify-content: space-between;
-  }
-  .pricing-peek__link {
-    flex: 1;
-    justify-content: center;
-  }
-}
-
-/* ----- 2. CostHeadlineAb wrapper ----- */
+/* ----- 1. CostHeadlineAb wrapper ----- */
 
 .cost-headline-ab {
   /* Inherit the H1 styles from .cost-page-header h1 — the wrapper is
@@ -100,7 +19,7 @@
   text-transform: lowercase;
 }
 
-/* ----- 3. SponsorStrip — compact in-fold row ----- */
+/* ----- 2. SponsorStrip — compact in-fold row ----- */
 
 .sponsor-strip-fold {
   max-width: 1200px;
@@ -110,17 +29,17 @@
   flex-direction: column;
   gap: 10px;
   align-items: center;
-  border-top: 1px solid var(--rule, rgba(0, 0, 0, 0.08));
-  border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.08));
-  background: var(--bg-paper-2, #efe6d2);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg-paper-2);
 }
 
 .sponsor-strip-fold__label {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink-soft, #707078);
+  color: var(--ink-soft);
 }
 
 .sponsor-strip-fold__row {
@@ -143,19 +62,19 @@
   align-items: center;
   gap: 8px;
   padding: 6px 4px;
-  color: var(--ink-soft, #707078);
+  color: var(--ink-soft);
   text-decoration: none;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   filter: grayscale(1);
   opacity: 0.78;
-  transition: opacity 140ms ease, filter 140ms ease, color 140ms ease;
+  transition: opacity var(--dur-2) ease, filter var(--dur-2) ease, color var(--dur-2) ease;
 }
 .sponsor-strip-fold__link:hover,
 .sponsor-strip-fold__link:focus-visible {
   filter: grayscale(0);
   opacity: 1;
-  color: var(--ink, #0A0A0A);
+  color: var(--ink);
 }
 
 .sponsor-strip-fold__avatar {
@@ -179,7 +98,7 @@
   }
 }
 
-/* ----- 4. SocialProofStrip — `as featured in` row ----- */
+/* ----- 3. SocialProofStrip — `as featured in` row ----- */
 
 .social-proof-strip {
   max-width: 1200px;
@@ -193,10 +112,10 @@
 
 .social-proof-strip__label {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ink-soft, #707078);
+  color: var(--ink-soft);
 }
 
 .social-proof-strip__row {
@@ -215,18 +134,18 @@
   align-items: center;
   gap: 8px;
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: var(--text-sm);
   letter-spacing: 0.04em;
-  color: var(--ink-soft, #707078);
+  color: var(--ink-soft);
   text-decoration: none;
 }
 .social-proof-strip__item:hover {
-  color: var(--ink, #0A0A0A);
+  color: var(--ink);
 }
 
 .social-proof-strip__count {
   font-weight: 600;
-  color: var(--ink, #0A0A0A);
+  color: var(--ink);
 }
 
 @media (max-width: 720px) {
@@ -235,29 +154,29 @@
   }
 }
 
-/* ----- 5. WatchCta — star + watch combined CTA near hero ----- */
+/* ----- 4. WatchCta — star + watch combined CTA near hero ----- */
 
 .watch-cta {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   padding: 6px 12px;
-  border-radius: 8px;
-  background: var(--bg-paper-2, #efe6d2);
-  border: 1px solid var(--rule, rgba(0, 0, 0, 0.12));
+  border-radius: var(--radius);
+  background: var(--bg-paper-2);
+  border: 1px solid var(--rule);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   letter-spacing: 0.02em;
-  color: var(--ink, #0A0A0A);
+  color: var(--ink);
   text-decoration: none;
-  transition: background 140ms ease;
+  transition: background var(--dur-2) ease;
 }
 .watch-cta:hover {
-  background: var(--bg-paper, #f4ecdc);
+  background: var(--bg-paper);
 }
 .watch-cta__icon {
   display: inline-block;
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 .watch-cta__count {
   font-weight: 600;
@@ -274,23 +193,23 @@
 .blog-digest-line {
   margin-top: var(--space-6, 24px);
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--text-sm);
   line-height: 1.55;
-  color: var(--ink-soft, #707078);
+  color: var(--ink-soft);
   max-width: 720px;
 }
 .blog-digest-line a {
-  color: var(--ink, #0A0A0A);
-  border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.2));
+  color: var(--ink);
+  border-bottom: 1px solid var(--rule);
   text-decoration: none;
-  transition: color 140ms ease, border-bottom-color 140ms ease;
+  transition: color var(--dur-2) ease, border-bottom-color var(--dur-2) ease;
 }
 .blog-digest-line a:hover {
-  color: var(--accent, #b45a2a);
-  border-bottom-color: var(--accent, #b45a2a);
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
-/* ----- 6. RSS subscribe links ----- */
+/* ----- 5. RSS subscribe links ----- */
 
 .rss-subscribe-link {
   display: inline-flex;
@@ -300,7 +219,7 @@
   text-decoration: none;
 }
 .rss-subscribe-link:hover {
-  color: var(--ink, #0A0A0A);
+  color: var(--ink);
 }
 .rss-subscribe-link__icon {
   width: 12px;
@@ -308,7 +227,7 @@
   display: inline-block;
 }
 
-/* ----- 7. BetaNotice — slim dismissible status strip under the hero ----- */
+/* ----- 6. BetaNotice — slim dismissible status strip under the hero ----- */
 
 .beta-notice {
   max-width: 1200px;
@@ -322,12 +241,12 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  border-top: 1px solid var(--rule, rgba(0, 0, 0, 0.08));
+  border-top: 1px solid var(--rule);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   letter-spacing: 0.02em;
   line-height: 1.5;
-  color: var(--ink-soft, #707078);
+  color: var(--ink-soft);
 }
 
 .beta-notice__text {
@@ -336,15 +255,15 @@
 }
 
 .beta-notice__link {
-  color: var(--ink, #0A0A0A);
-  border-bottom: 1px solid var(--rule-strong, rgba(0, 0, 0, 0.2));
+  color: var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
   text-decoration: none;
-  transition: color 140ms ease, border-bottom-color 140ms ease;
+  transition: color var(--dur-2) ease, border-bottom-color var(--dur-2) ease;
 }
 
 .beta-notice__link:hover {
-  color: var(--accent, #b45a2a);
-  border-bottom-color: var(--accent, #b45a2a);
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 .beta-notice__close {
@@ -353,19 +272,19 @@
   border: 0;
   padding: 2px 6px;
   font: inherit;
-  font-size: 15px;
+  font-size: var(--text-base);
   line-height: 1;
-  color: var(--ink-faint, #9a9aa2);
+  color: var(--ink-faint);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .beta-notice__close:hover {
-  color: var(--ink, #0A0A0A);
+  color: var(--ink);
 }
 
 .beta-notice__close:focus-visible {
-  outline: 2px solid var(--accent, #b45a2a);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -402,11 +321,11 @@
   font-family: var(--font-mono);
   letter-spacing: 0.02em;
   line-height: 1.6;
-  color: var(--ink-soft, #707078);
+  color: var(--ink-soft);
 }
 
 .read-the-code__label {
-  color: var(--ink-faint, #9a9aa2);
+  color: var(--ink-faint);
 }
 
 .read-the-code__item {
@@ -417,23 +336,23 @@
 }
 
 .read-the-code__sep {
-  color: var(--ink-faint, #9a9aa2);
+  color: var(--ink-faint);
 }
 
 .read-the-code__link {
-  color: var(--ink, #0a0a0a);
-  border-bottom: 1px solid var(--rule-strong, rgba(0, 0, 0, 0.2));
+  color: var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
   text-decoration: none;
-  transition: color 140ms ease, border-bottom-color 140ms ease;
+  transition: color var(--dur-2) ease, border-bottom-color var(--dur-2) ease;
 }
 
 .read-the-code__link:hover {
-  color: var(--accent, #b45a2a);
-  border-bottom-color: var(--accent, #b45a2a);
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 .read-the-code__link:focus-visible {
-  outline: 2px solid var(--accent, #b45a2a);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -442,9 +361,9 @@
    out-shout the install block. */
 .read-the-code--hero {
   margin-top: 12px;
-  font-size: 11.5px;
+  font-size: var(--text-xs);
   opacity: 0.8;
-  transition: opacity 0.2s ease-out;
+  transition: opacity var(--dur-3) ease-out;
 }
 
 .read-the-code--hero:hover {
@@ -457,7 +376,7 @@
 .read-the-code--footer {
   margin-top: var(--space-2, 8px);
   padding-top: 3px;
-  font-size: 11.5px;
+  font-size: var(--text-xs);
 }
 
 .footer-col .read-the-code__link {
@@ -465,11 +384,11 @@
   padding: 0;
   font-family: var(--font-mono);
   font-size: inherit;
-  color: var(--ink-soft, #707078);
+  color: var(--ink-soft);
 }
 
 .footer-col .read-the-code__link:hover {
-  color: var(--accent, #b45a2a);
+  color: var(--accent);
 }
 
 @media (prefers-reduced-motion: reduce) {

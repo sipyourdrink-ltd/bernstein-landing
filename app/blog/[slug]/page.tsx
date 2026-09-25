@@ -16,6 +16,7 @@ import { ReadingComplete } from '@/components/blog/ReadingComplete';
 import { RelatedPosts, type RelatedPostCard } from '@/components/blog/RelatedPosts';
 import { pickSiblings } from '@/lib/clusters';
 import { withUtm } from '@/lib/utm';
+import { PageSeal } from '@/components/landing/PageSeal';
 import {
   ArticleCompressionRoot,
   ArticleCompressionTrigger,
@@ -231,6 +232,7 @@ export default async function BlogPost({ params }: Props) {
                 <meta itemProp="dateModified" content={post.fm.date} />
                 <span aria-hidden="true">·</span>
                 <span>{post.readingMinutes} min read</span>
+                <PageSeal />
               </p>
             </header>
             <ArticleCompressionBody className="prose">

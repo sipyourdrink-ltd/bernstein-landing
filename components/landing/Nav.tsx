@@ -6,22 +6,15 @@ import { trackOutbound } from '@/components/site/track-outbound';
 import { emitFunnelStep } from '@/lib/analytics/events';
 import { withUtm } from '@/lib/utm';
 import { MARK_AMBER, MARK_PATH, MARK_VIEWBOX } from '@/lib/brand';
+import { formatStars } from '@/lib/format-stars';
 
 /* Primary nav is one entry point per job: Install, Verify, Docs, Ask, plus
    GitHub. Everything else (how it works, cost, blog, the code-map
-   shortcuts) lives in the footer or inline in page copy instead - see
-   Footer.tsx. There is no on-page scroll-spy anymore: none of the five
-   entries point at a same-page anchor, so the previous IntersectionObserver
-   wiring for `#how` was removed along with the nav link that used it. */
-
-function formatStars(stars: number): string {
-  if (stars >= 1000) {
-    const k = stars / 1000;
-    const fixed = k.toFixed(1);
-    return `${fixed.endsWith('.0') ? fixed.slice(0, -2) : fixed}k`;
-  }
-  return String(stars);
-}
+   shortcuts, the LinkedIn profile) lives in the footer or inline in page
+   copy instead - see Footer.tsx. There is no on-page scroll-spy anymore:
+   none of the five entries point at a same-page anchor, so the previous
+   IntersectionObserver wiring for `#how` was removed along with the nav
+   link that used it. */
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -121,17 +114,6 @@ export function Nav() {
           >
             GitHub
           </a>
-          <a
-            href="https://www.linkedin.com/company/bernstein-run/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="LinkedIn"
-            data-umami-event="outbound-linkedin"
-            data-umami-event-source="nav-mobile"
-            onClick={() => trackOutbound('linkedin.com', 'site-nav', 'mobile-li')}
-          >
-            LinkedIn
-          </a>
         </nav>
         <div className="nav-inner">
           <a href="/" className="nav-logo" aria-label="bernstein.run home">
@@ -202,21 +184,6 @@ export function Nav() {
                   <span className="nav-gh-stars">{formatStars(stars)}</span>
                 </>
               ) : null}
-            </a>
-            <a
-              href="https://www.linkedin.com/company/bernstein-run/"
-              className="nav-github"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="LinkedIn"
-              data-umami-event="outbound-linkedin"
-              data-umami-event-source="nav-desktop"
-              onClick={() => trackOutbound('linkedin.com', 'site-nav', 'desktop-li')}
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-              </svg>
-              <span>LinkedIn</span>
             </a>
           </nav>
         </div>

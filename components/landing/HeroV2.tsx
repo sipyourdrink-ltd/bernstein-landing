@@ -160,13 +160,18 @@ export async function HeroV2({
             <span className="pulse" aria-hidden="true" />
             {versionTag} shipping
           </span>
-          {/* Deliberately "40+" rather than the live figure. Every other
-              surface quotes the same floor, and an exact number rendered
-              here drifted out of step with them the moment the registry
-              changed. resolvedAdapterCount still backs the surfaces that
-              genuinely want a live count. */}
+          {/* Sourced from resolvedAdapterCount, the same figure the rail's
+              mini-stats tile renders, so the two surfaces in this viewport
+              agree instead of each carrying its own guess. Falls back to
+              the "40+" floor only when the resolved figure is not a
+              usable positive number: a literal here drifted out of step
+              with the registry once, which is why a hand-typed count
+              never belongs in this line. */}
           <span className="v2-meta">
-            40+ cli adapters · apache 2.0 · on-prem
+            {Number.isFinite(resolvedAdapterCount) && resolvedAdapterCount > 0
+              ? resolvedAdapterCount
+              : '40+'}{' '}
+            cli adapters · apache 2.0 · on-prem
           </span>
         </div>
 
@@ -198,26 +203,22 @@ export async function HeroV2({
           record.
         </p>
 
-        <p className="v2-sub">
-          ships adapters for claude code, codex, gemini cli, aider, and
-          40+ more. each coding task runs in its own git worktree; lint,
-          types, and tests gate every merge. non-code work closes on
-          artifact contracts with signed lineage receipts: research,
-          datasets, audit evidence packs. flip on the hmac audit log and
-          someone who did not run it can check the record offline,
-          without rerunning it.
-        </p>
-
+        {/* Each item carries its own leading separator; the row is pulled
+            left by one separator width and the kicker clips it, so the
+            separator that starts any wrapped line is hidden. */}
         <div className="v2-docs-kicker">
-          <span>ask the docs</span>
-          <span className="sep" aria-hidden="true">
-            ·
-          </span>
-          <span>grounded in source + {postCount} posts</span>
-          <span className="sep" aria-hidden="true">
-            ·
-          </span>
-          <span>cited</span>
+          <div className="v2-docs-kicker-row">
+            <span>
+              <span className="sep" aria-hidden="true">·</span>ask the docs
+            </span>
+            <span>
+              <span className="sep" aria-hidden="true">·</span>grounded in
+              source + {postCount} posts
+            </span>
+            <span>
+              <span className="sep" aria-hidden="true">·</span>cited
+            </span>
+          </div>
         </div>
 
         {/* `#ask` lives on the server-rendered heading: the bot itself
