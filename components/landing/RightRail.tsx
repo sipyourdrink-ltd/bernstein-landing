@@ -618,6 +618,13 @@ export function RightRail({ adapterCount, closedPrs, contributors }: RightRailPr
             <dd className="v2-v">only what passes</dd>
           </div>
           <div className="v2-row">
+            <dt className="v2-k">closes</dt>
+            <dd className="v2-v">
+              research · datasets · audit packs <em>on artifact
+              contracts with signed lineage receipts</em>
+            </dd>
+          </div>
+          <div className="v2-row">
             <dt className="v2-k">runs on</dt>
             <dd className="v2-v">your laptop, on-prem, air-gapped</dd>
           </div>
