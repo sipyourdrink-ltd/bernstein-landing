@@ -110,6 +110,16 @@
   --radius:    8px;   /* cards, inputs, buttons */
   --radius-lg: 12px;  /* panels, the terminal, the hero status stamp */
 
+  /* Motion — every transition and animation duration uses one of these.
+     Pair with ease-out for enter and hover. Nothing loops at idle; the
+     reduced-motion block below cuts all of them to ~0. */
+  --dur-1: 100ms;  /* press and row-highlight feedback, small lifts */
+  --dur-2: 150ms;  /* hover colour, border and background changes */
+  --dur-3: 200ms;  /* small movements: chevrons, header rule, popover open/close */
+  --dur-4: 300ms;  /* reveal-on-scroll fades */
+  --dur-5: 500ms;  /* hide delay on the star-row popover */
+  --dur-spin: 800ms; /* one turn of the busy spinner on the email button (the only loop) */
+
   --container-w: 1080px;
   --header-h:    64px;
 }
@@ -149,7 +159,7 @@ body {
 a {
   color: var(--ink);
   text-decoration: none;
-  transition: color 0.15s ease-out, border-color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out;
 }
 a:hover { color: var(--accent); }
 
@@ -182,7 +192,7 @@ input:focus-visible,
   font-weight: 600;
   border-radius: var(--radius);
   transform: translateY(-120%);
-  transition: transform 0.2s ease-out;
+  transition: transform var(--dur-3) ease-out;
 }
 .skip-to-content:focus { transform: translateY(0); color: var(--bg-paper); }
 

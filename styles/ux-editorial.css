@@ -95,7 +95,7 @@
 .faq-question em { font-style: italic; color: var(--accent); font-weight: 400; }
 .faq-question:hover { color: var(--accent); }
 .faq-chevron {
-  transition: transform 0.2s;
+  transition: transform var(--dur-3) ease-out;
   color: var(--ink-faint);
   flex-shrink: 0;
   margin-left: var(--space-3);
@@ -175,7 +175,7 @@
   font-size: var(--text-xs);
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.15s ease-out, color 0.15s ease-out;
+  transition: border-color var(--dur-2) ease-out, color var(--dur-2) ease-out;
 }
 .faq-collapse-all:hover:not(:disabled) { border-color: var(--ink); color: var(--ink); }
 .faq-collapse-all:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -348,7 +348,7 @@
   color: var(--ink);
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  transition: border-color 0.15s ease-out;
+  transition: border-color var(--dur-2) ease-out;
 }
 .email-form input[type="email"]::placeholder { color: var(--ink-faint); }
 .email-form input[type="email"]:focus { border-color: var(--accent); }
@@ -364,13 +364,13 @@
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s ease-out, border-color 0.15s ease-out;
+  transition: background var(--dur-2) ease-out, border-color var(--dur-2) ease-out;
 }
 .email-form button:hover { background: var(--accent); border-color: var(--accent); }
 .email-form button.email-btn-success { background: var(--ok); border-color: var(--ok); }
 .email-spinner { display: inline-flex; align-items: center; justify-content: center; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.email-spinner .spin { animation: spin 0.8s linear infinite; }
+.email-spinner .spin { animation: spin var(--dur-spin) linear infinite; }
 
 .email-note {
   color: var(--ink-faint);
@@ -433,7 +433,7 @@ footer {
   font-size: var(--text-sm);
   color: var(--ink-soft);
   padding: 3px 0;
-  transition: color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out;
 }
 .footer-col a:hover { color: var(--ink); }
 
@@ -465,7 +465,7 @@ footer {
   height: auto;
   filter: saturate(0.6);
   opacity: 0.85;
-  transition: opacity 0.15s ease-out, filter 0.15s ease-out;
+  transition: opacity var(--dur-2) ease-out, filter var(--dur-2) ease-out;
 }
 .footer-featured-badges a:hover img { opacity: 1; filter: saturate(1); }
 
@@ -505,7 +505,7 @@ footer {
   letter-spacing: 0.06em;
   color: var(--ink-faint);
   text-decoration: none;
-  transition: color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out;
 }
 .ai-crawler-link:hover { color: var(--ink); text-decoration: underline; }
 
@@ -545,7 +545,7 @@ footer {
   vertical-align: baseline;
   color: var(--ink-faint);
   text-decoration: none;
-  transition: color 150ms ease-out;
+  transition: color var(--dur-2) ease-out;
 }
 .cite-link:hover,
 .cite-link:focus-visible {

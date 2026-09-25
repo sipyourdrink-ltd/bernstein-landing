@@ -175,7 +175,7 @@
   border-left: 0;
   border-bottom: 0;
   cursor: pointer;
-  transition: background 140ms, color 140ms;
+  transition: background var(--dur-2) ease-out, color var(--dur-2) ease-out;
 }
 .v2-install-tab:last-child { border-right: 0; }
 .v2-install-tab.is-on {
@@ -213,7 +213,7 @@
   background: var(--bg-paper);
   cursor: pointer;
   flex-shrink: 0;
-  transition: color 140ms, border-color 140ms;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out;
 }
 .v2-install-copy:hover { color: var(--ink); border-color: var(--ink); }
 .v2-install-copy.is-copied { color: var(--ok); border-color: var(--ok); }
@@ -234,7 +234,7 @@
   border: 1px solid var(--rule);
   border-radius: var(--radius);
   text-decoration: none;
-  transition: border-color 120ms ease-out, transform 120ms ease-out;
+  transition: border-color var(--dur-1) ease-out, transform var(--dur-1) ease-out;
 }
 .v2-gh-row:hover {
   color: var(--ink);
@@ -289,7 +289,7 @@
    The popover is an in-flow block — when it animates open it pushes
    the mini-stats grid below it instead of overlaying so nothing in
    the rail gets visually clipped. The hide transition is delayed by
-   1.5s so the cursor has time to drop from the GH CTA into the
+   --dur-5 so the cursor has time to drop from the GH CTA into the
    popover and click the link without the surface yanking away. */
 .v2-gh-wrap {
   display: flex;
@@ -317,13 +317,14 @@
   overflow: hidden;
   pointer-events: none;
   box-shadow: var(--shadow-2);
-  /* Hide path: 1500ms grace period so the user can move from the
-     star CTA down into the popover before it disappears. */
-  transition: max-height 200ms ease-out 1500ms,
-              margin-top 200ms ease-out 1500ms,
-              padding 200ms ease-out 1500ms,
-              opacity 200ms ease-out 1500ms,
-              visibility 0s linear 1700ms;
+  /* Hide path: a --dur-5 grace period so the user can move from the
+     star CTA down into the popover before it disappears. Visibility
+     flips to hidden only once the fade has finished. */
+  transition: max-height var(--dur-3) ease-out var(--dur-5),
+              margin-top var(--dur-3) ease-out var(--dur-5),
+              padding var(--dur-3) ease-out var(--dur-5),
+              opacity var(--dur-3) ease-out var(--dur-5),
+              visibility var(--dur-3) linear var(--dur-5);
   visibility: hidden;
 }
 .v2-gh-tooltip strong {
@@ -340,18 +341,18 @@
 .v2-gh-wrap:focus-within .v2-gh-tooltip {
   /* Expanded state: enough height for the two-line content; padding
      and margin restored. Show is instant (no delay) so the popover
-     surfaces the moment the cursor enters the row. */
+     surfaces the moment the cursor enters the row; visibility is left
+     out of the list so it switches to visible at once. */
   max-height: 100px;
   margin-top: 6px;
   padding: 12px 14px;
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
-  transition: max-height 200ms ease-out 0s,
-              margin-top 200ms ease-out 0s,
-              padding 200ms ease-out 0s,
-              opacity 200ms ease-out 0s,
-              visibility 0s linear 0s;
+  transition: max-height var(--dur-3) ease-out,
+              margin-top var(--dur-3) ease-out,
+              padding var(--dur-3) ease-out,
+              opacity var(--dur-3) ease-out;
 }
 
 /* Mini-stats grid */
@@ -373,7 +374,7 @@
   display: block;
   text-decoration: none;
   color: inherit;
-  transition: border-color 120ms ease;
+  transition: border-color var(--dur-1) ease-out;
 }
 .v2-mini-stats a.v2-ms-link:hover,
 .v2-mini-stats a.v2-ms-link:focus-visible {
@@ -794,7 +795,7 @@
   font-family: var(--font-body);
   font-size: var(--text-sm);
   cursor: pointer;
-  transition: transform 120ms ease-out, background 0.15s ease-out;
+  transition: transform var(--dur-1) ease-out, background var(--dur-2) ease-out;
 }
 .v2-email-form button:hover { transform: translateY(-1px); }
 .v2-email-form button.v2-btn-success { background: var(--ok); }

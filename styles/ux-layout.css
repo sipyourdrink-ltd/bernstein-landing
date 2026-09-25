@@ -52,7 +52,7 @@ body > header {
   height: var(--header-h);
   background: var(--bg-paper);
   border-bottom: 1px solid transparent;
-  transition: border-color 0.2s ease-out;
+  transition: border-color var(--dur-3) ease-out;
   padding: 0 var(--space-5);
 }
 body > header.nav-top { border-bottom-color: transparent; }
@@ -106,7 +106,7 @@ body > header.nav-scrolled {
   color: var(--ink-soft);
   position: relative;
   padding-bottom: 2px;
-  transition: color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out;
 }
 .nav-links a:hover { color: var(--ink); }
 
@@ -131,7 +131,7 @@ body > header.nav-scrolled {
   font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: 500;
-  transition: border-color 0.15s ease-out, color 0.15s ease-out, background 0.15s ease-out;
+  transition: border-color var(--dur-2) ease-out, color var(--dur-2) ease-out, background var(--dur-2) ease-out;
 }
 .nav-github:hover {
   background: var(--bg-paper-2);
@@ -169,7 +169,7 @@ body > header.nav-scrolled {
   padding: 0 var(--space-2);
   display: inline-flex;
   align-items: center;
-  transition: color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out;
 }
 .nav-mobile-strip a:hover { color: var(--ink); }
 .nav-mobile-strip a.nav-active { color: var(--ink); }
@@ -191,7 +191,7 @@ body > header.nav-scrolled {
   font-weight: 500;
   cursor: pointer;
   border: 1px solid transparent;
-  transition: background 0.15s ease-out, color 0.15s ease-out, border-color 0.15s ease-out;
+  transition: background var(--dur-2) ease-out, color var(--dur-2) ease-out, border-color var(--dur-2) ease-out;
 }
 .btn-primary {
   background: var(--ink);
@@ -229,7 +229,7 @@ body > header.nav-scrolled {
   cursor: pointer;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.2s ease-out, color 0.15s ease-out, border-color 0.15s ease-out;
+  transition: opacity var(--dur-3) ease-out, color var(--dur-2) ease-out, border-color var(--dur-2) ease-out;
 }
 .back-to-top:hover { color: var(--ink); border-color: var(--ink); }
 .back-to-top-visible { opacity: 1; pointer-events: auto; }
@@ -238,7 +238,7 @@ body > header.nav-scrolled {
 .scroll-reveal {
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+  transition: opacity var(--dur-4) ease-out, transform var(--dur-4) ease-out;
 }
 .scroll-reveal.revealed { opacity: 1; transform: translateY(0); }
 
