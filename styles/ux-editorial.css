@@ -352,6 +352,7 @@
 }
 .email-form input[type="email"]::placeholder { color: var(--ink-faint); }
 .email-form input[type="email"]:focus { border-color: var(--accent); }
+.email-form input[type="email"][aria-invalid="true"] { border-color: var(--warn); }
 .email-form button {
   padding: 10px 20px;
   border-radius: var(--radius);
@@ -378,6 +379,8 @@
   font-family: var(--font-mono);
   letter-spacing: 0.04em;
 }
+.email-note.email-note-success { color: var(--ok); }
+.email-note.email-note-error { color: var(--warn); }
 
 @media (max-width: 540px) {
   .email-form { flex-direction: column; }

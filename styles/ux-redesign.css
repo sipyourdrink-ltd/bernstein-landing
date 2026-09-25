@@ -787,6 +787,7 @@
   color: var(--ink);
 }
 .v2-email-form input::placeholder { color: var(--ink-soft); }
+.v2-email-form input[aria-invalid="true"] { box-shadow: inset 0 0 0 1px var(--warn); }
 .v2-email-form button {
   background: var(--bg-deep);
   color: var(--bg-paper);
@@ -796,9 +797,10 @@
   font-family: var(--font-body);
   font-size: 13px;
   cursor: pointer;
-  transition: transform 120ms ease-out;
+  transition: transform 120ms ease-out, background 0.15s ease-out;
 }
 .v2-email-form button:hover { transform: translateY(-1px); }
+.v2-email-form button.v2-btn-success { background: var(--ok); }
 
 /* ---------------------------------------------------------------------------
    9. MOBILE — order matters more than column split. Stack everything.

@@ -44,7 +44,10 @@
 
   /* Status colours — used very sparingly. Same hue family as accent. */
   --ok:          oklch(45% 0.08 145);
-  --warn:        oklch(55% 0.10 60);
+  /* Was 55% L: 4.46:1 on --bg-paper, 4.19:1 on --bg-paper-2 (below the
+     4.5:1 text minimum, checked for #54's email-form error state). 50% L
+     clears 4.5:1 on both. */
+  --warn:        oklch(50% 0.10 60);
 
   /* Backwards-compat aliases — older blog/share/CTA components reference
      these names. Mapped onto the new ink palette so nothing flat-out breaks

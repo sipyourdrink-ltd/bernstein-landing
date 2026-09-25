@@ -147,9 +147,14 @@ export function EmailStrip() {
             onChange={(e) => setEmail(e.target.value)}
             onFocus={onFirstFocus}
             aria-label="email address"
+            aria-invalid={status === 'error' ? true : undefined}
             disabled={status === 'submitting' || status === 'ok'}
           />
-          <button type="submit" disabled={status === 'submitting' || status === 'ok'}>
+          <button
+            type="submit"
+            disabled={status === 'submitting' || status === 'ok'}
+            className={status === 'ok' ? 'v2-btn-success' : undefined}
+          >
             {status === 'submitting' ? '…' : status === 'ok' ? 'thanks ✓' : 'subscribe'}
           </button>
         </form>
@@ -163,7 +168,7 @@ export function EmailStrip() {
             margin: '12px auto 0',
             padding: '0 64px',
             fontSize: '13px',
-            color: 'oklch(50% 0.12 25)',
+            color: 'var(--warn)',
           }}
         >
           {errMsg}
