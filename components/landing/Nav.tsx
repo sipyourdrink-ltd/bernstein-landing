@@ -6,6 +6,7 @@ import { trackOutbound } from '@/components/site/track-outbound';
 import { emitFunnelStep } from '@/lib/analytics/events';
 import { withUtm } from '@/lib/utm';
 import { MARK_AMBER, MARK_PATH, MARK_VIEWBOX } from '@/lib/brand';
+import { formatStars } from '@/lib/format-stars';
 
 /* Primary nav is one entry point per job: Install, Verify, Docs, Ask, plus
    GitHub. Everything else (how it works, cost, blog, the code-map
@@ -13,15 +14,6 @@ import { MARK_AMBER, MARK_PATH, MARK_VIEWBOX } from '@/lib/brand';
    Footer.tsx. There is no on-page scroll-spy anymore: none of the five
    entries point at a same-page anchor, so the previous IntersectionObserver
    wiring for `#how` was removed along with the nav link that used it. */
-
-function formatStars(stars: number): string {
-  if (stars >= 1000) {
-    const k = stars / 1000;
-    const fixed = k.toFixed(1);
-    return `${fixed.endsWith('.0') ? fixed.slice(0, -2) : fixed}k`;
-  }
-  return String(stars);
-}
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
