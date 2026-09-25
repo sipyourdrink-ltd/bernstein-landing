@@ -161,7 +161,7 @@
   align-items: center;
   gap: 10px;
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--bg-paper-2);
   border: 1px solid var(--rule);
   font-family: var(--font-mono);
@@ -276,7 +276,7 @@
   line-height: 1;
   color: var(--ink-faint);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .beta-notice__close:hover {

@@ -235,7 +235,7 @@
   color: var(--ink-faint);
   padding: 5px 11px;
   border: 1px solid var(--rule);
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: transparent;
   cursor: pointer;
   transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
@@ -483,7 +483,7 @@
   background: var(--code-paper);
   border: 1px solid var(--rule);
   padding: 1px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   color: var(--ink);
 }
 .prose pre {
@@ -568,7 +568,7 @@
   width: 32px;
   height: 32px;
   border: 1px solid var(--rule-strong);
-  border-radius: 999px;
+  border-radius: 50%;
   color: var(--ink-soft);
   background: transparent;
   transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
@@ -947,7 +947,7 @@
   color: var(--ink-soft);
   background: transparent;
   border: 1px solid var(--rule);
-  border-radius: 999px;
+  border-radius: var(--radius);
   padding: 6px 12px;
   cursor: pointer;
   transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
@@ -988,7 +988,7 @@
   max-width: 26rem;
   padding: var(--space-4);
   border: 1px solid var(--rule);
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-lg);
   background: var(--bg-paper-2);
   text-align: center;
 }
@@ -1002,7 +1002,7 @@
 .blog-compress-progress {
   height: 2px;
   overflow: hidden;
-  border-radius: 999px;
+  border-radius: 50%;
   background: var(--rule);
   margin-bottom: var(--space-3);
 }
@@ -1010,7 +1010,7 @@
   display: block;
   width: 42%;
   height: 100%;
-  border-radius: 999px;
+  border-radius: 50%;
   background: linear-gradient(90deg, var(--accent-soft) 0%, var(--accent) 100%);
   animation: blog-compress-slide 1.2s ease-in-out infinite;
 }
@@ -1025,7 +1025,7 @@
 .blog-compress-card {
   position: relative;
   border: 1px solid var(--rule);
-  border-radius: var(--radius-lg, 12px);
+  border-radius: var(--radius-lg);
   background: var(--bg-paper-2);
   padding: var(--space-5);
   margin: 0 0 var(--space-5);
@@ -1052,7 +1052,7 @@
   color: var(--ink-faint);
   padding: 5px 12px;
   border: 1px solid var(--rule);
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: var(--bg-paper);
   cursor: pointer;
   transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
@@ -1113,7 +1113,7 @@
   top: 0.7em;
   width: 6px;
   height: 6px;
-  border-radius: 999px;
+  border-radius: 50%;
   background: var(--accent-soft);
 }
 
@@ -1183,7 +1183,7 @@
   color: var(--accent);
   background: transparent;
   border: 1px solid var(--accent-soft);
-  border-radius: 999px;
+  border-radius: var(--radius);
   padding: 4px 12px;
   cursor: pointer;
   transition: border-color 0.15s ease-out;
