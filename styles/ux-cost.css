@@ -608,4 +608,15 @@
   line-height: 1.65;
   color: var(--ink-soft);
   margin: 0;
+  /* The FAQ answer about routing internals inlines unbroken source
+     paths (`src/bernstein/core/routing/bandit_router.py`) as <code>.
+     With no spaces to break on, the browser treats each path as one
+     word and grows the paragraph past the viewport instead of
+     wrapping it, taking documentElement.scrollWidth with it (399px
+     at a 375px viewport - #64). Same failure mode as long CLI
+     flags/URLs in blog prose; same fix as ux-blog.css's
+     `.blog-post .prose p` rule: let the browser break inside the
+     word as a last resort. */
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
