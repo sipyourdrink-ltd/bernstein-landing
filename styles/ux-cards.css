@@ -31,7 +31,7 @@
 }
 .audience-card-eyebrow {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--ink-faint);
@@ -49,7 +49,7 @@
 .audience-card h3 {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   line-height: 1.15;
   letter-spacing: -0.01em;
   color: var(--ink);
@@ -58,13 +58,13 @@
 .audience-card h3 em { font-style: italic; color: var(--accent); font-weight: 400; }
 .audience-card p {
   font-family: var(--font-body);
-  font-size: 14.5px;
+  font-size: var(--text-sm);
   line-height: 1.65;
   color: var(--ink-soft);
 }
 .audience-card pre {
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: var(--text-sm);
   background: var(--bg-paper);
   border: 1px solid var(--rule);
   border-radius: var(--radius);
@@ -76,7 +76,7 @@
 .audience-card-link {
   margin-top: auto;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--accent);
   display: inline-flex;
@@ -102,7 +102,7 @@
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .compare-table th,
 .compare-table td {
@@ -114,7 +114,7 @@
   background: var(--bg-paper);
   color: var(--ink-soft);
   font-weight: 500;
-  font-size: 12.5px;
+  font-size: var(--text-xs);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -145,7 +145,7 @@
   display: inline-block;
   margin-left: var(--space-2);
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: var(--text-xs);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--accent);
@@ -166,14 +166,14 @@
 }
 .compare-verified {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink-faint);
 }
 .compare-footnote {
   margin-top: var(--space-5);
-  font-size: 14px;
+  font-size: var(--text-sm);
   color: var(--ink-soft);
   max-width: 64ch;
 }
@@ -201,5 +201,4 @@
     background: var(--bg-paper-2);
   }
   .compare-table thead th:first-child { background: var(--bg-paper); }
-  .compare-table { font-size: 13px; }
 }

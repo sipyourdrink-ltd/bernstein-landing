@@ -74,7 +74,7 @@ body > header.nav-scrolled {
   align-items: baseline;
   gap: 2px;
   font-family: var(--font-display);
-  font-size: 19px;
+  font-size: var(--text-lg);
   font-weight: 500;
   letter-spacing: -0.01em;
   color: var(--ink);
@@ -101,7 +101,7 @@ body > header.nav-scrolled {
 }
 .nav-links a {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--ink-soft);
   position: relative;
@@ -129,7 +129,7 @@ body > header.nav-scrolled {
   padding: 6px 12px;
   border-radius: var(--radius);
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 500;
   transition: border-color 0.15s ease-out, color 0.15s ease-out, background 0.15s ease-out;
 }
@@ -147,7 +147,7 @@ body > header.nav-scrolled {
 }
 .nav-gh-stars {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   font-weight: 500;
   color: var(--ink-soft);
 }
@@ -162,7 +162,7 @@ body > header.nav-scrolled {
 .nav-mobile-strip { display: none; }
 .nav-mobile-strip a {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--ink-soft);
   min-height: 44px;
@@ -187,7 +187,7 @@ body > header.nav-scrolled {
   padding: 10px 20px;
   border-radius: var(--radius);
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 500;
   cursor: pointer;
   border: 1px solid transparent;
@@ -285,7 +285,7 @@ body > header.nav-scrolled {
    fit on one line without relying on the overflow-x scroll above. */
 @media (max-width: 480px) {
   .nav-mobile-strip { gap: var(--space-1); padding: 0 var(--space-1); }
-  .nav-mobile-strip a { font-size: 12px; padding: 0 var(--space-1); }
+  .nav-mobile-strip a { font-size: var(--text-xs); padding: 0 var(--space-1); }
   .nav-mobile-strip a:not(:last-child)::after { margin-left: var(--space-1); }
 }
 
