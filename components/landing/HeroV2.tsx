@@ -203,16 +203,22 @@ export async function HeroV2({
           record.
         </p>
 
+        {/* Each item carries its own leading separator; the row is pulled
+            left by one separator width and the kicker clips it, so the
+            separator that starts any wrapped line is hidden. */}
         <div className="v2-docs-kicker">
-          <span>ask the docs</span>
-          <span className="sep" aria-hidden="true">
-            ·
-          </span>
-          <span>grounded in source + {postCount} posts</span>
-          <span className="sep" aria-hidden="true">
-            ·
-          </span>
-          <span>cited</span>
+          <div className="v2-docs-kicker-row">
+            <span>
+              <span className="sep" aria-hidden="true">·</span>ask the docs
+            </span>
+            <span>
+              <span className="sep" aria-hidden="true">·</span>grounded in
+              source + {postCount} posts
+            </span>
+            <span>
+              <span className="sep" aria-hidden="true">·</span>cited
+            </span>
+          </div>
         </div>
 
         {/* `#ask` lives on the server-rendered heading: the bot itself
