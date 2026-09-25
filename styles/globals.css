@@ -97,11 +97,13 @@
   --space-11: 96px;   /* legacy alias */
   --space-12: 128px;  /* legacy alias */
 
-  --shadow-xs: 0 1px 0 0 oklch(20% 0.005 60 / 0.04);
-  --shadow-sm: 0 1px 2px oklch(20% 0.005 60 / 0.06);
-  --shadow-md: 0 2px 6px oklch(20% 0.005 60 / 0.08);
-  --shadow-lg: 0 6px 16px oklch(20% 0.005 60 / 0.10);
-  --shadow-xl: 0 12px 32px oklch(20% 0.005 60 / 0.12);
+  /* Elevation — three steps, all cast in --ink. */
+  --shadow-1: 0 6px 16px oklch(20% 0.005 60 / 0.10);           /* small popovers (citation chips) */
+  --shadow-2: 0 10px 30px -12px oklch(20% 0.005 60 / 0.35);    /* raised cards and tooltips (install card, star-row popover) */
+  --shadow-3: 0 30px 60px -30px oklch(20% 0.005 60 / 0.40),
+              0 4px 12px -4px oklch(20% 0.005 60 / 0.20);      /* large panels (terminal, dialog) */
+  /* 1px inset ring for invalid inputs that have no border of their own. */
+  --ring-invalid: inset 0 0 0 1px var(--warn);
 
   /* Corner radii. Round dots use 50% directly. */
   --radius-sm: 4px;   /* small controls: copy buttons, inline code, focus rings, pills */

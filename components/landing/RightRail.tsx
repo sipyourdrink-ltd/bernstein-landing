@@ -308,7 +308,7 @@ export function RightRail({ adapterCount, closedPrs, contributors }: RightRailPr
           (github row, mini-stats, fact list) are visually quieter via
           Tailwind utility classes layered on top of the existing v2-*
           CSS, so dropping the className additions reverts the emphasis. */}
-      <div className="ring-2 ring-[color:var(--accent)]/70 ring-offset-2 ring-offset-[color:var(--bg-paper-2)] rounded-[var(--radius-lg)] p-1 shadow-[0_10px_30px_-12px_oklch(20%_0.005_60/0.35)]">
+      <div className="ring-2 ring-[color:var(--accent)]/70 ring-offset-2 ring-offset-[color:var(--bg-paper-2)] rounded-[var(--radius-lg)] p-1 shadow-[shadow:var(--shadow-2)]">
         {/* No time estimate here: the previous "· 5 min" chip was a
             hand-typed figure with nothing behind it, and install time is
             dominated by the visitor's Python setup, not by us. */}

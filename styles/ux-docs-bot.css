@@ -587,7 +587,7 @@
   border: 1px solid var(--rule-strong);
   border-radius: var(--radius-lg, 12px);
   background: var(--bg-paper);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-1);
   margin: 0;
   animation: docs-bot-popover-fade 200ms ease-out;
 }
@@ -801,7 +801,7 @@
   width: min(880px, 92vw);
   background: var(--bg-paper);
   color: var(--ink);
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-3);
 }
 .docs-bot-modal::backdrop {
   background: oklch(20% 0.005 60 / 0.45);

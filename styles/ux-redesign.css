@@ -316,7 +316,7 @@
   opacity: 0;
   overflow: hidden;
   pointer-events: none;
-  box-shadow: 0 10px 24px -10px oklch(20% 0.005 60 / 0.55);
+  box-shadow: var(--shadow-2);
   /* Hide path: 1500ms grace period so the user can move from the
      star CTA down into the popover before it disappears. */
   transition: max-height 200ms ease-out 1500ms,
@@ -561,8 +561,7 @@
   background: oklch(18% 0.012 65);
   color: oklch(88% 0.02 75);
   border-radius: var(--radius-lg);
-  box-shadow: 0 30px 60px -30px oklch(20% 0.005 60 / 0.40),
-              0 4px 12px -4px oklch(20% 0.005 60 / 0.20);
+  box-shadow: var(--shadow-3);
   font-family: var(--font-mono);
   /* Dropped from 12.5px → 11px so the longest mock log row
      ("scheduler.pause … conflict · t-001 ↔ t-007 · src/auth/refresh.py")
@@ -785,7 +784,7 @@
   color: var(--ink);
 }
 .v2-email-form input::placeholder { color: var(--ink-soft); }
-.v2-email-form input[aria-invalid="true"] { box-shadow: inset 0 0 0 1px var(--warn); }
+.v2-email-form input[aria-invalid="true"] { box-shadow: var(--ring-invalid); }
 .v2-email-form button {
   background: var(--bg-deep);
   color: var(--bg-paper);
