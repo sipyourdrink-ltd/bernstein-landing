@@ -218,6 +218,19 @@
 .v2-install-copy:hover { color: var(--ink); border-color: var(--ink); }
 .v2-install-copy.is-copied { color: var(--ok); border-color: var(--ok); }
 
+/* Install frame — accent ring around the entire install card
+   (copy & install title + tabs + commands). The ring is built from a
+   double box-shadow: inner 2px offset in paper-2, outer 2px accent at
+   70% opacity. Drop-shadow preserved from Tailwind utility. */
+.v2-install-frame {
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  box-shadow:
+    0 0 0 2px var(--bg-paper-2),
+    0 0 0 4px color-mix(in srgb, var(--accent) 70%, transparent),
+    var(--shadow-2);
+}
+
 /* GitHub row — paper surface, standard 1px rule border, same tier as
    the mini-stats tiles below it, so the install action above stays the
    highest-contrast element in the rail. Hover raises the border to
