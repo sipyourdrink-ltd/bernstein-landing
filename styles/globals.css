@@ -49,6 +49,19 @@
      clears 4.5:1 on both. */
   --warn:        oklch(50% 0.10 60);
 
+  /* Terminal — the dark audit-log panel on the homepage. Contrast on
+     --term-bg (WCAG 2.x): --term-ink 13.1:1, --term-ink-soft 5.8:1,
+     --term-ok 9.8:1, --term-warn 8.3:1, --term-bad 7.2:1, --term-acc 9.1:1.
+     Re-check all six if --term-bg moves. */
+  --term-bg:       oklch(18% 0.012 65);  /* panel and title-bar surface */
+  --term-rule:     oklch(28% 0.014 65);  /* title-bar divider */
+  --term-ink:      oklch(88% 0.02 75);   /* default terminal text */
+  --term-ink-soft: oklch(65% 0.04 70);   /* title, comments, hashes */
+  --term-ok:       oklch(78% 0.12 140);  /* passing events */
+  --term-warn:     oklch(75% 0.13 75);   /* events waiting on an operator */
+  --term-bad:      oklch(72% 0.14 25);   /* failed events */
+  --term-acc:      oklch(78% 0.10 50);   /* timestamps and paths */
+
   /* Backwards-compat aliases — older blog/share/CTA components reference
      these names. Mapped onto the new ink palette so nothing flat-out breaks
      while the redesign rolls out. */
@@ -71,6 +84,18 @@
   --font-body:    var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   --font-mono:    var(--font-jetbrains), 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
 
+  /* Type scale — every font-size in the site stylesheets is one of these.
+     UI and body steps are fixed; the three heading steps are fluid, so
+     components need no breakpoint overrides for size. */
+  --text-xs:   0.6875rem; /* 11px: mono labels, eyebrows, terminal text */
+  --text-sm:   0.875rem;  /* 14px: UI text - nav, buttons, inputs, secondary copy */
+  --text-base: 1rem;      /* 16px: body copy and ledes */
+  --text-lg:   1.25rem;   /* 20px: logo, card titles, small headings */
+  --text-xl:   clamp(1.5rem, 1.05rem + 1.25vw, 1.875rem);  /* 24-30px: h3, stat numerals */
+  --text-2xl:  clamp(1.75rem, 1rem + 2.2vw, 2.375rem);     /* 28-38px: section h2 */
+  --text-3xl:  clamp(2.25rem, 6.25vw - 2.125rem, 3.5rem);  /* 36-56px: page h1 */
+  --text-code: 0.9em;     /* inline code, relative to the text around it */
+
   /* Spacing — strict 8px grid (4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 / 128) */
   --space-1: 4px;
   --space-2: 8px;
@@ -85,14 +110,28 @@
   --space-11: 96px;   /* legacy alias */
   --space-12: 128px;  /* legacy alias */
 
-  --shadow-xs: 0 1px 0 0 oklch(20% 0.005 60 / 0.04);
-  --shadow-sm: 0 1px 2px oklch(20% 0.005 60 / 0.06);
-  --shadow-md: 0 2px 6px oklch(20% 0.005 60 / 0.08);
-  --shadow-lg: 0 6px 16px oklch(20% 0.005 60 / 0.10);
-  --shadow-xl: 0 12px 32px oklch(20% 0.005 60 / 0.12);
+  /* Elevation — three steps, all cast in --ink. */
+  --shadow-1: 0 6px 16px oklch(20% 0.005 60 / 0.10);           /* small popovers (citation chips) */
+  --shadow-2: 0 10px 30px -12px oklch(20% 0.005 60 / 0.35);    /* raised cards and tooltips (install card, star-row popover) */
+  --shadow-3: 0 30px 60px -30px oklch(20% 0.005 60 / 0.40),
+              0 4px 12px -4px oklch(20% 0.005 60 / 0.20);      /* large panels (terminal, dialog) */
+  /* 1px inset ring for invalid inputs that have no border of their own. */
+  --ring-invalid: inset 0 0 0 1px var(--warn);
 
-  --radius:    8px;
-  --radius-lg: 12px;
+  /* Corner radii. Round dots use 50% directly. */
+  --radius-sm: 4px;   /* small controls: copy buttons, inline code, focus rings, pills */
+  --radius:    8px;   /* cards, inputs, buttons */
+  --radius-lg: 12px;  /* panels, the terminal, the hero status stamp */
+
+  /* Motion — every transition and animation duration uses one of these.
+     Pair with ease-out for enter and hover. Nothing loops at idle; the
+     reduced-motion block below cuts all of them to ~0. */
+  --dur-1: 100ms;  /* press and row-highlight feedback, small lifts */
+  --dur-2: 150ms;  /* hover colour, border and background changes */
+  --dur-3: 200ms;  /* small movements: chevrons, header rule, popover open/close */
+  --dur-4: 300ms;  /* reveal-on-scroll fades */
+  --dur-5: 500ms;  /* hide delay on the star-row popover */
+  --dur-spin: 800ms; /* one turn of the busy spinner on the email button (the only loop) */
 
   --container-w: 1080px;
   --header-h:    64px;
@@ -110,7 +149,7 @@ html {
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-paper); }
-::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: var(--radius-sm); }
 ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
 
 body {
@@ -133,7 +172,7 @@ body {
 a {
   color: var(--ink);
   text-decoration: none;
-  transition: color 0.15s ease-out, border-color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out;
 }
 a:hover { color: var(--accent); }
 
@@ -141,7 +180,7 @@ a:hover { color: var(--accent); }
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 .btn:focus-visible,
 button:focus-visible,
@@ -162,11 +201,11 @@ input:focus-visible,
   padding: 8px 16px;
   background: var(--bg-deep);
   color: var(--bg-paper);
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 600;
   border-radius: var(--radius);
   transform: translateY(-120%);
-  transition: transform 0.2s ease-out;
+  transition: transform var(--dur-3) ease-out;
 }
 .skip-to-content:focus { transform: translateY(0); color: var(--bg-paper); }
 

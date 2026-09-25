@@ -332,13 +332,13 @@ export function RightRail({ adapterCount, closedPrs, contributors }: RightRailPr
             ))}
           </div>
           <div className="v2-install-body !py-4" id={`install-body-${tab.id}`}>
-            <span className="v2-install-cmd !text-[15px]">
+            <span className="v2-install-cmd !text-[length:var(--text-base)]">
               <span className="v2-prompt">$</span>
               {tab.cmd}
             </span>
             <button
               type="button"
-              className={`v2-install-copy ${copiedId === tab.id ? 'is-copied' : ''} !text-[12px] !py-2 !px-3 !font-semibold !bg-[color:var(--accent)] !text-[color:var(--bg-paper)] !border-[color:var(--accent)] hover:!bg-[color:var(--ink)] hover:!border-[color:var(--ink)]`.trim()}
+              className={`v2-install-copy ${copiedId === tab.id ? 'is-copied' : ''} !text-[length:var(--text-xs)] !py-2 !px-3 !font-semibold !bg-[color:var(--accent)] !text-[color:var(--bg-paper)] !border-[color:var(--accent)] hover:!bg-[color:var(--ink)] hover:!border-[color:var(--ink)]`.trim()}
               onClick={() => onCopy(tab.id, tab.cmd, 'install-snippet-copy')}
               aria-label={`Copy command: ${tab.cmd}`}
             >
@@ -354,7 +354,7 @@ export function RightRail({ adapterCount, closedPrs, contributors }: RightRailPr
           aria-label="post-install init command"
         >
           <div className="v2-install-body !py-2">
-            <span className="v2-install-cmd !text-[12px]">
+            <span className="v2-install-cmd !text-[length:var(--text-xs)]">
               <span className="v2-prompt">$</span>bernstein init
             </span>
             <button

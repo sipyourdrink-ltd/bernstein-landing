@@ -167,7 +167,7 @@ export function EmailStrip() {
             maxWidth: '1100px',
             margin: '12px auto 0',
             padding: '0 64px',
-            fontSize: '13px',
+            fontSize: 'var(--text-sm)',
             color: 'var(--warn)',
           }}
         >
