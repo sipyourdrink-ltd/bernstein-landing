@@ -95,7 +95,7 @@
   border-top: 1px solid var(--rule);
   text-decoration: none;
   color: inherit;
-  transition: color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out;
 }
 .blog-card:hover {
   color: var(--accent);
@@ -137,7 +137,7 @@
   color: var(--ink);
   margin: 0 0 var(--space-3);
   text-wrap: balance;
-  transition: color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out;
 }
 
 .blog-card-desc {
@@ -169,7 +169,7 @@
   border: 1px solid var(--rule);
   border-radius: var(--radius);
   background: var(--bg-paper-2);
-  transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out, background var(--dur-2) ease-out;
 }
 
 .blog-card:hover .blog-tag-chip {
@@ -185,7 +185,7 @@
   border: 1px solid var(--rule);
   border-radius: var(--radius-lg);
   background: var(--bg-paper-2);
-  transition: border-color 0.15s ease-out, transform 0.15s ease-out;
+  transition: border-color var(--dur-2) ease-out, transform var(--dur-2) ease-out;
 }
 .blog-card--featured:hover {
   border-color: var(--accent);
@@ -238,7 +238,7 @@
   border-radius: var(--radius);
   background: transparent;
   cursor: pointer;
-  transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out, background var(--dur-2) ease-out;
 }
 .blog-tag-filter-chip:hover {
   color: var(--ink);
@@ -315,7 +315,7 @@
   margin-bottom: var(--space-6);
   text-decoration: none;
   border-bottom: 1px solid transparent;
-  transition: color 0.15s ease-out, border-color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out;
 }
 .blog-back:hover {
   color: var(--accent);
@@ -442,7 +442,7 @@
   color: var(--ink);
   text-decoration: none;
   border-bottom: 1px solid var(--rule-strong);
-  transition: color 0.15s ease-out, border-color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out;
 }
 .prose a:hover {
   color: var(--accent);
@@ -571,7 +571,7 @@
   border-radius: 50%;
   color: var(--ink-soft);
   background: transparent;
-  transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out, background var(--dur-2) ease-out;
 }
 .share-buttons .share-btn:hover {
   color: var(--bg-paper);
@@ -615,7 +615,7 @@
 .blog-author a {
   color: var(--ink);
   border-bottom: 1px solid var(--rule-strong);
-  transition: color 0.15s ease-out, border-color 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out;
 }
 .blog-author a:hover {
   color: var(--accent);
@@ -675,7 +675,7 @@
   background: var(--bg-paper-2);
   color: var(--ink);
   text-decoration: none;
-  transition: border-color 0.15s ease-out, transform 0.15s ease-out;
+  transition: border-color var(--dur-2) ease-out, transform var(--dur-2) ease-out;
 }
 .blog-nextprev-card:hover {
   border-color: var(--accent);
@@ -799,7 +799,7 @@
   height: 18px;
   color: var(--ink-faint);
   opacity: 0;
-  transition: opacity 0.15s ease-out, color 0.15s ease-out;
+  transition: opacity var(--dur-2) ease-out, color var(--dur-2) ease-out;
   border-bottom: none !important;
 }
 .prose .mdx-heading:hover .anchor-link,
@@ -950,7 +950,7 @@
   border-radius: var(--radius);
   padding: 6px 12px;
   cursor: pointer;
-  transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out, background var(--dur-2) ease-out;
 }
 .blog-compress-trigger:hover:not(:disabled) {
   color: var(--accent);
@@ -976,7 +976,7 @@
 .blog-compress-original-wrap > .is-compressing {
   filter: blur(4px);
   opacity: 0.3;
-  transition: filter 0.18s ease-out, opacity 0.18s ease-out;
+  transition: filter var(--dur-3) ease-out, opacity var(--dur-3) ease-out;
   pointer-events: none;
   user-select: none;
 }
@@ -1012,7 +1012,7 @@
   height: 100%;
   border-radius: 50%;
   background: linear-gradient(90deg, var(--accent-soft) 0%, var(--accent) 100%);
-  animation: blog-compress-slide 1.2s ease-in-out infinite;
+  animation: blog-compress-slide var(--dur-spin) ease-in-out infinite;
 }
 @keyframes blog-compress-slide {
   0% { transform: translateX(-100%); }
@@ -1055,7 +1055,7 @@
   border-radius: var(--radius);
   background: var(--bg-paper);
   cursor: pointer;
-  transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
+  transition: color var(--dur-2) ease-out, border-color var(--dur-2) ease-out, background var(--dur-2) ease-out;
 }
 .blog-compress-pill:hover,
 .blog-compress-pill:focus-visible,
@@ -1186,7 +1186,7 @@
   border-radius: var(--radius);
   padding: 4px 12px;
   cursor: pointer;
-  transition: border-color 0.15s ease-out;
+  transition: border-color var(--dur-2) ease-out;
 }
 .blog-compress-error button:hover:not(:disabled) {
   border-color: var(--accent);
