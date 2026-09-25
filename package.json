@@ -17,7 +17,8 @@
     "lint": "eslint .",
     "test": "node --test --experimental-strip-types \"tests/**/*.test.ts\"",
     "test:e2e": "playwright test",
-    "test:vs-live": "VS_LIVE_CHECK=1 node --test --experimental-strip-types tests/vs-pages-live.test.ts"
+    "test:vs-live": "VS_LIVE_CHECK=1 node --test --experimental-strip-types tests/vs-pages-live.test.ts",
+    "check:published-urls": "node scripts/check-published-urls.mjs"
   },
   "dependencies": {
     "@react-email/components": "^1.0.12",
