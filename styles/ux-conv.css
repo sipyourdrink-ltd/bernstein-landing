@@ -1,7 +1,6 @@
 /* ============================================================================
-   ux-conv.css — sticky CTA, sponsor strip, social proof, watch CTA, RSS.
+   ux-conv.css — sponsor strip, social proof, watch CTA, RSS, and status strips.
    Scoped classes:
-     .pricing-peek            — sticky `view pricing →` CTA on `/`.
      .sponsor-strip-fold      — compact in-fold sponsor logo row.
      .social-proof-strip      — `as featured in` badge row.
      .watch-cta               — github star+watch CTA near hero.
@@ -12,87 +11,7 @@
    No collisions with .v2-*, .cost-*, .sponsor-wall, or legacy classes.
    ============================================================================ */
 
-/* ----- 1. PricingPeekCta — sticky bottom-right pill ----- */
-
-.pricing-peek {
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
-  z-index: 40;
-  display: inline-flex;
-  align-items: stretch;
-  background: var(--ink, #0A0A0A);
-  color: var(--bg-paper, #f4ecdc);
-  border-radius: 999px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
-  font-family: var(--font-mono);
-  font-size: 13px;
-  letter-spacing: 0.02em;
-  /* The component renders nothing in flow when dismissed; this
-     element's fixed positioning means no surrounding layout reserves
-     space for it. */
-}
-
-.pricing-peek__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px 10px 18px;
-  color: inherit;
-  text-decoration: none;
-  border-radius: 999px 0 0 999px;
-}
-.pricing-peek__link:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.pricing-peek__label {
-  text-transform: lowercase;
-  font-weight: 500;
-}
-.pricing-peek__arrow {
-  font-size: 14px;
-  transition: transform 160ms ease;
-}
-.pricing-peek__link:hover .pricing-peek__arrow {
-  transform: translateX(2px);
-}
-
-.pricing-peek__close {
-  background: transparent;
-  border: 0;
-  color: inherit;
-  cursor: pointer;
-  padding: 8px 14px 8px 8px;
-  font-size: 18px;
-  line-height: 1;
-  border-radius: 0 999px 999px 0;
-  opacity: 0.6;
-}
-.pricing-peek__close:hover {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.08);
-}
-.pricing-peek__close:focus-visible {
-  outline: 2px solid var(--bg-paper, #f4ecdc);
-  outline-offset: -2px;
-}
-
-@media (max-width: 640px) {
-  .pricing-peek {
-    /* full-width pill anchored at bottom, 12px gutter */
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
-    justify-content: space-between;
-  }
-  .pricing-peek__link {
-    flex: 1;
-    justify-content: center;
-  }
-}
-
-/* ----- 2. CostHeadlineAb wrapper ----- */
+/* ----- 1. CostHeadlineAb wrapper ----- */
 
 .cost-headline-ab {
   /* Inherit the H1 styles from .cost-page-header h1 — the wrapper is
@@ -100,7 +19,7 @@
   text-transform: lowercase;
 }
 
-/* ----- 3. SponsorStrip — compact in-fold row ----- */
+/* ----- 2. SponsorStrip — compact in-fold row ----- */
 
 .sponsor-strip-fold {
   max-width: 1200px;
@@ -179,7 +98,7 @@
   }
 }
 
-/* ----- 4. SocialProofStrip — `as featured in` row ----- */
+/* ----- 3. SocialProofStrip — `as featured in` row ----- */
 
 .social-proof-strip {
   max-width: 1200px;
@@ -235,7 +154,7 @@
   }
 }
 
-/* ----- 5. WatchCta — star + watch combined CTA near hero ----- */
+/* ----- 4. WatchCta — star + watch combined CTA near hero ----- */
 
 .watch-cta {
   display: inline-flex;
@@ -290,7 +209,7 @@
   border-bottom-color: var(--accent, #b45a2a);
 }
 
-/* ----- 6. RSS subscribe links ----- */
+/* ----- 5. RSS subscribe links ----- */
 
 .rss-subscribe-link {
   display: inline-flex;
@@ -308,7 +227,7 @@
   display: inline-block;
 }
 
-/* ----- 7. BetaNotice — slim dismissible status strip under the hero ----- */
+/* ----- 6. BetaNotice — slim dismissible status strip under the hero ----- */
 
 .beta-notice {
   max-width: 1200px;

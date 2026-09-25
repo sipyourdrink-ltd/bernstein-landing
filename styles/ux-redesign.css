@@ -21,7 +21,11 @@
   align-items: start;
   max-width: 1440px;
   margin: 0 auto;
-  padding: 56px 64px 36px;
+  /* Top padding clears the fixed header (ux-layout.css `body > header`,
+     position: fixed, does not reserve layout space) - same
+     calc(var(--header-h) + gap) pattern as ux-hero.css/ux-blog.css/
+     ux-cost.css. 56px is the gap below the bar the section already had. */
+  padding: calc(var(--header-h) + 56px) 64px 36px;
   /* Anchors the absolute-positioned <InViewTracker> sentinel to the
      section instead of the viewport so the IntersectionObserver fires
      on scroll-into-view, not on initial paint. */
@@ -54,12 +58,6 @@
 .v2-hero-pre .v2-stamp .pulse {
   width: 6px; height: 6px; border-radius: 50%;
   background: var(--ok);
-  animation: v2-pulse 2.4s infinite ease-out;
-}
-@keyframes v2-pulse {
-  0%   { box-shadow: 0 0 0 0 oklch(45% 0.08 145 / 0.45); }
-  70%  { box-shadow: 0 0 0 8px oklch(45% 0.08 145 / 0); }
-  100% { box-shadow: 0 0 0 0 oklch(45% 0.08 145 / 0); }
 }
 .v2-hero-pre .v2-meta {
   font-family: var(--font-mono);
@@ -220,21 +218,29 @@
 .v2-install-copy:hover { color: var(--ink); border-color: var(--ink); }
 .v2-install-copy.is-copied { color: var(--ok); border-color: var(--ok); }
 
-/* GitHub row — black filled with sparkline */
+/* GitHub row — paper surface, standard 1px rule border, same tier as
+   the mini-stats tiles below it, so the install action above stays the
+   highest-contrast element in the rail. Hover raises the border to
+   --rule-strong rather than lowering opacity, matching every other
+   interactive tile in the column. */
 .v2-gh-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   padding: 16px 18px;
-  background: var(--bg-deep);
-  color: var(--bg-paper);
+  background: var(--bg-paper-2);
+  color: var(--ink);
+  border: 1px solid var(--rule);
   border-radius: var(--radius);
   text-decoration: none;
-  transition: transform 120ms ease-out, box-shadow 200ms ease-out;
-  box-shadow: 0 1px 0 0 oklch(20% 0.005 60 / 0.04), 0 6px 18px -8px oklch(20% 0.005 60 / 0.40);
+  transition: border-color 120ms ease-out, transform 120ms ease-out;
 }
-.v2-gh-row:hover { color: var(--bg-paper); transform: translateY(-1px); }
+.v2-gh-row:hover {
+  color: var(--ink);
+  border-color: var(--rule-strong);
+  transform: translateY(-1px);
+}
 .v2-gh-row .v2-gh-left {
   display: flex;
   align-items: center;
@@ -243,7 +249,12 @@
   font-size: 14px;
   font-weight: 500;
 }
-.v2-gh-row .v2-gh-star { color: var(--accent-soft); font-size: 16px; }
+.v2-gh-row .v2-gh-star {
+  color: var(--accent);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
 .v2-gh-row .v2-gh-right {
   display: flex;
   align-items: center;
@@ -252,12 +263,12 @@
 .v2-gh-row .v2-gh-count {
   font-family: var(--font-mono);
   font-size: 13px;
-  color: var(--bg-paper);
+  color: var(--ink);
 }
 .v2-gh-row .v2-gh-delta {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: oklch(75% 0.10 145);
+  color: var(--ok);
   margin-left: 6px;
 }
 .v2-gh-spark {
@@ -803,7 +814,9 @@
   .v2-hero {
     grid-template-columns: 1fr;
     gap: 24px;
-    padding: 28px 20px;
+    /* --header-h switches to 104px at 768px (ux-layout.css); calc()
+       re-reads the custom property at each breakpoint. */
+    padding: calc(var(--header-h) + 28px) 20px 28px;
   }
   /* Natural DOM order on mobile: the H1 and lede render first, the
      install/github rail follows. A prior mobile-only promotion put the
@@ -885,7 +898,7 @@
   .v2-hero {
     grid-template-columns: 1.4fr 1fr;
     gap: 36px;
-    padding: 40px 28px 24px;
+    padding: calc(var(--header-h) + 40px) 28px 24px;
   }
   .v2-hero h1 { font-size: 46px; }
   .v2-section { padding: 64px 28px; }
@@ -893,7 +906,3 @@
   .v2-email { padding: 48px 28px; }
 }
 
-/* Reduced-motion: kill the green pulse and rail emphasis transitions */
-@media (prefers-reduced-motion: reduce) {
-  .v2-hero-pre .v2-stamp .pulse { animation: none; }
-}

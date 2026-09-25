@@ -51,7 +51,6 @@ import { FaqV2 } from '@/components/landing/FaqV2';
 import { EmailStrip } from '@/components/landing/EmailStrip';
 import { Footer } from '@/components/landing/Footer';
 import { BackToTop } from '@/components/landing/BackToTop';
-import { PricingPeekCta } from '@/components/landing/PricingPeekCta';
 import { BetaNotice } from '@/components/landing/BetaNotice';
 import { SponsorStrip } from '@/components/landing/SponsorStrip';
 import { SocialProofStrip } from '@/components/landing/SocialProofStrip';
@@ -241,9 +240,6 @@ export default async function LandingPage() {
       </main>
       <Footer />
       <BackToTop />
-      {/* Sticky pointer to /cost. Hidden after dismiss via a 7-day
-          cookie; never mounted on /cost itself. */}
-      <PricingPeekCta />
       <SoftwareApplicationJsonLd />
       <script
         type="application/ld+json"

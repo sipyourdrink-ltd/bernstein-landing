@@ -50,17 +50,14 @@ body > header {
   top: 0; left: 0; right: 0;
   z-index: 100;
   height: var(--header-h);
-  background: color-mix(in srgb, var(--bg-paper) 92%, transparent);
-  backdrop-filter: saturate(140%) blur(8px);
-  -webkit-backdrop-filter: saturate(140%) blur(8px);
+  background: var(--bg-paper);
   border-bottom: 1px solid transparent;
-  transition: border-color 0.2s ease-out, background 0.2s ease-out;
+  transition: border-color 0.2s ease-out;
   padding: 0 var(--space-5);
 }
 body > header.nav-top { border-bottom-color: transparent; }
 body > header.nav-scrolled {
   border-bottom-color: var(--rule);
-  background: color-mix(in srgb, var(--bg-paper) 96%, transparent);
 }
 
 .nav-inner {
@@ -265,8 +262,9 @@ body > header.nav-scrolled {
        could never reach it. overflow-x:auto is a safety net under the
        tightened spacing below - content that still does not fit at a
        given width scrolls instead of clipping against the viewport
-       edge (measured at 375px: "Install" and "LinkedIn", the first and
-       last links, lost ~5px each - axe/Lighthouse audit 2026-09-23). */
+       edge (measured at 375px against the six-link row before LinkedIn
+       was dropped from the nav: "Install" and the last link lost ~5px
+       each - axe/Lighthouse audit 2026-09-23). */
     justify-content: flex-start;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -283,7 +281,7 @@ body > header.nav-scrolled {
 }
 
 /* Tighten further on narrow phones (≤480 px, covers the common 375-
-   390px widths) so Install · Verify · Docs · Ask · GitHub · LinkedIn
+   390px widths) so Install · Verify · Docs · Ask · GitHub
    fit on one line without relying on the overflow-x scroll above. */
 @media (max-width: 480px) {
   .nav-mobile-strip { gap: var(--space-1); padding: 0 var(--space-1); }
