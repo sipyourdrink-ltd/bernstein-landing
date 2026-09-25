@@ -836,8 +836,10 @@
 /* ---- RESPONSIVE TIGHTENING ---- */
 @media (max-width: 480px) {
   .blog-index { padding-top: calc(var(--header-h) + var(--space-6)); }
-  .blog-card--featured { padding: var(--space-5); }
+  /* .blog-card first: the featured card carries both classes, so the
+     later rule of equal specificity sets its padding. */
   .blog-card { padding: var(--space-4) 0; }
+  .blog-card--featured { padding: var(--space-5); }
   .blog-post-layout { padding-top: calc(var(--header-h) + var(--space-6)); }
 }
 
