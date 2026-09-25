@@ -559,8 +559,8 @@
 
 /* Terminal — dark warm surface with traffic-light chrome */
 .v2-term {
-  background: oklch(18% 0.012 65);
-  color: oklch(88% 0.02 75);
+  background: var(--term-bg);
+  color: var(--term-ink);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-3);
   font-family: var(--font-mono);
@@ -585,11 +585,11 @@
   align-items: center;
   gap: 8px;
   padding: 11px 14px;
-  background: oklch(22% 0.014 65);
-  border-bottom: 1px solid oklch(28% 0.014 65);
+  background: var(--term-bg);
+  border-bottom: 1px solid var(--term-rule);
 }
 .v2-term-chrome .v2-title {
-  color: oklch(70% 0.04 70);
+  color: var(--term-ink-soft);
   font-size: var(--text-xs);
   letter-spacing: 0.04em;
 }
@@ -605,12 +605,12 @@
   color: inherit;
 }
 .v2-term pre code { background: transparent; }
-.v2-term .c-ok    { color: oklch(78% 0.12 140); }
-.v2-term .c-warn  { color: oklch(75% 0.13 75); }
-.v2-term .c-bad   { color: oklch(72% 0.14 25); }
-.v2-term .c-acc   { color: oklch(78% 0.10 50); }
-.v2-term .c-mute  { color: oklch(60% 0.04 70); }
-.v2-term .c-hash  { color: oklch(70% 0.04 60); }
+.v2-term .c-ok    { color: var(--term-ok); }
+.v2-term .c-warn  { color: var(--term-warn); }
+.v2-term .c-bad   { color: var(--term-bad); }
+.v2-term .c-acc   { color: var(--term-acc); }
+.v2-term .c-mute  { color: var(--term-ink-soft); }
+.v2-term .c-hash  { color: var(--term-ink-soft); }
 
 /* ---------------------------------------------------------------------------
    6. COMPARE STRIP — dense table.
@@ -675,7 +675,7 @@
   font-size: var(--text-sm);
 }
 .v2-compare .v2-yes { color: var(--ok); }
-.v2-compare .v2-no  { color: oklch(50% 0.12 25); }
+.v2-compare .v2-no  { color: var(--red); }
 .v2-compare .v2-meh { color: var(--ink-soft); }
 
 /* ---------------------------------------------------------------------------

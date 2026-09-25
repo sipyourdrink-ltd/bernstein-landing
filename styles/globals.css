@@ -49,6 +49,19 @@
      clears 4.5:1 on both. */
   --warn:        oklch(50% 0.10 60);
 
+  /* Terminal — the dark audit-log panel on the homepage. Contrast on
+     --term-bg (WCAG 2.x): --term-ink 13.1:1, --term-ink-soft 5.8:1,
+     --term-ok 9.8:1, --term-warn 8.3:1, --term-bad 7.2:1, --term-acc 9.1:1.
+     Re-check all six if --term-bg moves. */
+  --term-bg:       oklch(18% 0.012 65);  /* panel and title-bar surface */
+  --term-rule:     oklch(28% 0.014 65);  /* title-bar divider */
+  --term-ink:      oklch(88% 0.02 75);   /* default terminal text */
+  --term-ink-soft: oklch(65% 0.04 70);   /* title, comments, hashes */
+  --term-ok:       oklch(78% 0.12 140);  /* passing events */
+  --term-warn:     oklch(75% 0.13 75);   /* events waiting on an operator */
+  --term-bad:      oklch(72% 0.14 25);   /* failed events */
+  --term-acc:      oklch(78% 0.10 50);   /* timestamps and paths */
+
   /* Backwards-compat aliases — older blog/share/CTA components reference
      these names. Mapped onto the new ink palette so nothing flat-out breaks
      while the redesign rolls out. */
