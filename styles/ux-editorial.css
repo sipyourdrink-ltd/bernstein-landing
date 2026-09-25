@@ -154,7 +154,7 @@
   padding: 2px 8px;
   background: var(--bg-paper-2);
   border: 1px solid var(--rule);
-  border-radius: 999px;
+  border-radius: var(--radius);
   font-family: var(--font-mono);
   font-size: 11.5px;
   color: var(--ink);
@@ -491,7 +491,7 @@ footer {
   letter-spacing: 0.06em;
   text-decoration: none;
   border: 1px solid var(--rule);
-  border-radius: 999px;
+  border-radius: var(--radius);
   padding: 3px 10px;
 }
 .page-seal::before { content: '✓ '; color: var(--accent, #c9784f); }
