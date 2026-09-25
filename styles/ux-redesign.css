@@ -54,12 +54,6 @@
 .v2-hero-pre .v2-stamp .pulse {
   width: 6px; height: 6px; border-radius: 50%;
   background: var(--ok);
-  animation: v2-pulse 2.4s infinite ease-out;
-}
-@keyframes v2-pulse {
-  0%   { box-shadow: 0 0 0 0 oklch(45% 0.08 145 / 0.45); }
-  70%  { box-shadow: 0 0 0 8px oklch(45% 0.08 145 / 0); }
-  100% { box-shadow: 0 0 0 0 oklch(45% 0.08 145 / 0); }
 }
 .v2-hero-pre .v2-meta {
   font-family: var(--font-mono);
@@ -905,7 +899,3 @@
   .v2-email { padding: 48px 28px; }
 }
 
-/* Reduced-motion: kill the green pulse and rail emphasis transitions */
-@media (prefers-reduced-motion: reduce) {
-  .v2-hero-pre .v2-stamp .pulse { animation: none; }
-}
