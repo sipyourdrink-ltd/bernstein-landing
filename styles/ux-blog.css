@@ -394,6 +394,8 @@
   color: var(--ink-faint);
 }
 .blog-post-meta time { color: inherit; font: inherit; }
+.blog-post-meta .page-seal { color: var(--ink-soft); text-transform: none; margin-left: auto; }
+.blog-post-meta .page-seal:hover { color: var(--ink); border-color: var(--ink-soft); }
 
 /* ---- PROSE (MDX body) ---- */
 .prose {
