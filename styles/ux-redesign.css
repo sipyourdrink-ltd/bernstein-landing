@@ -23,7 +23,7 @@
   margin: 0 auto;
   /* Top padding clears the fixed header (ux-layout.css `body > header`,
      position: fixed, does not reserve layout space) - same
-     calc(var(--header-h) + gap) pattern as ux-hero.css/ux-blog.css/
+     calc(var(--header-h) + gap) pattern as ux-blog.css/
      ux-cost.css. 56px is the gap below the bar the section already had. */
   padding: calc(var(--header-h) + 56px) 64px 36px;
   /* Anchors the absolute-positioned <InViewTracker> sentinel to the

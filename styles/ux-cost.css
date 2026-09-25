@@ -18,7 +18,7 @@
      keeps this clearing the fixed nav at every width instead of only
      the one the hardcoded value happened to match. Shared by /cost,
      /cli-quickstart, and /tools/agent-md-bench (same header markup),
-     matching the pattern already used in ux-blog.css and ux-hero.css. */
+     matching the pattern already used in ux-blog.css. */
   padding: calc(var(--header-h) + var(--space-6)) 32px 0;
 }
 

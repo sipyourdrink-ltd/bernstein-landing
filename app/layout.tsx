@@ -5,7 +5,6 @@ import { OPERATOR_EXCLUDE_INLINE_SCRIPT } from "@/lib/analytics/disable";
 import "@/styles/globals.css";
 import "@/styles/ux-typography.css";
 import "@/styles/ux-layout.css";
-import "@/styles/ux-hero.css";
 import "@/styles/ux-cards.css";
 import "@/styles/ux-editorial.css";
 import "@/styles/ux-blog.css";
