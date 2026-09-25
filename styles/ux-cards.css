@@ -126,7 +126,7 @@
 .compare-table tbody tr {
   transition: background 0.1s ease-out;
 }
-.compare-table tbody tr:hover { background: color-mix(in oklch, var(--accent) 6%, transparent); }
+.compare-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
 .compare-table thead th:nth-child(2) {
   color: var(--accent);
   font-weight: 500;

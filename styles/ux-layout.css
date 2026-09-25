@@ -50,7 +50,7 @@ body > header {
   top: 0; left: 0; right: 0;
   z-index: 100;
   height: var(--header-h);
-  background: color-mix(in oklch, var(--bg-paper) 92%, transparent);
+  background: color-mix(in srgb, var(--bg-paper) 92%, transparent);
   backdrop-filter: saturate(140%) blur(8px);
   -webkit-backdrop-filter: saturate(140%) blur(8px);
   border-bottom: 1px solid transparent;
@@ -60,7 +60,7 @@ body > header {
 body > header.nav-top { border-bottom-color: transparent; }
 body > header.nav-scrolled {
   border-bottom-color: var(--rule);
-  background: color-mix(in oklch, var(--bg-paper) 96%, transparent);
+  background: color-mix(in srgb, var(--bg-paper) 96%, transparent);
 }
 
 .nav-inner {
