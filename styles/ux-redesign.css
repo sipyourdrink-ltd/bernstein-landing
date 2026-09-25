@@ -785,7 +785,6 @@
   font-family: var(--font-body);
   font-size: 14px;
   color: var(--ink);
-  outline: 0;
 }
 .v2-email-form input::placeholder { color: var(--ink-soft); }
 .v2-email-form button {

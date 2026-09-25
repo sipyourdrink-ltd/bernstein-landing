@@ -348,7 +348,6 @@
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 14px;
-  outline: none;
   transition: border-color 0.15s ease-out;
 }
 .email-form input[type="email"]::placeholder { color: var(--ink-faint); }
