@@ -30,6 +30,7 @@
 import { useEffect, useState } from 'react';
 import { trackOutbound } from '@/components/site/track-outbound';
 import { UmamiEvent, emitFunnelStep, track } from '@/lib/analytics/events';
+import { formatStars } from '@/lib/format-stars';
 import { withUtm } from '@/lib/utm';
 
 /**
@@ -199,10 +200,6 @@ const INSTALL_TABS: Tab[] = [
    field, the existing `delta > 0` guard below will start rendering it. */
 const STAR_FALLBACK: number | null = null;
 const DELTA_FALLBACK = 0;
-
-function formatStars(stars: number | null): string {
-  return stars === null ? '-' : stars.toLocaleString('en-US');
-}
 
 function trackUmami(name: string, data?: Record<string, unknown>): void {
   if (typeof window === 'undefined') return;
