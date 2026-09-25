@@ -113,7 +113,7 @@
   background: var(--code-paper);
   border: 1px solid var(--rule);
   padding: 1px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
   font-size: var(--text-code);
   color: var(--ink);
@@ -554,7 +554,7 @@ footer {
 .cite-link:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
 }
 .cite-link svg {
   display: block;
