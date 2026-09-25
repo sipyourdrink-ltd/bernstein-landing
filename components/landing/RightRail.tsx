@@ -7,9 +7,9 @@
  *   1. Install snippet (segmented tabset: pipx / brew / uv / docker), with
  *      a follow-up `bernstein init` row directly under it. Both setup
  *      steps are shown verbatim rather than collapsed into one line.
- *   2. GitHub star row - black row with the 7-day delta. Star count
- *      fetched via /api/stats (same source the Nav uses) so the number
- *      stays consistent across nav & rail.
+ *   2. GitHub star row - paper-surface row with the 7-day delta. Star
+ *      count fetched via /api/stats (same source the Nav uses) so the
+ *      number stays consistent across nav & rail.
  *   3. Mini-stats grid (2×2) - adapters / closed PRs / downloads-or-
  *      contributors / $0. The third slot prefers monthly PyPI downloads
  *      and degrades to contributor count when upstream is unavailable.
@@ -378,10 +378,12 @@ export function RightRail({ adapterCount, closedPrs, contributors }: RightRailPr
           readers / keyboard users still hit it as one tab stop; the
           tooltip is an additional anchor that becomes reachable via the
           wrapper's :focus-within state.
-          opacity-80 + reduced shadow so this row no longer out-shouts
-          the install block above. Hover restores full contrast so the
-          row stays clearly clickable. */}
-      <div className="v2-gh-wrap opacity-80 hover:opacity-100 transition-opacity [&_.v2-gh-row]:!shadow-none">
+          The row sits on the same paper surface as the mini-stats tiles
+          below it (see .v2-gh-row in styles/ux-redesign.css) so it no
+          longer out-shouts the install block above. Hover raises the
+          border contrast instead of changing opacity, so the row stays
+          clearly clickable at every state. */}
+      <div className="v2-gh-wrap">
         <a
           href={withUtm('https://github.com/sipyourdrink-ltd/bernstein', {
             source: 'bernstein.run',
@@ -421,9 +423,14 @@ export function RightRail({ adapterCount, closedPrs, contributors }: RightRailPr
              it dropped the delta chip the visible row shows. */
         >
           <div className="v2-gh-left">
-            <span className="v2-gh-star" aria-hidden="true">
-              ★
-            </span>
+            <svg
+              className="v2-gh-star"
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              fill="currentColor"
+            >
+              <path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z" />
+            </svg>
             <span>star on github</span>
           </div>
           <div className="v2-gh-right">
