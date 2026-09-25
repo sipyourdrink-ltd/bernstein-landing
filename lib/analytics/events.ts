@@ -190,17 +190,7 @@ export const UmamiEvent = {
    *  Powers the blog → blog traversal report mentioned in the ticket. */
   InternalLinkClick: 'internal-link-click',
 
-  // --- 2026-05-17 - conv-001 sticky pricing CTA + cost A/B ---
-  /** Sticky `view pricing →` CTA mounted on `/`. Fires once per
-   *  session when the component renders (after the dismiss-cookie
-   *  check passes). Pairs with `pricing-peek-click` and
-   *  `pricing-peek-dismiss` for the funnel report. */
-  PricingPeekImpression: 'pricing-peek-impression',
-  /** Visitor clicked the sticky `view pricing →` CTA on `/`. */
-  PricingPeekClick: 'pricing-peek-click',
-  /** Visitor closed the sticky CTA. Sets a 7-day cookie so the
-   *  pointer stays dismissed for that visitor. */
-  PricingPeekDismiss: 'pricing-peek-dismiss',
+  // --- 2026-05-17 - cost A/B variant tracking ---
   /** Fires once per session on `/cost`, seeding the
    *  `pricing-variant=a|b` dimension into the events stream. The
    *  variant is picked from a 90-day cookie set on first visit. */
