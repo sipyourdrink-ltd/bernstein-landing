@@ -155,7 +155,7 @@ export function EmailStrip() {
             disabled={status === 'submitting' || status === 'ok'}
             className={status === 'ok' ? 'v2-btn-success' : undefined}
           >
-            {status === 'submitting' ? '…' : status === 'ok' ? 'thanks ✓' : 'subscribe'}
+            {status === 'submitting' ? '…' : status === 'ok' ? 'thanks' : 'subscribe'}
           </button>
         </form>
       </div>

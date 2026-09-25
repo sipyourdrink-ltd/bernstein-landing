@@ -106,7 +106,7 @@ export function EmailCapture() {
                     <path d="M14 8a6 6 0 00-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                   </svg>
                 </span>
-              ) : status === 'success' ? 'You\u2019re in \u2713' : 'Subscribe'}
+              ) : status === 'success' ? 'you\u2019re in' : 'Subscribe'}
             </button>
           </form>
           <p

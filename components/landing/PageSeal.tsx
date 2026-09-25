@@ -16,6 +16,22 @@ export function PageSeal() {
       rel="nofollow"
       data-umami-event="page-seal-verify"
     >
+      <svg
+        className="page-seal-check"
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M3.5 8.5L6.5 11.5L12.5 4.5"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
       this page is signed · verify
     </a>
   );

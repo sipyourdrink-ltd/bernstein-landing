@@ -486,6 +486,9 @@ footer {
 .footer-bottom a { color: var(--ink-faint); }
 .footer-bottom a:hover { color: var(--ink); }
 .page-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.06em;
@@ -494,7 +497,7 @@ footer {
   border-radius: var(--radius);
   padding: 3px 10px;
 }
-.page-seal::before { content: '✓ '; color: var(--accent, #c9784f); }
+.page-seal-check { color: var(--accent); flex-shrink: 0; }
 
 .ai-crawler-link {
   font-family: var(--font-mono);
