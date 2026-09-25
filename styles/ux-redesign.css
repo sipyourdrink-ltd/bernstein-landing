@@ -577,19 +577,6 @@
   background: oklch(22% 0.014 65);
   border-bottom: 1px solid oklch(28% 0.014 65);
 }
-.v2-term-chrome .v2-dots {
-  display: flex;
-  gap: 6px;
-}
-.v2-term-chrome .v2-dots i {
-  display: block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-.v2-term-chrome .v2-dots i:nth-child(1) { background: oklch(65% 0.14 25); }
-.v2-term-chrome .v2-dots i:nth-child(2) { background: oklch(75% 0.14 80); }
-.v2-term-chrome .v2-dots i:nth-child(3) { background: oklch(65% 0.14 145); }
 .v2-term-chrome .v2-title {
   color: oklch(70% 0.04 70);
   font-size: 11px;
