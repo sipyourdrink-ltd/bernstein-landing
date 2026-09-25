@@ -74,7 +74,7 @@ const nextConfig = {
       },
       {
         source: '/v1/models',
-        destination: '/mcp-catalog.json',
+        destination: '/mcp-server.json',
         permanent: false,
       },
       /* Inbound links name the cost page /pricing. */

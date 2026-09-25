@@ -278,7 +278,7 @@ async function main() {
   );
 
   await syncJsonField(
-    'public/mcp-catalog.json',
+    'public/mcp-server.json',
     version,
     (d) => d.version,
     (d, v) => {

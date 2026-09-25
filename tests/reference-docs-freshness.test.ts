@@ -1,10 +1,9 @@
 /**
- * `public/openapi.yaml` and `public/mcp-catalog.json` describe software
- * that lives in another repository, and both are advertised from
- * robots.txt, ai.txt, the agent card and the API catalogue as machine
+ * `public/openapi.yaml` and `public/mcp-server.json` describe software
+ * that lives in another repository, and both are published as machine
  * surfaces an agent may act on.
  *
- * They rotted once, quietly: the catalogue named twelve MCP tools while
+ * They rotted once, quietly: the MCP document named twelve tools while
  * the server registered twenty-five, and the API document described
  * seven endpoints out of four hundred and fifty-five. Nothing failed,
  * because nothing was checking. `scripts/sync-mcp-catalog.mjs` and
@@ -39,8 +38,8 @@ const version = (
   }
 ).version;
 
-const catalog = JSON.parse(
-  fs.readFileSync(path.join(ROOT, 'public', 'mcp-catalog.json'), 'utf8'),
+const serverCard = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'public', 'mcp-server.json'), 'utf8'),
 ) as {
   version: string;
   tools: Array<{ name: string; description: string; input_schema: Record<string, unknown> }>;
@@ -61,11 +60,11 @@ const openapi = YAML.parse(
 const MIN_TOOLS = 20;
 const MIN_PATHS = 100;
 
-test('the MCP catalogue claims the release the rest of the site claims', () => {
+test('the MCP server document claims the release the rest of the site claims', () => {
   assert.equal(
-    catalog.version,
+    serverCard.version,
     version,
-    'public/mcp-catalog.json is behind data/bernstein-version.json. Run ' +
+    'public/mcp-server.json is behind data/bernstein-version.json. Run ' +
       '`node scripts/sync-mcp-catalog.mjs` against a bernstein checkout.',
   );
 });
@@ -79,10 +78,10 @@ test('the OpenAPI document claims the release the rest of the site claims', () =
   );
 });
 
-test('every catalogued tool carries a contract a client can call', () => {
-  assert.ok(Array.isArray(catalog.tools), 'mcp-catalog.json: tools[] missing');
+test('every listed MCP tool carries a contract a client can call', () => {
+  assert.ok(Array.isArray(serverCard.tools), 'mcp-server.json: tools[] missing');
   const seen = new Set<string>();
-  for (const tool of catalog.tools) {
+  for (const tool of serverCard.tools) {
     assert.match(tool.name, /^[a-z][a-z0-9_]*$/, `tool name is not a callable identifier: ${tool.name}`);
     assert.ok(!seen.has(tool.name), `duplicate tool ${tool.name}`);
     seen.add(tool.name);
@@ -98,11 +97,11 @@ test('every catalogued tool carries a contract a client can call', () => {
   }
 });
 
-test('the catalogue still describes the whole tool set', () => {
+test('the MCP server document still describes the whole tool set', () => {
   assert.ok(
-    catalog.tools.length >= MIN_TOOLS,
-    `mcp-catalog.json lists ${catalog.tools.length} tools (floor ${MIN_TOOLS}). ` +
-      'A catalogue that has shrunk to a subset tells a client the missing tools ' +
+    serverCard.tools.length >= MIN_TOOLS,
+    `mcp-server.json lists ${serverCard.tools.length} tools (floor ${MIN_TOOLS}). ` +
+      'A document that has shrunk to a subset tells a client the missing tools ' +
       'do not exist. Regenerate it before shipping.',
   );
 });

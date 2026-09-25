@@ -5,7 +5,7 @@
      - public/structured-data.json             (.softwareVersion)
      - public/agents.json                      (.info.version)
      - public/.well-known/agents.json          (.info.version)
-     - public/mcp-catalog.json                 (.version)
+     - public/mcp-server.json                  (.version)
      - public/openapi.yaml                     (info.version)
      - data/bernstein-version.json             (.version, build-baked
        fallback for the rendered release pill)

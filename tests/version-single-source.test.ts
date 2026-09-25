@@ -85,7 +85,7 @@ test('every static discovery surface synced by scripts/sync-version.mjs carries 
     },
     { file: 'public/agents.json', get: (d) => (d as any).info.version },
     { file: 'public/.well-known/agents.json', get: (d) => (d as any).info.version },
-    { file: 'public/mcp-catalog.json', get: (d) => (d as any).version },
+    { file: 'public/mcp-server.json', get: (d) => (d as any).version },
   ];
 
   for (const { file, get } of jsonSurfaces) {
