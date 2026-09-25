@@ -167,7 +167,7 @@
   color: var(--ink-soft);
   padding: 3px 10px;
   border: 1px solid var(--rule);
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: var(--bg-paper-2);
   transition: color 0.15s ease-out, border-color 0.15s ease-out, background 0.15s ease-out;
 }

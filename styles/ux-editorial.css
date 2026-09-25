@@ -154,7 +154,7 @@
   padding: 2px 8px;
   background: var(--bg-paper-2);
   border: 1px solid var(--rule);
-  border-radius: 999px;
+  border-radius: var(--radius);
   font-family: var(--font-mono);
   font-size: 11.5px;
   color: var(--ink);
@@ -348,11 +348,11 @@
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 14px;
-  outline: none;
   transition: border-color 0.15s ease-out;
 }
 .email-form input[type="email"]::placeholder { color: var(--ink-faint); }
 .email-form input[type="email"]:focus { border-color: var(--accent); }
+.email-form input[type="email"][aria-invalid="true"] { border-color: var(--warn); }
 .email-form button {
   padding: 10px 20px;
   border-radius: var(--radius);
@@ -379,6 +379,8 @@
   font-family: var(--font-mono);
   letter-spacing: 0.04em;
 }
+.email-note.email-note-success { color: var(--ok); }
+.email-note.email-note-error { color: var(--warn); }
 
 @media (max-width: 540px) {
   .email-form { flex-direction: column; }
@@ -484,15 +486,18 @@ footer {
 .footer-bottom a { color: var(--ink-faint); }
 .footer-bottom a:hover { color: var(--ink); }
 .page-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.06em;
   text-decoration: none;
   border: 1px solid var(--rule);
-  border-radius: 999px;
+  border-radius: var(--radius);
   padding: 3px 10px;
 }
-.page-seal::before { content: '✓ '; color: var(--accent, #c9784f); }
+.page-seal-check { color: var(--accent); flex-shrink: 0; }
 
 .ai-crawler-link {
   font-family: var(--font-mono);

@@ -81,11 +81,6 @@ export function AuditLogEvidence() {
       </div>
       <div className="v2-term" role="img" aria-label="bernstein audit verify terminal output">
         <div className="v2-term-chrome">
-          <div className="v2-dots" aria-hidden="true">
-            <i />
-            <i />
-            <i />
-          </div>
           <span className="v2-title">~/proj $ bernstein audit verify</span>
         </div>
         {/* The terminal block below is decorative content; it carries no
