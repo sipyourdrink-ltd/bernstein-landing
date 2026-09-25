@@ -756,7 +756,7 @@
   padding: 0 var(--space-3);
 }
 [data-rehype-pretty-code-figure] [data-highlighted-line] {
-  background: color-mix(in oklch, var(--accent) 12%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 [data-rehype-pretty-code-title] {
   font-family: var(--font-mono);
