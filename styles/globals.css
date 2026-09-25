@@ -96,6 +96,10 @@
   --text-3xl:  clamp(2.25rem, 6.25vw - 2.125rem, 3.5rem);  /* 36-56px: page h1 */
   --text-code: 0.9em;     /* inline code, relative to the text around it */
 
+  /* Article reading scale — no homepage step lands within 1px of these. */
+  --text-lead: 1.125rem;                              /* 18px: blog lede and article lead paragraph */
+  --text-article-h1: clamp(2rem, 4.4vw, 3.25rem);      /* 32-52px: blog index and article h1 */
+
   /* Spacing — strict 8px grid (4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 / 128) */
   --space-1: 4px;
   --space-2: 8px;
