@@ -19,7 +19,7 @@ const nextConfig = {
            . The negative-lookahead `has` constraint
            keeps the redirect scoped. */
         source: '/docs',
-        destination: 'https://bernstein.readthedocs.io/',
+        destination: 'https://docs.bernstein.run/',
         permanent: true,
       },
       {
@@ -30,7 +30,7 @@ const nextConfig = {
            indexed drops out (config redirects run before middleware;
            without this carve-out the 308 would win). */
         source: '/docs/:path((?!cli$|cli/|_internal$|_internal/).*)',
-        destination: 'https://bernstein.readthedocs.io/en/latest/:path/',
+        destination: 'https://docs.bernstein.run/en/latest/:path/',
         permanent: true,
       },
       /* Singular `/sponsor` 404'd because the live route is `/sponsors`

@@ -53,6 +53,6 @@ Tool surface and card: https://bernstein.run/.well-known/mcp/server-card.json
 
 ## Where the docs are
 
-- https://bernstein.readthedocs.io/ — full documentation
+- https://docs.bernstein.run/ — full documentation
 - https://github.com/sipyourdrink-ltd/bernstein — source, issues
 - https://bernstein.run/llms.txt — this site's corpus index

@@ -19,8 +19,8 @@ Status: beta (solo-maintained; pin the version you depend on)
 Homepage: https://bernstein.run
 Repository: https://github.com/sipyourdrink-ltd/bernstein
 Package: https://pypi.org/project/bernstein/
-Documentation: https://bernstein.readthedocs.io/
-API: https://bernstein.readthedocs.io/en/latest/openapi-reference/
+Documentation: https://docs.bernstein.run/
+API: https://docs.bernstein.run/en/latest/openapi-reference/
 Author: Alex Chernysh <https://alexchernysh.com>
 Author-X: https://x.com/alex_chernysh
 License: Apache-2.0

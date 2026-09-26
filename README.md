@@ -10,7 +10,7 @@
 [![next.js](https://img.shields.io/badge/next.js-15-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org)
 [![licence](https://img.shields.io/github/license/sipyourdrink-ltd/bernstein-landing)](LICENSE)
 
-[site](https://bernstein.run) &middot; [the orchestrator](https://github.com/sipyourdrink-ltd/bernstein) &middot; [docs](https://bernstein.readthedocs.io/) &middot; [contributing](CONTRIBUTING.md) &middot; [security](SECURITY.md)
+[site](https://bernstein.run) &middot; [the orchestrator](https://github.com/sipyourdrink-ltd/bernstein) &middot; [docs](https://docs.bernstein.run/) &middot; [contributing](CONTRIBUTING.md) &middot; [security](SECURITY.md)
 
 </div>
 

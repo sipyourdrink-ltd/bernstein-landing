@@ -122,14 +122,14 @@ Cloud artifact sinks, progressive skill packs, and Cloudflare cloud execution ar
 
 ## Docs
 
-- [Documentation](https://bernstein.readthedocs.io/): Full technical documentation
-- [Architecture](https://bernstein.readthedocs.io/en/latest/architecture/): System architecture and design
-- [Getting Started](https://bernstein.readthedocs.io/en/latest/getting-started/): Installation and quickstart
-- [Adapter Guide](https://bernstein.readthedocs.io/en/latest/adapters/ADAPTER_GUIDE/): Supported agents and how to add your own
-- [API Reference](https://bernstein.readthedocs.io/en/latest/reference/openapi-reference/): Task server REST API
-- [Cloudflare Guide](https://bernstein.readthedocs.io/en/latest/cloudflare/cloudflare-overview/): Cloud execution on Cloudflare Workers
-- [Configuration](https://bernstein.readthedocs.io/en/latest/operations/CONFIG/): bernstein.yaml reference
-- [CHANGELOG](https://bernstein.readthedocs.io/en/latest/CHANGELOG/): Release notes per version
+- [Documentation](https://docs.bernstein.run/): Full technical documentation
+- [Architecture](https://docs.bernstein.run/en/latest/architecture/): System architecture and design
+- [Getting Started](https://docs.bernstein.run/en/latest/getting-started/): Installation and quickstart
+- [Adapter Guide](https://docs.bernstein.run/en/latest/adapters/ADAPTER_GUIDE/): Supported agents and how to add your own
+- [API Reference](https://docs.bernstein.run/en/latest/reference/openapi-reference/): Task server REST API
+- [Cloudflare Guide](https://docs.bernstein.run/en/latest/cloudflare/cloudflare-overview/): Cloud execution on Cloudflare Workers
+- [Configuration](https://docs.bernstein.run/en/latest/operations/CONFIG/): bernstein.yaml reference
+- [CHANGELOG](https://docs.bernstein.run/en/latest/CHANGELOG/): Release notes per version
 
 ## Site pages
 
@@ -231,7 +231,7 @@ ${posts.length > 0 ? `## Blog\n\n${postList}\n` : ''}
 
 ## Optional
 
-- [Contributing](https://bernstein.readthedocs.io/en/latest/contributing/): How to contribute
+- [Contributing](https://docs.bernstein.run/en/latest/contributing/): How to contribute
 - [License](https://github.com/sipyourdrink-ltd/bernstein/blob/main/LICENSE): Apache 2.0
 `;
 }

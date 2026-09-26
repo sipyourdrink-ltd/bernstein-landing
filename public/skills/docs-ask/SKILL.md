@@ -45,5 +45,5 @@ one `event: citation` frame, then `event: done`.
 - Queries are capped at 2000 characters and rate limited per IP; back
   off on `429`.
 - A decline means the corpus does not cover the question. Fetch the
-  documentation directly at https://bernstein.readthedocs.io/ instead
+  documentation directly at https://docs.bernstein.run/ instead
   of rephrasing until something slips through.

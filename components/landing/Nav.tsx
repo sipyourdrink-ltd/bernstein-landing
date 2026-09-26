@@ -77,7 +77,7 @@ export function Nav() {
             Verify
           </a>
           <a
-            href="https://bernstein.readthedocs.io/"
+            href="https://docs.bernstein.run/"
             target="_blank"
             rel="noopener noreferrer"
             data-umami-event="read-the-docs-click"
@@ -142,7 +142,7 @@ export function Nav() {
               Verify
             </a>
             <a
-              href="https://bernstein.readthedocs.io/"
+              href="https://docs.bernstein.run/"
               target="_blank"
               rel="noopener noreferrer"
               data-umami-event="read-the-docs-click"

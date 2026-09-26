@@ -671,7 +671,7 @@ Bernstein ships its role guidance (backend, frontend, QA, security, DevOps, arch
 - Website: https://bernstein.run
 - GitHub: https://github.com/sipyourdrink-ltd/bernstein
 - PyPI: https://pypi.org/project/bernstein/
-- Documentation: https://bernstein.readthedocs.io/
+- Documentation: https://docs.bernstein.run/
 - Issues: https://github.com/sipyourdrink-ltd/bernstein/issues
 - Agent Card (A2A): https://bernstein.run/.well-known/agent-card.json
 - MCP Server Card: https://bernstein.run/.well-known/mcp/server-card.json

@@ -27,7 +27,7 @@
   "homepage": "https://bernstein.run",
   "repository": "https://github.com/sipyourdrink-ltd/bernstein",
   "package": "https://pypi.org/project/bernstein/",
-  "documentationUrl": "https://bernstein.readthedocs.io/",
+  "documentationUrl": "https://docs.bernstein.run/",
   "capabilities": {
     "streaming": false,
     "pushNotifications": false,

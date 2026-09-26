@@ -37,7 +37,7 @@ const PAGE_DESC =
   'How a goal becomes a verified pull request in Bernstein: express intent, review the decomposed task plan before any agent spawns, then execute under gates.';
 const PAGE_URL = `${SITE_URL}/spec-driven`;
 const REPO_URL = 'https://github.com/sipyourdrink-ltd/bernstein';
-const DOCS_URL = 'https://bernstein.readthedocs.io/';
+const DOCS_URL = 'https://docs.bernstein.run/';
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
