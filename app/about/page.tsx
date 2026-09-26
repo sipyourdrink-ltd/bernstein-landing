@@ -157,7 +157,7 @@ export default function AboutPage() {
                 github
               </a>{' '}
               and the api docs are on{' '}
-              <a href="https://bernstein.readthedocs.io/" rel="noopener">
+              <a href="https://docs.bernstein.run/" rel="noopener">
                 readthedocs
               </a>
               ; the design rationale lives in commit history, prs, and{' '}

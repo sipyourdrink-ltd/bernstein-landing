@@ -19,7 +19,7 @@
     "type": "git",
     "url": "https://github.com/sipyourdrink-ltd/bernstein"
   },
-  "documentation": "https://bernstein.readthedocs.io/",
+  "documentation": "https://docs.bernstein.run/",
   "changelog": "https://github.com/sipyourdrink-ltd/bernstein/blob/main/CHANGELOG.md",
   "issues": "https://github.com/sipyourdrink-ltd/bernstein/issues",
   "package": {

@@ -74,7 +74,7 @@ export function DeclineCard({ reason, suggestions, children }: DeclineCardProps)
         </li>
         <li>
           <span className="docs-bot-decline-action">browse</span>{' '}
-          - <a href="/blog">blog</a> · <a href="https://bernstein.readthedocs.io/">docs</a>.
+          - <a href="/blog">blog</a> · <a href="https://docs.bernstein.run/">docs</a>.
         </li>
         <li>
           <span className="docs-bot-decline-action">file</span>{' '}

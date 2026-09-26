@@ -136,7 +136,7 @@ const SITELINKS_JSON_LD = {
       position: 2,
       name: 'Documentation',
       description: 'Installation, configuration, adapter guide, and API reference',
-      url: 'https://bernstein.readthedocs.io/',
+      url: 'https://docs.bernstein.run/',
     },
     {
       '@type': 'SiteNavigationElement',

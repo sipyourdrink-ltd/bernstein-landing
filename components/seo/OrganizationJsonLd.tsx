@@ -42,7 +42,7 @@ export const ORGANIZATION_JSON_LD: JsonLdData = {
     'https://github.com/chernistry',
     'https://pypi.org/project/bernstein/',
     'https://www.npmjs.com/package/bernstein-orchestrator',
-    'https://bernstein.readthedocs.io/',
+    'https://docs.bernstein.run/',
     'https://x.com/alex_chernysh',
     'https://mastodon.social/@alexchernysh',
     'https://bsky.app/profile/alex-chernysh.bsky.social',

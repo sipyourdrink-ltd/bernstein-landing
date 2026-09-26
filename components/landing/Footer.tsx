@@ -51,7 +51,7 @@ export function Footer() {
             >
               PyPI
             </a>
-            <a href="https://bernstein.readthedocs.io/" data-umami-event="click-docs-out" data-umami-event-source="footer">Docs</a>
+            <a href="https://docs.bernstein.run/" data-umami-event="click-docs-out" data-umami-event-source="footer">Docs</a>
             {/* /#how used to have its own Nav entry; it moved here when
                 the primary nav was trimmed to Install / Verify / Docs /
                 Ask (plus GitHub) - the section itself still lives on the

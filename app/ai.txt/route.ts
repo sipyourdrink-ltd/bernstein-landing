@@ -33,8 +33,8 @@ Content-type: documentation, software, developer-tools
 License: Apache 2.0
 Source-code: https://github.com/sipyourdrink-ltd/bernstein
 Package: https://pypi.org/project/bernstein/
-Documentation: https://bernstein.readthedocs.io/
-Release-notes: https://bernstein.readthedocs.io/en/latest/CHANGELOG/
+Documentation: https://docs.bernstein.run/
+Release-notes: https://docs.bernstein.run/en/latest/CHANGELOG/
 Issue-tracker: https://github.com/sipyourdrink-ltd/bernstein/issues
 Contact-email: forte@bernstein.run
 

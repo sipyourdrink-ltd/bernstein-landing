@@ -47,7 +47,7 @@
     }
   ],
   "links": {
-    "documentation": "https://bernstein.readthedocs.io/",
+    "documentation": "https://docs.bernstein.run/",
     "openapi": "https://bernstein.run/openapi.yaml",
     "github": "https://github.com/sipyourdrink-ltd/bernstein"
   }

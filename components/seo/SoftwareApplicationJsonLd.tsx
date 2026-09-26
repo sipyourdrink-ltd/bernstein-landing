@@ -76,7 +76,7 @@ export const SOFTWARE_APPLICATION_JSON_LD: JsonLdData = {
   /* releaseNotes URL points at the CHANGELOG inside ReadTheDocs, which is
      the human-readable release surface. Google's SoftwareApplication
      validator accepts a URL string. */
-  releaseNotes: 'https://bernstein.readthedocs.io/en/latest/CHANGELOG/',
+  releaseNotes: 'https://docs.bernstein.run/en/latest/CHANGELOG/',
   installUrl: 'https://pypi.org/project/bernstein/',
   maintainer: {
     '@id': 'https://alexchernysh.com/#person',
