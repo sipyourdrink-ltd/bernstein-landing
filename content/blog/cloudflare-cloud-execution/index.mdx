@@ -41,7 +41,7 @@ Cloudflare became [OpenAI's infrastructure partner for agent cloud computing](ht
 
 ## the picture
 
-<Mermaid chart={`flowchart TB
+<Mermaid chart='flowchart TB
   subgraph Local["Your machine or CI"]
     CLI["bernstein cloud init<br/>npx wrangler deploy"]
     Orch["Orchestrator<br/>deterministic tick loop"]
@@ -60,7 +60,7 @@ Cloudflare became [OpenAI's infrastructure partner for agent cloud computing](ht
   WF --> W
   W <--> R2
   Orch --> D1
-`} />
+' />
 
 The orchestrator does not move to the cloud. It keeps its deterministic tick loop on your machine and dispatches agent work through a bridge. Workflows resume from the last completed step; agents read their workspace from R2 and write results back; D1 keeps the metering ledger.
 
