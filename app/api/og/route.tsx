@@ -74,7 +74,7 @@ async function fetchLiveStats(): Promise<{ stars: number; adapters: number }> {
   }
 }
 
-// Round stars DOWN to the nearest 50 / 100 / 500 milestone so the
+// Round stars DOWN to the nearest 25 / 50 / 100 milestone so the
 // badge reads "390+" rather than "394" - looks intentional + ages
 // gracefully between deploys.
 function formatStarsBadge(n: number): string {

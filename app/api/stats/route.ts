@@ -35,7 +35,7 @@ let cacheTime = 0;
 /* When the last fetch was partial (one upstream returned data but the other
    didn't), we keep the merged response in `cache` so the route can still
    answer - but we MUST NOT honour the full REVALIDATE_SECONDS window for
-   the in-memory short-circuit on line 86, otherwise a single bad cycle
+   the in-memory short-circuit below, otherwise a single bad cycle
    (e.g. GitHub IP rate-limit at 60/h unauth) pins a stale star count for
    30 minutes regardless of the short HTTP s-maxage we emit. We track the
    partial flag so the early-return path uses FAILURE_RETRY_SECONDS instead,
@@ -44,7 +44,7 @@ let cachePartial = false;
 
 async function fetchFresh(bypassDataCache: boolean): Promise<FetchResult> {
   /* Authorise the GitHub call when GITHUB_TOKEN (or GH_TOKEN) is set.
-     Unauthenticated lifts the rate limit from 60/h-per-IP to 5000/h -
+     Authenticating lifts the rate limit from 60/h-per-IP to 5000/h -
      under multi-instance Next workers and proxy fan-out the unauth ceiling
      is too easy to blow, which manifests as `stars: 0` zero-cementing. */
   const ghToken = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
