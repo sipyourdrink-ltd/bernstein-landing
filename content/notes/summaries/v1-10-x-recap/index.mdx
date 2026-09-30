@@ -1,7 +1,7 @@
 ---
 title: '1.10.1 through 1.10.6: the shipped things'
 description: >-
-  Five point releases in five days: AGENTS.md cross-CLI sync, run-time cost
+  Six point releases in five days: AGENTS.md cross-CLI sync, run-time cost
   guards, A2A v1.0 signed agent cards, and four new adapters.
 date: '2026-05-10'
 url: 'https://bernstein.run/blog/v1-10-x-recap'
@@ -12,7 +12,7 @@ tags:
 source_post: v1-10-x-recap
 summary_modes:
   quick:
-    title: 'five point releases, one clear trajectory'
+    title: 'six point releases, one clear trajectory'
     items:
       - >-
         bernstein now syncs agent configs from a single source of truth to
@@ -59,7 +59,7 @@ summary_modes:
       - >-
         a2a v1.0 implements signed agent cards at /.well-known/agent.json using
         JWS detached signatures over JCS-canonicalized bytes with Ed25519 keys
-        rotated every 24 hours. verification keys are published at
+        and a 24-hour rotation grace window. verification keys are published at
         /.well-known/jwks.json with O_EXCL file semantics and resource indicator
         audience binding per RFC 8707.
       - >-
@@ -77,7 +77,7 @@ summary_modes:
 
 ## summary
 
-five point releases between 1.10.1 and 1.10.6 addressed the friction most visible once bernstein was used on a real polyglot codebase. `bernstein agents-md` generates a canonical AAIF AGENTS.md as the single source of truth and rewrites it into four vendor-specific formats (Cursor `.cursor/rules/*.mdc`, Claude Code `CLAUDE.md`, Aider `CONVENTIONS.md`, Goose `.goosehints`) in one `sync` command, with a `verify` CI gate that fails on drift. cost legibility got two patches: a per-turn budget countdown and a `--max-cost-usd` hard cap. A2A v1.0 now ships JWS-signed agent cards at `/.well-known/agent.json` with Ed25519, RFC 8707 audience binding, 24-hour key rotation grace, and a standalone verifier (`tools/verify_audit_dsse.py`) with no bernstein dependency. the adapter count grew from 31 to 44, with notable additions for Devin for Terminal, JetBrains Junie, AWS Q Developer, and DeepSeek V4-Flash/V4-Pro (the DeepSeek adapter ships an EU-residency guard that pins the endpoint host).
+six point releases, 1.10.1 through 1.10.6, addressed the friction most visible once bernstein was used on a real polyglot codebase. `bernstein agents-md` generates a canonical AAIF AGENTS.md as the single source of truth and rewrites it into four vendor-specific formats (Cursor `.cursor/rules/*.mdc`, Claude Code `CLAUDE.md`, Aider `CONVENTIONS.md`, Goose `.goosehints`) in one `sync` command, with a `verify` CI gate that fails on drift. cost legibility got two patches: a per-turn budget countdown and a `--max-cost-usd` hard cap. A2A v1.0 now ships JWS-signed agent cards at `/.well-known/agent.json` with Ed25519, RFC 8707 audience binding, 24-hour key rotation grace, and a standalone verifier (`tools/verify_audit_dsse.py`) with no bernstein dependency. the adapter count grew from 40 to 43, with new adapters for Devin for Terminal, JetBrains Junie and AWS Q Developer, plus DeepSeek V4-Flash/V4-Pro model support (the DeepSeek adapter ships an EU-residency guard that pins the endpoint host).
 
 ## key takeaways
 

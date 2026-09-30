@@ -5520,6 +5520,77 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
+    delete:
+      tags:
+        - scim
+      summary: Delete a user (soft delete with history retention)
+      description: |-
+        Soft-delete a user per SCIM 2.0 DELETE semantics.
+
+        SCIM clients expect DELETE to remove the resource. This server marks the
+        principal inactive while retaining its history in the chain, as declared
+        in ServiceProviderConfig. The 204 response signals successful removal to
+        the client; the ledger records the deprovisioning event.
+      operationId: delete_user_scim_v2_Users__user_id__delete
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: User Id
+      responses:
+        "204":
+          description: Successful Response
+        "404":
+          description: Unknown principal
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+    patch:
+      tags:
+        - scim
+      summary: Update a user via PATCH operations
+      description: |-
+        Apply RFC 7644 §3.5.2 PATCH operations to a user.
+
+        Only the active=false deactivation path is supported; other attribute
+        updates are not implemented.
+      operationId: patch_user_scim_v2_Users__user_id__patch
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: User Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Body
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Invalid PATCH operation
+        "404":
+          description: Unknown principal
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
   /hooks/{session_id}:
     post:
       summary: Receive Hook
@@ -12485,6 +12556,77 @@ paths:
           content:
             application/json:
               schema: {}
+        "404":
+          description: Unknown principal
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+    delete:
+      tags:
+        - scim
+      summary: Delete a user (soft delete with history retention)
+      description: |-
+        Soft-delete a user per SCIM 2.0 DELETE semantics.
+
+        SCIM clients expect DELETE to remove the resource. This server marks the
+        principal inactive while retaining its history in the chain, as declared
+        in ServiceProviderConfig. The 204 response signals successful removal to
+        the client; the ledger records the deprovisioning event.
+      operationId: delete_user_api_v1_scim_v2_Users__user_id__delete
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: User Id
+      responses:
+        "204":
+          description: Successful Response
+        "404":
+          description: Unknown principal
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+    patch:
+      tags:
+        - scim
+      summary: Update a user via PATCH operations
+      description: |-
+        Apply RFC 7644 §3.5.2 PATCH operations to a user.
+
+        Only the active=false deactivation path is supported; other attribute
+        updates are not implemented.
+      operationId: patch_user_api_v1_scim_v2_Users__user_id__patch
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: User Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              title: Body
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Invalid PATCH operation
         "404":
           description: Unknown principal
         "422":

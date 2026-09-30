@@ -215,7 +215,7 @@ export default async function QPage({ params }: Props) {
               ))}
             </ul>
             <p className="ask-seeds-foot">
-              browse the full index at <a href="/q">/q</a> or ask on the
+              browse the full index at <a href="/q">/q</a> or ask on the{' '}
               <a href="/#ask">homepage</a>.
             </p>
           </section>

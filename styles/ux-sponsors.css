@@ -10,6 +10,7 @@
   margin: 0 auto;
   padding: calc(var(--header-h) + var(--space-7)) var(--space-5) var(--space-9);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-7);
 }
 

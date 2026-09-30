@@ -11,7 +11,7 @@
   ],
   "schemaVersion": "1.0",
   "protocolVersion": "0.3.0",
-  "adapterCount": 45,
+  "adapterCount": 53,
   "provider": {
     "organization": "Bernstein",
     "url": "https://bernstein.run",

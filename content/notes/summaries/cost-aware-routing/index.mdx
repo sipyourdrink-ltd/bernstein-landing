@@ -1,45 +1,45 @@
 ---
 title: "Picking a cheaper model when the task allows"
-description: "Bernstein's epsilon-greedy bandit picks a model per task. Internal runs cut roughly in half. Measure your own with bernstein cost."
+description: "Bernstein's static cascade routes tasks by default, and an opt-in contextual bandit can pick a model and effort level per task. An earlier router cut spend roughly in half in internal runs. Measure your own with bernstein cost."
 date: "2026-04-07"
 url: "https://bernstein.run/blog/cost-aware-routing"
 tags: ["summary", "AI cost optimization", "contextual bandit"]
 source_post: "cost-aware-routing"
 summary_modes:
   quick:
-    title: "epsilon-greedy bandit picks a cheaper model per task, with measurable savings"
+    title: "a static cascade routes each task to a cheaper model when it can, with an opt-in bandit and measurable savings"
     items:
-      - "A heuristic classifier maps task complexity and role to an opening model guess, then an epsilon-greedy bandit refines the pick over time."
-      - "Internal multi-agent runs landed at roughly half the bill versus sending every task to Sonnet, with completion rate within a couple of percent."
+      - "A static cascade router is the default; an opt-in LinUCB contextual bandit learns which model and effort level each task type needs."
+      - "Internal runs on the earlier epsilon-greedy router landed at roughly half the bill versus sending every task to Sonnet, with completion rate within a couple of percent."
     whyItMatters: "Most agent frameworks ignore that a docstring task and an architecture task do not need the same model; this one does not."
   takeaways:
     title: "What the cost-aware router actually does, and what it does not"
     items:
-      - "Routing docstrings or test writing to Haiku or Sonnet while reserving Opus for architecture and security tasks is the dominant learned pattern across internal runs."
-      - "Bandit epsilon is 0.2 by default (configurable); the cascade ordering is cheapest-to-strongest, and high-complexity tasks never get sent to Haiku."
-      - "Rewards are measured as task completed, tests green, and no retries; this is the real success signal, not a proxy metric."
-      - "The bandit is default-on once .sdd/metrics/ exists; disable with bandit_enabled: false in .sdd/config.yaml."
-    whyItMatters: "Operators get a routing layer they can audit by reading .sdd/metrics, not a black-box scheduler."
+      - "Routing docstrings, test writing and bug fixes to Sonnet while reserving Opus for architecture and security tasks is the typical pattern after warm-up."
+      - "The static cascade is sonnet then opus; the bandit is opt-in with BERNSTEIN_ROUTING=bandit, and bandit-shadow logs what it would have picked while static routing executes."
+      - "Reward is quality_score * (1 - normalized_cost), where quality is 1.0 when janitor verification passes and 0.0 when it fails."
+      - "Capability floors clamp the bandit's pick from below: high-stakes work never drops under Sonnet, and the highest-stakes combination is pinned to Opus."
+    whyItMatters: "Operators get a routing layer whose state lives on disk under .sdd/routing/, not a black-box scheduler."
   technical:
-    title: "cost-aware routing layers: heuristic classifier, epsilon-greedy bandit, cold-start seed"
+    title: "cost-aware routing layers: static cascade, LinUCB bandit, capability floors"
     items:
-      - "Layer one is a heuristic classifier that maps task complexity (low/medium/high) and role (backend, qa, security, docs) to an opening model guess; this is the only state a fresh repo needs to make routing decisions."
-      - "Layer two is an epsilon-greedy bandit that exploits the best-known model 80% of the time and explores 20%; rewards are observed at the task boundary (completed, tests green, no retries), so the proxy-metric trap does not apply."
-      - "Layer three is cold-start effectiveness data seeded from .sdd/metrics/, so a repo with prior runs starts from informed priors rather than uniform random; the cascade ordering is cheapest-to-strongest and high-complexity tasks never get sent to Haiku."
-      - "Across bernstein's own self-development sessions, bandit routing cut the bill roughly in half versus Sonnet-for-everything; a 10-agent / 50-task session that used to run $15-20 lands at $7-10, with completion rate within a couple of percent."
-    whyItMatters: "Every layer is auditable on disk, so the operator can answer why a task got routed to a specific model without running the orchestrator."
+      - "Layer one is the static cascade router: each task's complexity (low/medium/high), scope, role and priority pick the starting tier, and it escalates on failure or low-confidence output."
+      - "Layer two is the opt-in LinUCB contextual bandit for the model, plus a separate UCB1 bandit for the effort level (low/high/max) per (task type, model) pair; below warmup_min completions (50 by default) it delegates to the static heuristics."
+      - "Layer three is capability floors: the bandit's pick is raised to a per-task minimum, and policy state persists in .sdd/routing/policy.json and .sdd/routing/bandit_state.json across restarts."
+      - "Across bernstein's own self-development sessions in April 2026, on the since-retired epsilon-greedy router, bandit routing cut the bill roughly in half versus Sonnet-for-everything; a 10-agent / 50-task session that used to run $15-20 landed at $7-10, with completion rate within a couple of percent."
+    whyItMatters: "Every layer is auditable on disk, so the operator can answer why a task got routed to a specific model."
 ---
 
 ## summary
 
-most agent frameworks send every task to the same model regardless of complexity - routing a docstring task to Opus instead of Haiku is roughly 30x overspend at current pricing. bernstein's cost-aware router uses three layers: a heuristic classifier that maps task `complexity` (low/medium/high) and `role` (backend, qa, security, docs, etc.) to an opening model guess; an epsilon-greedy bandit that exploits the best-known model 80% of the time and explores 20%; and cold-start effectiveness data seeded from `.sdd/metrics/`. across bernstein's own self-development sessions, bandit routing cut the bill roughly in half versus Sonnet-for-everything, with completion rate staying within a couple of percent. a 10-agent / 50-task session that used to run $15-20 lands at $7-10.
+most agent frameworks send every task to the same model regardless of complexity - routing a docstring task to Opus instead of Haiku is roughly 5x overspend at current pricing. bernstein's default router is a static cascade that starts each task at the cheapest viable tier (`sonnet` then `opus`) and escalates on failure. an opt-in LinUCB contextual bandit (`BERNSTEIN_ROUTING=bandit`) learns the model per task from a feature vector, a separate UCB1 bandit learns the effort level, and capability floors keep high-stakes work from dropping below Sonnet. policy state persists under `.sdd/routing/`. across bernstein's own self-development sessions in April 2026, on the since-retired epsilon-greedy router, bandit routing cut the bill roughly in half versus Sonnet-for-everything, with completion rate staying within a couple of percent. a 10-agent / 50-task session that used to run $15-20 landed at $7-10.
 
 ## key takeaways
 
-- routing docstrings or test writing to Haiku or Sonnet while reserving Opus for architecture and security tasks is the dominant learned pattern.
-- bandit epsilon is 0.2 by default (configurable); the cascade ordering is cheapest-to-strongest - high-complexity tasks never get sent to Haiku.
-- rewards are measured as: task completed, tests green, no retries - not a proxy metric.
-- bandit is default-on once `.sdd/metrics/` exists; disable with `bandit_enabled: false` in `.sdd/config.yaml`.
+- routing docstrings, test writing and bug fixes to Sonnet while reserving Opus for architecture and security tasks is the typical pattern after warm-up.
+- the static cascade is the default; `BERNSTEIN_ROUTING=bandit` turns the bandit on, and `bandit-shadow` only logs what it would have picked.
+- reward is `quality_score * (1 - normalized_cost)`; quality is 1.0 when janitor verification passes, 0.0 when it fails.
+- policy state lives in `.sdd/routing/policy.json` and `.sdd/routing/bandit_state.json`; delete the directory and the router starts cold.
 
 ## when to read this
 

@@ -248,7 +248,7 @@ input:focus-visible,
  * family + OpenType feature settings + text-wrap hints so components can
  * reach for a single class instead of re-assembling the same 4–5 hints.
  * Sibling utility names (`.display-*`, `.mono-*`, `.prose-body`) from the
- * foundation agent remain valid — these are ADDITIVE aliases.
+ * original type ramp remain valid — these are ADDITIVE aliases.
  * ─────────────────────────────────────────────────────────────────── */
 @layer utilities {
   /* === design-tokens — start === */

@@ -7,7 +7,7 @@
 [![ci](https://github.com/sipyourdrink-ltd/bernstein-landing/actions/workflows/ci.yml/badge.svg)](https://github.com/sipyourdrink-ltd/bernstein-landing/actions/workflows/ci.yml)
 [![codeql](https://github.com/sipyourdrink-ltd/bernstein-landing/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/sipyourdrink-ltd/bernstein-landing/actions/workflows/codeql.yml)
 [![openssf scorecard](https://api.securityscorecards.dev/projects/github.com/sipyourdrink-ltd/bernstein-landing/badge)](https://scorecard.dev/viewer/?uri=github.com/sipyourdrink-ltd/bernstein-landing)
-[![next.js](https://img.shields.io/badge/next.js-15-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![next.js](https://img.shields.io/badge/next.js-16-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org)
 [![licence](https://img.shields.io/github/license/sipyourdrink-ltd/bernstein-landing)](LICENSE)
 
 [site](https://bernstein.run) &middot; [the orchestrator](https://github.com/sipyourdrink-ltd/bernstein) &middot; [docs](https://docs.bernstein.run/) &middot; [contributing](CONTRIBUTING.md) &middot; [security](SECURITY.md)
@@ -22,7 +22,7 @@ This repository is the website, not the software it describes.
 governance layer for AI agents: a deterministic scheduler with no model in the
 coordination loop, running agents in parallel, gating what they produce, and
 recording every step so a run can be verified afterwards, offline, from the
-artifacts alone. CLI coding agents work out of the box — 51 adapters ship with
+artifacts alone. CLI coding agents work out of the box — 53 adapters ship with
 it — and the same layer governs any agent workload. Bugs and features in *that*
 belong in
 [its tracker](https://github.com/sipyourdrink-ltd/bernstein/issues).

@@ -197,7 +197,7 @@ export default function RootLayout({
               operator's own browser console. Visitor traffic is unaffected
               because their localStorage flag is unset. */}
         <script
-          // eslint-disable-next-line react/no-danger -- inline string is a
+           
           // hardcoded constant from lib/analytics/disable.ts; not user input.
           dangerouslySetInnerHTML={{ __html: OPERATOR_EXCLUDE_INLINE_SCRIPT }}
         />

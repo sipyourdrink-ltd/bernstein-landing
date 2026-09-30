@@ -11,7 +11,7 @@
  * (verified against src/bernstein/cli/ at authoring time). No command is
  * invented for narrative convenience:
  *   - bernstein init                  -> creates the .sdd/ workspace
- *   - bernstein run -g "<goal>"       -> open-ended natural-language goal
+ *   - bernstein run --goal "<goal>"   -> open-ended natural-language goal
  *   - bernstein run --plan-only       -> emit decomposed plan, no agents
  *   - bernstein run --dry-run         -> plan + scheduling + cost preview
  *   - bernstein run --from-plan plan.yaml -> execute a hand-written manifest
@@ -74,9 +74,9 @@ const STAGES: Stage[] = [
     num: 1,
     id: 'spec',
     title: 'Spec - state the intent',
-    command: 'bernstein init && bernstein run -g "<goal>"',
+    command: 'bernstein init && bernstein run --goal "<goal>"',
     what:
-      'bernstein init creates the .sdd/ workspace and a bernstein.yaml in the current directory. From there a spec is either a natural-language goal passed to run -g, or - when the goal is too coarse - a hand-written plan.yaml manifest that pins stages, roles, and models explicitly.',
+      'bernstein init creates the .sdd/ workspace and a bernstein.yaml in the current directory. From there a spec is either a natural-language goal passed to run --goal, or - when the goal is too coarse - a hand-written plan.yaml manifest that pins stages, roles, and models explicitly.',
     detail:
       'The spec is the only place a human writes prose. Everything downstream of the decomposed plan is derived deterministically, so the plan is also the artefact you version and review in a pull request before a single agent runs.',
   },
@@ -86,7 +86,7 @@ const STAGES: Stage[] = [
     title: 'Checklist - review the decomposed plan',
     command: 'bernstein run --plan-only   # or --dry-run for cost preview',
     what:
-      'run --plan-only emits the decomposed task plan as Markdown and exits before any agent spawns. run --dry-run adds the scheduling order and an estimated cost band. This is the checkpoint where you read what the planner intends to do and stop it if the decomposition is wrong.',
+      'run --plan-only displays the decomposed task plan and exits before any agent spawns. run --dry-run adds the scheduling order and an estimated cost band. This is the checkpoint where you read what the planner intends to do and stop it if the decomposition is wrong.',
     detail:
       'Decomposing a free-text goal is one LLM call, so two runs of the same goal can differ. Everything after it - scheduling, routing, gating - is plain Python, and a hand-written plan.yaml skips the LLM entirely and reproduces the same task graph every time. Either way a decomposition bug shows up here as a wrong checklist you can read, not as a bad chain-of-thought you have to infer after the fact.',
   },
@@ -106,7 +106,7 @@ const STAGES: Stage[] = [
     title: 'Implement - one agent per worktree',
     command: '(agents run automatically as tasks become eligible)',
     what:
-      'Each eligible task gets one agent in its worktree. Model selection follows the task role - a stronger model for architecture, a mid-tier model for ordinary implementation, a cheap model for tests and boilerplate. An epsilon-greedy bandit reroutes by observed pass rate per task type.',
+      'Each eligible task gets one agent in its worktree. Model selection follows the task role - a stronger model for architecture, a mid-tier model for ordinary implementation, a cheap model for tests and boilerplate. An optional contextual bandit router (--routing bandit) learns from observed pass rate per task type.',
     detail:
       'The agent itself is whichever CLI tool you already trust (Claude Code, Codex, and other adapters). Bernstein owns the scheduling, scoping, and audit; the adapter owns the edit. Every routing and gate decision is written to the HMAC-chained audit log under .sdd/audit/.',
   },

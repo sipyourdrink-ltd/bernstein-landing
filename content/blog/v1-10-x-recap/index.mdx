@@ -1,6 +1,6 @@
 ---
 title: "bernstein 1.10.x recap: agents.md sync, a2a, cost guards"
-description: "five point releases in five days: agents.md cross-cli sync, runtime cost guards, a2a v1.0 signed agent cards, four new cli adapters."
+description: "six point releases in five days: agents.md cross-cli sync, runtime cost guards, a2a v1.0 signed agent cards, four new cli adapters."
 date: "2026-05-10"
 tags: ["multi-agent orchestration", "release", "AGENTS.md", "A2A", "cost guards", "adapters"]
 schemaType: "TechArticle"
@@ -13,7 +13,7 @@ techDependencies:
 ---
 
 <Lead>
-The v1.10.0 post covered the regulated-deployment work. The five point releases since are not headline-shaped. They are the things people kept asking for in issues and the things that were quietly broken once we tried to use the orchestrator on a real polyglot codebase. Worth a single round-up so the trajectory is legible from one page.
+The v1.10.0 post covered the regulated-deployment work. The six point releases since are not headline-shaped. They are the things people kept asking for in issues and the things that were quietly broken once we tried to use the orchestrator on a real polyglot codebase. Worth a single round-up so the trajectory is legible from one page.
 </Lead>
 
 ## a single AGENTS.md the rest of the agents can read
@@ -42,7 +42,7 @@ Honest framing: the compliance surface ships with tests, runbooks, and the stand
 
 ## four new adapters
 
-Adapter count went from 31 to 44 over the five releases. The four worth calling out by name:
+Adapter count went from 40 to 43 over the six releases: three new adapters plus DeepSeek V4 model support. The four worth calling out by name:
 
 - **Devin for Terminal (Cognition).** First-class adapter for the enterprise coding agent. 558 lines of contract tests verify the spawn surface mirrors the long-running adapter pattern. Drop-in via `cli_agent: devin_terminal`.
 - **JetBrains Junie.** BYOK across Anthropic, OpenAI, Google, xAI, OpenRouter, and the Copilot proxy. Bring whichever key the org already has procurement for.

@@ -61,7 +61,11 @@ export function ArticleCompressionRoot({
       requestControllerRef.current?.abort();
       const controller = new AbortController();
       requestControllerRef.current = controller;
-      const timeout = window.setTimeout(() => controller.abort(), 24_000);
+      let timedOut = false;
+      const timeout = window.setTimeout(() => {
+        timedOut = true;
+        controller.abort();
+      }, 24_000);
       setLoadingMode(mode);
       setError(null);
       setRetryMode(null);
@@ -110,9 +114,15 @@ export function ArticleCompressionRoot({
           setRetryMode(null);
         }
       } catch (e) {
-        if (e instanceof Error && e.name === 'AbortError') return;
+        if (e instanceof Error && e.name === 'AbortError' && !timedOut) return;
         if (requestIdRef.current === requestId) {
-          setError(e instanceof Error ? e.message : 'summary did not land');
+          setError(
+            timedOut
+              ? 'the summary took too long; try again in a moment'
+              : e instanceof Error
+                ? e.message
+                : 'summary did not land',
+          );
           setRetryMode(mode);
         }
       } finally {

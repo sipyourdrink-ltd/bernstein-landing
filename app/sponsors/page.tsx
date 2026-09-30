@@ -117,7 +117,7 @@ const TIER_LADDER = [
 ] as const;
 
 /** Build the per-tier GitHub Sponsors deep link. GH Sponsors honours
- *  ``?frequency=monthly|one-time`` and ``?amount=N`` so a click on the
+ *  ``?frequency=recurring|one-time`` and ``?amount=N`` so a click on the
  *  $100 row preselects that tier rather than dropping the visitor on
  *  the generic landing page with nothing filled in. */
 function tierHref(tier: (typeof TIER_LADDER)[number]): string {
@@ -195,10 +195,11 @@ export default async function SponsorsPage() {
             <p>
               bernstein is the apache 2.0 reference implementation of an
               HMAC-chained audit log for parallel CLI coding agents. every
-              scheduling decision is plain python, every agent action is
-              tamper-evidently logged. the audit chain maps cleanly to EU AI
-              Act Article 12 automatic event-logging and DORA Article 8-15
-              ICT-incident-reporting evidence.
+              scheduling decision is plain python, with --audit, agent
+              actions are recorded in an HMAC-chained log. the log supports
+              evidence for EU AI Act Article 12 automatic event-logging and
+              DORA Article 9(3) ICT-record-integrity (a mapping, not a
+              certification).
             </p>
             <p>
               {realCount === 0
@@ -250,7 +251,7 @@ export default async function SponsorsPage() {
                 you study agent behaviour and need a deterministic substrate
                 that does not change the experiment when you re-run it.
                 bernstein is plain python on the coordination path, zero LLM
-                tokens on scheduling, every decision is in the HMAC chain.
+                tokens on scheduling, with --audit every decision is in the HMAC chain.
                 replayable end to end.
               </p>
               <p className="audience-tier-hint">$25/mo tier fits.</p>

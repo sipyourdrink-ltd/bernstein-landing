@@ -64,9 +64,10 @@ export function ReadingProgress({ wordCount }: ReadingProgressProps = {}) {
   const firedComplete = useRef(false);
   const sentinelHit = useRef(false);
   const maxScrollPct = useRef(0);
-  const mountedAt = useRef<number>(typeof window !== 'undefined' ? Date.now() : 0);
+  const mountedAt = useRef<number>(0);
 
   useEffect(() => {
+    mountedAt.current = Date.now();
     /* Article-aware dwell floor (ANALYTICS-002 recon §5). */
     const dwellFloorSeconds =
       typeof wordCount === 'number' && wordCount > 0

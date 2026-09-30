@@ -14,10 +14,10 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        /* /docs and /docs/* redirect to readthedocs EXCEPT /docs/cli/*
-           which is the locally-rendered CLI glossary generated catalogue pages
-           . The negative-lookahead `has` constraint
-           keeps the redirect scoped. */
+        /* /docs and /docs/* redirect to docs.bernstein.run EXCEPT /docs/cli
+           and /docs/cli/*, which the app handles itself (see
+           app/docs/cli/page.tsx). The negative lookahead in the next
+           rule keeps the redirect scoped. */
         source: '/docs',
         destination: 'https://docs.bernstein.run/',
         permanent: true,
@@ -276,7 +276,7 @@ const nextConfig = {
         source: '/openapi.yaml',
         headers: [{ key: 'Cache-Control', value: DISCOVERY_CACHE_CONTROL }],
       },
-      /* Edge-cacheable generated catalogue pages . 1-hour Cloudflare
+      /* Edge-cacheable generated catalogue pages: 1-hour Cloudflare
          cache + 24-hour stale-while-revalidate so a content tweak takes
          minutes to propagate and the surface stays warm regardless. */
       {
@@ -288,7 +288,7 @@ const nextConfig = {
       /* `:path+` (one or more segments), not `:path*` (zero or more):
          the zero-segment form also matched the bare `/docs/cli`, so the
          index and its sub-pages shared one TTL. They should not. The
-         index is a 308 to readthedocs and nothing else; the sub-pages,
+         index is a 308 to the docs host and nothing else; the sub-pages,
          if any come back, are rendered content. Keeping the two matchers
          disjoint also means `/docs/cli` is covered by exactly one rule,
          so there is no question of whether a second Cache-Control

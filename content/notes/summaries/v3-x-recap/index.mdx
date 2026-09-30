@@ -15,7 +15,7 @@ summary_modes:
   takeaways:
     title: "What shipped between 3.0 and 3.5.0, in one pass"
     items:
-      - "Deterministic replay is default: the step journal is a Merkle chain over inputs, model, prompt, tool calls and results, and `bernstein replay --from-step N` rebuilds state by walking it."
+      - "Deterministic replay is default: the step journal is a Merkle chain over inputs, model, prompt, tool calls and results, and `bernstein replay <run_id> --from-step N` rebuilds state by walking it."
       - "`bernstein ledger resume` re-dispatches only tasks with no completion entry — clone the repo on another laptop and finish the run there; `bernstein run-service` detaches a run from your terminal entirely."
       - "Tournament runs execute N sibling attempts in isolated worktrees and pick the winner as a pure function of scripted evaluator outputs — no model call decides it, and `bernstein tournament verify` recomputes the selection offline."
       - "Cost-aware dispatch admits or halts each task under USD caps as a receipted, replayable verdict; the run review board renders the journal deterministically with diffs and evidence panels."
@@ -38,7 +38,7 @@ the 2.x line taught the orchestrator to do more; the 3.x line made each capabili
 
 ## key takeaways
 
-- deterministic replay by default: `bernstein replay --from-step N` rebuilds state from the Merkle-chained step journal; non-determinism surfaces as a hash divergence at an exact position.
+- deterministic replay by default: `bernstein replay <run_id> --from-step N` rebuilds state from the Merkle-chained step journal; non-determinism surfaces as a hash divergence at an exact position.
 - evidence bundles gate completion with declared producers (tests, coverage, lint); deterministic producers replay to byte-identical bundle hashes, and PR bodies link the sealed bundle.
 - `bernstein ledger resume` and the detached run service make runs survive interrupts, crashes, and machine swaps; provider failover is a receipted decision you can rehearse with `bernstein doctor --failover-drill`.
 - tournament runs pick winners as a pure function of scripted evaluator outputs — no model in the decision path; `bernstein tournament verify` recomputes the selection offline.

@@ -208,7 +208,7 @@ async function runStream(
   const decoder = new TextDecoder('utf-8');
   let buffer = '';
   try {
-    /* eslint-disable-next-line no-constant-condition */
+     
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -291,6 +291,18 @@ function parseFrame(frame: string): { eventName: string | null; payload: string 
   return { eventName, payload: datas.join('\n') };
 }
 
+/** Optional `chunkId` / `section` carried by a citation payload. */
+function optionalCitationFields(
+  inner: Record<string, unknown>,
+): { chunkId?: string; section?: string } {
+  const chunk = inner.chunk_id ?? inner.chunkId;
+  const section = inner.section;
+  return {
+    ...(typeof chunk === 'string' && chunk ? { chunkId: chunk } : {}),
+    ...(typeof section === 'string' && section ? { section } : {}),
+  };
+}
+
 /**
  * Translate a gateway SSE frame ({event-name} + {snake_case payload})
  * into the camelCase tagged-union shape the reducer expects.
@@ -335,6 +347,7 @@ function normalizeEvent(eventName: string | null, data: Record<string, unknown>)
         ...(typeof inner.score === 'number' && Number.isFinite(inner.score)
           ? { score: inner.score }
           : {}),
+        ...optionalCitationFields(inner),
       };
     }
     case 'decline-replace': {
@@ -364,13 +377,19 @@ function normalizeEvent(eventName: string | null, data: Record<string, unknown>)
         suggestions,
       };
     }
-    case 'done':
+    case 'done': {
+      const rawFollowUps = data.follow_ups ?? data.followUps;
+      const followUps = Array.isArray(rawFollowUps)
+        ? rawFollowUps.filter((f): f is string => typeof f === 'string')
+        : undefined;
       return {
         type: 'done',
         costUsd: Number(data.cost_usd ?? data.costUsd ?? 0),
         elapsedMs: Number(data.elapsed_ms ?? data.elapsedMs ?? 0),
         declined: Boolean(data.declined),
+        ...(followUps ? { followUps } : {}),
       };
+    }
     /* research-006 - progressive TTFT preview frames. Same payload
        shape as their non-preview siblings; we keep the parsing tight
        so a malformed gateway frame degrades to "no preview" rather
@@ -386,6 +405,7 @@ function normalizeEvent(eventName: string | null, data: Record<string, unknown>)
         title: String(inner.title ?? ''),
         url: String(inner.url ?? ''),
         excerpt: String(inner.excerpt ?? ''),
+        ...optionalCitationFields(inner),
       };
     }
     case 'preview-done':

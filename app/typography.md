@@ -4,8 +4,8 @@ One-page brief on the type system. Read before touching any component.
 
 ## Three typefaces, three jobs
 
-- **Instrument Serif** (`font-display`) - editorial voice. Hero title, section titles, card titles. Carries mood; runs large; expects tight tracking and near-1 line-height.
-- **Inter / Geist** (`font-sans`) - default body + UI. Neutral, legible from 13-17 px. All prose, buttons, nav, captions.
+- **Fraunces** (`font-display`) - editorial voice. Hero title, section titles, card titles. Carries mood; runs large; expects tight tracking and near-1 line-height.
+- **Inter** (`font-sans`) - default body + UI. Neutral, legible from 13-17 px. All prose, buttons, nav, captions.
 - **JetBrains Mono** (`font-mono`) - numbers, eyebrows, tags, kbd chips. Tabular-nums when columns align.
 
 ## Semantic ramp

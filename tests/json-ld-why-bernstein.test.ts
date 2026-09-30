@@ -107,7 +107,7 @@ async function loadPageSource(): Promise<string> {
 function evalLiteral(literal: string): unknown {
   const argNames = Object.keys(WIRES) as Array<keyof typeof WIRES>;
   const argValues = argNames.map((k) => WIRES[k]);
-  // eslint-disable-next-line @typescript-eslint/no-implied-eval
+   
   const fn = new Function(...argNames, `return ${literal};`);
   return fn(...argValues);
 }

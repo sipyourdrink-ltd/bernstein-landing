@@ -6,7 +6,7 @@
  * the citations clickable:
  *
  *   `tasks live in `.sdd/` directories [1]…`
- *   `[1]: https://bernstein.run/blog/state-files`
+ *   `[1]: https://bernstein.run/blog/getting-started`
  *
  * Markers without a matching citation are kept literal in the body
  * but not added to the reference list - the user shouldn't see a

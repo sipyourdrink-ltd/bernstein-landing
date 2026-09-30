@@ -174,10 +174,10 @@ async function postBatch(endpoint, key, keyFile, urls) {
       });
       const status = `${r.status} ${r.statusText}`;
       if (r.ok || r.status === 202) {
-        // eslint-disable-next-line no-console
+         
         console.log(`[indexnow] ${endpoint} chunk ${i / CHUNK + 1}: ok (${status}, ${slice.length} urls)`);
       } else {
-        // eslint-disable-next-line no-console
+         
         console.warn(`[indexnow] ${endpoint} chunk ${i / CHUNK + 1}: ${status} (${slice.length} urls)`);
       }
     } catch (e) {
@@ -239,7 +239,7 @@ async function main() {
 
   const toSubmit = [...added, ...changed];
   if (toSubmit.length === 0) {
-    // eslint-disable-next-line no-console
+     
     console.log('[indexnow] no URL changes since last build; nothing to submit');
     await saveSnapshot(live); /* still refresh the snapshot */
     return;
@@ -252,7 +252,7 @@ async function main() {
     toSubmit.length = DAILY_QUOTA;
   }
 
-  // eslint-disable-next-line no-console
+   
   console.log(`[indexnow] submitting ${toSubmit.length} URLs (${added.length} new, ${changed.length} modified) to ${endpoints.length} endpoint(s)`);
   for (const endpoint of endpoints) {
     await postBatch(endpoint, key, keyFile, toSubmit);

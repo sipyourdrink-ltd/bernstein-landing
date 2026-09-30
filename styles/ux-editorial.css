@@ -418,7 +418,7 @@ footer {
   gap: var(--space-5);
   margin-bottom: var(--space-7);
 }
-.footer-col h4 {
+.footer-col h3 {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   font-weight: 500;

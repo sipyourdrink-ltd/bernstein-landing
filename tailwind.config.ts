@@ -10,9 +10,9 @@ const config: Config = {
     extend: {
       fontFamily: {
         // `sans` stays Inter (body). `mono` stays JetBrains Mono.
-        // `display` is the editorial serif slot (Instrument Serif when the
-        // foundation agent wires `--font-display`; graceful fallback to
-        // Iowan Old Style / Georgia if that variable is not yet defined).
+        // `display` is the editorial serif slot (Fraunces via `--font-display`,
+        // defined in styles/globals.css; falls back to Iowan Old Style /
+        // Georgia if that variable is not defined).
         display: ['var(--font-display)', 'Iowan Old Style', 'Palatino', 'Georgia', 'serif'],
         sans: ['var(--font-inter)'],
         mono: ['var(--font-jetbrains)'],

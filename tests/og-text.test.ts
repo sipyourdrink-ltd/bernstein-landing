@@ -84,7 +84,7 @@ test('the fixed card copy renders without a network fetch', async () => {
   const seen = await fetchesWhileRendering([
     PROJECT_TAGLINE,
     PROJECT_ONE_LINER,
-    '>_ bernstein.run 690+ stars 48 adapters pipx install bernstein Open source · Apache 2.0',
+    '>_ bernstein.run 690+ stars 53 adapters pipx install bernstein Open source · Apache 2.0',
   ]);
   assert.deepEqual(seen, []);
 });

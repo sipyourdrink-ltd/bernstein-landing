@@ -1,8 +1,9 @@
 ---
 title: 'Agents on Cloudflare: Workers, Workflows, Durable Objects'
 description: >-
-  Bernstein 1.8.4 adds a Cloudflare backend. Workers run agents, Durable
-  Workflows handle multi-step tasks, R2 holds artifacts, D1 keeps state.
+  Bernstein's experimental Cloudflare integration. Workers run agents,
+  Workflows handle multi-step tasks, R2 holds workspaces, D1 keeps metering.
+  Runs on your own account.
 date: '2026-04-14'
 url: 'https://bernstein.run/blog/cloudflare-cloud-execution'
 tags:
@@ -15,10 +16,9 @@ summary_modes:
     title: cloudflare backend for ai coding agents
     items:
       - >-
-        agents run on cloudflare workers with near-zero cold start and survive
-        disconnects.
+        agents run on cloudflare workers and survive disconnects.
       - >-
-        durable workflows, r2, and d1 handle state, artifacts, and retries
+        workflows, r2, and d1 handle retries, workspace sync, and metering
         across tasks.
     whyItMatters: >-
       it moves compute off the laptop so you can scale agents without
@@ -30,32 +30,32 @@ summary_modes:
         adds cloud execution on cloudflare workers to offload agent tasks from
         local machines.
       - >-
-        uses durable workflows to manage multi-step tasks with retry and state
-        persistence.
+        uses cloudflare workflows to manage multi-step tasks with retry and
+        resume from the last completed step.
       - >-
-        stores artifacts in r2 and state in d1, replacing the local .sdd/
-        directory when in cloud mode.
+        syncs workspaces through r2 and keeps the metering ledger in d1; the
+        orchestrator and its .sdd/ state stay local.
       - >-
-        keeps local execution functional while enabling scalable,
-        battery-friendly cloud runs.
+        is experimental: the hosted service at api.bernstein.run does not
+        resolve, so only the self-deployed worker path works today.
     whyItMatters: >-
       it allows developers to run many agents without overheating their laptops
       or losing progress.
   technical:
-    title: cloudflare backend for ai agents with workers and durable workflows
+    title: cloudflare backend for ai agents with workers and workflows
     items:
       - >-
-        agents run as isolated cloudflare workers with sub-50ms cold starts,
-        enabling rapid spawning and low overhead per task.
+        agents run as isolated cloudflare workers, enabling rapid spawning
+        and low overhead per task.
       - >-
-        multi-step workflows are managed by durable objects, which maintain
-        state and resume from the last completed step after failure.
+        multi-step workflows run on cloudflare workflows, which resume from the
+        last completed step after a failure.
       - >-
-        artifacts such as diffs and test outputs are stored in r2, with costs
-        amounting to pennies per session.
+        artifacts such as diffs and test outputs are stored in r2, with usage
+        metering kept in d1.
       - >-
-        task state, queue, and audit data are persisted in d1, replacing the
-        local .sdd/ directory for cloud runs.
+        usage metering lands in d1 as a ledger; the orchestrator's tick loop
+        and .sdd/ state stay on your machine.
     whyItMatters: >-
       it enables scalable, reliable agent execution without draining laptop
       resources or losing progress during interruptions.
@@ -63,14 +63,14 @@ summary_modes:
 
 ## summary
 
-bernstein 1.8.4 adds a Cloudflare backend that moves agent execution off the local machine. stateless agent runs go to Workers (cold start under 50ms), multi-step tasks with ordering and retry land on Durable Workflows, diffs and generated files go to R2, and task queue plus audit log go to D1. the local `.sdd/` story stays intact for development; the cloud backend is for when running four or five concurrent agents on a MacBook starts causing thermal problems or you need sessions that survive a lid close. `bernstein cloud deploy` creates the full topology in one command; `bernstein run --cloud` dispatches tasks against it.
+bernstein's experimental Cloudflare integration moves agent work off the local machine while the orchestrator stays local and deterministic. agent runs go to Workers, multi-step tasks with ordering and retry land on Workflows, workspaces sync through R2, and usage metering goes to D1. `bernstein cloud init` scaffolds a `wrangler.toml` and a worker entry point; you deploy with `npx wrangler deploy` against your own Cloudflare account. the hosted commands (`cloud login`, `run`, `status`, `runs`, `cost`) target `api.bernstein.run`, which does not resolve in DNS, so they report the service unreachable.
 
 ## key takeaways
 
-- Workers bill per request, not per VM; for a typical 50-task session, compute cost is roughly $0.50-2.00, while R2 and D1 are pennies.
-- a Durable Object holds orchestrator tick state so a Worker crash mid-task resumes from the last completed step rather than from scratch.
-- API keys are stored as Worker secrets via `wrangler secret put` and never leave Cloudflare.
-- the Cloudflare backend replaces local `.sdd/` state for cloud runs; multiple Workers can read D1 without stepping on each other.
+- Workers bill per request, not per VM; see Cloudflare's pricing pages for current rates.
+- Workflows resume from the last completed step, so a Worker crash mid-task does not restart the task from scratch.
+- API keys are stored as Worker secrets via `npx wrangler secret put` and never leave Cloudflare.
+- the orchestrator and its `.sdd/` state stay local; D1 is the metering ledger, not the source of truth.
 
 ## when to read this
 

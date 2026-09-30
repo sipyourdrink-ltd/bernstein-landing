@@ -4,7 +4,7 @@
  * Why an index page (the chips on /ask already link to /q/<slug>):
  *   - internal link surface. crawlers landing on a /q/<slug> via a
  *     citation breadcrumb back to /q, and /q lists every other slug
- *     under stable tag headings. without the index, the 44 leaf pages
+ *     under stable tag headings. without the index, the leaf pages
  *     have no internal back-link other than the breadcrumb on each
  *     leaf and the empty-state list on /ask.
  *   - operator-discoverability gap. one short url that lists every

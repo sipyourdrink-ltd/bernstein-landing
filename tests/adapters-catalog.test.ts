@@ -16,7 +16,7 @@ import path from 'node:path';
 
 const DATA = path.resolve(process.cwd(), 'data', 'adapters.json');
 
-const MIN_ADAPTERS = 40; /* the extraction currently yields 45 (46 registry keys minus mock, which has no adapter module); the floor leaves room for upstream churn */
+const MIN_ADAPTERS = 40; /* the extraction currently yields 53 (registry keys minus mock, plus profile-built adapters such as pydantic-ai, per data/adapter-count.json); the floor leaves room for upstream churn */
 
 test('data/adapters.json exists', async () => {
   const exists = await fs.access(DATA).then(() => true).catch(() => false);
@@ -54,4 +54,13 @@ test('every "ready" adapter has summary + whenToChoose + whenToChooseBernstein',
     assert.ok(a.whenToChoose, `ready adapter ${a.slug} is missing whenToChoose paragraph`);
     assert.ok(a.whenToChooseBernstein, `ready adapter ${a.slug} is missing whenToChooseBernstein paragraph`);
   }
+});
+
+test('adapters.json and adapters-meta.json list the same adapters', async () => {
+  const a = JSON.parse(await fs.readFile(DATA, 'utf8'));
+  const metaPath = path.resolve(process.cwd(), 'data', 'adapters-meta.json');
+  const m = JSON.parse(await fs.readFile(metaPath, 'utf8'));
+  const left = a.adapters.map((x: any) => x.slug).sort();
+  const right = m.entries.map((x: any) => x.slug).sort();
+  assert.deepEqual(left, right);
 });

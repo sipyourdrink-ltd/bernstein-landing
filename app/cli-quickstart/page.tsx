@@ -151,14 +151,15 @@ export default function CliQuickstartPage() {
               {/* DRIFT-SYNC:start key=cli-quickstart-install */}
               <code>{`pipx install bernstein
 bernstein init
-bernstein run -g "fix the failing test in tests/test_foo.py"`}</code>
+bernstein -g "fix the failing test in tests/test_foo.py"`}</code>
 {/* DRIFT-SYNC:end */}
             </pre>
             <p>
               Bernstein requires Python 3.12 or newer. The wheel is published
               to PyPI under <code>bernstein</code>, Apache 2.0. If you need an
               offline install, the air-gap wheelhouse path is documented in
-              the canonical reference linked at the bottom of this page.
+              the{' '}
+              <a href="https://docs.bernstein.run/en/latest/installation/air-gap/">air-gap guide</a>.
             </p>
 
             <StepHeading id="step-2-init" n={2} label="initialise the workspace" />
@@ -182,7 +183,8 @@ bernstein init`}</code>
               </li>
               <li>
                 <code>bernstein.yaml</code>: project config. The starter file
-                ships with one agent and a placeholder goal.
+                sets <code>cli: auto</code>, <code>team: auto</code>, a
+                budget, and a commented-out goal.
               </li>
               <li>
                 <code>templates/</code>: copied from the wheel. Contains the
@@ -198,38 +200,27 @@ bernstein init`}</code>
 
             <StepHeading id="step-3-configure" n={3} label="configure agents in bernstein.yaml" />
             <p>
-              Open <code>bernstein.yaml</code> and edit the <code>agents</code>{' '}
-              block. Each entry binds a <code>name</code> (free-form), an{' '}
-              <code>adapter</code> (one of the 40+ CLI adapters listed in the
-              project README), a <code>role</code>, and a <code>model</code>.
-              A minimal three-agent config looks like this:
+              Open <code>bernstein.yaml</code> and edit the keys.{' '}
+              The seed file sets <code>goal</code>, <code>cli</code> (one of the
+              40+ adapter names, or <code>auto</code>), <code>model</code>,{' '}
+              <code>team</code> (<code>auto</code> or a list of role names),{' '}
+              <code>max_agents</code>, and <code>budget</code>. A minimal
+              config looks like this:
             </p>
             <pre className="cliqs-code">
               <code>{`# bernstein.yaml
 goal: "Add JWT auth to the /login endpoint"
-
-agents:
-  - name: backend-claude
-    adapter: claude
-    role: backend
-    model: sonnet
-  - name: tests-codex
-    adapter: codex
-    role: qa
-    model: gpt-5.4-mini
-  - name: review-gemini
-    adapter: gemini
-    role: reviewer
-    model: gemini-2.5-pro
-
-budget:
-  max_cost_usd: 5.00`}</code>
+cli: claude          # or codex, gemini, aider, ... or auto
+model: sonnet
+team: [backend, qa]
+max_agents: 6
+budget: "$5"`}</code>
             </pre>
             <p>
-              Adapter names map one-to-one to files in{' '}
-              <code>src/bernstein/adapters/</code>. If the CLI binary for an
+              Adapter names are registered in{' '}
+              <code>src/bernstein/adapters/registry.py</code>. If the CLI binary for an
               adapter is not installed on the host, the scheduler skips that
-              agent and logs a warning. The <code>budget</code> block is
+              agent and logs a warning. The <code>budget</code> key is
               optional but recommended on first run.
             </p>
 
@@ -238,7 +229,7 @@ budget:
               With <code>bernstein.yaml</code> saved, kick the crew off:
             </p>
             <pre className="cliqs-code">
-              <code>{`bernstein run -g "Add JWT auth to the /login endpoint"`}</code>
+              <code>{`bernstein run --goal "Add JWT auth to the /login endpoint"`}</code>
             </pre>
             <p>
               Useful flags on the <code>run</code> command:
@@ -250,13 +241,13 @@ budget:
                 Zero token spend.
               </li>
               <li>
-                <code>--plan-only</code>: emit the decomposed task plan as
-                markdown and exit. Use this when you want a human review
+                <code>--plan-only</code>: generate and display the execution
+                plan and exit. Use this when you want a human review
                 before any agent runs.
               </li>
               <li>
-                <code>--auto-approve</code>: skip the interactive merge
-                prompt at the end of the run. Pair with{' '}
+                <code>--auto-approve</code>: skip the confirmation prompt
+                before execution. Pair with{' '}
                 <code>--max-cost-usd</code> for unattended runs.
               </li>
               <li>
@@ -284,15 +275,15 @@ budget:
             </p>
             <pre className="cliqs-code">
               <code>{`bernstein status        # one-shot text summary
-bernstein dashboard     # live TUI: agents, tasks, costs, traces
+bernstein live          # live TUI: active agents, task events, stats
 bernstein stop          # graceful shutdown of the running orchestra`}</code>
             </pre>
             <p>
-              After the run, the artefacts live in three places. The
-              HMAC-signed audit log is under{' '}
-              <code>.sdd/audit/</code>, rotated daily - one JSONL file per
-              UTC day; you can verify the chain with{' '}
-              <code>bernstein lineage verify &lt;run_id&gt;</code>.
+              After the run, the artefacts live in three places. When the
+              run used <code>--audit</code>, the HMAC-signed audit log is
+              under <code>.sdd/audit/</code>, rotated daily - one JSONL
+              file per UTC day; you can verify the chain with{' '}
+              <code>bernstein audit verify</code>.
               Per-task traces (JSONL) are under <code>.sdd/traces/</code>.
               The merged code is in your working tree, ready for{' '}
               <code>git diff</code>.
@@ -340,15 +331,14 @@ bernstein stop          # graceful shutdown of the running orchestra`}</code>
                 <code>.sdd/runtime/</code> is auto-appended to{' '}
                 <code>.gitignore</code> so process state never leaks
                 into commits. <code>bernstein.yaml</code> is the project
-                config; the starter file ships with one agent and a
-                placeholder goal. <code>templates/</code> holds the role
+                config; the starter file sets <code>cli: auto</code>,{' '}
+                <code>team: auto</code>, a budget, and a commented-out goal. <code>templates/</code> holds the role
                 prompt overrides (manager, backend, qa, security,
                 devops) copied from the wheel; edit them per project if
                 you want a different voice. <code>.sdd/config.yaml</code>{' '}
                 holds the server port, worker cap, default model, and
                 default effort. The init command is idempotent: running
-                it on an initialised project preserves existing files
-                and refreshes only the templates.
+                it on an initialised project preserves existing files.
               </p>
             </details>
             <details className="cliqs-faq">
@@ -375,9 +365,8 @@ bernstein stop          # graceful shutdown of the running orchestra`}</code>
                 Yes. <code>bernstein run --dry-run</code> prints the
                 scheduling plan (which agent and which model would be
                 assigned to which task) and exits with zero token spend.{' '}
-                <code>bernstein run --plan-only</code> emits the
-                decomposed task plan as markdown and exits before any
-                agent spawns. Use either flag as the first pass when you
+                <code>bernstein run --plan-only</code> displays the
+                execution plan and exits before any agent runs. Use either flag as the first pass when you
                 are checking that the goal decomposition matches what
                 you want. The dry-run flag also surfaces
                 missing-binary warnings up-front so you find them before
@@ -395,25 +384,25 @@ bernstein stop          # graceful shutdown of the running orchestra`}</code>
                 For the install side, bernstein ships a wheelhouse build
                 helper that bundles every dependency as a verifiable
                 archive so you can transport bernstein and its tree onto
-                a disconnected machine. The runtime configuration lives
-                in <code>.sdd/config.yaml</code> under the{' '}
-                <code>offline.allow_hosts</code> field.
+                a disconnected machine. The full procedure is in the{' '}
+                <a href="https://docs.bernstein.run/en/latest/installation/air-gap/">air-gap guide</a>.
               </p>
             </details>
             <details className="cliqs-faq">
               <summary>Where does the audit log live and how do I verify it?</summary>
               <p>
-                The HMAC-chained audit log lives under{' '}
+                When a run is started with <code>--audit</code>, the
+                HMAC-chained audit log lives under{' '}
                 <code>.sdd/audit/</code>, rotated daily - one JSONL file
                 per UTC day, for example{' '}
                 <code>.sdd/audit/2026-05-07.jsonl</code>. Each line is one
                 JSON record carrying the previous line&apos;s HMAC as a
                 chain link, so modifying any earlier line breaks the
                 chain at the next verification. Run{' '}
-                <code>bernstein lineage verify &lt;run_id&gt;</code> to
-                walk the chain end-to-end; the command exits zero on a
-                clean chain and prints the first divergent line on
-                tamper. Per-task transcripts under{' '}
+                <code>bernstein audit verify</code> to
+                check the HMAC chain and Merkle tree; the command exits
+                non-zero on any chain break, missing record, or HMAC
+                mismatch. Per-task transcripts under{' '}
                 <code>.sdd/traces/</code> are referenced from the audit
                 log by run_id so a reviewer can cross-check what a
                 specific agent saw and produced against the chain entry

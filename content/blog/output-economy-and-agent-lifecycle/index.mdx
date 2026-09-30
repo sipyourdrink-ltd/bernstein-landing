@@ -78,7 +78,7 @@ Attribution is strict: a task that changed profile mid-run is excluded from the 
 Cheaper output is only a win if the work still passes. Two harnesses landed, one per question. `bernstein ab-test --model-a opus --model-b sonnet --task "..."` runs the same task under two models and prints a side-by-side comparison. The profile harness is the more careful one:
 
 ```bash
-bernstein eval ab --suite suite.yaml --arm-b terse --arms 3
+bernstein eval ab --suite suite.yaml --arm-a baseline --arm-b terse --arms 3
 ```
 
 With `--arms 3` the suite runs under three arms: `baseline` (profile unset), `control` (a built-in minimal terse addendum), and `candidate` (the profile under test). The control arm exists because comparing a profile against an unconstrained baseline conflates the profile's content with the generic instruction to be brief; the honest delta is candidate versus control, and the artifact labels candidate-versus-baseline `conflated`. Every cost figure is a sum over concrete spend-ledger rows, referenced by the hash of their raw bytes, so a verifier holding the ledger can recompute every aggregate. A winner is declared only when both cost and quality are measured for both honest arms; a run missing either emits `incomparable`, never a partial winner. There is no automatic downgrade hidden inside this: the harness measures, the operator chooses.
@@ -208,7 +208,7 @@ None of these is a headline on its own. Together they are the difference between
 pipx install --upgrade bernstein     # or: pip install --upgrade bernstein
 ```
 
-That is the whole upgrade. 2.x configs and plans run unchanged - `bernstein run`, `bernstein conduct`, `bernstein dashboard` all behave as before. The new surfaces are opt-in: response-style profiles default to the previous behaviour until you set them, the A/B harnesses and template compression are commands you invoke deliberately, and proactive compaction plus the credential gate run inside tasks without changing their interface.
+That is the whole upgrade. 2.x configs and plans run unchanged - `bernstein run` behaves as before. The new surfaces are opt-in: response-style profiles default to the previous behaviour until you set them, the A/B harnesses and template compression are commands you invoke deliberately, and proactive compaction plus the credential gate run inside tasks without changing their interface.
 
 ```bash
 # read the bill by response-style profile
@@ -216,7 +216,7 @@ bernstein cost --by profile
 bernstein cost profile-report
 
 # measure a profile's cost against its quality before adopting it
-bernstein eval ab --suite suite.yaml --arm-b terse --arms 3
+bernstein eval ab --suite suite.yaml --arm-a baseline --arm-b terse --arms 3
 
 # check the fleet's pinned templates in CI
 bernstein team drift

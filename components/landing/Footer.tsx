@@ -16,7 +16,7 @@ export function Footer() {
         </div>
         <div className="footer-links">
           <div className="footer-col">
-            <h4>Product</h4>
+            <h3>Product</h3>
             <a
               href={withUtm('https://github.com/sipyourdrink-ltd/bernstein', {
                 source: 'bernstein.run',
@@ -79,7 +79,7 @@ export function Footer() {
             </a>
           </div>
           <div className="footer-col">
-            <h4>Resources</h4>
+            <h3>Resources</h3>
             <a href="/#ask" data-umami-event="click-ask-internal" data-umami-event-source="footer">Ask the docs</a>
             <a href="https://mcp.bernstein.run/verify" target="_blank" rel="noopener noreferrer" data-umami-event="click-verify-out" data-umami-event-source="footer">Verify a run receipt</a>
             {/* Was a top-level Nav entry before the nav was trimmed to
@@ -99,7 +99,7 @@ export function Footer() {
             <ReadTheCode surface="footer" />
           </div>
           <div className="footer-col">
-            <h4>Community</h4>
+            <h3>Community</h3>
             <a
               href={withUtm('https://github.com/sipyourdrink-ltd/bernstein/discussions', {
                 source: 'bernstein.run',
@@ -139,7 +139,7 @@ export function Footer() {
             <a href="/llms.txt" className="footer-llms-link" data-umami-event="click-llms" data-umami-event-source="footer">/llms.txt</a>
           </div>
           <div className="footer-col">
-            <h4>Legal &amp; meta</h4>
+            <h3>Legal &amp; meta</h3>
             <a href="/about" data-umami-event="click-about" data-umami-event-source="footer">About</a>
             <a href="mailto:forte@bernstein.run" data-umami-event="click-mailto" data-umami-event-source="footer">forte@bernstein.run</a>
             <a href="https://www.apache.org/licenses/LICENSE-2.0" data-umami-event="click-license-out" data-umami-event-source="footer">Apache 2.0</a>
@@ -149,7 +149,7 @@ export function Footer() {
             <a href="/humans.txt" data-umami-event="click-humans-txt" data-umami-event-source="footer">Humans</a>
           </div>
           <div className="footer-col">
-            <h4>Identity</h4>
+            <h3>Identity</h3>
             <a
               href="https://alexchernysh.com"
               target="_blank"

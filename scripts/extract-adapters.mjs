@@ -14,7 +14,7 @@
  *     local clone is the simplest deterministic input.
  *   - the operator owns the bernstein repo on the same machine; this
  *     script never reaches the network. CI runs `git clone` of the
- *     bernstein master branch into a sibling dir.
+ *     bernstein main branch into a sibling dir.
  *
  * The output JSON honours the `ready: true|false` flag per adapter so
  * the operator can ramp pages weekly per the brief — only `ready`
@@ -226,7 +226,7 @@ async function main() {
   } catch {
     const existing = await fs.access(OUT_FILE).then(() => true).catch(() => false);
     if (existing) {
-      // eslint-disable-next-line no-console
+       
       console.warn(
         `[adapters] bernstein repo missing at ${BERNSTEIN_REPO}; using committed data/adapters.json`,
       );
@@ -242,7 +242,8 @@ async function main() {
   const overlay = await loadOverlay();
   const adapters = [];
   for (const { name, cls } of reg) {
-    if (name === 'mock') continue;
+    /* mock is a test double and generic is a pseudo-adapter; neither is a catalogue entry. */
+    if (name === 'mock' || name === 'generic') continue;
     const file = await resolveAdapterFile(name, cls);
     if (!file) {
       console.warn(`[adapters] no source file resolved for ${name} (${cls})`);
@@ -276,6 +277,18 @@ async function main() {
       ready: ready.has(slug),
     });
   }
+  /* Profile-built adapters (declared in capability_profile.py, no module of
+     their own) are not in the _ADAPTERS dict; carry them over from the
+     committed file so regeneration does not drop them. */
+  try {
+    const prev = JSON.parse(await fs.readFile(OUT_FILE, 'utf8'));
+    const have = new Set(adapters.map((a) => a.slug));
+    for (const p of prev.adapters ?? []) {
+      if (p.sourceFile?.endsWith('capability_profile.py') && !have.has(p.slug)) adapters.push(p);
+    }
+  } catch {
+    /* no previous file */
+  }
   adapters.sort((a, b) => a.slug.localeCompare(b.slug));
 
   await fs.mkdir(path.dirname(OUT_FILE), { recursive: true });
@@ -292,14 +305,14 @@ async function main() {
   await fs.writeFile(OUT_FILE, JSON.stringify(out, null, 2), 'utf8');
 
   const readyCount = adapters.filter((a) => a.ready).length;
-  // eslint-disable-next-line no-console
+   
   console.log(
     `[adapters] wrote ${adapters.length} adapters (${readyCount} ready) to ${path.relative(ROOT, OUT_FILE)}`,
   );
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
+   
   console.error('[adapters] extract failed:', err);
   process.exit(1);
 });
