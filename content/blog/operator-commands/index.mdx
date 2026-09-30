@@ -9,7 +9,7 @@ howToSteps:
   - name: "bernstein chat serve --platform=telegram"
     text: "Start the chat bridge so the orchestrator runs as a Telegram bot; /run dispatches tasks, /approve gates destructive actions, /stop halts the session."
   - name: "bernstein approve-tool"
-    text: "Approve destructive actions mid-run from the TUI, dashboard, or a second terminal. Pass --always (or answer "always" at the prompt) to persist the pattern into always_allow."
+    text: "Approve destructive actions mid-run from the TUI, dashboard, or a second terminal. Pass --always (or answer always at the prompt) to persist the pattern into always_allow."
   - name: "bernstein tunnel start <port>"
     text: "Expose the dashboard or chat bridge over HTTPS; picks the first available provider (cloudflared, bore, ngrok, tailscale) and tracks tunnels in .sdd/runtime/tunnels.json."
   - name: "bernstein daemon install"
