@@ -240,8 +240,9 @@ export default async function CostPage() {
             <p>
               if you want to verify any of this on your own repo before
               you sponsor, install bernstein with{' '}
-              <code>pipx install bernstein</code> and check the cost
-              column in the run report after one parallel run. the
+              <code>pipx install bernstein</code> and run{' '}
+              <code>bernstein cost</code> after one parallel run to see
+              the spend breakdown by model and task. the
               numbers there are real, not heuristic.
             </p>
           </section>
@@ -275,13 +276,15 @@ export default async function CostPage() {
               <div className="cost-faq-item">
                 <h3>How does Bernstein decide which model to route a task to?</h3>
                 <p>
-                  Bernstein runs an epsilon-greedy contextual bandit over
-                  a per-task pass-rate history. Each task type (lint fix,
-                  test generation, refactor, architecture,
-                  tests-and-boilerplate) has its own arm. The bandit
-                  prefers the cheapest model whose recent pass rate on
-                  that task type is above a configurable threshold, and
-                  explores a more expensive model with probability epsilon.
+                  Bernstein runs a LinUCB contextual bandit over task
+                  outcomes. Each candidate model is an arm, and the task&apos;s
+                  features (complexity, scope, priority, task type,
+                  language, role) form the context. The reward is the
+                  quality score (1 when the janitor passes, 0 when it
+                  fails) multiplied by one minus the normalised cost, so
+                  cheap models that pass are favoured. Until it has
+                  enough completions, it uses the same static routing
+                  heuristics as the cascade router.
                 </p>
               </div>
               <div className="cost-faq-item">
@@ -291,8 +294,8 @@ export default async function CostPage() {
                   actual saving depends on how many tasks route to a
                   cheaper model (varies with task mix), how often the
                   cheaper model passes your tests (varies with test
-                  quality), and how aggressively you tune the bandit
-                  explore rate. The band is the lower and upper bounds of
+                  quality), and how far the bandit has moved past its
+                  cold-start heuristics. The band is the lower and upper bounds of
                   a heuristic that assumes routing kicks in 40-80% of the
                   time.
                 </p>
@@ -304,7 +307,7 @@ export default async function CostPage() {
                   calls the model APIs you configure with your own keys,
                   and writes state to disk you own. Sponsorship funds the
                   operator, not the routing logic. Routing decisions are
-                  deterministic Python in{' '}
+                  Python in{' '}
                   <code>src/bernstein/core/routing/bandit_router.py</code>, scheduled
                   from <code>src/bernstein/core/orchestration/</code>{' '}
                   - what model wins is a function of the bandit history,

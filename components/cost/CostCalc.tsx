@@ -140,7 +140,7 @@ export function CostCalc() {
         <p className="cost-calc-lede">
           enter your last month's spend on three of the bills bernstein
           users typically pay. the calculation below uses a documented
-          heuristic, hardcoded model prices, and shows every step so you
+          heuristic, the model prices listed below, and shows every step so you
           can audit it.
         </p>
       </header>
@@ -219,7 +219,7 @@ export function CostCalc() {
               href="#model-prices"
               className="cost-calc-tooltip"
               aria-label="see model price table"
-              title="see the dated model price table at the bottom of this page"
+              title="see the dated model price table further down this page"
             >
               [?]
             </a>
