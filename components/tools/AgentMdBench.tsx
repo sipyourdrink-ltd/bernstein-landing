@@ -270,7 +270,7 @@ export function AgentMdBench() {
         100% client-side. nothing leaves your browser.{' '}
         <a
           href={withUtm(
-            'https://github.com/sipyourdrink-ltd/bernstein/blob/main/src/bernstein/adapters',
+            'https://github.com/sipyourdrink-ltd/bernstein/tree/main/src/bernstein/adapters',
             {
               source: 'bernstein.run',
               medium: 'outbound-link',
@@ -282,7 +282,7 @@ export function AgentMdBench() {
           data-umami-event="outbound-github"
           data-umami-event-surface="agent-md-bench-disclaimer"
         >
-          parser rules sourced from the bernstein adapters
+          the bernstein adapters
         </a>
         .
       </p>
