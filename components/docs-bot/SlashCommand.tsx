@@ -14,9 +14,9 @@
  *     ref).
  *   - The URL gets `?ask=...` so the conversation is shareable.
  *
- * Note on `/docs/*`: the route doesn't exist yet in this codebase
- * - see ticket. We gate by `pathname` and ship the component as a
- * lazy import so the bundle on `/` doesn't pay for the modal's tree.
+ * Note on `/docs/*`: only `/docs/cli` exists in this codebase, and
+ * this component is not mounted by any route yet. We gate by
+ * `pathname` so it stays inert until it is mounted on a docs route.
  *
  * The modal uses the native `<dialog>` element. It's the closest the
  * platform comes to a focus-trapped modal without dragging in a

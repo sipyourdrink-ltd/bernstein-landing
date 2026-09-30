@@ -3,8 +3,8 @@
 /**
  * Client-only mount for DocsBot.
  *
- * Next 15 disallows `next/dynamic({ ssr: false })` from a Server
- * Component (where `app/page.tsx` and `app/ask/page.tsx` live). The
+ * Next.js disallows `next/dynamic({ ssr: false })` from a Server
+ * Component (where `app/page.tsx` lives). The
  * official upgrade path is to keep the dynamic-import call inside a
  * Client Component and have the Server Component import that wrapper.
  *
