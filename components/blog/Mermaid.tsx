@@ -49,7 +49,7 @@ export function Mermaid({ chart }: MermaidProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!ref.current || !chart) {
+    if (!chart) {
       return;
     }
 
