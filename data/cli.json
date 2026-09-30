@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "builtAt": "2026-08-10T14:15:56.936Z",
+  "builtAt": "2026-09-30T08:14:00.463Z",
   "source": "live",
   "root": {
     "usage": "bernstein [OPTIONS] COMMAND [ARGS]...",
-    "description": "Declarative agent orchestration for engineering teams. Deterministic Python scheduler for CLI coding agents — 51 adapters, parallel git worktrees, HMAC-SHA256 audit chain (RFC 2104).",
+    "description": "Declarative agent orchestration for engineering teams. Deterministic Python scheduler for CLI coding agents — 53 adapters, parallel git worktrees, HMAC-SHA256 audit chain (RFC 2104).",
     "flags": [
       {
         "spec": "--goal, -g",
@@ -644,7 +644,7 @@
           ],
           "primary": "--cli",
           "type": "",
-          "help": "[agy|aichat|aider|amp|antigravity|auggie|auto|autohand|charm|claude|cline|clm|codebuff|codex|cody|composio|computer_use|continue|copilot|cursor|devin_terminal|droid|forge|gemini|generic|goose|gptme|hermes|iac|junie|kilo|kimchi|kimi|kiro|letta_code|mistral|muse|ollama|open_interpreter|openai_agents|opencode|openhands|pi|plandex|pydantic_ai|python_runtime|q_dev|qwen|ralphex|rovo] Force specific CLI agent (overrides auto- detection and config file).",
+          "help": "[agy|aichat|aider|amp|antigravity|auggie|auto|autohand|charm|claude|cline|clm|codebuff|codex|cody|composio|computer_use|continue|copilot|cursor|devin_terminal|droid|forge|garak|gemini|generic|goose|gpt_researcher|gptme|hermes|holmesgpt|iac|junie|kilo|kimchi|kimi|kiro|letta_code|mistral|muse|ollama|open_interpreter|openai_agents|opencode|openhands|pi|plandex|pydantic_ai|python_runtime|q_dev|qwen|ralphex|rovo|skyvern|tongyi_deepresearch] Force specific CLI agent (overrides auto- detection and config file).",
           "default": null,
           "slug": "cli",
           "ready": true
@@ -947,6 +947,18 @@
           "help": "[read-only|builder|reviewer|custom] Per-tool permission profile (roadmap #1318). 'read-only' = review/explore agents only; 'builder' = write + shell on an allowlist; 'reviewer' = read + diff only; 'custom' = honour [permissions.custom] in bernstein.yaml/bernstein.toml. Off by default to preserve existing behaviour.",
           "default": null,
           "slug": "permission-profile",
+          "ready": true
+        },
+        {
+          "spec": "--wait",
+          "flags": [
+            "--wait"
+          ],
+          "primary": "--wait",
+          "type": "",
+          "help": "[SECONDS]                Block until the run reaches a terminal state and exit with its outcome, keeping the progress output. Takes an optional ceiling in seconds (default 3600); a fleet that allows a run longer than that has to say so. Without it a non-interactive run detaches once the first agent is up.",
+          "default": null,
+          "slug": "wait",
           "ready": true
         },
         {
@@ -1553,7 +1565,7 @@
       "name": "live",
       "summary": "interactive TUI dashboard (3 columns)",
       "usage": "bernstein live [OPTIONS]",
-      "description": "Live dashboard: active agents, task events, and stats (Ctrl+C to exit). Launches the 3-column interactive Textual TUI by default: Agents | Tasks | Activity feed + sparkline + chat input. Mouse + keyboard. Pass --classic for the simpler Rich Live display.",
+      "description": "Live dashboard: active agents, task events, and stats (Ctrl+C to exit). Launches the two-column interactive Textual TUI by default: Agents | Tasks, with a full-width activity feed + sparkline + chat input below. Mouse + keyboard. Pass --classic for the simpler Rich Live display.",
       "flags": [
         {
           "spec": "--interval",
@@ -1612,32 +1624,8 @@
       "name": "dashboard",
       "summary": "open web dashboard in browser",
       "usage": "bernstein dashboard [OPTIONS]",
-      "description": "Open the web dashboard in your browser. Requires the Bernstein server to be running. If it is not, prints instructions on how to start it.",
+      "description": "The legacy dashboard has been removed in favor of 'bernstein gui serve' (#4395).",
       "flags": [
-        {
-          "spec": "--port",
-          "flags": [
-            "--port"
-          ],
-          "primary": "--port",
-          "type": "INTEGER",
-          "help": "Server port.  [default: 8052]",
-          "default": "8052",
-          "slug": "port",
-          "ready": false
-        },
-        {
-          "spec": "--no-open",
-          "flags": [
-            "--no-open"
-          ],
-          "primary": "--no-open",
-          "type": "",
-          "help": "Do not open browser.",
-          "default": null,
-          "slug": "no-open",
-          "ready": false
-        },
         {
           "spec": "--help",
           "flags": [
@@ -1704,7 +1692,7 @@
           ],
           "primary": "--by",
           "type": "",
-          "help": "[agent|model|task|day|role|feature_label|envelope|profile] Group breakdown by agent, model, task, day, role, feature_label, envelope, or profile (issue #2245).",
+          "help": "[agent|model|task|day|role|feature_label|envelope|profile|principal|grant|authorizing_identity] Group breakdown by agent, model, task, day, role, feature_label, envelope, profile (issue #2245), principal, grant, or authorizing_identity (issue #4985).",
           "default": null,
           "slug": "by",
           "ready": false
@@ -1768,6 +1756,10 @@
           "help": "Predict the cost of a task before running it."
         },
         {
+          "name": "model-call",
+          "help": "Model call ledger operations: invoke with reuse, replay..."
+        },
+        {
           "name": "policy",
           "help": "Cost-aware scheduling: preflight pool caps, verify..."
         },
@@ -1815,7 +1807,7 @@
       "name": "trace",
       "summary": "step-by-step agent decision trace",
       "usage": "bernstein trace [OPTIONS] [COMMAND] [ARGS]...",
-      "description": "Inspect, serve, and verify local agent traces. bernstein trace <task-id>           Pretty-print a task trace (alias of show) bernstein trace show <task-id>      Pretty-print a task trace bernstein trace serve --port 8765   Run the local read-only viewer bernstein trace verify <trace-id>   Confirm on-disk bytes match sha256 bernstein trace reindex             Rebuild .sdd/traces/index.jsonl",
+      "description": "Inspect, serve, and verify local agent traces. bernstein trace <task-id>           Pretty-print a task trace (alias of show) bernstein trace show <task-id>      Pretty-print a task trace bernstein trace serve --port 8765   Run the local read-only viewer bernstein trace verify <trace-id>   Confirm on-disk bytes match sha256 bernstein trace follow <entity-id>  Every trace entry referencing one entity bernstein trace reindex             Rebuild .sdd/traces/index.jsonl",
       "flags": [
         {
           "spec": "--traces-dir",
@@ -1844,6 +1836,14 @@
       ],
       "subcommands": [
         {
+          "name": "export",
+          "help": "Export ``RUN_ID``'s execution evidence as a TRACE..."
+        },
+        {
+          "name": "follow",
+          "help": "Show every trace entry that references ENTITY_ID,..."
+        },
+        {
           "name": "project",
           "help": "Project ``RUN_ID``'s event journal into a signed..."
         },
@@ -1865,7 +1865,7 @@
         },
         {
           "name": "verify-projection",
-          "help": "Recompute span ids from ``RUN_ID``'s journal and..."
+          "help": "Verify ``RUN_ID``'s signed projection and..."
         }
       ],
       "slug": "trace",
@@ -1875,7 +1875,7 @@
       "name": "replay",
       "summary": "replay a saved trace deterministically",
       "usage": "bernstein replay [OPTIONS] RUN_ID...",
-      "description": "Replay a past orchestration run step-by-step. Reads .sdd/runs/{run_id}/journal.jsonl and displays events in a Rich table showing timing, event type, agent, task, and details. If run_id is \"latest\", replays the most recent run. Use \"list\" to show all available run IDs. Use ``diff`` to localise the first divergence between two recorded runs (events.jsonl). bernstein replay list                       # list available runs bernstein replay latest                     # replay most recent run bernstein replay 20240315-143022            # replay a specific run bernstein replay <RUN_ID> --verify          # recompute head, find divergence bernstein replay <RUN_ID> --from-step N     # rebuild state to step N bernstein replay diff RUN_A RUN_B           # first-divergence finder bernstein replay <AGENT_ID>                 # per-step journal view (#1799) bernstein replay export <AGENT_ID> -o RECEIPT   # portable receipt (#1799) bernstein replay publish <AGENT_ID> -o RECEIPT  # redacted publish (#1799) bernstein replay verify <RECEIPT>           # offline verifier (#1799) bernstein replay diff-journal A B           # per-step divergence finder bernstein replay debug <RUN>                # forensic single-chain walk (#2605) bernstein replay debug <LEFT> <RIGHT>       # two-run time-travel path diff bernstein replay debug <RUN> --fork-from N  # fork-and-reproduce at step N",
+      "description": "Replay a past orchestration run step-by-step. Reads .sdd/runs/{run_id}/journal.jsonl and displays events in a Rich table showing timing, event type, agent, task, and details. If run_id is \"latest\", replays the most recent run. Use \"list\" to show all available run IDs. Use ``diff`` to localise the first divergence between two recorded runs (events.jsonl). bernstein replay list                       # list available runs bernstein replay latest                     # replay most recent run bernstein replay 20240315-143022            # replay a specific run bernstein replay <RUN_ID> --verify          # recompute head, find divergence bernstein replay <RUN_ID> --re-derive       # re-derive coordination, compare heads bernstein replay <RUN_ID> --from-step N     # rebuild state to step N bernstein replay diff RUN_A RUN_B           # first-divergence finder bernstein replay <AGENT_ID>                 # per-step journal view (#1799) bernstein replay export <AGENT_ID> [OUT]                          # portable receipt (#1799) bernstein replay publish <AGENT_ID> [OUT] --yes-i-want-to-publish # redacted publish (#1799) bernstein replay verify <RECEIPT>           # offline verifier (#1799) bernstein replay diff-journal A B           # per-step divergence finder bernstein replay repair <RUN_ID>            # truncate a crash-torn tail (#3910) bernstein replay debug <RUN>                # forensic single-chain walk (#2605) bernstein replay debug <LEFT> <RIGHT>       # two-run time-travel path diff bernstein replay debug <RUN> --fork-from N  # fork-and-reproduce at step N",
       "flags": [
         {
           "spec": "--sdd-dir",
@@ -1959,6 +1959,30 @@
           "help": "Rebuild deterministic run state by walking the journal to step N.",
           "default": null,
           "slug": "from-step",
+          "ready": false
+        },
+        {
+          "spec": "--re-derive",
+          "flags": [
+            "--re-derive"
+          ],
+          "primary": "--re-derive",
+          "type": "",
+          "help": "Re-derive the coordination sequence from the recorded plan and outcomes and compare the re- derived head to the recorded one.",
+          "default": null,
+          "slug": "re-derive",
+          "ready": false
+        },
+        {
+          "spec": "--yes-i-want-to-publish",
+          "flags": [
+            "--yes-i-want-to-publish"
+          ],
+          "primary": "--yes-i-want-to-publish",
+          "type": "",
+          "help": "replay publish: confirm writing a redacted receipt outside .sdd/runtime/. Only valid with the 'publish' verb; any other verb rejects it.",
+          "default": null,
+          "slug": "yes-i-want-to-publish",
           "ready": false
         },
         {
@@ -2206,7 +2230,7 @@
         },
         {
           "name": "run",
-          "help": "Read evolve config from bernstein.yaml if CLI flags were not set."
+          "help": "Run the autoresearch evolution loop."
         },
         {
           "name": "status",
@@ -2395,6 +2419,10 @@
           "help": "Acknowledge tear evidence so verification and..."
         },
         {
+          "name": "anchor",
+          "help": "Anchor the newest checkpoint with an RFC 3161..."
+        },
+        {
           "name": "archive",
           "help": "Safely archive corrupt / pre-rotation audit chain..."
         },
@@ -2435,12 +2463,20 @@
           "help": "Write a deterministic subset of the audit log..."
         },
         {
+          "name": "suppress",
+          "help": "Suppress a finding until a given date by anchoring..."
+        },
+        {
           "name": "taint",
           "help": "Recompute the propagated-taint verdict for..."
         },
         {
           "name": "verify",
           "help": "Verify audit log integrity (HMAC chain per RFC 2104..."
+        },
+        {
+          "name": "verify-export",
+          "help": "Verify a SIEM export file is contiguous, in order,..."
         },
         {
           "name": "verify-gates",
@@ -2457,6 +2493,10 @@
         {
           "name": "verify-suspension",
           "help": "Prove a durable suspend/resume continuity offline..."
+        },
+        {
+          "name": "witness",
+          "help": "Co-sign checkpoints from a second party that..."
         }
       ],
       "slug": "audit",
@@ -2466,7 +2506,7 @@
       "name": "verify",
       "summary": "verify run integrity",
       "usage": "bernstein verify [OPTIONS] COMMAND [ARGS]...",
-      "description": "Verify run receipts, ladder receipts, WAL integrity, determinism, memory, or a wheelhouse. bernstein verify run <run-id>               Build the signed run receipt bernstein verify receipt <path>             Verify a receipt offline (0/1/2) bernstein verify ladder <receipt-hash>      Re-derive a verifier-ladder receipt (0/1/2) bernstein verify <wheelhouse-path>          Verify air-gap wheelhouse signatures bernstein verify --wal-integrity <run-id>   Validate hash chain bernstein verify --determinism  <run-id>    Show execution fingerprint bernstein verify --memory-audit             Audit lesson memory provenance bernstein verify --formal <task-id>         Run Z3/Lean4 property checks Flag and positional modes route to the ``legacy`` subcommand unchanged.",
+      "description": "Verify run receipts, ladder receipts, WAL integrity, determinism, memory, or a wheelhouse. bernstein verify run <run-id>               Build the signed run receipt bernstein verify receipt <path>             Verify a receipt offline (0/1/2) bernstein verify ladder <receipt-hash>      Re-derive a verifier-ladder receipt (0/1/2) bernstein verify pins --manifest ...        Check loaded set against pin manifest (0/1/2) bernstein verify coverage <head-sha>        Inspect merge receipt coverage (0/1/2) bernstein verify <wheelhouse-path>          Verify air-gap wheelhouse signatures bernstein verify --wal-integrity <run-id>   Validate hash chain bernstein verify --determinism  <run-id>    Show execution fingerprint bernstein verify --memory-audit             Audit lesson memory provenance bernstein verify --formal <task-id>         Run Z3/Lean4 property checks Flag and positional modes route to the ``legacy`` subcommand unchanged.",
       "flags": [
         {
           "spec": "--help",
@@ -2483,12 +2523,20 @@
       ],
       "subcommands": [
         {
+          "name": "coverage",
+          "help": "Inspect and verify structured coverage on a merge admission..."
+        },
+        {
           "name": "ladder",
           "help": "Re-derive and verify the verifier-ladder receipt RECEIPT_HASH."
         },
         {
           "name": "legacy",
           "help": "Verify WAL integrity, execution determinism, memory..."
+        },
+        {
+          "name": "pins",
+          "help": "Verify the loaded plugin/skill set against the pin manifest."
         },
         {
           "name": "receipt",
@@ -2546,7 +2594,7 @@
       "name": "pr",
       "summary": "open a GitHub PR for the current run",
       "usage": "bernstein pr [OPTIONS]",
-      "description": "Open a GitHub pull request from a completed Bernstein session. The command is safe to re-run: on ``--dry-run`` it never touches the network, and when ``gh`` is missing it exits with a helpful message instead of a traceback.",
+      "description": "Open a GitHub pull request from a completed Bernstein session. The title names the commit that changed the most under ``src/``, so a run that ends with a lint or formatting pass is still titled after the change it made; a run that left nothing but upkeep falls back to the linked issue's title. ``--title`` and ``--body`` override both. The command is safe to re-run: on ``--dry-run`` it touches the network only to read the issue named by ``--issue`` (nothing at all without it), and when ``gh`` is missing it exits with a helpful message instead of a traceback.",
       "flags": [
         {
           "spec": "--session-id",
@@ -2573,6 +2621,30 @@
           "ready": false
         },
         {
+          "spec": "--issue",
+          "flags": [
+            "--issue"
+          ],
+          "primary": "--issue",
+          "type": "",
+          "help": "N|URL      Link the PR to a GitHub issue: title it from the issue and open the body with `Closes #N`. Reads the issue, so",
+          "default": null,
+          "slug": "issue",
+          "ready": false
+        },
+        {
+          "spec": "--dry-run",
+          "flags": [
+            "--dry-run"
+          ],
+          "primary": "--dry-run",
+          "type": "",
+          "help": "makes that one request.",
+          "default": null,
+          "slug": "dry-run",
+          "ready": false
+        },
+        {
           "spec": "--title",
           "flags": [
             "--title"
@@ -2582,6 +2654,18 @@
           "help": "Override the auto-generated PR title.",
           "default": null,
           "slug": "title",
+          "ready": false
+        },
+        {
+          "spec": "--body",
+          "flags": [
+            "--body"
+          ],
+          "primary": "--body",
+          "type": "TEXT",
+          "help": "Override the auto-generated PR body. `Closes #N` is still prepended with --issue.",
+          "default": null,
+          "slug": "body",
           "ready": false
         },
         {
@@ -3166,6 +3250,10 @@
           "help": "Publish a fact under ``tag``/``key`` for other tasks to..."
         },
         {
+          "name": "show",
+          "help": "Print what a scope/namespace currently says, and where each..."
+        },
+        {
           "name": "verify",
           "help": "Prove a fact was written by the claimed actor and never edited."
         },
@@ -3646,8 +3734,8 @@
     {
       "name": "merge",
       "summary": "merge a run's branches into main",
-      "usage": "bernstein merge [OPTIONS]",
-      "description": "Pick the best agent solution and merge it. After comparing parallel branches with ``bernstein diff --compare``, use this command to merge the winning solution into the target branch. Examples: bernstein merge --pick backend-abc123           # merge agent's work bernstein merge --pick task-id-prefix           # resolve by task ID bernstein merge --pick agent1 --reject agent2   # merge one, delete other bernstein merge --pick agent1 --dry-run         # preview only",
+      "usage": "bernstein merge [OPTIONS] [COMMAND] [ARGS]...",
+      "description": "Merge management: pick best agent solution and verify merge admission receipts. bernstein merge pick   --pick <task-id>   # merge agent work into main bernstein merge verify --sha <sha>         # offline-verify merge receipt Back-compat: the options above also work directly on ``bernstein merge`` with no subcommand (``bernstein merge --base main --pick 2``), reaching the same code as ``bernstein merge pick``. Scripts written before ``pick`` and ``verify`` became subcommands keep working unchanged; new scripts should prefer ``bernstein merge pick`` explicitly.",
       "flags": [
         {
           "spec": "--pick",
@@ -3656,7 +3744,7 @@
           ],
           "primary": "--pick",
           "type": "AGENT",
-          "help": "Task ID or session ID of the agent whose solution to merge.  [required]",
+          "help": "Task ID or session ID of the agent whose solution to merge. Legacy form: passing this directly to `bernstein merge` (no subcommand) runs `merge pick`.",
           "default": null,
           "slug": "pick",
           "ready": false
@@ -3747,7 +3835,16 @@
           "ready": false
         }
       ],
-      "subcommands": [],
+      "subcommands": [
+        {
+          "name": "pick",
+          "help": "Pick the best agent solution and merge it."
+        },
+        {
+          "name": "verify",
+          "help": "Prove offline that a merge SHA carries a valid merge-admission..."
+        }
+      ],
       "slug": "merge",
       "ready": false
     },
@@ -4208,6 +4305,14 @@
           "help": "Evaluate compliance policies against the current runtime..."
         },
         {
+          "name": "coverage",
+          "help": "Report compliance coverage per control, per enabled framework."
+        },
+        {
+          "name": "decisions",
+          "help": "Report decision provenance for every approval-gated action."
+        },
+        {
           "name": "disable",
           "help": "Deactivate a compliance framework."
         },
@@ -4373,7 +4478,7 @@
       "subcommands": [
         {
           "name": "bulk-cost-report",
-          "help": "Run ``bernstein cost report`` against every matching..."
+          "help": "Run ``bernstein cost`` against every matching project."
         },
         {
           "name": "bulk-pause",
@@ -4606,6 +4711,10 @@
         {
           "name": "list",
           "help": "List bundled and user-installed workflow manifests."
+        },
+        {
+          "name": "resume",
+          "help": "Resume a previously killed or interrupted workflow run."
         },
         {
           "name": "run",
@@ -5197,6 +5306,10 @@
           "help": "Export the lineage chain for *run_id* as a regulator..."
         },
         {
+          "name": "export-prov",
+          "help": "Export ARTEFACT_PATH's ancestry as a PROV-O document..."
+        },
+        {
           "name": "forks",
           "help": "Report all unresolved forks in the lineage log."
         },
@@ -5209,6 +5322,10 @@
           "help": "Manually resolve a lineage fork via operator-chosen..."
         },
         {
+          "name": "plan",
+          "help": "Render RUN_ID's whole task graph from its journal."
+        },
+        {
           "name": "reindex",
           "help": "Rebuild by-artefact + tips projections from log.jsonl..."
         },
@@ -5219,6 +5336,10 @@
         {
           "name": "resolve",
           "help": "Resolve one unresolved fork using a named ``MergePolicy``."
+        },
+        {
+          "name": "sensitivity",
+          "help": "Report the effective data sensitivity of TARGET and why..."
         },
         {
           "name": "tracker-audit",
@@ -5368,7 +5489,7 @@
       "name": "cluster",
       "summary": "cluster lifecycle helpers (mTLS bootstrap)",
       "usage": "bernstein cluster [OPTIONS] COMMAND [ARGS]...",
-      "description": "Cluster lifecycle helpers. bernstein cluster bootstrap-ca   # generate self-signed CA + server/node certs",
+      "description": "Cluster lifecycle helpers. bernstein cluster bootstrap-ca      # generate self-signed CA + server/node certs bernstein cluster govern-inventory  # inventory workloads by their governance label",
       "flags": [
         {
           "spec": "--help",
@@ -5393,12 +5514,16 @@
           "help": "Read and verify the signed MESH claim journal."
         },
         {
+          "name": "govern-inventory",
+          "help": "Inventory cluster workloads by the governance label..."
+        },
+        {
           "name": "nodes",
           "help": "List registered cluster nodes with heartbeat age and..."
         },
         {
           "name": "status",
-          "help": "Show cluster topology: online/offline counts and the node..."
+          "help": "Show cluster topology: online/offline counts and the..."
         }
       ],
       "slug": "cluster",
@@ -5444,7 +5569,7 @@
       "name": "identity",
       "summary": "install-rev identity helpers",
       "usage": "bernstein identity [OPTIONS] COMMAND [ARGS]...",
-      "description": "Operator-side install-rev fingerprint helpers. The install-rev token is a 16-character base32 string embedded in artefacts the user voluntarily publishes (yaml configs, trace JSONL, role-prompt md footers).  No network egress, ever - operator-side discovery uses public GitHub code search (``gh search code 'bernstein-rev:'``). Examples: bernstein identity show bernstein identity decode c4j2k7n8p3q5r9s7 bernstein identity verify c4j2k7n8p3q5r9s7 \\ --nonce 0123456789abcdef0123 --version-major 1 bernstein identity disable",
+      "description": "Operator-side install-rev fingerprint helpers. The install-rev token is a 16-character base32 string embedded in artefacts the user voluntarily publishes (yaml configs, trace JSONL, role-prompt md footers).  No network egress, ever - operator-side discovery uses public GitHub code search (``gh search code 'bernstein-rev:'``). Examples: bernstein identity show bernstein identity decode c4j2k7n8p3q5r9s7 bernstein identity verify c4j2k7n8p3q5r9s7 \\ --nonce 0123456789abcdef0123 --version-major 1 bernstein identity disable bernstein identity attest show --run r-1234 \\ --signing-key-path key.pem bernstein identity agents --json bernstein identity review --since 2026-01-01",
       "flags": [
         {
           "spec": "--help",
@@ -5461,6 +5586,14 @@
       ],
       "subcommands": [
         {
+          "name": "agents",
+          "help": "List the agent principals the audit chain establishes."
+        },
+        {
+          "name": "attest",
+          "help": "Project and verify a run's attestation receipt."
+        },
+        {
           "name": "decode",
           "help": "Confirm a token came from a real install (shape + sentinel..."
         },
@@ -5471,6 +5604,10 @@
         {
           "name": "keydir",
           "help": "Print the install-identity key directory (JWKS) as JSON."
+        },
+        {
+          "name": "review",
+          "help": "Derive a signed per-principal access review from the identity..."
         },
         {
           "name": "show",
@@ -5969,7 +6106,7 @@
       "name": "undo",
       "summary": "undo the last run's merge",
       "usage": "bernstein undo [OPTIONS] [TASK_ID]",
-      "description": "Revert changes made by an agent. bernstein undo task-123    # revert changes from a specific task bernstein undo --all       # revert all changes in current session",
+      "description": "Revert changes made by an agent. bernstein undo task-123              # revert changes from a specific task bernstein undo task-123 --dry-run    # show what that task changed, change nothing bernstein undo --all                 # revert all changes in current session",
       "flags": [
         {
           "spec": "--all",
@@ -5994,6 +6131,18 @@
           "help": "Skip confirmation prompt.",
           "default": null,
           "slug": "yes",
+          "ready": false
+        },
+        {
+          "spec": "--dry-run",
+          "flags": [
+            "--dry-run"
+          ],
+          "primary": "--dry-run",
+          "type": "",
+          "help": "Print the paths the task changed and exit without touching the tree.",
+          "default": null,
+          "slug": "dry-run",
           "ready": false
         },
         {
@@ -6110,7 +6259,7 @@
           ],
           "primary": "--adapter",
           "type": "",
-          "help": "[agy|aichat|aider|amp|antigravity|auggie|auto|autohand|charm|claude|cline|clm|codebuff|codex|cody|composio|computer_use|continue|copilot|cursor|devin_terminal|droid|forge|gemini|generic|goose|gptme|hermes|iac|junie|kilo|kimchi|kimi|kiro|letta_code|mistral|muse|ollama|open_interpreter|openai_agents|opencode|openhands|pi|plandex|pydantic_ai|python_runtime|q_dev|qwen|ralphex|rovo] CLI agent adapter (default: auto-detect).",
+          "help": "[agy|aichat|aider|amp|antigravity|auggie|auto|autohand|charm|claude|cline|clm|codebuff|codex|cody|composio|computer_use|continue|copilot|cursor|devin_terminal|droid|forge|garak|gemini|generic|goose|gpt_researcher|gptme|hermes|holmesgpt|iac|junie|kilo|kimchi|kimi|kiro|letta_code|mistral|muse|ollama|open_interpreter|openai_agents|opencode|openhands|pi|plandex|pydantic_ai|python_runtime|q_dev|qwen|ralphex|rovo|skyvern|tongyi_deepresearch] CLI agent adapter (default: auto-detect).",
           "default": null,
           "slug": "adapter",
           "ready": false
