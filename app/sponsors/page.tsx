@@ -117,7 +117,7 @@ const TIER_LADDER = [
 ] as const;
 
 /** Build the per-tier GitHub Sponsors deep link. GH Sponsors honours
- *  ``?frequency=monthly|one-time`` and ``?amount=N`` so a click on the
+ *  ``?frequency=recurring|one-time`` and ``?amount=N`` so a click on the
  *  $100 row preselects that tier rather than dropping the visitor on
  *  the generic landing page with nothing filled in. */
 function tierHref(tier: (typeof TIER_LADDER)[number]): string {
@@ -197,8 +197,8 @@ export default async function SponsorsPage() {
               HMAC-chained audit log for parallel CLI coding agents. every
               scheduling decision is plain python, every agent action is
               tamper-evidently logged. the audit chain maps cleanly to EU AI
-              Act Article 12 automatic event-logging and DORA Article 8-15
-              ICT-incident-reporting evidence.
+              Act Article 12 automatic event-logging and DORA Article 9(3)
+              ICT-record-integrity evidence.
             </p>
             <p>
               {realCount === 0
