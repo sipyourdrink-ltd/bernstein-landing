@@ -35,7 +35,7 @@ summary_modes:
         central queue.
       - >-
         provides a tui interface to monitor progress and handles failures by
-        rolling back and logging to dead letter json.
+        rolling back and logging to the dead-letter queue (.sdd/runtime/dlq.jsonl).
     whyItMatters: >-
       it enables developers to quickly set up and manage multi-agent coding
       workflows with clear visibility and error handling.
@@ -44,12 +44,12 @@ summary_modes:
     items:
       - >-
         bernstein auto-detects installed cli agents and requires at least one,
-        such as claude code, on path. eighteen adapters are included by default,
+        such as claude code, on path. 40+ adapters ship in the box,
         with detection handled at runtime.
       - >-
         goals are decomposed into tasks, each assigned a role and model, then
         executed in isolated worktrees. completed tasks merge through a central
-        queue, while failures are logged to .sdd/dead_letter.json.
+        queue, while failures are logged to .sdd/runtime/dlq.jsonl.
       - >-
         the tui displays task status as ✓ merged, ► running, or ○ waiting, with
         q for graceful shutdown and ctrl+c for immediate termination. heartbeats
@@ -65,7 +65,7 @@ summary_modes:
 
 ## summary
 
-this is the hands-on quickstart for bernstein: `pip install bernstein`, point it at Claude Code (or any of the 18 auto-detected adapters), run `bernstein run --goal "<task>"`, and read the TUI that shows task status, agent count, and a live cost ticker. goals get decomposed into tasks, each task gets a role and a model, agents spawn into isolated worktrees, and completed work merges back through the queue. failed tasks roll back into `.sdd/dead_letter.json`. the post also shows the `bernstein cost` output and explains YAML plan files for multi-stage projects.
+this is the hands-on quickstart for bernstein: `pip install bernstein`, point it at Claude Code (or any of the 40+ auto-detected adapters), run `bernstein run --goal "<task>"`, and read the TUI that shows task status, agent count, and a live cost ticker. goals get decomposed into tasks, each task gets a role and a model, agents spawn into isolated worktrees, and completed work merges back through the queue. failed tasks roll back into `.sdd/runtime/dlq.jsonl`. the post also shows the `bernstein cost` output and explains YAML plan files for multi-stage projects.
 
 ## key takeaways
 
