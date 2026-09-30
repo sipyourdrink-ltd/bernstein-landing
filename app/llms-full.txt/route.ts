@@ -106,7 +106,7 @@ bernstein run plans/my-project.yaml
 
 ### Core Sub-packages
 
-The system is organized into 22 sub-packages under \`src/bernstein/core/\`:
+The system is organized into sub-packages under \`src/bernstein/core/\`:
 
 #### Orchestration (\`orchestration/\`)
 - Orchestrator lifecycle management
@@ -326,10 +326,10 @@ Initialize a project (\`.sdd/\` + \`bernstein.yaml\`); \`--wizard\` runs the int
 ### Operator commands
 
 - \`bernstein pr\` - generate a pull request from the current worktree, with a janitor-cleaned diff and a cost-summary body.
-- \`bernstein from-ticket <id>\` - materialize a run directly from a tracker ticket (GitHub, Linear, Jira) as the goal.
-- \`bernstein ticket\` - create, list, and sync orchestration tickets against the configured tracker backend.
+- \`bernstein from-ticket <url>\` - import a task from a tracker ticket URL (GitHub, Linear, Jira); \`--run\` starts a run on it immediately.
+- \`bernstein ticket\` - ticket utilities: \`import\` (alias for \`from-ticket\`) and \`validate\` for SDD ticket files.
 - \`bernstein remote run <host> <path>\` - dispatch a run on a remote host over SSH with ControlMaster socket reuse for fast repeats.
-- \`bernstein hooks\` - register and run lifecycle hooks (pre/post for run, task, merge - six slots total).
+- \`bernstein hooks\` - inspect and exercise lifecycle hooks (\`list\`, \`check\`, \`run\`, \`dry-run\`); events include pre/post task, merge, spawn, and archive.
 - \`bernstein chat serve --platform=telegram\` - run a chat bot (Telegram, Discord, Slack, Teams) that accepts /run, /status, /approve, /reject, /switch, /stop from a thread.
 - \`bernstein approve-tool\` - interactively approve a pending tool-call via TUI, web, or CLI.
 - \`bernstein reject-tool\` - reject a pending tool-call from the same three surfaces.
@@ -449,42 +449,13 @@ stages:
 Bernstein has 150+ configurable parameters. Key ones:
 
 ### Environment Variables
-- \`BERNSTEIN_MAX_AGENTS\`: Maximum concurrent agents (default: 5)
-- \`BERNSTEIN_DEFAULT_MODEL\`: Default model for tasks
-- \`BERNSTEIN_BUDGET_LIMIT\`: Maximum cost per run in USD
-- \`BERNSTEIN_QUALITY_GATES\`: Comma-separated list of quality gates to run
+- \`BERNSTEIN_MAX_AGENTS\`: Maximum parallel agents (same as \`--max-agents\`)
+- \`BERNSTEIN_AUDIT=1\`: Enable the opt-in HMAC-chained audit log
 
-### Configuration File (\`.sdd/config.yaml\`)
-\`\`\`yaml
-orchestration:
-  max_agents: 5
-  tick_interval: 10
-  drain_timeout: 300
-
-routing:
-  strategy: contextual_bandit
-  epsilon: 0.1
-  default_model: sonnet
-
-quality:
-  gates:
-    - lint
-    - typecheck
-    - test
-    - security
-  retry_on_failure: true
-  max_retries: 2
-  escalate_model_on_retry: true
-
-cost:
-  budget_limit: 50.00
-  alert_threshold: 0.8
-  track_per_agent: true
-
-git:
-  worktree_base: .worktrees
-  auto_merge: true
-  merge_strategy: squash
+### Project configuration
+\`bernstein init\` creates \`bernstein.yaml\` (project config) and \`.sdd/config.yaml\`. Cost is capped per run with \`--budget N\` (USD, 0 = unlimited):
+\`\`\`bash
+bernstein --budget 5 -g "your goal here"
 \`\`\`
 
 ---
@@ -544,10 +515,10 @@ Bernstein tracks costs at multiple levels:
 ### Prometheus Metrics
 Bernstein exports metrics to Prometheus:
 - \`bernstein_tasks_total\` (counter, labels: status, role)
-- \`bernstein_agents_active\` (gauge)
-- \`bernstein_cost_usd\` (counter, labels: model, agent)
-- \`bernstein_quality_gate_results\` (counter, labels: gate, result)
-- \`bernstein_tick_duration_seconds\` (histogram)
+- \`bernstein_agents_active\` (gauge, labels: role)
+- \`bernstein_cost_usd_total\` (counter, labels: adapter)
+- \`bernstein_cost_usd_by_model_total\` (counter, labels: model, adapter)
+- \`bernstein_task_duration_seconds\` (histogram, labels: status, role)
 
 ### OpenTelemetry
 Full distributed tracing support via OpenTelemetry:
@@ -618,7 +589,7 @@ Bernstein can run agents on Cloudflare's edge network:
 - **Vectorize Cache**: Semantic caching for LLM responses with embedding similarity
 - **Browser Rendering**: Headless browser bridge for scraping and screenshots
 - **MCP Remote Transport**: Expose Bernstein as an MCP server over HTTP
-- **Cloud CLI**: \`bernstein cloud init/deploy/run/status/cost\` commands
+- **Cloud CLI**: \`bernstein cloud init/login/run/runs/status/cost\` commands
 
 ## FAQ
 
@@ -653,7 +624,7 @@ Yes. YAML plan files let you define stages with dependencies, and steps with rol
 Yes. Bernstein can run as an MCP (Model Context Protocol) server, exposing its orchestration capabilities as tools that other MCP-compatible systems can invoke.
 
 ### Does Bernstein work with the OpenAI Agents SDK?
-Yes. The \`openai_agents\` adapter embeds OpenAI's Agents SDK v2 as a first-class runtime. Each task runs in an Agents SDK session against the Responses API, so you get OpenAI's tool-calling, handoffs, and guardrails inside Bernstein's orchestrator without shelling out to a CLI. Install with \`pip install "bernstein[openai-agents]"\`.
+Yes. The \`openai_agents\` adapter embeds OpenAI's Agents SDK v2 as a first-class runtime. Each task runs in an Agents SDK session against the Responses API, so you get OpenAI's tool-calling, handoffs, and guardrails inside Bernstein's orchestrator without shelling out to a CLI. Install with \`pip install "bernstein[openai]"\`.
 
 ### What sandbox backends does Bernstein support?
 Bernstein exposes a \`SandboxBackend\` protocol. The default backend is a git worktree on the local machine. You can swap in Docker, E2B, Modal, Blaxel, Cloudflare Workers sandboxes, Daytona, Runloop, or Vercel sandboxes by setting \`sandbox.backend\` in \`bernstein.yaml\` and installing the matching extra (for example \`pip install "bernstein[e2b]"\`). The orchestrator and adapters do not change.
