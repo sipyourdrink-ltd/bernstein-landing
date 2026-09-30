@@ -118,7 +118,7 @@ Honest mistake worth naming. The shipped wheel had `errors.bernstein.run` baked 
 
 ## observability under one umbrella
 
-`bernstein doctor observe` runs each per-backend probe (Sonar, GlitchTip, Dependency-Track, GitHub Code Scanning) in order and renders one Rich table with metric, value, delta-since-last-check, threshold, and status. `--json` and `--watch`. Each backend soft-fails to SKIPPED when its env vars are unset, so a fresh checkout stays green. A per-PR sticky summary comment and a daily trends snapshot ride on the same JSON. Per-backend `bernstein doctor sonar` and `bernstein doctor glitchtip` ship behind the same umbrella for the operators who want one signal at a time.
+`bernstein doctor observe` runs each per-backend probe in order (GitHub Code Scanning today) and renders one Rich table with metric, value, delta-since-last-check, threshold, and status. `--json` and `--watch`. Each backend soft-fails to SKIPPED when its env vars are unset, so a fresh checkout stays green. A per-PR sticky summary comment and a daily trends snapshot ride on the same JSON. `bernstein doctor code-scanning` reports the Code Scanning signal on its own.
 
 ## the smaller things
 
@@ -161,15 +161,15 @@ bernstein gui serve                             # web UI at http://127.0.0.1:805
 bernstein gui serve --tunnel                    # public URL + QR + bearer + diceware
 bernstein desktop-register --host cursor        # register as a plugin in another host
 bernstein doctor --substrate                    # which hosts have us registered
-bernstein doctor observe                        # one umbrella table over four backends
+bernstein doctor observe                        # one umbrella table over the observability backends
 
 # routing and replay
-bernstein simulate --plan plan.yaml             # digital-twin a routing decision
+bernstein simulate plan.yaml                    # digital-twin a plan
 bernstein plan dag                              # render the declarative task DAG
 bernstein run --max-cost-usd 5                  # per-run hard cap
 
 # trackers and lineage
-bernstein trackers                              # plugin index for tracker adapters
+bernstein trackers list                         # tracker adapters the orchestrator knows about
 bernstein lineage gate                          # required check; fails on unresolved forks
 bernstein compliance pack \
   --since 2026-04-01 --until 2026-05-19 \
@@ -178,7 +178,7 @@ pipx install bernstein-verify
 bernstein-verify pack pack.zip                  # zero-trust verification
 
 # AI-BOM
-bernstein bom emit --format cyclonedx-1.5 > sbom.json
+bernstein bom emit --run <run-id> --format cyclonedx > sbom.json
 bernstein bom verify sbom.json
 ```
 
