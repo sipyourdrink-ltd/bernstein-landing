@@ -14,7 +14,7 @@
  *     local clone is the simplest deterministic input.
  *   - the operator owns the bernstein repo on the same machine; this
  *     script never reaches the network. CI runs `git clone` of the
- *     bernstein master branch into a sibling dir.
+ *     bernstein main branch into a sibling dir.
  *
  * The output JSON honours the `ready: true|false` flag per adapter so
  * the operator can ramp pages weekly per the brief — only `ready`
@@ -226,7 +226,7 @@ async function main() {
   } catch {
     const existing = await fs.access(OUT_FILE).then(() => true).catch(() => false);
     if (existing) {
-      // eslint-disable-next-line no-console
+       
       console.warn(
         `[adapters] bernstein repo missing at ${BERNSTEIN_REPO}; using committed data/adapters.json`,
       );
@@ -292,14 +292,14 @@ async function main() {
   await fs.writeFile(OUT_FILE, JSON.stringify(out, null, 2), 'utf8');
 
   const readyCount = adapters.filter((a) => a.ready).length;
-  // eslint-disable-next-line no-console
+   
   console.log(
     `[adapters] wrote ${adapters.length} adapters (${readyCount} ready) to ${path.relative(ROOT, OUT_FILE)}`,
   );
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
+   
   console.error('[adapters] extract failed:', err);
   process.exit(1);
 });

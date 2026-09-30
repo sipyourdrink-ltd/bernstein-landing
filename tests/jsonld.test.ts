@@ -150,7 +150,7 @@ function extractObjectLiteral(source: string, name: string): string | null {
 function evalSiteOrgLiteral(literal: string): unknown {
   const argNames = Object.keys(SITE_ORG_WIRES) as Array<keyof typeof SITE_ORG_WIRES>;
   const argValues = argNames.map((k) => SITE_ORG_WIRES[k]);
-  // eslint-disable-next-line @typescript-eslint/no-implied-eval
+   
   const fn = new Function(...argNames, `return ${literal};`);
   return fn(...argValues);
 }

@@ -206,7 +206,7 @@ function parseClickHelp(body) {
 }
 
 function stripAnsi(s) {
-  /* eslint-disable-next-line no-control-regex */
+   
   return s.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
 }
 
@@ -264,7 +264,7 @@ function normalizeDeep(value) {
  * without `bernstein` on PATH, which is most of them.
  */
 async function normalizeCommitted(reason) {
-  // eslint-disable-next-line no-console
+   
   console.warn(`[cli] ${reason}`);
   let raw;
   try {
@@ -278,13 +278,13 @@ async function normalizeCommitted(reason) {
        re-normalisation pass produces a value diff and nothing else. */
     next = JSON.stringify(normalizeDeep(JSON.parse(raw)), null, 2);
   } catch (e) {
-    // eslint-disable-next-line no-console
+     
     console.warn('[cli] committed catalogue is not parseable JSON:', e?.message ?? e);
     return;
   }
   if (next === raw) return;
   await fs.writeFile(OUT_FILE, next, 'utf8');
-  // eslint-disable-next-line no-console
+   
   console.log('[cli] normalised absolute home paths in committed data/cli.json');
 }
 
@@ -340,7 +340,7 @@ async function main() {
       await normalizeCommitted('SKIP_CLI_EXTRACT=1; using committed data/cli.json');
       return;
     }
-    // eslint-disable-next-line no-console
+     
     console.warn('[cli] SKIP_CLI_EXTRACT=1 but data/cli.json is missing; extracting');
   }
 
@@ -412,20 +412,20 @@ async function main() {
     (acc, c) => acc + c.flags.filter((f) => f.ready).length,
     0,
   );
-  // eslint-disable-next-line no-console
+   
   console.log(
     `[cli] wrote ${commands.length} commands (${totalFlags} flags total) to ${path.relative(ROOT, OUT_FILE)}; ready: ${readyCmds} cmds, ${readyFlags} flag pages [source: ${out.source}]`,
   );
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
+   
   console.error('[cli] extract failed:', err);
   /* Same defensive fall-back as extract-adapters.mjs: when the sibling
      bernstein checkout / `bernstein --help` are unavailable, the static
      bundle ships fine from the committed data/cli.json. */
   if (/ENOENT|spawn .* ENOENT|not found|Command failed/.test(String(err && err.message))) {
-    // eslint-disable-next-line no-console
+     
     console.warn('[cli] bernstein binary absent - using committed data/cli.json');
     process.exit(0);
   }

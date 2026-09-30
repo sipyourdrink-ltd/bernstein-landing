@@ -105,7 +105,7 @@ export function BetaNotice() {
           innerHTML on client-side navigation do not execute; the
           useEffect above covers that path. */}
       <script
-        // eslint-disable-next-line react/no-danger -- hardcoded constant
+         
         // from beta-notice-data.ts; not user input.
         dangerouslySetInnerHTML={{ __html: BETA_NOTICE_HIDE_SCRIPT }}
       />

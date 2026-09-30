@@ -106,9 +106,11 @@ export function CostCalc() {
     }, 1000);
   };
 
-  const onChange =
-    (setter: (v: number) => void, which: 'claude' | 'codex' | 'cursor') =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: (v: number) => void,
+    which: 'claude' | 'codex' | 'cursor',
+  ) => {
       const parsed = Number(e.target.value);
       const next = Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
       setter(next);
@@ -162,7 +164,7 @@ export function CostCalc() {
                 max={100000}
                 step={10}
                 value={claude}
-                onChange={onChange(setClaude, 'claude')}
+                onChange={(e) => handleChange(e, setClaude, 'claude')}
                 aria-label="claude monthly spend in usd"
               />
             </div>
@@ -182,7 +184,7 @@ export function CostCalc() {
                 max={100000}
                 step={10}
                 value={codex}
-                onChange={onChange(setCodex, 'codex')}
+                onChange={(e) => handleChange(e, setCodex, 'codex')}
                 aria-label="codex or openai monthly spend in usd"
               />
             </div>
@@ -202,7 +204,7 @@ export function CostCalc() {
                 max={100000}
                 step={10}
                 value={cursor}
-                onChange={onChange(setCursor, 'cursor')}
+                onChange={(e) => handleChange(e, setCursor, 'cursor')}
                 aria-label="cursor monthly spend in usd"
               />
             </div>

@@ -184,7 +184,7 @@ export async function submitUrls(
       });
       const ok = res.status === 200 || res.status === 202;
       if (!ok) {
-        // eslint-disable-next-line no-console
+         
         console.warn(
           `[indexnow] ${endpoint} returned ${res.status} ${res.statusText} for ${onHost.length} url(s)`,
         );
@@ -192,7 +192,7 @@ export async function submitUrls(
       results.push({ endpoint, status: res.status, ok });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      // eslint-disable-next-line no-console
+       
       console.warn(`[indexnow] ${endpoint} request failed: ${message}`);
       results.push({ endpoint, status: 0, ok: false, error: message });
     }

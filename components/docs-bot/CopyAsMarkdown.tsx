@@ -8,7 +8,7 @@
  * the citations clickable:
  *
  *   `tasks live in `.sdd/` directories [1]…`
- *   `[1]: https://bernstein.run/blog/state-files`
+ *   `[1]: https://bernstein.run/blog/getting-started`
  *
  * Click handler is small and avoids importing `clipboard-polyfill` -
  * `navigator.clipboard.writeText` is universally available on the
