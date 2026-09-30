@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "builtAt": "2026-09-30T08:07:36.119Z",
+  "builtAt": "2026-09-30T18:52:45.860Z",
   "bernsteinRepoPath": "(env)",
   "adapters": [
     {
@@ -526,27 +526,6 @@
       "ready": true
     },
     {
-      "slug": "generic",
-      "name": "generic",
-      "cls": "GenericAdapter",
-      "displayName": "Generic",
-      "docstring": "Generic CLI adapter for arbitrary coding agent CLIs.",
-      "install": "",
-      "verified": null,
-      "category": "cli-family",
-      "sourceFile": "src/bernstein/adapters/generic.py",
-      "license": null,
-      "auth": null,
-      "parallelSafe": null,
-      "mcpSupport": null,
-      "auditChain": false,
-      "homepage": null,
-      "summary": null,
-      "whenToChoose": null,
-      "whenToChooseBernstein": null,
-      "ready": false
-    },
-    {
       "slug": "goose",
       "name": "goose",
       "cls": "GooseAdapter",
@@ -985,6 +964,27 @@
       "verified": null,
       "category": "cli-family",
       "sourceFile": "src/bernstein/adapters/plandex.py",
+      "license": null,
+      "auth": null,
+      "parallelSafe": null,
+      "mcpSupport": null,
+      "auditChain": false,
+      "homepage": null,
+      "summary": null,
+      "whenToChoose": null,
+      "whenToChooseBernstein": null,
+      "ready": false
+    },
+    {
+      "slug": "pydantic-ai",
+      "name": "pydantic_ai",
+      "cls": null,
+      "displayName": "Pydantic AI",
+      "docstring": "Pydantic AI (``clai``) capability profile.\n\nNo hand-written module: the agent is tracked as a declarative capability profile.",
+      "install": null,
+      "verified": null,
+      "category": "cli-family",
+      "sourceFile": "src/bernstein/adapters/capability_profile.py",
       "license": null,
       "auth": null,
       "parallelSafe": null,

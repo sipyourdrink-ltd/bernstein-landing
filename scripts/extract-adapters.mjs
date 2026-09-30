@@ -242,7 +242,8 @@ async function main() {
   const overlay = await loadOverlay();
   const adapters = [];
   for (const { name, cls } of reg) {
-    if (name === 'mock') continue;
+    /* mock is a test double and generic is a pseudo-adapter; neither is a catalogue entry. */
+    if (name === 'mock' || name === 'generic') continue;
     const file = await resolveAdapterFile(name, cls);
     if (!file) {
       console.warn(`[adapters] no source file resolved for ${name} (${cls})`);
@@ -275,6 +276,18 @@ async function main() {
       whenToChooseBernstein: ov.whenToChooseBernstein ?? null,
       ready: ready.has(slug),
     });
+  }
+  /* Profile-built adapters (declared in capability_profile.py, no module of
+     their own) are not in the _ADAPTERS dict; carry them over from the
+     committed file so regeneration does not drop them. */
+  try {
+    const prev = JSON.parse(await fs.readFile(OUT_FILE, 'utf8'));
+    const have = new Set(adapters.map((a) => a.slug));
+    for (const p of prev.adapters ?? []) {
+      if (p.sourceFile?.endsWith('capability_profile.py') && !have.has(p.slug)) adapters.push(p);
+    }
+  } catch {
+    /* no previous file */
   }
   adapters.sort((a, b) => a.slug.localeCompare(b.slug));
 
