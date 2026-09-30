@@ -44,7 +44,7 @@ This is the single round-up for the whole arc, so the trajectory from 2.0 to 3.5
 
 Before 3.0, lineage was a set of optional per-subsystem logs. Useful, but you had to opt in, and the pieces did not join up into one thing you could verify start to finish.
 
-3.0 collapsed them into a single Ed25519-signed spine. Every step that produces an artefact folds into one chain, and `bernstein lineage verify <run_id>` walks the whole thing. The matching change is the one that pays off most often: deterministic replay is now on by default. The step journal is a Merkle chain where each entry hashes its predecessor, the inputs, the model, the prompt, the tool call, and the tool result. `bernstein replay --from-step N` rebuilds state by walking it.
+3.0 collapsed them into a single Ed25519-signed spine. Every step that produces an artefact folds into one chain, and `bernstein lineage verify <run_id>` walks the whole thing. The matching change is the one that pays off most often: deterministic replay is now on by default. The step journal is a Merkle chain where each entry hashes its predecessor, the inputs, the model, the prompt, the tool call, and the tool result. `bernstein replay <run_id> --from-step N` rebuilds state by walking it.
 
 The reason that matters is not archival. It changes how non-determinism shows up. Two runs from the same seed, plan, and state are compared by hash, so a run that drifts is a hash divergence at an exact position, not a flaky test you rerun until it passes. The coordinator has no model in its scheduling loop, which is what makes the property hold: given the same inputs, it schedules the byte-identical task graph. If yours does not, the chain tells you which step broke the tie.
 
@@ -76,7 +76,7 @@ Cost-aware scheduling is the same idea applied to dispatch. Each decision is a `
 
 The web UI shipped in 2.0 as a minimal demo. The 3.x line gave it the two things a demo does not have: access control and a way to review a finished run without reading raw JSONL.
 
-The dashboard is no longer all-or-nothing. Operators issue scoped credentials with `bernstein dashboard-token`, read-only or operator scope, and every allow or deny is a governance journal receipt, so an access review can reconstruct who reached which surface under which credential. Token grants and revocations are signed journal rows; a tampered grant fails signature verification and counts as no grant.
+The dashboard is no longer all-or-nothing. Operators issue scoped credentials with `bernstein auth dashboard-token`, viewer (read-only) or operator scope, and every allow or deny is a governance journal receipt, so an access review can reconstruct who reached which surface under which credential. Token grants and revocations are signed journal rows; a tampered grant fails signature verification and counts as no grant.
 
 The run review board is the surface I reach for most. It is a deterministic projection of the run journal into a web view, so the same journal always renders the same board, with no hand-maintained status anywhere. 3.4 added a diff viewer and an evidence panel, so a reviewer sees the run diff and the sealed evidence behind each step in one place, and approvals and rejections are `review_board.action` receipts joined back to the journal. On the adapter side, a nightly conformance canary now probes every primary adapter against whatever upstream version is installed and seals each probe as a content-addressed receipt; a last-green table names the newest version each adapter passed with, and `bernstein doctor` warns when your installed version is newer than the last one that was attested. The `agy` adapter joined the matrix under the same contract in 3.3.
 
@@ -140,22 +140,22 @@ pipx install --upgrade bernstein     # or: uv tool upgrade bernstein
 
 # the record
 bernstein lineage verify <run_id>               # walk the signed spine
-bernstein replay --from-step 12                 # rebuild state from the Merkle chain
+bernstein replay <run_id> --from-step 12       # rebuild state from the Merkle chain
 bernstein evidence show <task>                  # render the sealed evidence bundle
 bernstein audit verify                          # covers chain + bundle integrity
 
 # runs that survive
-bernstein run-service submit --goal "…"         # detach and reattach later
-bernstein ledger resume                         # re-dispatch only unfinished tasks
+bernstein run-service submit "…" --task t1    # detach and reattach later
+bernstein ledger resume <run_id>               # re-dispatch only unfinished tasks
 bernstein doctor --failover-drill               # rehearse provider outages
 
 # scheduling that shows its work
-bernstein tournament verify <run>               # recompute the winner offline
-bernstein plan compile --spec spec.md           # draft, approve, model-free compile
+bernstein tournament verify <task>              # recompute the winner offline
+bernstein plan compile spec.md                  # draft, approve, model-free compile
 
 # surfaces and identity
-bernstein dashboard-token issue --scope read    # scoped dashboard credential
-bernstein spiffe id                             # derive the SPIFFE id offline
+bernstein auth dashboard-token issue --principal alice --scope viewer  # scoped dashboard credential
+bernstein spiffe id --install-key install.pub --agent backend-1 --trust-domain example.org  # derive the SPIFFE id offline
 ```
 
 Container: `ghcr.io/sipyourdrink-ltd/bernstein:3.5.0`.
