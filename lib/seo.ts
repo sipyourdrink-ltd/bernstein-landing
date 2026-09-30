@@ -160,7 +160,7 @@ Cloud artifact sinks, progressive skill packs, and Cloudflare cloud execution ar
 
 Canonical runnable examples for the four primitives an AI assistant needs to reason about Bernstein. Each bullet points at the stand-alone answer page; the same example is inlined underneath.
 
-- [Adapter (claude_code)](${SITE_URL}/q/how-to-add-a-cli-adapter): Declaring a CLI agent in bernstein.yaml - name, adapter, role, model
+- [Adapter (claude_code)](${SITE_URL}/q/how-to-add-a-cli-adapter): Routing a role to a CLI agent in bernstein.yaml - cli, model, effort
 - [plan.yaml](${SITE_URL}/q/how-to-write-a-bernstein-plan-yaml): Plan-file shape - stages, depends_on, per-step role and complexity
 - [MCP server](${SITE_URL}/q/mcp-server-for-multi-agent-coding): Running Bernstein as an MCP server over stdio or HTTP, and the tool tiers
 - [Worktree isolation](${SITE_URL}/q/git-worktree-parallel-ai-agents): One git worktree per task; the merge queue serializes results once the gates pass
@@ -168,12 +168,12 @@ Canonical runnable examples for the four primitives an AI assistant needs to rea
 ### Adapter (claude_code)
 
 \`\`\`yaml
-# .sdd/bernstein.yaml
-agents:
-  - name: claude_code
-    adapter: claude
-    role: backend
+# bernstein.yaml
+role_model_policy:
+  backend:
+    cli: claude
     model: sonnet
+    effort: high
 \`\`\`
 
 ### plan.yaml
