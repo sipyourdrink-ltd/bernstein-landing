@@ -18,8 +18,8 @@ summary_modes:
         bernstein's monolithic orchestrator was split into 22 focused
         sub-packages, each under 600 lines.
       - >-
-        eighteen adapters landed, expanding tool support from seven to eighteen
-        in one month.
+        sixteen adapters were registered by the end of the month, up from seven
+        at v1.0.0.
     whyItMatters: >-
       the project became more maintainable and widely usable through
       community-driven growth.
@@ -30,8 +30,8 @@ summary_modes:
         the orchestrator was decomposed into 22 smaller packages to improve
         maintainability and reduce complexity.
       - >-
-        eighteen adapters were added, expanding integration support for various
-        agent platforms and tools.
+        the adapter list grew from seven to sixteen (plus a generic fallback),
+        expanding integration support for various agent platforms and tools.
       - >-
         cost-aware routing was implemented, cutting internal cloud spending by
         approximately half.
@@ -48,8 +48,8 @@ summary_modes:
         the orchestrator was decomposed into 22 sub-packages, each under 600
         lines, down from a single 4,198-line module.
       - >-
-        eighteen adapters were added, averaging ~200 lines each, expanding from
-        the initial seven to support diverse agent backends.
+        the adapter list grew from seven to sixteen (plus a generic fallback),
+        averaging ~200 lines each, to support diverse agent backends.
       - >-
         the bandit-based cost-aware router reduced cloud spend by approximately
         50 percent during internal execution runs.
@@ -63,12 +63,12 @@ summary_modes:
 
 ## summary
 
-april 2026 was bernstein's first full month as a public project - the span between v1.0.0 and v1.8.8. a handful of contributors shipped work that made the release: the 4,198-line orchestrator broken into 22 sub-packages, the adapter list grown from 7 to 18, the epsilon-greedy bandit router that halved per-session costs, the Cloudflare cloud execution backend, and genuine Windows support with correct env passthrough, Unicode handling, and process management. seven contributors are named; all are in `CONTRIBUTORS.md`.
+april 2026 was bernstein's first full month as a public project - the span between v1.0.0 and v1.8.8. a handful of contributors shipped work that made the release: the 4,198-line orchestrator broken into 22 sub-packages, the adapter list grown from 7 to 16 (plus a generic fallback), the epsilon-greedy bandit router that halved per-session costs, the Cloudflare cloud execution backend, and genuine Windows support with correct env passthrough, Unicode handling, and process management. seven contributors are named; all are in `CONTRIBUTORS.md`.
 
 ## key takeaways
 
 - [@oldschoola](https://github.com/oldschoola) landed Windows compatibility across 3 PRs, plus codex config, task filtering, and auto-PR.
-- adapter count grew from 7 to 18 in one month; each adapter is roughly 200 lines.
+- registered adapters grew from 7 to 16 in one month; each adapter is roughly 200 lines.
 - bandit router cut spend roughly in half on internal self-development runs.
 - the project is Apache 2.0 with no CLA; contributor entry points are good-first-issues, adapter adoption, and benchmark submissions.
 

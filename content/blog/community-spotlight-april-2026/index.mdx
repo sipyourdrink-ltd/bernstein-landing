@@ -13,7 +13,7 @@ First time doing one of these. April was the first full month after going public
 ## what landed
 
 - **Architecture decomposition.** The 4,198-line orchestrator broken into 22 focused sub-packages, each under 600 lines. Story is in [the decomposition post](/blog/module-decomposition).
-- **Eighteen adapters.** Started at seven, ended the month at eighteen: Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, Cloudflare Agents, IaC, generic. ~200 lines apiece.
+- **Sixteen adapters.** Started at seven, ended the month at sixteen (plus the generic fallback): Claude Code, Codex, Gemini CLI, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, Cloudflare Agents, IaC. ~200 lines apiece.
 - **Cost-aware routing.** [Bandit router](/blog/cost-aware-routing) cut spend roughly in half on internal runs.
 - **Cloud execution.** [Cloudflare backend](/blog/cloudflare-cloud-execution): Workers, Durable Workflows, R2, D1.
 - **Windows support.** Real Windows, not a footnote: env passthrough, Unicode, process management, terminal handling. Done by [@oldschoola](https://github.com/oldschoola).
@@ -37,6 +37,6 @@ Everyone's in [CONTRIBUTORS.md](https://github.com/sipyourdrink-ltd/bernstein/bl
 Apache 2.0, no CLA. If you want something to do:
 
 - [Good first issues](https://github.com/sipyourdrink-ltd/bernstein/labels/good%20first%20issue)
-- [Write a post](https://github.com/sipyourdrink-ltd/bernstein/issues/786) - gets published here
-- [Adopt an adapter](https://github.com/sipyourdrink-ltd/bernstein/issues/775) - be the maintainer for your favourite agent
+- [Write a post](https://github.com/sipyourdrink-ltd/bernstein-landing) - gets published here
+- [Adopt an adapter](https://github.com/sipyourdrink-ltd/bernstein/issues?q=is%3Aopen+is%3Aissue+label%3Aadapter) - be the maintainer for your favourite agent
 - [Submit benchmarks](https://github.com/sipyourdrink-ltd/bernstein/issues/787)

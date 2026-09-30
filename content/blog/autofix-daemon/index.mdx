@@ -10,7 +10,7 @@ techDependencies:
   - "GitHub CLI (gh) on PATH for log retrieval and PR labelling"
   - "A bernstein-autofix label on every PR you want the daemon to touch (per-PR opt-in)"
   - "A repo-level cost cap (cost_cap_usd, default $5) set before enabling the daemon"
-  - "OpenSSH-style worktree access on the host running the daemon"
+  - "A checkout of the repository on the host running the daemon (the daemon keeps its state under .sdd/ in the working directory)"
 ---
 
 <Lead>
@@ -27,36 +27,36 @@ Boring red is the ideal autofix workload. The agent already has the diff, the lo
 
 `bernstein autofix start` runs a daemon ticking every `poll_interval_seconds` (default 60s). Each tick:
 
-1. Calls a `FailingPRSource` for Bernstein-opened PRs whose head commit has a red CI run.
+1. Calls a `FailingPRSource` for Bernstein-opened PRs (carrying a `bernstein-session-id` trailer) whose head commit has a red CI run.
 2. For each candidate, fetches the failing log via `gh run view --log-failed`, head-truncated to `log_byte_budget` bytes (default 64KB, enough for a full pytest traceback and small enough to keep prompt budgets predictable).
-3. Runs the log through a keyword classifier that buckets the failure (`lint`, `type`, `test`, `dependency`, `build`, `unknown`) and picks a bandit arm with model and effort tuned for that bucket.
+3. Runs the log through a keyword classifier that buckets the failure (`security`, `flaky`, or `config`; anything unmatched falls back to `config`) and picks a bandit arm (`opus`, `sonnet`, or `haiku`) with an effort level tuned for that bucket.
 4. Synthesises a goal that includes the run id, the classifier verdict, and the truncated log. Hands it to a `DispatchHook` that runs the agent against the PR's worktree.
 5. If the hook returns success and a non-empty commit SHA, records the attempt in the audit chain. If it doesn't, records the failure and lets the next tick try again, up to a hard cap.
 
-Both `FailingPRSource` and `DispatchHook` are protocols, not hardwired implementations. The daemon owns lifecycle, cost accounting, audit chain, safety rails; you supply the two ends. v1.9.0 ships the rails-and-state half; the network-backed source and default GitHub-aware dispatch hook land in a follow-up. Operators who want to drive the daemon today can install their own hooks via the Python API.
+Both `FailingPRSource` and `DispatchHook` are protocols, not hardwired implementations. The daemon owns lifecycle, cost accounting, audit chain, safety rails; you supply the two ends. The CLI ships the rails-and-state half; the network-backed source and default dispatch hook have not landed yet. Operators who want to drive the daemon today can install their own hooks via the Python API.
 
 ## the rails
 
 Self-healing CI is one bad heuristic away from a 3am runaway that burns through your API budget pushing wrong commits onto a release branch. Five rails ship, none optional:
 
-**Per-PR opt-in label.** A PR is invisible to the daemon unless it carries `bernstein-autofix` (configurable per repo). Removing the label stops further attempts immediately.
+**Per-PR opt-in label.** A PR is invisible to the daemon unless it carries `bernstein-autofix` (configurable per repo). Removing the label aborts in-flight attempts within one tick.
 
-**Per-repo cost cap.** `cost_cap_usd` (default $5) is checked before every dispatch. The dispatcher refuses to invoke the bandit router for a repo over budget; the budget resets on a configurable window. A misbehaving classifier cannot drain an account.
+**Per-repo cost cap.** `cost_cap_usd` (default $5, per attempt; `0` disables it) is handed to the dispatch hook, and an attempt whose reported spend exceeds the cap is aborted, recorded as `cost_capped`, and explained in a PR comment.
 
-**Hard attempt budget per push SHA.** `MAX_ATTEMPTS_PER_PUSH = 3`. Three failed attempts against the same commit and the dispatcher labels the PR `needs-human`, posts a summary comment with the attempt history, and stops touching the PR until a human pushes a new commit or removes the escalation label. No retry-forever path.
+**Hard attempt budget per push SHA.** `MAX_ATTEMPTS_PER_PUSH = 3`. Three failed attempts against the same commit and the dispatcher labels the PR `needs-human`, posts a summary comment with the attempt history, and stops touching the PR until a human pushes a new commit. No retry-forever path.
 
-**Force-push off by default.** `allow_force_push = false`. The dispatcher pushes a fix commit on top of the PR branch - never overwrites the operator's history. Force-push is per-repo, opt-in, audited separately.
+**Force-push off by default.** `allow_force_push = false`. The dispatcher pushes a fix commit on top of the PR branch - never overwrites the operator's history. Force-push is a per-repo opt-in.
 
-**HMAC-chained audit log.** Every dispatch decision - every label add, every comment posted, every attempt outcome - is appended to `.sdd/audit/` in an HMAC-chained JSONL. The chain detects tampering and gives a complete reconstruction of the daemon's behaviour after the fact. If autofix did something surprising, the audit log explains why.
+**HMAC-chained audit log.** Every attempt is recorded as a start event and an end event (outcome, commit SHA, cost) in an HMAC-chained JSONL under `.sdd/audit/`. The chain detects tampering and lets you reconstruct what the daemon decided after the fact. If autofix did something surprising, the audit log explains why.
 
 ## the operator surface
 
-The daemon writes pid, status, and recent attempts into `.sdd/runtime/autofix/`. Three commands cover the workflow:
+The daemon writes its pid to `.sdd/runtime/autofix.pid` and recent attempts to `.sdd/runtime/autofix.jsonl`. Four commands cover the workflow (`start`, `stop`, `status`, `attach`). The two you will use most:
 
 ```bash
 bernstein autofix status
 # autofix daemon: running (pid=84219)
-# last tick:      Sun Apr 27 14:08:01 2026
+# last tick:      Mon Apr 27 14:08:01 2026
 #
 # Recent attempts (newest first):
 #   sipyourdrink-ltd/bernstein#960  attempt=1  outcome=success  classifier=lint  cost=$0.0214
@@ -75,7 +75,7 @@ bernstein autofix attach
 
 ## what it doesn't do
 
-Mechanical fixes only. No refactoring. No merging. No new tests, no schema changes, no files outside the failing run's blast radius. No bypassing branch protection or required reviews. Every fix commit goes through the same review pipeline as anything else. If the failure is "this entire feature is wrong," the classifier hits `unknown`, the bandit picks a conservative single attempt, and the daemon lands on `needs-human` after one try.
+Built for mechanical fixes. The goal it hands the agent is the failing run id, the classifier verdict and the truncated log, nothing broader. The daemon never merges, and it cannot bypass branch protection or required reviews. Every fix commit goes through the same review pipeline as anything else. If the failure is "this entire feature is wrong," nothing in the log matches a known signal, the classifier falls back to `config` (the cheapest arm, never `opus`), and the daemon lands on `needs-human` once the three attempts on that commit are spent.
 
 A patch on top of your review process. Branch protection still rules.
 
@@ -93,4 +93,4 @@ bernstein autofix start --foreground --once
 # autofix daemon completed after 1 tick(s).
 ```
 
-Run it under `bernstein daemon install` to keep it up across reboots. Pair with `bernstein chat serve` if you want the `needs-human` escalations in your Telegram thread. The [operator-commands post](/blog/operator-commands) covers the chat bridge and daemon installer; this one closes the loop. The [operator pack](/blog/operator-pack) is the broader collection that the chat bridge and the daemon both plug into.
+Run it under `bernstein daemon install --command 'bernstein autofix start --foreground'` to keep it up across reboots. Pair with `bernstein chat serve` if you also want to drive runs from a Telegram thread. The [operator-commands post](/blog/operator-commands) covers the chat bridge and daemon installer; this one closes the loop. The [operator pack](/blog/operator-pack) is the broader collection that the chat bridge and the daemon both plug into.
