@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "builtAt": "2026-09-30T08:14:00.463Z",
+  "builtAt": "2026-09-30T08:52:52.960Z",
   "source": "live",
   "root": {
     "usage": "bernstein [OPTIONS] COMMAND [ARGS]...",
@@ -621,7 +621,7 @@
           "primary": "--cells",
           "type": "INTEGER",
           "help": "Number of parallel orchestration cells (1 = single-cell, >1 = MultiCellOrchestrator). [default: 1]",
-          "default": null,
+          "default": "1",
           "slug": "cells",
           "ready": true
         },
@@ -643,8 +643,8 @@
             "--cli"
           ],
           "primary": "--cli",
-          "type": "",
-          "help": "[agy|aichat|aider|amp|antigravity|auggie|auto|autohand|charm|claude|cline|clm|codebuff|codex|cody|composio|computer_use|continue|copilot|cursor|devin_terminal|droid|forge|garak|gemini|generic|goose|gpt_researcher|gptme|hermes|holmesgpt|iac|junie|kilo|kimchi|kimi|kiro|letta_code|mistral|muse|ollama|open_interpreter|openai_agents|opencode|openhands|pi|plandex|pydantic_ai|python_runtime|q_dev|qwen|ralphex|rovo|skyvern|tongyi_deepresearch] Force specific CLI agent (overrides auto- detection and config file).",
+          "type": "[agy|aichat|aider|amp|antigravity|auggie|auto|autohand|charm|claude|cline|clm|codebuff|codex|cody|composio|computer_use|continue|copilot|cursor|devin_terminal|droid|forge|garak|gemini|generic|goose|gpt_researcher|gptme|hermes|holmesgpt|iac|junie|kilo|kimchi|kimi|kiro|letta_code|mistral|muse|ollama|open_interpreter|openai_agents|opencode|openhands|pi|plandex|pydantic_ai|python_runtime|q_dev|qwen|ralphex|rovo|skyvern|tongyi_deepresearch]",
+          "help": "Force specific CLI agent (overrides auto- detection and config file).",
           "default": null,
           "slug": "cli",
           "ready": true
@@ -667,8 +667,8 @@
             "--workflow"
           ],
           "primary": "--workflow",
-          "type": "",
-          "help": "[governed]           Activate a governed workflow mode (deterministic phase-based execution).",
+          "type": "[governed]",
+          "help": "Activate a governed workflow mode (deterministic phase-based execution).",
           "default": null,
           "slug": "workflow",
           "ready": true
@@ -679,8 +679,8 @@
             "--routing"
           ],
           "primary": "--routing",
-          "type": "",
-          "help": "[static|bandit|bandit-shadow] Model routing strategy: 'static' = fixed cascade heuristics (default), 'bandit' = contextual LinUCB bandit that learns cost- quality tradeoffs, 'bandit-shadow' = log bandit decisions without changing live routing.",
+          "type": "[static|bandit|bandit-shadow]",
+          "help": "Model routing strategy: 'static' = fixed cascade heuristics (default), 'bandit' = contextual LinUCB bandit that learns cost- quality tradeoffs, 'bandit-shadow' = log bandit decisions without changing live routing.",
           "default": null,
           "slug": "routing",
           "ready": true
@@ -691,20 +691,21 @@
             "--compliance"
           ],
           "primary": "--compliance",
-          "type": "",
-          "help": "[development|standard|regulated] Compliance preset: 'development' = audit + WAL + AI labels, 'standard' = + HMAC chain + governed workflow + approval gates, 'regulated' = + signed WAL + data residency + SBOM + evidence bundle.",
+          "type": "[development|standard|regulated]",
+          "help": "Compliance preset: 'development' = audit + WAL + AI labels, 'standard' = + HMAC chain + governed workflow + approval gates, 'regulated' = + signed WAL + data residency + SBOM + evidence bundle.",
           "default": null,
           "slug": "compliance",
           "ready": true
         },
         {
-          "spec": "--container",
+          "spec": "--container / --no-container",
           "flags": [
-            "--container"
+            "--container",
+            "--no-container"
           ],
           "primary": "--container",
           "type": "",
-          "help": "/ --no-container    Run agents inside containers for kernel- level isolation (requires Docker or Podman).",
+          "help": "Run agents inside containers for kernel- level isolation (requires Docker or Podman).",
           "default": null,
           "slug": "container",
           "ready": true
@@ -727,8 +728,8 @@
             "--sandbox"
           ],
           "primary": "--sandbox",
-          "type": "",
-          "help": "[docker|podman|worktree|e2b|modal|daytona|blaxel|runloop|vercel|microvm] Sandbox backend for agent isolation. Free: worktree, docker, podman. Paid (require --allow-paid): e2b, modal, daytona, blaxel, runloop, vercel. Overrides the selector's deterministic precedence; pass nothing to let the selector pick the cheapest backend that satisfies the manifest.",
+          "type": "[docker|podman|worktree|e2b|modal|daytona|blaxel|runloop|vercel|microvm]",
+          "help": "Sandbox backend for agent isolation. Free: worktree, docker, podman. Paid (require --allow-paid): e2b, modal, daytona, blaxel, runloop, vercel. Overrides the selector's deterministic precedence; pass nothing to let the selector pick the cheapest backend that satisfies the manifest.",
           "default": null,
           "slug": "sandbox",
           "ready": true
@@ -746,13 +747,14 @@
           "ready": true
         },
         {
-          "spec": "--two-phase-sandbox",
+          "spec": "--two-phase-sandbox / --no-two-phase-sandbox",
           "flags": [
-            "--two-phase-sandbox"
+            "--two-phase-sandbox",
+            "--no-two-phase-sandbox"
           ],
           "primary": "--two-phase-sandbox",
           "type": "",
-          "help": "/ --no-two-phase-sandbox Codex-style two-phase sandboxed execution: Phase 1 installs dependencies with network access, Phase 2 runs the agent with the network fully disabled. Requires --container.",
+          "help": "Codex-style two-phase sandboxed execution: Phase 1 installs dependencies with network access, Phase 2 runs the agent with the network fully disabled. Requires --container.",
           "default": null,
           "slug": "two-phase-sandbox",
           "ready": true
@@ -884,19 +886,7 @@
           ],
           "primary": "--idle",
           "type": "",
-          "help": "GUI-dev mode: force every adapter to ``mock`` and have each spawned agent sleep for $BERNSTEIN_MOCK_IDLE_MIN_S..MAX_S seconds (defaults: min=15, max=120) instead of calling an LLM. Zero token spend - used to populate the web GUI with live state.",
-          "default": null,
-          "slug": "idle",
-          "ready": true
-        },
-        {
-          "spec": "--idle",
-          "flags": [
-            "--idle"
-          ],
-          "primary": "--idle",
-          "type": "",
-          "help": "forces the mock backend internally (it exports BERNSTEIN_ADAPTER=mock), so no bernstein.yaml edit is needed. Mutually exclusive with --dry-run.",
+          "help": "GUI-dev mode: force every adapter to ``mock`` and have each spawned agent sleep for $BERNSTEIN_MOCK_IDLE_MIN_S..MAX_S seconds (defaults: min=15, max=120) instead of calling an LLM. Zero token spend - used to populate the web GUI with live state. --idle forces the mock backend internally (it exports BERNSTEIN_ADAPTER=mock), so no bernstein.yaml edit is needed. Mutually exclusive with --dry-run.",
           "default": null,
           "slug": "idle",
           "ready": true
@@ -919,8 +909,8 @@
             "--profile"
           ],
           "primary": "--profile",
-          "type": "",
-          "help": "[airgap|sovereign]    Run profile. 'airgap' = no network egress by default, MCP catalog disabled, memo store pinned to .sdd/runtime/memo/. 'sovereign' = airgap network posture plus a signed, chain- anchored residency posture (local storage, offline catalog, strict EU residency, certified endpoints) that refuses spawns on drift. Combine with --allow-network to open specific destinations.",
+          "type": "[airgap|sovereign]",
+          "help": "Run profile. 'airgap' = no network egress by default, MCP catalog disabled, memo store pinned to .sdd/runtime/memo/. 'sovereign' = airgap network posture plus a signed, chain- anchored residency posture (local storage, offline catalog, strict EU residency, certified endpoints) that refuses spawns on drift. Combine with --allow-network to open specific destinations.",
           "default": null,
           "slug": "profile",
           "ready": true
@@ -931,8 +921,8 @@
             "--allow-network"
           ],
           "primary": "--allow-network",
-          "type": "",
-          "help": "HOST|CIDR|HOST:PORT|none|any Allow-list outbound network destinations. May be repeated. Use 'none' for explicit deny-all (the --profile airgap default), 'any' to opt out of the gate (legacy default).",
+          "type": "HOST|CIDR|HOST:PORT|none|any",
+          "help": "Allow-list outbound network destinations. May be repeated. Use 'none' for explicit deny-all (the --profile airgap default), 'any' to opt out of the gate (legacy default).",
           "default": null,
           "slug": "allow-network",
           "ready": true
@@ -943,8 +933,8 @@
             "--permission-profile"
           ],
           "primary": "--permission-profile",
-          "type": "",
-          "help": "[read-only|builder|reviewer|custom] Per-tool permission profile (roadmap #1318). 'read-only' = review/explore agents only; 'builder' = write + shell on an allowlist; 'reviewer' = read + diff only; 'custom' = honour [permissions.custom] in bernstein.yaml/bernstein.toml. Off by default to preserve existing behaviour.",
+          "type": "[read-only|builder|reviewer|custom]",
+          "help": "Per-tool permission profile (roadmap #1318). 'read-only' = review/explore agents only; 'builder' = write + shell on an allowlist; 'reviewer' = read + diff only; 'custom' = honour [permissions.custom] in bernstein.yaml/bernstein.toml. Off by default to preserve existing behaviour.",
           "default": null,
           "slug": "permission-profile",
           "ready": true
@@ -955,8 +945,8 @@
             "--wait"
           ],
           "primary": "--wait",
-          "type": "",
-          "help": "[SECONDS]                Block until the run reaches a terminal state and exit with its outcome, keeping the progress output. Takes an optional ceiling in seconds (default 3600); a fleet that allows a run longer than that has to say so. Without it a non-interactive run detaches once the first agent is up.",
+          "type": "[SECONDS]",
+          "help": "Block until the run reaches a terminal state and exit with its outcome, keeping the progress output. Takes an optional ceiling in seconds (default 3600); a fleet that allows a run longer than that has to say so. Without it a non-interactive run detaches once the first agent is up.",
           "default": null,
           "slug": "wait",
           "ready": true
@@ -1076,8 +1066,8 @@
             "--max-blast-radius"
           ],
           "primary": "--max-blast-radius",
-          "type": "FLOAT",
-          "help": "RANGE  Reversibility gate (#1322): refuse merges whose blast-radius score exceeds the supplied ceiling [0, 1]. Hard one-way changes (DROP/DELETE SQL, rm -rf, schema migrations, secrets writes) always score 1.0. Off by default; existing runs are unaffected.  [0.0<=x<=1.0]",
+          "type": "FLOAT RANGE",
+          "help": "Reversibility gate (#1322): refuse merges whose blast-radius score exceeds the supplied ceiling [0, 1]. Hard one-way changes (DROP/DELETE SQL, rm -rf, schema migrations, secrets writes) always score 1.0. Off by default; existing runs are unaffected.  [0.0<=x<=1.0]",
           "default": null,
           "slug": "max-blast-radius",
           "ready": true
@@ -1149,7 +1139,7 @@
           "primary": "--dir",
           "type": "TEXT",
           "help": "Directory to initialise (default: current directory).  [default: .]",
-          "default": null,
+          "default": ".",
           "slug": "dir",
           "ready": true
         },
@@ -1171,9 +1161,9 @@
             "--badge-variant"
           ],
           "primary": "--badge-variant",
-          "type": "",
-          "help": "[signed|audited-by|orchestrated-by|crew-managed-by] Badge variant when --add-badge is passed. [default: signed]",
-          "default": null,
+          "type": "[signed|audited-by|orchestrated-by|crew-managed-by]",
+          "help": "Badge variant when --add-badge is passed. [default: signed]",
+          "default": "signed",
           "slug": "badge-variant",
           "ready": true
         },
@@ -1315,8 +1305,8 @@
             "--mode"
           ],
           "primary": "--mode",
-          "type": "",
-          "help": "[novice|standard|expert] Dashboard detail level (novice, standard, expert). Default: persisted or standard.",
+          "type": "[novice|standard|expert]",
+          "help": "Dashboard detail level (novice, standard, expert). Default: persisted or standard.",
           "default": null,
           "slug": "mode",
           "ready": true
@@ -1483,7 +1473,7 @@
           "primary": "--endpoint-timeout",
           "type": "FLOAT",
           "help": "Per-probe response budget in seconds; exceeding it fails the probe.  [default: 60.0]",
-          "default": null,
+          "default": "60.0",
           "slug": "endpoint-timeout",
           "ready": true
         },
@@ -1657,7 +1647,7 @@
           "primary": "--metrics-dir",
           "type": "TEXT",
           "help": "Directory containing metrics JSONL files. [default: .sdd/metrics]",
-          "default": null,
+          "default": ".sdd/metrics",
           "slug": "metrics-dir",
           "ready": false
         },
@@ -1691,8 +1681,8 @@
             "--by"
           ],
           "primary": "--by",
-          "type": "",
-          "help": "[agent|model|task|day|role|feature_label|envelope|profile|principal|grant|authorizing_identity] Group breakdown by agent, model, task, day, role, feature_label, envelope, profile (issue #2245), principal, grant, or authorizing_identity (issue #4985).",
+          "type": "[agent|model|task|day|role|feature_label|envelope|profile|principal|grant|authorizing_identity]",
+          "help": "Group breakdown by agent, model, task, day, role, feature_label, envelope, profile (issue #2245), principal, grant, or authorizing_identity (issue #4985).",
           "default": null,
           "slug": "by",
           "ready": false
@@ -1705,7 +1695,7 @@
           "primary": "--ledger",
           "type": "TEXT",
           "help": "Path to the rolling spend ledger (issue #1320). Used when --by is role|feature_label|profile.  [default: .sdd/cost/ledger.jsonl]",
-          "default": null,
+          "default": ".sdd/cost/ledger.jsonl",
           "slug": "ledger",
           "ready": false
         },
@@ -2111,7 +2101,7 @@
           "primary": "--timeout",
           "type": "INTEGER",
           "help": "Soft-stop timeout in seconds (only used with --stop). [default: 30]",
-          "default": null,
+          "default": "30",
           "slug": "timeout",
           "ready": false
         },
@@ -2290,7 +2280,7 @@
           "primary": "--timeout",
           "type": "INTEGER",
           "help": "Maximum seconds to wait for tasks to complete.  [default: 120]",
-          "default": null,
+          "default": "120",
           "slug": "timeout",
           "ready": false
         },
@@ -2626,22 +2616,10 @@
             "--issue"
           ],
           "primary": "--issue",
-          "type": "",
-          "help": "N|URL      Link the PR to a GitHub issue: title it from the issue and open the body with `Closes #N`. Reads the issue, so",
+          "type": "N|URL",
+          "help": "Link the PR to a GitHub issue: title it from the issue and open the body with `Closes #N`. Reads the issue, so --dry-run makes that one request.",
           "default": null,
           "slug": "issue",
-          "ready": false
-        },
-        {
-          "spec": "--dry-run",
-          "flags": [
-            "--dry-run"
-          ],
-          "primary": "--dry-run",
-          "type": "",
-          "help": "makes that one request.",
-          "default": null,
-          "slug": "dry-run",
           "ready": false
         },
         {
@@ -2745,8 +2723,8 @@
             "--priority"
           ],
           "primary": "--priority",
-          "type": "",
-          "help": "[low|medium|high]  Override the task priority.",
+          "type": "[low|medium|high]",
+          "help": "Override the task priority.",
           "default": null,
           "slug": "priority",
           "ready": false
@@ -2956,8 +2934,8 @@
             "--backend"
           ],
           "primary": "--backend",
-          "type": "",
-          "help": "[keyring|file]  Vault backend (default: keyring; file requires --passphrase-env).",
+          "type": "[keyring|file]",
+          "help": "Vault backend (default: keyring; file requires --passphrase-env).",
           "default": null,
           "slug": "backend",
           "ready": false
@@ -3097,7 +3075,7 @@
           "primary": "--template",
           "type": "NAME",
           "help": "Template to use; 'auto' picks via keyword heuristic on PROMPT.  [default: auto]",
-          "default": null,
+          "default": "auto",
           "slug": "template",
           "ready": false
         },
@@ -3369,8 +3347,8 @@
             "--transport"
           ],
           "primary": "--transport",
-          "type": "",
-          "help": "[stdio|http]        Transport mechanism.  [default: stdio]",
+          "type": "[stdio|http]",
+          "help": "Transport mechanism.  [default: stdio]",
           "default": "stdio",
           "slug": "transport",
           "ready": false
@@ -3383,7 +3361,7 @@
           "primary": "--host",
           "type": "TEXT",
           "help": "Host for HTTP transport.  [default: 127.0.0.1]",
-          "default": null,
+          "default": "127.0.0.1",
           "slug": "host",
           "ready": false
         },
@@ -3407,7 +3385,7 @@
           "primary": "--server-url",
           "type": "TEXT",
           "help": "Bernstein server URL.  [default: http://localhost:8052]",
-          "default": null,
+          "default": "http://localhost:8052",
           "slug": "server-url",
           "ready": false
         },
@@ -3417,8 +3395,8 @@
             "--mcp-tier"
           ],
           "primary": "--mcp-tier",
-          "type": "",
-          "help": "[core|standard|all]  Tool tier to advertise (context-budget knob). Overrides BERNSTEIN_MCP_TOOL_TIER; defaults to 'standard'.",
+          "type": "[core|standard|all]",
+          "help": "Tool tier to advertise (context-budget knob). Overrides BERNSTEIN_MCP_TOOL_TIER; defaults to 'standard'.",
           "default": null,
           "slug": "mcp-tier",
           "ready": false
@@ -3686,7 +3664,7 @@
           "primary": "--fold-lines",
           "type": "INTEGER",
           "help": "Lines kept per hunk when --fold is set.  [default: 3]",
-          "default": null,
+          "default": "3",
           "slug": "fold-lines",
           "ready": false
         },
@@ -3708,8 +3686,8 @@
             "--compare"
           ],
           "primary": "--compare",
-          "type": "AGENT1",
-          "help": "AGENT2  Compare two agents side-by-side (task IDs or session IDs).",
+          "type": "AGENT1 AGENT2",
+          "help": "Compare two agents side-by-side (task IDs or session IDs).",
           "default": null,
           "slug": "compare",
           "ready": false
@@ -3879,13 +3857,14 @@
           "ready": false
         },
         {
-          "spec": "--save",
+          "spec": "--save / --no-save",
           "flags": [
-            "--save"
+            "--save",
+            "--no-save"
           ],
           "primary": "--save",
           "type": "",
-          "help": "/ --no-save  Also save the report to .sdd/reports/.",
+          "help": "Also save the report to .sdd/reports/.",
           "default": null,
           "slug": "save",
           "ready": false
@@ -3934,7 +3913,7 @@
           "primary": "--workdir",
           "type": "DIRECTORY",
           "help": "Project root containing .sdd/archive/tasks.jsonl. [default: .]",
-          "default": null,
+          "default": ".",
           "slug": "workdir",
           "ready": false
         },
@@ -3946,7 +3925,7 @@
           "primary": "--limit",
           "type": "INTEGER",
           "help": "Maximum number of matching tasks to show.  [default: 10]",
-          "default": null,
+          "default": "10",
           "slug": "limit",
           "ready": false
         },
@@ -3993,7 +3972,7 @@
           "primary": "--workdir",
           "type": "DIRECTORY",
           "help": "Project root containing .sdd/runtime and .sdd/worktrees.  [default: .]",
-          "default": null,
+          "default": ".",
           "slug": "workdir",
           "ready": false
         },
@@ -5657,8 +5636,8 @@
             "--format"
           ],
           "primary": "--format",
-          "type": "",
-          "help": "[console|markdown]  Output format.  [default: console]",
+          "type": "[console|markdown]",
+          "help": "Output format.  [default: console]",
           "default": "console",
           "slug": "format",
           "ready": false
@@ -5671,21 +5650,9 @@
           ],
           "primary": "--output",
           "type": "FILE",
-          "help": "Write Markdown output to this file (implies",
+          "help": "Write Markdown output to this file (implies --format markdown).",
           "default": null,
           "slug": "output",
-          "ready": false
-        },
-        {
-          "spec": "--format",
-          "flags": [
-            "--format"
-          ],
-          "primary": "--format",
-          "type": "",
-          "help": "markdown).",
-          "default": null,
-          "slug": "format",
           "ready": false
         },
         {
@@ -5794,8 +5761,8 @@
             "--format"
           ],
           "primary": "--format",
-          "type": "",
-          "help": "[console|markdown]  Output format.  [default: console]",
+          "type": "[console|markdown]",
+          "help": "Output format.  [default: console]",
           "default": "console",
           "slug": "format",
           "ready": false
@@ -5808,21 +5775,9 @@
           ],
           "primary": "--output",
           "type": "FILE",
-          "help": "Write Markdown output to this file (implies",
+          "help": "Write Markdown output to this file (implies --format markdown).",
           "default": null,
           "slug": "output",
-          "ready": false
-        },
-        {
-          "spec": "--format",
-          "flags": [
-            "--format"
-          ],
-          "primary": "--format",
-          "type": "",
-          "help": "markdown).",
-          "default": null,
-          "slug": "format",
           "ready": false
         },
         {
@@ -6034,7 +5989,7 @@
           "primary": "--interval",
           "type": "INTEGER",
           "help": "Refresh interval in seconds (--watch mode).  [default: 30]",
-          "default": null,
+          "default": "30",
           "slug": "interval",
           "ready": false
         },
@@ -6081,7 +6036,7 @@
           "primary": "--output-dir",
           "type": "PATH",
           "help": "Directory to write man page files into.  [default: docs/man]",
-          "default": null,
+          "default": "docs/man",
           "slug": "output-dir",
           "ready": false
         },
@@ -6200,7 +6155,7 @@
           "primary": "--slots",
           "type": "INTEGER",
           "help": "Maximum concurrent agents on this worker. [default: 6]",
-          "default": null,
+          "default": "6",
           "slug": "slots",
           "ready": false
         },
@@ -6212,7 +6167,7 @@
           "primary": "--roles",
           "type": "TEXT",
           "help": "Comma-separated roles this worker accepts. [default: backend,qa,security,frontend]",
-          "default": null,
+          "default": "backend,qa,security,frontend",
           "slug": "roles",
           "ready": false
         },
@@ -6223,19 +6178,7 @@
           ],
           "primary": "--label",
           "type": "TEXT",
-          "help": "Node labels as key=value (can repeat:",
-          "default": null,
-          "slug": "label",
-          "ready": false
-        },
-        {
-          "spec": "--label",
-          "flags": [
-            "--label"
-          ],
-          "primary": "--label",
-          "type": "",
-          "help": "gpu=true --label region=us-east).",
+          "help": "Node labels as key=value (can repeat: --label gpu=true --label region=us-east).",
           "default": null,
           "slug": "label",
           "ready": false
@@ -6258,8 +6201,8 @@
             "--adapter"
           ],
           "primary": "--adapter",
-          "type": "",
-          "help": "[agy|aichat|aider|amp|antigravity|auggie|auto|autohand|charm|claude|cline|clm|codebuff|codex|cody|composio|computer_use|continue|copilot|cursor|devin_terminal|droid|forge|garak|gemini|generic|goose|gpt_researcher|gptme|hermes|holmesgpt|iac|junie|kilo|kimchi|kimi|kiro|letta_code|mistral|muse|ollama|open_interpreter|openai_agents|opencode|openhands|pi|plandex|pydantic_ai|python_runtime|q_dev|qwen|ralphex|rovo|skyvern|tongyi_deepresearch] CLI agent adapter (default: auto-detect).",
+          "type": "[agy|aichat|aider|amp|antigravity|auggie|auto|autohand|charm|claude|cline|clm|codebuff|codex|cody|composio|computer_use|continue|copilot|cursor|devin_terminal|droid|forge|garak|gemini|generic|goose|gpt_researcher|gptme|hermes|holmesgpt|iac|junie|kilo|kimchi|kimi|kiro|letta_code|mistral|muse|ollama|open_interpreter|openai_agents|opencode|openhands|pi|plandex|pydantic_ai|python_runtime|q_dev|qwen|ralphex|rovo|skyvern|tongyi_deepresearch]",
+          "help": "CLI agent adapter (default: auto-detect).",
           "default": null,
           "slug": "adapter",
           "ready": false
@@ -6284,7 +6227,7 @@
           "primary": "--poll-interval",
           "type": "INTEGER",
           "help": "Seconds between task polling cycles (ignored if --poll-interval-ms is set).  [default: 10]",
-          "default": null,
+          "default": "10",
           "slug": "poll-interval",
           "ready": false
         },
@@ -6306,9 +6249,9 @@
             "--heartbeat-interval-ms"
           ],
           "primary": "--heartbeat-interval-ms",
-          "type": "",
-          "help": "INTEGER Milliseconds between heartbeats to the central server.  [default: 15000]",
-          "default": null,
+          "type": "INTEGER",
+          "help": "Milliseconds between heartbeats to the central server.  [default: 15000]",
+          "default": "15000",
           "slug": "heartbeat-interval-ms",
           "ready": false
         },
