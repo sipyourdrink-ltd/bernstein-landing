@@ -95,7 +95,7 @@ export function GET() {
     'Hosting: Netcup VPS, Caddy, Docker',
     'CDN: Cloudflare',
     'Email: Kit (ConvertKit)',
-    'Design: OKLCH color space, Inter + JetBrains Mono',
+    'Design: OKLCH color space, Fraunces + Inter + JetBrains Mono',
     'Build: Node.js 20, standalone Docker output',
     LAST_UPDATED ? `Last updated: ${LAST_UPDATED}` : null,
     '',
