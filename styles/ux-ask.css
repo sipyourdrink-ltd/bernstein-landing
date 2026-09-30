@@ -256,7 +256,7 @@
   vertical-align: middle;
 }
 .ask-faq-intro {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-size: var(--text-base);
   color: var(--ink-faint);
   margin: 0 0 var(--space-5);
