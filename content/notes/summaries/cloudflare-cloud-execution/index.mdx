@@ -16,8 +16,7 @@ summary_modes:
     title: cloudflare backend for ai coding agents
     items:
       - >-
-        agents run on cloudflare workers with near-zero cold start and survive
-        disconnects.
+        agents run on cloudflare workers and survive disconnects.
       - >-
         workflows, r2, and d1 handle retries, workspace sync, and metering
         across tasks.
@@ -43,17 +42,17 @@ summary_modes:
       it allows developers to run many agents without overheating their laptops
       or losing progress.
   technical:
-    title: cloudflare backend for ai agents with workers and durable workflows
+    title: cloudflare backend for ai agents with workers and workflows
     items:
       - >-
-        agents run as isolated cloudflare workers with sub-50ms cold starts,
-        enabling rapid spawning and low overhead per task.
+        agents run as isolated cloudflare workers, enabling rapid spawning
+        and low overhead per task.
       - >-
         multi-step workflows run on cloudflare workflows, which resume from the
         last completed step after a failure.
       - >-
-        artifacts such as diffs and test outputs are stored in r2, with costs
-        amounting to pennies per session.
+        artifacts such as diffs and test outputs are stored in r2, with usage
+        metering kept in d1.
       - >-
         usage metering lands in d1 as a ledger; the orchestrator's tick loop
         and .sdd/ state stay on your machine.
@@ -64,11 +63,11 @@ summary_modes:
 
 ## summary
 
-bernstein's experimental Cloudflare integration moves agent work off the local machine while the orchestrator stays local and deterministic. agent runs go to Workers (cold start under 50ms), multi-step tasks with ordering and retry land on Workflows, workspaces sync through R2, and usage metering goes to D1. `bernstein cloud init` scaffolds a `wrangler.toml` and a worker entry point; you deploy with `npx wrangler deploy` against your own Cloudflare account. the hosted commands (`cloud login`, `run`, `status`, `runs`, `cost`) target `api.bernstein.run`, which does not resolve in DNS, so they report the service unreachable.
+bernstein's experimental Cloudflare integration moves agent work off the local machine while the orchestrator stays local and deterministic. agent runs go to Workers, multi-step tasks with ordering and retry land on Workflows, workspaces sync through R2, and usage metering goes to D1. `bernstein cloud init` scaffolds a `wrangler.toml` and a worker entry point; you deploy with `npx wrangler deploy` against your own Cloudflare account. the hosted commands (`cloud login`, `run`, `status`, `runs`, `cost`) target `api.bernstein.run`, which does not resolve in DNS, so they report the service unreachable.
 
 ## key takeaways
 
-- Workers bill per request, not per VM; for a typical 50-task session, compute cost is roughly $0.50-2.00, while R2 and D1 are pennies.
+- Workers bill per request, not per VM; see Cloudflare's pricing pages for current rates.
 - Workflows resume from the last completed step, so a Worker crash mid-task does not restart the task from scratch.
 - API keys are stored as Worker secrets via `npx wrangler secret put` and never leave Cloudflare.
 - the orchestrator and its `.sdd/` state stay local; D1 is the metering ledger, not the source of truth.
