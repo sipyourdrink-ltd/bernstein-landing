@@ -30,25 +30,25 @@ bernstein acp serve
 Daemon. Watches Bernstein-opened PRs. When CI goes red it pulls the failing log, finds the worktree the PR came from, hands the log to a fresh agent in that worktree, and pushes a fix commit if the agent succeeds. Lint errors, type errors, the broken import after a rename. That flavour. Long write-up in [the autofix post](/blog/autofix-daemon).
 
 ```bash
-bernstein autofix --watch
-# polling CI status for open PRs…
+bernstein autofix start
+# daemon spawned; follow it with `bernstein autofix attach`
 ```
 
 Same gate runner as the orchestrator, so it can't push a "fix" that introduces a different break.
 
 ## `bernstein connect <provider>`
 
-Stop pasting tokens into config files. `bernstein connect` does OAuth or PAT entry once per provider and stores the result in the OS keychain (macOS Keychain, GNOME Keyring, Windows Credential Manager). Subsequent runs read from the keychain; nothing in `.env` or `bernstein.yaml`.
+Stop pasting tokens into config files. `bernstein connect` does token paste (or OAuth device-code for Linear) once per provider and stores the result in the OS keychain (macOS Keychain, GNOME Keyring, Windows Credential Manager). Subsequent runs read from the keychain; nothing in `.env` or `bernstein.yaml`.
 
 ```bash
-bernstein connect github   # OAuth → keychain
-bernstein connect linear   # API key → keychain
+bernstein connect github   # PAT → keychain
+bernstein connect linear   # API key → keychain (--oauth for device-code flow)
 bernstein connect jira
 bernstein connect slack
 bernstein connect telegram
 ```
 
-`--list` to see what's stored, `--revoke <provider>` to drop one.
+`bernstein creds list` shows what's stored, `bernstein creds revoke <provider>` drops one.
 
 ## `bernstein preview start`
 
