@@ -10,13 +10,23 @@
   margin: 0 auto;
   padding: calc(var(--header-h) + var(--space-7)) var(--space-5) var(--space-9);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-7);
+}
+
+/* The global `section { margin: 0 auto }` in ux-layout.css turns off grid
+   stretch, so a section sizes to its min-content instead of the track. The
+   tier table's min-content is ~470px, which scrolled the whole page sideways
+   on a 375px viewport; with stretch back, only .tier-table-wrap scrolls. */
+.sponsors-page > * {
+  min-width: 0;
+  margin-inline: 0;
 }
 
 .sponsors-page__intro h1 {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(28px, 4vw, 40px);
+  font-size: var(--text-2xl);
   letter-spacing: -0.01em;
   margin-bottom: var(--space-3);
 }
@@ -32,7 +42,7 @@
   margin-bottom: var(--space-4);
   color: var(--ink-soft);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 
 .sponsors-page__back:hover { color: var(--ink); }
@@ -47,7 +57,7 @@
 .sponsor-wall__heading {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   letter-spacing: -0.005em;
   color: var(--ink);
 }
@@ -99,7 +109,7 @@
 
 .sponsor-wall__login {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   color: var(--ink-soft);
   word-break: break-all;
   max-width: 96px;
@@ -128,11 +138,11 @@
   display: grid;
   place-items: center;
   color: var(--ink-faint);
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
 }
 
 .sponsor-wall__placeholder-caption {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   color: var(--ink-faint);
   max-width: 22ch;
 }
@@ -147,7 +157,7 @@
 }
 
 .sponsor-wall__grid--empty .sponsor-wall__placeholder-caption {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   max-width: 56ch;
   color: var(--ink-soft);
 }
@@ -164,7 +174,7 @@
 .tier-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
 }
 
 .tier-table caption {
@@ -188,7 +198,7 @@
 .tier-table th {
   font-weight: 600;
   color: var(--ink-soft);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   text-transform: lowercase;
   letter-spacing: 0.02em;
 }
@@ -202,6 +212,49 @@
 .tier-table tr:last-child th,
 .tier-table tr:last-child td {
   border-bottom: 0;
+}
+
+/* Narrow screens: three columns leave the benefits text a few characters
+   wide or behind a sideways scroll. Each row becomes a block - price and
+   label on one line, benefits underneath at full width. The column headers
+   are hidden visually only; the caption still names the table. */
+@media (max-width: 560px) {
+  .tier-table,
+  .tier-table tbody,
+  .tier-table tr,
+  .tier-table td {
+    display: block;
+  }
+  .tier-table caption {
+    display: block;
+  }
+  .tier-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .tier-table tr {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--rule);
+  }
+  .tier-table tr:last-child {
+    border-bottom: 0;
+  }
+  .tier-table td {
+    padding: 0;
+    border-bottom: 0;
+  }
+  .tier-table td:last-child {
+    grid-column: 1 / -1;
+    margin-top: var(--space-2);
+    color: var(--ink-soft);
+  }
 }
 
 /* ---------- cta block ---------- */
@@ -223,7 +276,7 @@
   color: var(--bg-paper);
   text-decoration: none;
   font-family: var(--font-mono);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   width: fit-content;
 }
 
@@ -232,16 +285,16 @@
 }
 
 .sponsors-page__footnote {
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   color: var(--ink-faint);
 }
 
 .sponsors-page__footnote code {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   background: var(--code-paper);
   padding: 1px 4px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
 }
 
 /* ---------- audience panels ----------
@@ -264,7 +317,7 @@
   border: 1px solid var(--rule);
   background: var(--bg-paper-2, var(--bg-paper));
   padding: var(--space-4);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -273,7 +326,7 @@
 .audience-card h3 {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: var(--text-base);
   letter-spacing: -0.005em;
   color: var(--ink);
   margin: 0;
@@ -282,13 +335,13 @@
 .audience-card p {
   color: var(--ink-soft);
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
   line-height: 1.5;
 }
 
 .audience-card .audience-tier-hint {
   font-family: var(--font-mono, monospace);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   color: var(--ink-faint, var(--ink-soft));
   margin-top: auto;
   padding-top: var(--space-2);
