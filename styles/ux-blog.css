@@ -1013,7 +1013,7 @@
   width: 42%;
   height: 100%;
   border-radius: 50%;
-  background: linear-gradient(90deg, var(--accent-soft) 0%, var(--accent) 100%);
+  background: var(--accent);
   animation: blog-compress-slide var(--dur-spin) ease-in-out infinite;
 }
 @keyframes blog-compress-slide {
