@@ -24,7 +24,7 @@ wheelhouse profile — see the install docs.
 ```
 cd your-repo
 bernstein init
-bernstein run "add input validation to the checkout form"
+bernstein -g "add input validation to the checkout form"
 ```
 
 `init` writes the project seed; `run` plans the goal into tasks and
@@ -46,7 +46,7 @@ The package ships an MCP server (stdio transport) so an agent can drive
 runs through tools instead of a shell:
 
 ```
-bernstein mcp serve
+bernstein mcp
 ```
 
 Tool surface and card: https://bernstein.run/.well-known/mcp/server-card.json

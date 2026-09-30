@@ -43,7 +43,7 @@ Bernstein exposes an MCP server (`bernstein mcp`, stdio or HTTP transport). Tool
 - Status: beta - solo-maintained, under active development; pin the version you depend on
 - License: Apache 2.0
 - Language: Python 3.12+
-- Adapters: 40+ CLI agent adapters (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Cloudflare Agents, GitHub Copilot, Droid, Crush, Auggie, Cline, and more)
+- Adapters: 40+ CLI agent adapters (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, GitHub Copilot, Droid, Crush, Auggie, Cline, and more)
 - Cloud: Cloudflare Workers with Durable Workflows, V8 sandboxes, R2, D1, Vectorize
 - State: File-based (.sdd/), not in-memory
 - Orchestrator: Deterministic Python, zero LLM tokens on scheduling

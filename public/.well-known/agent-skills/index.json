@@ -13,7 +13,7 @@
       "type": "skill-md",
       "description": "Install Bernstein locally and drive an orchestration run - parallel CLI coding agents in isolated git worktrees with a deterministic, replayable coordination loop.",
       "url": "https://bernstein.run/skills/run-bernstein/SKILL.md",
-      "digest": "sha256:d1cea12463918aede223b359d78ea04297b885275e503a1c4a1477dd2942c7c1"
+      "digest": "sha256:b7e5f153893e62986e17f8d84f493be768ac89b10657c5eb4d9a088953aff9be"
     }
   ]
 }
