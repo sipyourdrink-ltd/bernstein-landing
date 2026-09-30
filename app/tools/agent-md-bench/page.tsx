@@ -107,7 +107,7 @@ export default function AgentMdBenchPage() {
               </li>
             </ul>
             <p>
-              every rule is a pure function over the input text. the source of truth is{' '}
+              every rule is a pure function over the input text. the adapters that launch each agent live in{' '}
               <a
                 href={withUtm(
                   'https://github.com/sipyourdrink-ltd/bernstein/tree/main/src/bernstein/adapters',
@@ -124,7 +124,7 @@ export default function AgentMdBenchPage() {
               >
                 src/bernstein/adapters
               </a>{' '}
-              in the bernstein OSS repo. send a PR to fix or extend a rule.
+              in the bernstein OSS repo. open an issue on this site's repo to fix or extend a rule.
             </p>
           </section>
         </article>
