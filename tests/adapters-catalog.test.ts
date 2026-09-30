@@ -16,7 +16,7 @@ import path from 'node:path';
 
 const DATA = path.resolve(process.cwd(), 'data', 'adapters.json');
 
-const MIN_ADAPTERS = 40; /* the extraction currently yields 45 (46 registry keys minus mock, which has no adapter module); the floor leaves room for upstream churn */
+const MIN_ADAPTERS = 40; /* the extraction currently yields 53 (registry keys minus mock and generic, per data/adapter-count.json); the floor leaves room for upstream churn */
 
 test('data/adapters.json exists', async () => {
   const exists = await fs.access(DATA).then(() => true).catch(() => false);
