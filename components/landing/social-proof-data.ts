@@ -1,15 +1,12 @@
 /**
  * Static `as featured in` data for the in-fold SocialProofStrip.
  *
- * Voice rule: ONLY operator-confirmed badges. The list mirrors the
- * footer's existing badge set (CodeTrendy, SaaSHub) so we don't
- * introduce a new claim surface. Add new entries only after the
- * operator confirms the listing exists and the badge URL is current.
+ * Voice rule: ONLY operator-confirmed badges. Add new entries only
+ * after the operator confirms the listing exists and the badge URL is
+ * current.
  *
- * Each entry is rendered as a single link with kebab-case copy in
- * the strip. The first cell ALWAYS renders the GitHub star count
- * (live, from /api/stats) so the strip leads with a fact rather than
- * a logo wall.
+ * Each entry is rendered as a single link with lowercase copy in the
+ * strip. The list is currently empty, so the block renders nothing.
  */
 
 export interface SocialProofItem {

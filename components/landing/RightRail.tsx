@@ -473,7 +473,7 @@ export function RightRail({ adapterCount, closedPrs, contributors }: RightRailPr
           carries one canonical Docs entry, and stacking two more
           read-the-docs CTAs directly under the install block just
           repeated it twice in the same fold. The code-map links (github /
-          deepwiki / docs) still render once, in the footer - see
+          deepwiki) still render once, in the footer - see
           Footer.tsx. */}
 
       {/* MINI STATS - opacity dampens the 4-tile grid + sponsor + /cost
