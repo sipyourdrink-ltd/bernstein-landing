@@ -5557,8 +5557,8 @@ paths:
       description: |-
         Apply RFC 7644 §3.5.2 PATCH operations to a user.
 
-        This slice implements only the active=false deactivation path. Full PATCH
-        support for arbitrary attribute updates belongs to a later slice.
+        Only the active=false deactivation path is supported; other attribute
+        updates are not implemented.
       operationId: patch_user_scim_v2_Users__user_id__patch
       parameters:
         - name: user_id
@@ -12601,8 +12601,8 @@ paths:
       description: |-
         Apply RFC 7644 §3.5.2 PATCH operations to a user.
 
-        This slice implements only the active=false deactivation path. Full PATCH
-        support for arbitrary attribute updates belongs to a later slice.
+        Only the active=false deactivation path is supported; other attribute
+        updates are not implemented.
       operationId: patch_user_api_v1_scim_v2_Users__user_id__patch
       parameters:
         - name: user_id

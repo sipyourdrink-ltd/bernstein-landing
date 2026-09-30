@@ -279,10 +279,10 @@ bernstein live          # live TUI: active agents, task events, stats
 bernstein stop          # graceful shutdown of the running orchestra`}</code>
             </pre>
             <p>
-              After the run, the artefacts live in three places. The
-              HMAC-signed audit log is under{' '}
-              <code>.sdd/audit/</code>, rotated daily - one JSONL file per
-              UTC day; you can verify the chain with{' '}
+              After the run, the artefacts live in three places. When the
+              run used <code>--audit</code>, the HMAC-signed audit log is
+              under <code>.sdd/audit/</code>, rotated daily - one JSONL
+              file per UTC day; you can verify the chain with{' '}
               <code>bernstein audit verify</code>.
               Per-task traces (JSONL) are under <code>.sdd/traces/</code>.
               The merged code is in your working tree, ready for{' '}
@@ -391,7 +391,8 @@ bernstein stop          # graceful shutdown of the running orchestra`}</code>
             <details className="cliqs-faq">
               <summary>Where does the audit log live and how do I verify it?</summary>
               <p>
-                The HMAC-chained audit log lives under{' '}
+                When a run is started with <code>--audit</code>, the
+                HMAC-chained audit log lives under{' '}
                 <code>.sdd/audit/</code>, rotated daily - one JSONL file
                 per UTC day, for example{' '}
                 <code>.sdd/audit/2026-05-07.jsonl</code>. Each line is one

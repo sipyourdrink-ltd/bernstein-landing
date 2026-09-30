@@ -1,13 +1,13 @@
 ---
 title: "Picking a cheaper model when the task allows"
-description: "Bernstein's contextual bandit picks a model and effort level per task. Internal runs cut roughly in half. Measure your own with bernstein cost."
+description: "Bernstein's static cascade routes tasks by default, and an opt-in contextual bandit can pick a model and effort level per task. An earlier router cut spend roughly in half in internal runs. Measure your own with bernstein cost."
 date: "2026-04-07"
 url: "https://bernstein.run/blog/cost-aware-routing"
 tags: ["summary", "AI cost optimization", "contextual bandit"]
 source_post: "cost-aware-routing"
 summary_modes:
   quick:
-    title: "a contextual bandit picks a cheaper model per task, with measurable savings"
+    title: "a static cascade routes each task to a cheaper model when it can, with an opt-in bandit and measurable savings"
     items:
       - "A static cascade router is the default; an opt-in LinUCB contextual bandit learns which model and effort level each task type needs."
       - "Internal runs on the earlier epsilon-greedy router landed at roughly half the bill versus sending every task to Sonnet, with completion rate within a couple of percent."

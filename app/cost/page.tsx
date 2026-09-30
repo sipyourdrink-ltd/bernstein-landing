@@ -276,15 +276,17 @@ export default async function CostPage() {
               <div className="cost-faq-item">
                 <h3>How does Bernstein decide which model to route a task to?</h3>
                 <p>
-                  Bernstein runs a LinUCB contextual bandit over task
-                  outcomes. Each candidate model is an arm, and the task&apos;s
-                  features (complexity, scope, priority, task type,
-                  language, role) form the context. The reward is the
-                  quality score (1 when the janitor passes, 0 when it
-                  fails) multiplied by one minus the normalised cost, so
-                  cheap models that pass are favoured. Until it has
-                  enough completions, it uses the same static routing
-                  heuristics as the cascade router.
+                  By default Bernstein uses a static routing cascade:
+                  heuristics over task complexity, scope and role pick the
+                  model. An optional LinUCB contextual bandit is available
+                  with <code>--routing bandit</code>. There each candidate
+                  model is an arm, and the task&apos;s features
+                  (complexity, scope, priority, task type, language, role)
+                  form the context. The reward is the quality score (1
+                  when the janitor passes, 0 when it fails) multiplied by
+                  one minus the normalised cost, so cheap models that pass
+                  are favoured. Until it has enough completions, it uses
+                  the same static routing heuristics as the cascade router.
                 </p>
               </div>
               <div className="cost-faq-item">
@@ -294,8 +296,9 @@ export default async function CostPage() {
                   actual saving depends on how many tasks route to a
                   cheaper model (varies with task mix), how often the
                   cheaper model passes your tests (varies with test
-                  quality), and how far the bandit has moved past its
-                  cold-start heuristics. The band is the lower and upper bounds of
+                  quality), and whether you have opted in to the bandit
+                  router and how far it has moved past its cold-start
+                  heuristics. The band is the lower and upper bounds of
                   a heuristic that assumes routing kicks in 40-80% of the
                   time.
                 </p>
@@ -310,8 +313,9 @@ export default async function CostPage() {
                   Python in{' '}
                   <code>src/bernstein/core/routing/bandit_router.py</code>, scheduled
                   from <code>src/bernstein/core/orchestration/</code>{' '}
-                  - what model wins is a function of the bandit history,
-                  the cost table, and your test results.
+                  - what model wins is a function of the routing mode you chose, the cost
+                  table, your bandit history if you opted in, and your
+                  test results.
                 </p>
               </div>
             </div>

@@ -32,7 +32,7 @@ The problem was never the total bill. It was that the total arrived at the end, 
 
 The 2.16 suite makes output spend a first-class, bounded quantity:
 
-- **Per-task budgets that actually stop the task.** `--max-cost-usd` is a run-level cap. The cost policy also carries a per-task ceiling (`per_task_usd` under `caps`), so a single runaway task is gated at its own envelope instead of eating the whole run's headroom before anything trips.
+- **A run budget that actually stops the run.** `--max-cost-usd` is a run-level cap that stops the run once the budget is spent, so spend has a hard ceiling before anything else trips.
 - **An attributed ledger, not a total.** Every token charge is written against the task, the step, the adapter, and the model that incurred it. `bernstein cost` reads back a line-item breakdown (`bernstein cost --by profile` groups it per response-style profile), so "the run cost more than I planned" becomes "this task on this model was 60 percent of it."
 - **A calibrated forecast, scored.** The cost guard forecasts spend before a step runs and logs the forecast next to the actual. The forecast log is Brier-scored, so the guard's confidence is measured against outcomes rather than asserted. A guard that is systematically over- or under-confident shows up as a number, not a vibe.
 
@@ -73,4 +73,4 @@ That is the whole upgrade. 2.x configs and plans run unchanged - `bernstein run`
 
 - [bernstein 2.x recap](/blog/v2-x-recap): the cycle this one picks up from - lineage, ten trackers, A2A cards, the standalone verifier.
 - [v2.0 release notes](/blog/v2-0-release): when the web UI landed in the wheel.
-- [cost-aware routing](/blog/cost-aware-routing): the bandit that decides which arm gets the work, which the per-task budget now bounds.
+- [cost-aware routing](/blog/cost-aware-routing): the bandit that decides which arm gets the work, which the run budget bounds.

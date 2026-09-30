@@ -27,7 +27,7 @@ bernstein acp serve
 
 ## `bernstein autofix`
 
-Daemon. Watches Bernstein-opened PRs. When CI goes red it pulls the failing log, finds the worktree the PR came from, hands the log to a fresh agent in that worktree, and pushes a fix commit if the agent succeeds. Lint errors, type errors, the broken import after a rename. That flavour. Long write-up in [the autofix post](/blog/autofix-daemon).
+Daemon. The design: watch Bernstein-opened PRs, and when CI goes red, classify the failing log and hand it to a fresh agent in the PR's worktree, pushing a fix commit on success. In this release the lifecycle, cost cap, attempt budget and audit rails ship; the network-backed PR source and the default dispatch hook have not landed yet. Long write-up in [the autofix post](/blog/autofix-daemon).
 
 ```bash
 bernstein autofix start

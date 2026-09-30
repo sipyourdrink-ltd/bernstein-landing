@@ -32,14 +32,13 @@ mixing kimi or qwen at the end is the same pattern: assign `cli: kimi` or `cli: 
 
 <h2 id="merge-gates">can it block merge if review notes, changelog, schema audit, or custom files are not updated?</h2>
 
-yes. the merge queue runs a configurable gate suite before any worktree lands on `main`. the built-in gates include lint, type-check, tests and a cross-model verifier, switched on under `quality_gates:` in `bernstein.yaml`. custom gates are declared as named steps in `quality_gates.pipeline`, or added through a plugin:
+yes. the merge queue runs a configurable gate suite before any worktree lands on `main`. the built-in gates include lint, type-check and tests, plus several others (security scan, coverage delta, run-config and more). you pick and order them as named steps in `quality_gates.pipeline`; step names must be built-in gate names. a step can set `command_override` to run your own command for that gate (for example a changelog or schema check), and plugins can add more:
 
 ```yaml
 quality_gates:
   pipeline:
-    - { name: "lint",  required: true, condition: "always" }
     - { name: "tests", required: true, condition: "python_changed" }
-    - { name: "no_foo", required: true, condition: "any_changed" }  # custom
+    - { name: "lint", required: true, condition: "always", command_override: "./scripts/check-changelog.sh" }  # custom command
 ```
 
 gate failures block the merge and route the task back to the builder. with `--audit` the evidence trail is in the hmac-chained audit log under `.sdd/audit/`. `docs/architecture/quality-pipeline.md` has the full schema.
@@ -52,9 +51,9 @@ air-gap deployments tighten this further: `bernstein run --profile airgap` denie
 
 <h2 id="scheduling-policy">can i force sequential execution for risky repos and parallel only for independent tasks?</h2>
 
-yes. the scheduler reads two signals per task: `parallel_safe` (declared in the task spec, default `false`) and the dependency dag (`depends_on:`). tasks without `parallel_safe: true` are scheduled serially even when they have no declared dependencies - useful for migrations, secret rotations, or files with global state.
+yes. `max_agents` in `bernstein.yaml` caps how many agents run at once, and `depends_on:` orders tasks that must not overlap. the task spec also accepts a `parallel_safe` flag (default `false`); today it shapes the batches that `bernstein plan dag` prints rather than gating the live scheduler. use `max_agents: 1` for migrations, secret rotations, or files with global state.
 
-independent tasks (no shared paths, no `depends_on`, `parallel_safe: true`) fan out across as many worktrees as your agent cap allows. you set the cap globally with `max_agents` in `bernstein.yaml`:
+independent tasks (no shared paths, no `depends_on`) fan out across as many worktrees as your agent cap allows. you set the cap globally with `max_agents` in `bernstein.yaml`:
 
 ```yaml
 max_agents: 1   # sequential mode - safe for production migrations

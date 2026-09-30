@@ -112,6 +112,6 @@ the orchestrator itself: $0. apache 2.0, `pipx install bernstein`, no license fe
 
 the cli agents bernstein wraps cost what they cost - check the vendor's current pricing page, since plan tiers move. claude code on a max plan is a flat monthly subscription. codex cli on chatgpt plus rolls into the chatgpt subscription. aider with sonnet on a heavy day adds up in api spend. gemini cli is free up to a quota. running all four together is what bernstein optimizes - the opt-in cost-aware bandit (`--routing bandit`) routes each task to the model that's been passing tasks in that shape.
 
-the operator's own gateway (the thing answering this docs bot) runs on a small ovh vps with qdrant and the openrouter free-tier middleware. a self-hosted bernstein run is cheaper than that - you're not paying the openrouter middle hop, you're calling the model apis directly with your own keys.
+a bernstein run calls the model apis directly with your own keys, so you pay the vendors' rates and nothing in between.
 
 bernstein adds no license cost on top of those model fees. what it changes is the shape of the spend: parallel tasks saturate the api budget you already have instead of queueing behind one agent at a time. cap a run with the `budget` key in `bernstein.yaml` (or `--budget` on the command line) if you want a hard ceiling.

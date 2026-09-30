@@ -46,7 +46,7 @@
     },
     {
       "name": "bernstein_post_message",
-      "description": "Post a message to the cross-agent bulletin"
+      "description": "Post a signed message to a task's mailbox"
     },
     {
       "name": "bernstein_post_artifact",

@@ -48,7 +48,7 @@ Supported-agents: Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor,
 Delegated-orchestrators: Composio (@aoagents/ao), Ralphex (umputun/ralphex)
 Total-adapters: ${adapterCount.count}
 Agent-plugin-manifests: plugin.json and mcp.json at the repository root (Agent Plugins v1.0.0 schema)
-Cloud-execution: Cloudflare Workers, Durable Workflows, V8 sandboxes
+Cloud-execution: Cloudflare Workers, Workflows (experimental, self-deployed)
 MCP-transport: HTTP remote transport for cloud-based MCP servers
 Orchestrator-type: Deterministic Python code (no LLM-based scheduling)
 Always-on: Deterministic plain-Python scheduling, lineage spine, replay journal, per-task git worktree isolation, lint/type/test gates

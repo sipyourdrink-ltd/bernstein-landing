@@ -102,7 +102,7 @@ bernstein run plans/my-project.yaml
 
 4. **Agent-agnostic**: Works with any CLI coding agent. Currently ships 40+ adapters. Adding a new agent requires implementing a simple adapter interface.
 
-5. **Model-per-task routing**: A contextual bandit router learns which model works best for each task type and complexity level. In our own runs, the bandit router cut spend roughly in half compared to uniformly using expensive models. Measure yours with bernstein cost.
+5. **Model-per-task routing**: Routing defaults to a static cascade by task complexity; an optional LinUCB contextual bandit router (\`--routing bandit\`) can learn which model works best for each task type and complexity level. An earlier epsilon-greedy router cut spend roughly in half in our own April 2026 runs; that figure has not been re-measured on the current router. Measure yours with bernstein cost.
 
 ### Core Sub-packages
 
@@ -449,7 +449,7 @@ stages:
 Bernstein has 150+ configurable parameters. Key ones:
 
 ### Environment Variables
-- \`BERNSTEIN_MAX_AGENTS\`: Maximum parallel agents (same as \`--max-agents\`)
+- \`BERNSTEIN_MAX_AGENTS\`: Maximum parallel agents (same as \`max_agents\` in bernstein.yaml)
 - \`BERNSTEIN_AUDIT=1\`: Enable the opt-in HMAC-chained audit log
 
 ### Project configuration
@@ -578,11 +578,10 @@ Bernstein assigns roles to agents based on task requirements:
 
 ## Cloud Execution (Cloudflare)
 
-Bernstein can run agents on Cloudflare's edge network:
+Bernstein has an experimental Cloudflare integration that you deploy to your own Cloudflare account; the hosted cloud service is not generally available:
 
 - **Workers Runtime**: Execute agents on Cloudflare Workers
-- **Durable Workflows**: Map tasks to durable workflows with auto-retry and approval gates
-- **V8 Sandbox Isolation**: Secure agent code execution in isolated V8 isolates
+- **Workflows**: Map tasks to workflows with auto-retry and approval gates
 - **R2 Workspace Sync**: Upload/download workspace files during cloud execution
 - **Workers AI**: Use Cloudflare's AI models for task decomposition and planning
 - **D1 Analytics**: Serverless SQLite for usage tracking and billing
@@ -603,7 +602,7 @@ The orchestrator is deterministic Python code - no model tokens are spent on coo
 Bernstein ships 40+ adapters for popular coding agents including Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Ollama, GitHub Copilot, Droid, Crush, and more. It also has a generic adapter for wrapping any CLI tool.
 
 ### How does task routing work?
-Bernstein uses a contextual bandit (epsilon-greedy) router that learns which model works best for each task type and complexity. Simple tasks go to cheaper models (Haiku, Flash), complex architecture tasks go to expensive models (Opus). In our own runs, the bandit router cut spend roughly in half compared to using expensive models for everything. Measure yours with bernstein cost.
+By default Bernstein uses a static routing cascade. Simple tasks go to cheaper models (Haiku, Flash), complex architecture tasks go to expensive models (Opus). An optional LinUCB contextual bandit router, enabled with \`--routing bandit\`, learns which model works best for each task type and complexity. An earlier epsilon-greedy router cut spend roughly in half in our own April 2026 runs; that figure has not been re-measured on the current router. Measure yours with bernstein cost.
 
 ### Is Bernstein free?
 Yes. Bernstein is open-source under the Apache 2.0 license. You pay only for the AI model API usage of the agents themselves.
@@ -627,7 +626,7 @@ Yes. Bernstein can run as an MCP (Model Context Protocol) server, exposing its o
 Yes. The \`openai_agents\` adapter embeds OpenAI's Agents SDK v2 as a first-class runtime. Each task runs in an Agents SDK session against the Responses API, so you get OpenAI's tool-calling, handoffs, and guardrails inside Bernstein's orchestrator without shelling out to a CLI. Install with \`pip install "bernstein[openai]"\`.
 
 ### What sandbox backends does Bernstein support?
-Bernstein exposes a \`SandboxBackend\` protocol. The default backend is a git worktree on the local machine. You can swap in Docker, E2B, Modal, Blaxel, Cloudflare Workers sandboxes, Daytona, Runloop, or Vercel sandboxes by setting \`sandbox.backend\` in \`bernstein.yaml\` and installing the matching extra (for example \`pip install "bernstein[e2b]"\`). The orchestrator and adapters do not change.
+Bernstein exposes a \`SandboxBackend\` protocol. The default backend is a git worktree on the local machine. You can swap in Docker, Podman, E2B, Modal, Blaxel, Daytona, Runloop, or Vercel sandboxes with \`bernstein run --sandbox <backend>\` (paid cloud backends also need \`--allow-paid\`) and installing the matching extra (for example \`pip install "bernstein[e2b]"\`). The orchestrator and adapters do not change.
 
 ### Can I store \`.sdd/\` state and artifacts in the cloud?
 Yes. The \`BufferedSink\` wrapper batches writes and forwards them to pluggable storage backends: local disk, Amazon S3, Google Cloud Storage, Azure Blob Storage, or Cloudflare R2. Configure under the \`storage\` block in \`bernstein.yaml\` and install the relevant extra (\`pip install "bernstein[s3]"\`, \`[gcs]\`, \`[azure]\`, or \`[r2]\`). Agents continue to read and write through the normal local-file API - only the persistence layer changes.

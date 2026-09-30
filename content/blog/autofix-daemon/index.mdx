@@ -39,7 +39,7 @@ Both `FailingPRSource` and `DispatchHook` are protocols, not hardwired implement
 
 Self-healing CI is one bad heuristic away from a 3am runaway that burns through your API budget pushing wrong commits onto a release branch. Five rails ship, none optional:
 
-**Per-PR opt-in label.** A PR is invisible to the daemon unless it carries `bernstein-autofix` (configurable per repo). Removing the label aborts in-flight attempts within one tick.
+**Per-PR opt-in label.** A PR is invisible to the daemon unless it carries `bernstein-autofix` (configurable per repo). The label is required before an attempt starts; aborting an attempt that is already in flight when the label is removed is not wired yet.
 
 **Per-repo cost cap.** `cost_cap_usd` (default $5, per attempt; `0` disables it) is handed to the dispatch hook, and an attempt whose reported spend exceeds the cap is aborted, recorded as `cost_capped`, and explained in a PR comment.
 
@@ -59,8 +59,8 @@ bernstein autofix status
 # last tick:      Mon Apr 27 14:08:01 2026
 #
 # Recent attempts (newest first):
-#   sipyourdrink-ltd/bernstein#960  attempt=1  outcome=success  classifier=lint  cost=$0.0214
-#   sipyourdrink-ltd/bernstein#958  attempt=2  outcome=needs_human  classifier=test  cost=$0.4832
+#   sipyourdrink-ltd/bernstein#960  attempt=1  outcome=success  classifier=flaky  cost=$0.0214
+#   sipyourdrink-ltd/bernstein#958  attempt=2  outcome=needs_human  classifier=config  cost=$0.4832
 ```
 
 `status --watch` tails new attempts. `status --json` for piping into a dashboard. Both work whether the daemon is local or under a `bernstein daemon install`-ed systemd unit.

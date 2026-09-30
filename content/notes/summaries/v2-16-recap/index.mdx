@@ -9,13 +9,13 @@ summary_modes:
   quick:
     title: "bernstein 2.16: output economy, audit fixes, windows install path"
     items:
-      - "the output-economy suite gates spend against per-task cost caps and attributes it with a line-item ledger."
+      - "the output-economy suite caps spend at run level and attributes it with a line-item ledger."
       - "a windows adapter path bug is fixed: .cmd and .bat agent shims now spawn correctly."
     whyItMatters: "this release makes token spending visible and controlled while making the standard install work on windows."
   takeaways:
     title: "bernstein 2.16: output economy, audit fixes, and windows install path"
     items:
-      - "the output-economy suite gates spend against per-task cost caps and attributes spend to specific tasks, steps, adapters, and models."
+      - "the output-economy suite caps spend at run level and attributes spend to specific tasks, steps, adapters, and models."
       - "cost forecasts are now scored with Brier scores to measure guard confidence against actual outcomes, not just asserted."
       - "deterministic orchestration is hardened end to end, with byte-identical replays verified by hash and an unbroken HMAC-chained audit log."
       - "the windows adapter path now resolves the agent binary to its absolute path, routes .cmd and .bat shims through the command interpreter, and passes PATHEXT through the worker environment."
@@ -23,7 +23,7 @@ summary_modes:
   technical:
     title: "output economy, deterministic runs, and windows adapter fixes in 2.16"
     items:
-      - "the cost policy carries a per-task usd cap alongside the run-level --max-cost-usd, so a runaway task is gated before it consumes the entire run's allowance."
+      - "the run-level --max-cost-usd cap stops a run once its budget is spent."
       - "an attributed ledger records every token charge by task, step, adapter, and model, enabling line-item cost attribution via bernstein cost."
       - "the orchestrator's audit chain now covers all state transitions with hmac-chained entries, and the standalone bernstein-verify tool validates compliance without importing the main package."
       - "windows spawns resolve the adapter binary to an absolute path, route .cmd/.bat shims through the command interpreter, and pass PATHEXT to the worker environment (2.16.1)."
@@ -32,9 +32,9 @@ summary_modes:
 
 ## summary
 
-the output-economy suite gates spend against per-task cost caps and attributes spend to specific tasks, steps, adapters, and models. cost forecasts are now scored with Brier scores to measure guard confidence against actual outcomes, not just asserted. deterministic orchestration is hardened end to end, with byte-identical replays verified by hash and an unbroken HMAC-chained audit log. the windows adapter path now resolves the agent binary to its absolute path, routes .cmd and .bat shims through the command interpreter, and passes PATHEXT through the worker environment.
+the output-economy suite caps spend at run level and attributes spend to specific tasks, steps, adapters, and models. cost forecasts are now scored with Brier scores to measure guard confidence against actual outcomes, not just asserted. deterministic orchestration is hardened end to end, with byte-identical replays verified by hash and an unbroken HMAC-chained audit log. the windows adapter path now resolves the agent binary to its absolute path, routes .cmd and .bat shims through the command interpreter, and passes PATHEXT through the worker environment.
 
 ## key takeaways
 
-- the output-economy suite gates spend against per-task cost caps and attributes it with a line-item ledger.
+- the output-economy suite caps spend at run level and attributes it with a line-item ledger.
 - a windows adapter path bug is fixed: .cmd and .bat agent shims now spawn correctly.

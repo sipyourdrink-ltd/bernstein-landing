@@ -18,8 +18,8 @@ summary_modes:
         zed can now dispatch tasks through the new acp bridge and stream output
         directly in-editor.
       - >-
-        a daemon automatically fixes red ci on prs and pushes commits if the
-        agent succeeds.
+        an autofix daemon ships its lifecycle, cost cap and audit rails; pr
+        polling and dispatch are not wired yet.
     whyItMatters: >-
       it streamlines development by automating fixes and reducing manual
       credential and server management.
@@ -32,8 +32,9 @@ summary_modes:
         bernstein now runs an ACP bridge that lets editors like Zed dispatch
         tasks and stream output directly.
       - >-
-        an autofix daemon automatically attempts to fix CI failures on pull
-        requests opened by bernstein.
+        an autofix daemon is designed to attempt fixes for CI failures on pull
+        requests opened by bernstein; the lifecycle rails ship, pr polling and
+        dispatch are not wired yet.
       - >-
         credentials are stored in the OS keychain instead of config files for
         improved security.
@@ -54,10 +55,11 @@ summary_modes:
         http or mcp. this integration requires no changes to existing task
         definitions in bernstein.yaml.
       - >-
-        the bernstein autofix daemon monitors pull requests opened by bernstein,
-        triggers on red ci, and uses the same gate runner as the orchestrator to
-        prevent introducing new breaks. it retrieves failed logs, spawns an
-        agent in the source worktree, and pushes a fix commit if successful.
+        the bernstein autofix daemon is designed to monitor pull requests opened by
+        bernstein and react to red ci, using the same gate runner as the
+        orchestrator. the lifecycle, cost cap and audit rails ship in this
+        release; the network-backed pr source and default dispatch hook have not
+        landed yet.
       - >-
         credentials are now stored in the os keychain (macos keychain, gnome
         keyring, windows credential manager) via bernstein connect, eliminating
@@ -77,12 +79,11 @@ summary_modes:
 
 ## summary
 
-bernstein 1.9.0 ships four distinct features. the ACP bridge (`bernstein acp serve`) lets any Agent Client Protocol editor - Zed today, others as they ship - dispatch tasks, stream output line-by-line, and read gate results without leaving the editor; it maps ACP tool calls to the existing task-server HTTP/MCP API. the autofix daemon watches bernstein-opened PRs for red CI, hands the failing log to a fresh agent in the PR's worktree, and pushes a fix commit if the agent succeeds using the same gate runner as the orchestrator. the keychain-backed credential store (`bernstein connect <provider>`) does token paste (or OAuth device-code for Linear) once per provider and stores the result in macOS Keychain, GNOME Keyring, or Windows Credential Manager - nothing in `.env` or `bernstein.yaml`. the preview server (`bernstein preview start`) spins up the project's dev server inside the active worktree and exposes a public HTTPS URL via the same tunnel cascade used elsewhere.
+bernstein 1.9.0 ships four distinct features. the ACP bridge (`bernstein acp serve`) lets any Agent Client Protocol editor - Zed today, others as they ship - dispatch tasks, stream output line-by-line, and read gate results without leaving the editor; it maps ACP tool calls to the existing task-server HTTP/MCP API. the autofix daemon is designed to watch bernstein-opened PRs for red CI and hand the failing log to a fresh agent in the PR's worktree; this release ships its lifecycle, cost cap and audit rails, while the network-backed PR source and default dispatch hook have not landed yet. the keychain-backed credential store (`bernstein connect <provider>`) does token paste (or OAuth device-code for Linear) once per provider and stores the result in macOS Keychain, GNOME Keyring, or Windows Credential Manager - nothing in `.env` or `bernstein.yaml`. the preview server (`bernstein preview start`) spins up the project's dev server inside the active worktree and exposes a public HTTPS URL via the same tunnel cascade used elsewhere.
 
 ## key takeaways
 
 - `bernstein acp serve` speaks stdio; anything that already works over HTTP or MCP works through the ACP bridge without changes.
-- the autofix daemon cannot push a "fix" that introduces a different break - it uses the same gate runner as the orchestrator.
 - `bernstein creds list` shows what is stored per provider; `bernstein creds revoke <provider>` drops individual credentials.
 - the preview start command infers the dev server command from `package.json` (`dev`/`start`), then `Makefile` (`make dev`), then a `bernstein.yaml` override.
 
