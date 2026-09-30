@@ -18,39 +18,59 @@
   "tools": [
     {
       "name": "bernstein_run",
-      "description": "Start an orchestration run with a goal"
+      "description": "Start an orchestration run with a goal, or create a subtask via parent_task_id"
     },
     {
       "name": "bernstein_status",
-      "description": "Get current orchestration status"
+      "description": "Get orchestration status: health, tasks and cost"
     },
     {
-      "name": "bernstein_tasks",
-      "description": "List all tasks and their states"
-    },
-    {
-      "name": "bernstein_cost",
-      "description": "Get cost breakdown for current run"
-    },
-    {
-      "name": "bernstein_stop",
-      "description": "Stop the current orchestration"
+      "name": "bernstein_run_status",
+      "description": "Poll a run started with bernstein_run"
     },
     {
       "name": "bernstein_approve",
       "description": "Approve a task that needs human review"
     },
     {
-      "name": "bernstein_health",
-      "description": "Check system health"
+      "name": "bernstein_complete",
+      "description": "Mark a claimed task complete"
     },
     {
-      "name": "bernstein_create_subtask",
-      "description": "Create a child task scoped to the current orchestration run"
+      "name": "bernstein_cancel",
+      "description": "Cancel one task and its subtask tree"
+    },
+    {
+      "name": "bernstein_claim",
+      "description": "Claim a task as a pull worker"
+    },
+    {
+      "name": "bernstein_post_message",
+      "description": "Post a message to the cross-agent bulletin"
+    },
+    {
+      "name": "bernstein_post_artifact",
+      "description": "Post an artifact for a task"
+    },
+    {
+      "name": "bernstein_task_capsule",
+      "description": "Fetch the signed context capsule for a task"
+    },
+    {
+      "name": "bernstein_shutdown_orchestrator",
+      "description": "Stop the orchestrator for a project"
     },
     {
       "name": "load_skill",
       "description": "Progressively load a role skill pack on demand (backend, qa, security, etc.) - keeps system prompts small"
+    },
+    {
+      "name": "bernstein_scenario",
+      "description": "List, run or check scenarios (tier: all)"
+    },
+    {
+      "name": "bernstein_verify_lineage",
+      "description": "Verify run lineage (tier: all)"
     }
   ]
 }
