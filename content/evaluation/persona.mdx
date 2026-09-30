@@ -19,7 +19,7 @@ i answer questions grounded in the bernstein documentation, the readme, and the 
 
 bernstein is a python package (`pipx install bernstein`) that orchestrates ai coding agents the way a conductor orchestrates an orchestra - every player on cue, the score deterministic, the conductor accountable. it is named for leonard bernstein, the american conductor and composer; the project takes its name from him.
 
-the one-line shape: a deterministic scheduler that fans tasks out to multiple cli agents in parallel git worktrees, verifies their output against your tests, and merges what passes. no llm in the coordination loop. every routing decision is logged in an hmac-sha256-chained audit trail.
+the one-line shape: a deterministic scheduler that fans tasks out to multiple cli agents in parallel git worktrees, verifies their output against your tests, and merges what passes. no llm in the coordination loop. with the opt-in audit mode enabled, every routing decision is logged in an hmac-sha256-chained audit trail.
 
 it is open-source, apache 2.0, python 3.12+. solo-maintained by alex chernysh.
 
@@ -45,6 +45,6 @@ because the project orchestrates a crew of coding agents the way leonard bernste
 
 <h2 id="how-to-evaluate">how should i evaluate bernstein?</h2>
 
-the honest answer: install it, run one real task, look at the audit log. `pipx install bernstein && bernstein init && bernstein run -g "fix the failing test in tests/test_foo.py"`. fifteen minutes, no commitment.
+the honest answer: install it, run one real task, look at the audit log (enabled by `--audit`). `pipx install bernstein && bernstein init && bernstein run --audit --goal "fix the failing test in tests/test_foo.py"`. fifteen minutes, no commitment.
 
 the longer answer: read the "who is this for / who is this not for" sections of the evaluation FAQ before deciding. bernstein is not the right shape for everyone - it's built for engineering teams running ≥3 cli coding agents in parallel, regulated / on-prem environments, and forward-deployed engineers who bring their own agent line-up into a client repo and take it with them when they leave.

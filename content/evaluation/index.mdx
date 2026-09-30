@@ -37,7 +37,7 @@ short test: if your last week of claude code sessions had any moment where you w
 
 yes, with specific caveats - not the marketing kind.
 
-what works: the scheduler is deterministic, the merge queue lands what passes the gates, the audit log is hmac-signed and replays cleanly, there are 53 adapters in the registry, the install is one `pipx install bernstein`.
+what works: the scheduler is deterministic, the merge queue lands what passes the gates, the opt-in audit log is hmac-signed and replays cleanly, there are 53 adapters in the registry, the install is one `pipx install bernstein`.
 
 what to know before you commit: the team is one person (alex, the operator). the project is in beta - the version number counts releases, not maturity, and minor versions may change interfaces, so pin the version for anything you depend on. the audit format is hmac-signed but the vendor binary format is not yet a published standard, so cross-tool replay is bernstein-only for now. the cloudflare workers integration is solid for edge sandboxing, but the agents you wrap (claude code, codex) still call their own apis, so api outages upstream knock those agents out individually.
 
@@ -56,8 +56,8 @@ if you're looking for a 12-person team, vc backing, and a roadmap meeting twice 
 specific shapes where the value lands:
 
 - engineering teams running ≥3 cli coding agents in parallel - each agent gets its own git worktree, the merge queue serialises landings, no race conditions
-- regulated or on-prem environments - every routing decision is in plain text, the audit log is hmac-signed and tamper-evident, no saas hop, no third-party data plane
-- platform teams that need an audit log of agent decisions - the orchestrator writes one row per scheduling decision, you can grep it
+- regulated or on-prem environments - every routing decision is in plain text, the audit log (opt-in, `--audit`) is hmac-signed and tamper-evident, no saas hop, no third-party data plane
+- platform teams that need an audit log of agent decisions - with `--audit` the orchestrator writes one row per scheduling decision, you can grep it
 - anyone burning more than $1k/mo on cursor/aider/claude-max who wants determinism - you can replay yesterday's plan and get yesterday's task graph
 - forward-deployed engineers dropping into a client repo - credentials stay in your env, not the client's; agents you spawn are whichever cli tool the client already trusts
 
@@ -110,8 +110,8 @@ specific numbers, not round ones.
 
 the orchestrator itself: $0. apache 2.0, `pipx install bernstein`, no license fee.
 
-the cli agents bernstein wraps cost what they cost - check the vendor's current pricing page, since plan tiers move. claude code on a max plan is a flat monthly subscription. codex cli on chatgpt plus rolls into the chatgpt subscription. aider with sonnet on a heavy day adds up in api spend. gemini cli is free up to a quota. running all four together is what bernstein optimizes - the cost-aware bandit routes each task to the model that's been passing tasks in that shape.
+the cli agents bernstein wraps cost what they cost - check the vendor's current pricing page, since plan tiers move. claude code on a max plan is a flat monthly subscription. codex cli on chatgpt plus rolls into the chatgpt subscription. aider with sonnet on a heavy day adds up in api spend. gemini cli is free up to a quota. running all four together is what bernstein optimizes - the opt-in cost-aware bandit (`--routing bandit`) routes each task to the model that's been passing tasks in that shape.
 
-the operator's own gateway (the thing answering this docs bot) runs on a small ovh vps at roughly $80/yr including hosting, qdrant, and the openrouter free-tier middleware. a self-hosted bernstein run is cheaper than that - you're not paying the openrouter middle hop, you're calling the model apis directly with your own keys.
+the operator's own gateway (the thing answering this docs bot) runs on a small ovh vps with qdrant and the openrouter free-tier middleware. a self-hosted bernstein run is cheaper than that - you're not paying the openrouter middle hop, you're calling the model apis directly with your own keys.
 
-bernstein adds no license cost on top of those model fees. what it changes is the shape of the spend: parallel tasks saturate the api budget you already have instead of queueing behind one agent at a time. cap a run with the `budget` block in `bernstein.yaml` if you want a hard ceiling.
+bernstein adds no license cost on top of those model fees. what it changes is the shape of the spend: parallel tasks saturate the api budget you already have instead of queueing behind one agent at a time. cap a run with the `budget` key in `bernstein.yaml` (or `--budget` on the command line) if you want a hard ceiling.
