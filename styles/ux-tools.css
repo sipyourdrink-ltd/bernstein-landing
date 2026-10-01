@@ -23,7 +23,7 @@
 
 .amd-label {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   color: var(--ink);
 }
 
@@ -32,21 +32,21 @@
   width: 240px;
   padding: 6px 10px;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: var(--bg-paper);
   color: var(--ink);
 }
 
 .amd-file {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 
 .amd-drop {
   border: 1px dashed var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 16px;
   background: var(--bg-paper);
 }
@@ -56,10 +56,10 @@
   min-height: 280px;
   padding: 12px;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   line-height: 1.5;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: #fff;
   color: var(--ink);
   resize: vertical;
@@ -67,7 +67,7 @@
 
 .amd-hint {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--ink-muted, #666);
   margin: 8px 0 0;
 }
@@ -77,7 +77,7 @@
 .amd-findings {
   background: var(--bg-paper);
   padding: 16px 20px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
 }
 
@@ -86,13 +86,13 @@
 .amd-findings h2 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 22px;
+  font-size: var(--text-xl);
   margin: 0 0 12px;
 }
 
 .amd-counts {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   color: var(--ink-muted, #666);
   font-weight: normal;
 }
@@ -101,7 +101,7 @@
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 
 .amd-table th,
@@ -118,7 +118,7 @@
 
 .amd-empty {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   color: #3a7d3a;
   margin: 0;
 }
@@ -156,7 +156,7 @@
   gap: 12px;
   align-items: baseline;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--ink-muted, #666);
 }
 
@@ -168,7 +168,7 @@
 .amd-finding-msg {
   margin: 6px 0 0;
   font-family: var(--font-body, var(--font-mono));
-  font-size: 14px;
+  font-size: var(--text-sm);
   line-height: 1.5;
   color: var(--ink);
 }
@@ -176,12 +176,12 @@
 .amd-finding-docs {
   margin: 4px 0 0;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 .amd-disclaimer {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--ink-muted, #666);
   margin-top: 8px;
 }
@@ -197,21 +197,21 @@
 
 .orch-progress {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   color: var(--ink-muted, #666);
 }
 
 .orch-question {
   background: var(--bg-paper);
   padding: 24px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
 }
 
 .orch-question h2 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 24px;
+  font-size: var(--text-xl);
   margin: 0 0 16px;
 }
 
@@ -224,21 +224,22 @@
 .orch-option-button {
   text-align: left;
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: var(--text-sm);
   padding: 10px 14px;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: #fff;
   color: var(--ink);
   cursor: pointer;
-  transition: border-color 120ms ease, background 120ms ease;
+  transition: border-color var(--dur-2) ease, background var(--dur-2) ease;
 }
 
+/* Keyboard focus keeps the site-wide accent ring from globals.css;
+   only the hover/focus fill is shared. */
 .orch-option-button:hover,
-.orch-option-button:focus {
+.orch-option-button:focus-visible {
   border-color: var(--ink);
   background: rgba(0, 0, 0, 0.04);
-  outline: none;
 }
 
 .orch-option-button.is-selected {
@@ -254,10 +255,10 @@
 
 .orch-controls button {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   padding: 8px 14px;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: #fff;
   cursor: pointer;
 }
@@ -270,20 +271,20 @@
 .orch-result {
   background: var(--bg-paper);
   padding: 24px;
-  border-radius: 6px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
 }
 
 .orch-result h2 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 28px;
+  font-size: var(--text-2xl);
   margin: 0 0 12px;
 }
 
 .orch-result-pick {
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: var(--text-sm);
   margin-bottom: 16px;
 }
 
@@ -293,7 +294,7 @@
 
 .orch-runners h3 {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: var(--text-lead);
   margin: 0 0 8px;
 }
 
@@ -305,7 +306,7 @@
 
 .orch-runners li {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   margin-bottom: 6px;
 }
 
@@ -314,9 +315,9 @@
   background: #111;
   color: #f4ecdc;
   padding: 12px 14px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   overflow-x: auto;
 }
 
@@ -329,7 +330,7 @@
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
 }
 
 .orch-table th,

@@ -170,7 +170,7 @@ export default async function QIndexPage() {
                   {' '}
                   ·{' '}
                 </span>
-                <span className="ask-eyebrow" style={{ fontSize: '0.85em' }}>
+                <span className="ask-faq-count">
                   {group.items.length} answer{group.items.length === 1 ? '' : 's'}
                 </span>
               </h2>

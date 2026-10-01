@@ -28,14 +28,14 @@
 
 .cost-page-header .blog-back-link {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   margin-bottom: 16px;
 }
 
 .cost-page-header h1 {
   font-family: var(--font-display);
   font-weight: 350;
-  font-size: clamp(36px, 5vw, 56px);
+  font-size: var(--text-3xl);
   line-height: 1.05;
   letter-spacing: -0.022em;
   color: var(--ink);
@@ -44,7 +44,7 @@
 
 .cost-page-header .cost-page-lede {
   font-family: var(--font-body);
-  font-size: 18px;
+  font-size: var(--text-lead);
   line-height: 1.55;
   color: var(--ink-soft);
   max-width: 640px;
@@ -64,7 +64,7 @@
 .cost-calc-header h2 {
   font-family: var(--font-display);
   font-weight: 380;
-  font-size: clamp(26px, 3vw, 34px);
+  font-size: var(--text-2xl);
   letter-spacing: -0.012em;
   color: var(--ink);
   margin: 8px 0 12px;
@@ -78,7 +78,7 @@
 
 .cost-calc-header .v2-kicker {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.18em;
   color: var(--ink-soft);
@@ -86,7 +86,7 @@
 
 .cost-calc-header .cost-calc-lede {
   font-family: var(--font-body);
-  font-size: 14.5px;
+  font-size: var(--text-sm);
   line-height: 1.55;
   color: var(--ink-soft);
   max-width: 640px;
@@ -118,7 +118,7 @@
 
 .cost-calc-inputs legend {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--ink-soft);
@@ -136,7 +136,7 @@
 
 .cost-calc-input label {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: var(--text-sm);
   color: var(--ink);
   font-weight: 500;
 }
@@ -148,7 +148,7 @@
   border-radius: var(--radius);
   background: var(--bg-paper);
   overflow: hidden;
-  transition: border-color 120ms ease;
+  transition: border-color var(--dur-2) ease;
 }
 
 .cost-calc-input-row:focus-within {
@@ -163,7 +163,7 @@
   background: var(--bg-paper-2);
   color: var(--ink-soft);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   border-right: 1px solid var(--rule);
 }
 
@@ -175,7 +175,7 @@
   background: var(--bg-paper);
   color: var(--ink);
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: var(--text-base);
   font-variant-numeric: tabular-nums;
   -moz-appearance: textfield;
 }
@@ -189,7 +189,7 @@
 /* OUTPUT BLOCK */
 .cost-calc-output {
   background: var(--bg-deep);
-  color: oklch(96% 0.015 75);
+  color: var(--bg-paper);
   border-radius: var(--radius);
   padding: 20px 24px;
   display: flex;
@@ -201,26 +201,26 @@
 
 .cost-calc-output-kicker {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  color: oklch(70% 0.005 60);
+  color: var(--term-ink-soft);
 }
 
 .cost-calc-tooltip {
   display: inline-block;
   margin-left: 6px;
-  color: oklch(80% 0.01 75);
+  color: var(--term-ink);
   text-decoration: none;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
 }
 
 .cost-calc-tooltip:hover { color: var(--accent-soft); text-decoration: underline; }
 
 .cost-calc-output-figure {
   font-family: var(--font-display);
-  font-size: clamp(36px, 5vw, 52px);
+  font-size: var(--text-3xl);
   font-weight: 380;
   line-height: 1.04;
   letter-spacing: -0.018em;
@@ -230,21 +230,21 @@
   gap: 8px;
 }
 
-.cost-calc-output-sep { color: oklch(70% 0.005 60); }
+.cost-calc-output-sep { color: var(--term-ink-soft); }
 
 .cost-calc-output-unit {
   font-family: var(--font-mono);
-  font-size: 18px;
-  color: oklch(70% 0.005 60);
+  font-size: var(--text-lead);
+  color: var(--term-ink-soft);
   letter-spacing: 0;
   font-weight: 400;
 }
 
 .cost-calc-output-meta {
   font-family: var(--font-body);
-  font-size: 13.5px;
+  font-size: var(--text-sm);
   line-height: 1.55;
-  color: oklch(82% 0.005 60);
+  color: var(--term-ink);
 }
 
 /* MATH BREAKDOWN */
@@ -256,7 +256,7 @@
 
 .cost-calc-math h3 {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--ink-soft);
@@ -279,7 +279,7 @@
   align-items: baseline;
   padding: 6px 0;
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--text-sm);
   line-height: 1.5;
   color: var(--ink);
   border-bottom: 1px solid var(--rule);
@@ -291,7 +291,7 @@
 
 .cost-calc-math-value {
   font-family: var(--font-mono);
-  font-size: 13.5px;
+  font-size: var(--text-sm);
   color: var(--ink);
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -299,14 +299,14 @@
 
 .cost-calc-math-value small {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
   color: var(--ink-faint);
   margin-left: 6px;
 }
 
 .cost-calc-math-footnote {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: var(--text-sm);
   line-height: 1.55;
   color: var(--ink-soft);
   font-style: italic;
@@ -322,7 +322,7 @@
   flex-direction: column;
   gap: 6px;
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: var(--text-base);
   line-height: 1.55;
   color: var(--ink);
 }
@@ -335,7 +335,7 @@
 .cost-calc-cta-link {
   margin-top: 10px;
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 
 .cost-calc-cta-link a {
@@ -356,14 +356,14 @@
 .cost-prices h2 {
   font-family: var(--font-display);
   font-weight: 380;
-  font-size: clamp(22px, 2.5vw, 28px);
+  font-size: var(--text-xl);
   color: var(--ink);
   margin-bottom: 8px;
 }
 
 .cost-prices-meta {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--ink-soft);
   margin-bottom: 16px;
 }
@@ -379,7 +379,7 @@
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 
 .cost-prices-table th,
@@ -394,7 +394,7 @@
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.10em;
-  font-size: 11px;
+  font-size: var(--text-xs);
   color: var(--ink-soft);
   background: var(--bg-paper-2);
 }
@@ -407,7 +407,7 @@
   background: var(--bg-paper-2);
   text-transform: none;
   letter-spacing: 0.04em;
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--ink);
   font-weight: 500;
 }
@@ -416,14 +416,14 @@
 
 .cost-prices-table code {
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: var(--text-xs);
   color: var(--ink);
   background: transparent;
 }
 
 .cost-prices-sources {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: var(--text-sm);
   color: var(--ink-soft);
   margin-top: 14px;
 }
@@ -437,7 +437,7 @@
 
 .cost-prices-footnote {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: var(--text-sm);
   line-height: 1.55;
   color: var(--ink-soft);
   margin-top: 10px;
@@ -454,14 +454,14 @@
 .cost-method h2 {
   font-family: var(--font-display);
   font-weight: 380;
-  font-size: clamp(22px, 2.5vw, 28px);
+  font-size: var(--text-xl);
   color: var(--ink);
   margin-bottom: 12px;
 }
 
 .cost-method p {
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: var(--text-base);
   line-height: 1.65;
   color: var(--ink-soft);
   margin-bottom: 14px;
@@ -470,10 +470,10 @@
 
 .cost-method code {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   background: var(--code-paper);
   padding: 1px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 /* ---------------------------------------------------------------------------
@@ -486,7 +486,7 @@
 
 .cliqs-body p {
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: var(--text-base);
   line-height: 1.65;
   color: var(--ink-soft);
   margin-bottom: 14px;
@@ -495,10 +495,10 @@
 
 .cliqs-body code {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   background: var(--code-paper);
   padding: 1px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .cliqs-body a {
@@ -510,7 +510,7 @@
 .cliqs-step-heading {
   font-family: var(--font-display);
   font-weight: 380;
-  font-size: clamp(22px, 2.5vw, 28px);
+  font-size: var(--text-xl);
   color: var(--ink);
   margin: 36px 0 14px;
   scroll-margin-top: 80px;
@@ -525,10 +525,10 @@
 
 .cliqs-code {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--text-sm);
   background: var(--code-paper);
   border: 1px solid var(--rule);
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius);
   padding: 14px 16px;
   margin: 8px 0 18px;
   overflow-x: auto;
@@ -545,7 +545,7 @@
 
 .cliqs-list {
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: var(--text-base);
   line-height: 1.65;
   color: var(--ink-soft);
   margin: 0 0 18px 18px;
@@ -574,7 +574,7 @@
 
 .cost-faq h2 {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--ink-soft);
@@ -595,7 +595,7 @@
 
 .cost-faq-item h3 {
   font-family: var(--font-body);
-  font-size: 17px;
+  font-size: var(--text-base);
   font-weight: 600;
   line-height: 1.4;
   color: var(--ink);
@@ -604,7 +604,7 @@
 
 .cost-faq-item p {
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: var(--text-base);
   line-height: 1.65;
   color: var(--ink-soft);
   margin: 0;
