@@ -23,9 +23,9 @@ const BASE_CONTENT = `# Bernstein - Complete Technical Reference
 
 ${PROJECT_OVERVIEW}
 
-State lives in \`.sdd/\` - no server to provision. Per-agent credential scoping keeps each agent's keys out of the others' environments. The 40+ adapter spread means it runs on whichever CLI agent you already trust (Claude Code, Codex, Gemini CLI, Aider, and more). A lineage spine and replay journal are always on, so any run can be reconstructed step by step; enable the HMAC-chained audit log and every step becomes a signed record a reviewer who did not execute the run can check offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Cluster mode and an air-gap install profile are included.
+State lives in \`.sdd/\` - no server to provision. Per-agent credential scoping keeps each agent's keys out of the others' environments. The 52 adapter spread means it runs on whichever CLI agent you already trust (Claude Code, Codex, Gemini CLI, Aider, and more). A lineage spine and replay journal are always on, so any run can be reconstructed step by step; enable the HMAC-chained audit log and every step becomes a signed record a reviewer who did not execute the run can check offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Cluster mode and an air-gap install profile are included.
 
-The orchestrator itself is deterministic Python code - no LLM tokens are spent on coordination, scheduling, or task management. LLMs are only used by the agents themselves to write code.
+The scheduler itself is deterministic Python code - no LLM tokens are spent on coordination, scheduling, or task management. LLMs are only used by the agents themselves to write code.
 
 **Status: beta.** Solo-maintained, under active development. The version number counts releases, not maturity - minor versions may change interfaces. Pin the version for anything you depend on.
 
@@ -94,13 +94,13 @@ bernstein run plans/my-project.yaml
 
 ### Design Principles
 
-1. **Deterministic orchestrator**: The orchestrator is pure Python code. No LLM calls for scheduling, routing, or coordination. This makes behavior predictable, debuggable, and fast.
+1. **Deterministic scheduler**: The scheduler is pure Python code. No LLM calls for scheduling, routing, or coordination. This makes behavior predictable, debuggable, and fast.
 
 2. **File-based state**: All state lives in the \`.sdd/\` directory - backlog, runtime data, metrics, configuration. No in-memory-only state that would be lost on crash.
 
 3. **Short-lived agents**: Agents handle 1-3 tasks each, then exit. No long-running agent processes. Fresh context per task prevents hallucination drift.
 
-4. **Agent-agnostic**: Works with any CLI coding agent. Currently ships 40+ adapters. Adding a new agent requires implementing a simple adapter interface.
+4. **Agent-agnostic**: Works with any CLI coding agent. Currently ships 52 adapters. Adding a new agent requires implementing a simple adapter interface.
 
 5. **Model-per-task routing**: A contextual bandit router learns which model works best for each task type and complexity level. In our own runs, the bandit router cut spend roughly in half compared to uniformly using expensive models. Measure yours with bernstein cost.
 
@@ -213,7 +213,7 @@ The system is organized into 22 sub-packages under \`src/bernstein/core/\`:
 
 ---
 
-## Supported Agents (40+ Adapters)
+## Supported Agents (52 Adapters)
 
 | Agent | Description | Models |
 |-------|-------------|--------|
@@ -623,13 +623,13 @@ Bernstein can run agents on Cloudflare's edge network:
 ## FAQ
 
 ### What is Bernstein?
-Bernstein is the open-source governance layer for AI agents (Claude Code, Codex, Gemini CLI and 40+ more) that runs them in parallel on your codebase. It decomposes goals into tasks, assigns each to an agent in its own git worktree, and verifies results through lint, type, and test gates before merging. The scheduler is plain Python with no model in the coordination loop, so replaying a plan reproduces its task graph byte-identically.
+Bernstein is the open-source governance layer for AI agents (Claude Code, Codex, Gemini CLI and 52 total) that runs them in parallel on your codebase. It decomposes goals into tasks, assigns each to an agent in its own git worktree, and verifies results through lint, type, and test gates before merging. The scheduler is plain Python with no model in the coordination loop, so replaying a plan reproduces its task graph byte-identically.
 
-### How does it differ from an LLM-driven orchestrator?
-The orchestrator is deterministic Python code - no model tokens are spent on coordination, and the same plan replays to the same task graph. It drives real CLI coding agents rather than API-only models, and each one gets a git worktree, quality gates, and cost tracking without extra wiring.
+### How does it differ from an LLM-driven scheduler?
+The scheduler is deterministic Python code - no model tokens are spent on coordination, and the same plan replays to the same task graph. It drives real CLI coding agents rather than API-only models, and each one gets a git worktree, quality gates, and cost tracking without extra wiring.
 
 ### What agents does Bernstein support?
-Bernstein ships 40+ adapters for popular coding agents including Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Ollama, GitHub Copilot, Droid, Crush, and more. It also has a generic adapter for wrapping any CLI tool.
+Bernstein ships 52 adapters for popular coding agents including Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Ollama, GitHub Copilot, Droid, Crush, and more. It also has a generic adapter for wrapping any CLI tool.
 
 ### How does task routing work?
 Bernstein uses a contextual bandit (epsilon-greedy) router that learns which model works best for each task type and complexity. Simple tasks go to cheaper models (Haiku, Flash), complex architecture tasks go to expensive models (Opus). In our own runs, the bandit router cut spend roughly in half compared to using expensive models for everything. Measure yours with bernstein cost.

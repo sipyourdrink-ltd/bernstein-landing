@@ -83,7 +83,7 @@ export const SOFTWARE_APPLICATION_JSON_LD: JsonLdData = {
   },
   featureList: [
     'Deterministic scheduling (no LLM in the coordination loop)',
-    '40+ CLI agent adapters',
+    '52 CLI agent adapters',
     'Always-on lineage spine and replay journal',
     'Opt-in HMAC-chained audit log with signed receipts',
     'Per-task git worktree isolation',

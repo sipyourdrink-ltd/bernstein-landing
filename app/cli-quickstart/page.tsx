@@ -200,7 +200,7 @@ bernstein init`}</code>
             <p>
               Open <code>bernstein.yaml</code> and edit the <code>agents</code>{' '}
               block. Each entry binds a <code>name</code> (free-form), an{' '}
-              <code>adapter</code> (one of the 40+ CLI adapters listed in the
+              <code>adapter</code> (one of the 52 CLI adapters listed in the
               project README), a <code>role</code>, and a <code>model</code>.
               A minimal three-agent config looks like this:
             </p>
