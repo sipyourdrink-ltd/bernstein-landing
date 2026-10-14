@@ -25,4 +25,4 @@
    reality.
 
    Keep this file isolated: do not add unrelated exports here. */
-export const BERNSTEIN_VERSION = '3.20.0';
+export const BERNSTEIN_VERSION = '3.21.0';
