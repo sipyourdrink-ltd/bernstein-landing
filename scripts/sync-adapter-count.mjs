@@ -34,7 +34,7 @@
  * loudly instead of silently keeping a stale number.
  *
  * Node built-ins only (fs, path, url) - no new dependencies, and no
- * TypeScript, so it runs on the node:20-alpine base image.
+ * TypeScript, so plain `node` runs it in the node:22-alpine base image.
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';

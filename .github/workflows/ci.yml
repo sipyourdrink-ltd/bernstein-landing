@@ -5,11 +5,11 @@ name: ci
 # build time, so a page that throws only fails at `next build` - never in
 # `tsc`, and never in a unit test.
 #
-# Two jobs, on two Node majors, because they answer different questions.
-# The test suite is TypeScript executed directly, which needs the type
-# stripping added in Node 22.6. The production image is `node:20-alpine`,
-# so the build has to be proved on 20 - running it only on a newer major
-# would let a syntax or API change pass here and fail in the image.
+# Two jobs, because they answer different questions. The test suite is
+# TypeScript executed directly, which needs the type stripping added in
+# Node 22.6, so it runs on the `.nvmrc` major. The build runs on the major
+# the production image ships (`node:22-alpine`) - proving it on any other
+# major would let a syntax or API change pass here and fail in the image.
 
 on:
   push:
@@ -72,7 +72,7 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7
         with:
           # The major the Dockerfile ships. Keep the two in step.
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install
