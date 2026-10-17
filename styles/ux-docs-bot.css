@@ -144,6 +144,8 @@
 .docs-bot-transcript-a pre code {
   background: transparent;
   padding: 0;
+  color: inherit;
+  font-size: inherit;
 }
 .docs-bot-transcript-cites {
   display: inline-flex;
