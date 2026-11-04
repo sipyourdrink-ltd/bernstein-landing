@@ -122,6 +122,7 @@ Cloud artifact sinks, progressive skill packs, and Cloudflare cloud execution ar
 
 ## Docs
 
+- [Repository docs](https://github.com/sipyourdrink-ltd/bernstein/tree/main/docs): Markdown docs that ship with the source
 - [Documentation](https://docs.bernstein.run/): Full technical documentation
 - [Architecture](https://docs.bernstein.run/en/latest/architecture/): System architecture and design
 - [Getting Started](https://docs.bernstein.run/en/latest/getting-started/): Installation and quickstart
@@ -144,6 +145,7 @@ Cloud artifact sinks, progressive skill packs, and Cloudflare cloud execution ar
 
 ## Resources
 
+- [Ask DeepWiki](https://deepwiki.com/sipyourdrink-ltd/bernstein): Question answering over the repository
 - [GitHub](https://github.com/sipyourdrink-ltd/bernstein): Source code and issues
 - [PyPI](https://pypi.org/project/bernstein/): Python package
 - [npm](https://www.npmjs.com/package/bernstein-orchestrator): Node.js wrapper
