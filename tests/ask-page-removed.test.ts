@@ -5,9 +5,7 @@
  * route keeps reappearing in: the route tree itself, the sitemap, and
  * the nav links a visitor can click.
  *
- * `/#ask` is not this route - it is an in-page anchor to the hero's ask
- * heading (`app/page.tsx` renders `<h2 id="ask">`) and is explicitly
- * allowed below.
+ * The nav's Ask link opens the repository's DeepWiki page.
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -34,18 +32,19 @@ test('the sitemap route never emits a literal /ask <loc>', () => {
   );
 });
 
-test('nav links point at the #ask anchor, never a standalone /ask page', () => {
+test('nav links include DeepWiki, never a standalone /ask page', () => {
   const src = read('components/landing/Nav.tsx');
   const hrefs = [...src.matchAll(/href=["']([^"']+)["']/g)].map((m) => m[1]);
   for (const href of hrefs) {
     assert.notEqual(
       href,
       '/ask',
-      'Nav.tsx must not link to a standalone /ask page - use the "/#ask" in-page anchor instead',
+      'Nav.tsx must not link to a standalone /ask page',
     );
   }
-  assert.ok(
-    hrefs.includes('/#ask'),
-    'Nav.tsx should still link to the "/#ask" in-page anchor for the ask-first hero',
+  assert.equal(
+    hrefs.filter((href) => href === 'https://deepwiki.com/sipyourdrink-ltd/bernstein').length,
+    2,
+    'Nav.tsx must link to DeepWiki in both mobile and desktop navigation',
   );
 });
