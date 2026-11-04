@@ -89,3 +89,45 @@ jobs:
         # Nothing outbound from CI: `scripts/submit-indexnow.mjs` runs
         # through `postbuild` and returns early under GITHUB_ACTIONS, so
         # the search-engine ping stays a deploy step.
+
+      - name: Generate and check llms.txt
+        run: |
+          PORT=3100 HOSTNAME=127.0.0.1 node .next/standalone/server.js &
+          echo "$!" > "$RUNNER_TEMP/llms-server.pid"
+          curl --fail --silent --show-error --retry 30 --retry-connrefused \
+            --retry-delay 1 --retry-max-time 60 --max-time 2 \
+            http://127.0.0.1:3100/api/health
+          curl -fsS http://127.0.0.1:3100/llms.txt -o llms.txt
+          test -s llms.txt
+          for url in \
+            'https://bernstein.run/cli-quickstart' \
+            'https://mcp.bernstein.run/verify' \
+            'https://github.com/sipyourdrink-ltd/bernstein/tree/main/docs' \
+            'https://deepwiki.com/sipyourdrink-ltd/bernstein'; do
+            grep -Fq "$url" llms.txt
+          done
+          duplicates=$(grep -oE 'https?://[^) ]+' llms.txt | sort | uniq -d)
+          test -z "$duplicates"
+
+      - name: Upload llms.txt
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: llms-txt
+          path: llms.txt
+          if-no-files-found: error
+
+      - name: Stop llms.txt server
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/llms-server.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/llms-server.pid")"
+          fi
+
+      - name: Blog freeze
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        # Remove this step in the same commit that lifts the freeze.
+        run: |
+          git fetch --depth=1 origin "$BASE_REF"
+          git diff --exit-code FETCH_HEAD -- content/blog
