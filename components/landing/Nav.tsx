@@ -77,7 +77,7 @@ export function Nav() {
             Verify
           </a>
           <a
-            href="https://docs.bernstein.run/"
+            href="https://github.com/sipyourdrink-ltd/bernstein/tree/main/docs"
             target="_blank"
             rel="noopener noreferrer"
             data-umami-event="read-the-docs-click"
@@ -86,7 +86,9 @@ export function Nav() {
             Docs
           </a>
           <a
-            href="/#ask"
+            href="https://deepwiki.com/sipyourdrink-ltd/bernstein"
+            target="_blank"
+            rel="noopener noreferrer"
             data-umami-event="click-ask-internal"
             data-umami-event-source="nav-mobile"
           >
@@ -142,7 +144,7 @@ export function Nav() {
               Verify
             </a>
             <a
-              href="https://docs.bernstein.run/"
+              href="https://github.com/sipyourdrink-ltd/bernstein/tree/main/docs"
               target="_blank"
               rel="noopener noreferrer"
               data-umami-event="read-the-docs-click"
@@ -151,7 +153,9 @@ export function Nav() {
               Docs
             </a>
             <a
-              href="/#ask"
+              href="https://deepwiki.com/sipyourdrink-ltd/bernstein"
+              target="_blank"
+              rel="noopener noreferrer"
               data-umami-event="click-ask-internal"
               data-umami-event-source="nav-desktop"
             >
