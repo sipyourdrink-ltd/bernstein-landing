@@ -197,7 +197,7 @@ export default async function SponsorsPage() {
                 : `${realCount} ${realCount === 1 ? 'sponsor' : 'sponsors'} so far. ordered by recognizability, then alphabetical. real avatars only.`}
             </p>
             <p>
-              <strong>stage honesty.</strong> a few hundred github stars. one
+              <strong>stage honesty.</strong> one
               maintainer. no production reference customer. no SOC 2 / ISO
               27001 / FedRAMP. tiers below are picked by who you are, not how
               much we are worth. nothing here gets diverted into growth

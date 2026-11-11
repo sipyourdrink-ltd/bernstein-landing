@@ -113,8 +113,8 @@ If bernstein routed a model that saved you a bill, $25 covers a month of coffee.
 
 ---
 
-Brand assets belong to [Sip Your Drink Ltd](https://sipyourdrink.ltd); the brand
+Brand assets belong to Alex Chernysh ([Sip Your Drink](https://sipyourdrink.ltd)); the brand
 system itself lives in the
 [orchestrator repository](https://github.com/sipyourdrink-ltd/bernstein).
 
-© [Sip Your Drink Ltd](https://sipyourdrink.ltd) · [MIT](LICENSE)
+© Alex Chernysh · [Sip Your Drink](https://sipyourdrink.ltd) · [MIT](LICENSE)
