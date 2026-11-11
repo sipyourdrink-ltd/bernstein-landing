@@ -146,14 +146,16 @@ export default function PrivacyPage() {
               model, timing, whether the question was declined, and the time.
               These records are deleted after 90 days. A separate integrity
               log keeps, for each answer, a hash of the question and of the
-              session, the model, the cost, the documentation passages cited
-              and timing. It holds no question or answer text. No deletion
+              session, the model, the cost, your locale, the documentation
+              passages cited, timing, and whether the question was declined.
+              It holds no question or answer text. No deletion
               period is set for this log yet.
             </p>
             <p>
               Until 19 September 2026 the assistant also wrote the full text
-              of questions and answers to a log on the server, together with
-              the country, a shortened browser name and a daily-salted hash of
+              of questions and answers to a log on the server, together with a
+              session identifier, the country, a shortened browser name and a
+              daily-salted hash of
               the IP address. That logging is switched off. The file from that
               period still exists. It is not read or used.
             </p>
