@@ -214,22 +214,6 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
     }
   }, [isStreaming, state.text]);
 
-  /* Sync query → URL (?q=) so a refresh keeps the conversation handle.
-     Out of scope: full snapshot rehydration; only the last typed query
-     persists. */
-  useEffect(() => {
-    if (variant === 'modal') return; /* modal uses ?ask= instead */
-    if (typeof window === 'undefined') return;
-    if (!query) return;
-    try {
-      const url = new URL(window.location.href);
-      url.searchParams.set('q', query);
-      window.history.replaceState(window.history.state, '', url.toString());
-    } catch {
-      /* swallow */
-    }
-  }, [query, variant]);
-
   /* Auto-focus the input when variant requests it. */
   useEffect(() => {
     if (autoFocus) inputRef.current?.focus();
@@ -275,11 +259,24 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
         /* swallow */
       }
       dispatch({ kind: 'ASK', query: q });
+      /* Write ?q= only for a question actually asked, never while it is
+         typed: the read on load below sends ?q= as a question, so a
+         keystroke-synced address would send unsent text on reload.
+         The modal uses ?ask= instead. */
+      if (variant !== 'modal' && typeof window !== 'undefined') {
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.set('q', q);
+          window.history.replaceState(window.history.state, '', url.toString());
+        } catch {
+          /* swallow */
+        }
+      }
       setShimmerHeld(true);
       setTimeout(() => setShimmerHeld(false), SHIMMER_MIN_MS);
       ask({ query: q, history: wireHistory });
     },
-    [ask, wireHistory],
+    [ask, wireHistory, variant],
   );
 
   /* Submit handler. */

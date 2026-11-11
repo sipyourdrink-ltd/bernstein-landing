@@ -111,9 +111,7 @@ export default async function SponsorsPage() {
             <p>
               <strong>stage honesty.</strong> one
               maintainer. no production reference customer. no SOC 2 / ISO
-              27001 / FedRAMP. nothing here gets diverted into growth
-              marketing or paid distribution. it goes into code and
-              audit-chain reference work.
+              27001 / FedRAMP.
             </p>
           </header>
         </div>
