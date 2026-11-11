@@ -29,6 +29,10 @@ interface FetchResult {
 
 let cache: CachedStats | null = null;
 let cacheTime = 0;
+/* Set after a failed cycle. The Next.js fetch-data-cache may hold the bad
+   upstream body (e.g. a 200 with zero stars) for the full revalidate
+   window, so the next cycle must bypass it to recover. */
+let lastFailed = false;
 
 async function fetchFresh(bypassDataCache: boolean): Promise<FetchResult> {
   /* Authorise the GitHub call when GITHUB_TOKEN (or GH_TOKEN) is set.
@@ -115,7 +119,7 @@ export async function GET(req: Request) {
     });
   }
 
-  const fresh = await fetchFresh(force);
+  const fresh = await fetchFresh(force || lastFailed);
 
   // Cache a fresh positive star count for the full revalidation window.
   if (fresh.stars !== undefined) {
@@ -125,6 +129,7 @@ export async function GET(req: Request) {
     };
     cache = merged;
     cacheTime = now;
+    lastFailed = false;
     return NextResponse.json(merged, {
       headers: { 'Cache-Control': `public, s-maxage=${REVALIDATE_SECONDS}, stale-while-revalidate=3600` },
     });
@@ -135,6 +140,7 @@ export async function GET(req: Request) {
   // cases so CF doesn't propagate a 5xx for what is effectively a planned
   // graceful degradation - the client checks `fallback`/zero values.
   console.warn('[stats] upstream fetch failed or timed out; serving fallback');
+  lastFailed = true;
   if (cache) {
     return NextResponse.json(cache, {
       headers: {

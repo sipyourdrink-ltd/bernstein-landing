@@ -69,7 +69,7 @@ test('an expired cache serves last-known-good stars on failure and then recovers
   t.mock.method(Date, 'now', () => now);
   t.mock.method(console, 'error', () => {});
   t.mock.method(console, 'warn', () => {});
-  t.mock.method(globalThis, 'fetch', async () =>
+  const fetchMock = t.mock.method(globalThis, 'fetch', async () =>
     failing ? new Response(null, { status: 503 }) : Response.json({ stargazers_count: 82 }),
   );
   const { GET } = await freshRoute();
@@ -83,10 +83,14 @@ test('an expired cache serves last-known-good stars on failure and then recovers
   assert.equal(fallback.headers.get('x-cache-source'), 'stale-fallback');
 
   failing = false;
-  const recovered = await GET(request('?force=1'));
+  const recovered = await GET(request());
   assert.equal((await recovered.json()).stars, 82);
   assert.equal(recovered.headers.get('cache-control'), normalCache);
   assert.equal(recovered.headers.get('x-cache-source'), null);
+  // The cycle after a failure bypasses the Next.js data cache.
+  const calls = fetchMock.mock.calls;
+  const recoveryInit = calls[calls.length - 1].arguments[1] as RequestInit;
+  assert.equal(recoveryInit.cache, 'no-store');
 });
 
 for (const failure of ['http', 'network', 'json', 'zero', 'negative', 'missing'] as const) {

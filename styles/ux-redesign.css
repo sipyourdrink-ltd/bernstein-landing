@@ -389,6 +389,19 @@
   border-radius: var(--radius);
   padding: 12px 14px;
 }
+/* Linked stats stay visually identical to their non-link siblings (no
+   underline, same color), with a subtle hover so they still read as
+   interactive on focus. */
+.v2-mini-stats a.v2-ms-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--dur-1) ease-out;
+}
+.v2-mini-stats a.v2-ms-link:hover,
+.v2-mini-stats a.v2-ms-link:focus-visible {
+  border-color: var(--ink);
+}
 .v2-mini-stats .v2-ms .v2-ms-n {
   font-family: var(--font-display);
   font-weight: 400;
