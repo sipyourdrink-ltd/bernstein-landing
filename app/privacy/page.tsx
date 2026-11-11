@@ -134,7 +134,7 @@ export default function PrivacyPage() {
             <p>
               Until 11 November 2026 the docs assistant also put the text
               being typed into the page address, and the analytics script
-              reported every change of the address as a page view. Page-view
+              reported every change of the address as a page view. Analytics
               records from that time can therefore hold text typed into the
               assistant, including text that was never sent. They are kept and
               deleted like the other analytics records.
