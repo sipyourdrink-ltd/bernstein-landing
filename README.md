@@ -1,6 +1,6 @@
 <div align="center">
 
-<img alt="" src="https://raw.githubusercontent.com/sipyourdrink-ltd/bernstein/main/docs/assets/logo-readme.svg" width="336">
+<img alt="" src="docs/readme-logo.svg" width="336">
 
 ### the source of [bernstein.run](https://bernstein.run)
 
