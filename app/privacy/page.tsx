@@ -103,6 +103,15 @@ export default function PrivacyPage() {
               browser&rsquo;s user agent.
             </p>
             <p>
+              Until 11 November 2026 the site also sent one event to the
+              analytics server for each answer of the docs assistant: the
+              model, timing, the lengths of the question and the answer, token
+              counts, your locale, the position of the message in the
+              conversation, and whether the answer came from a cache or was
+              declined. Those events carry no question or answer text. They
+              are kept and deleted like the other analytics records.
+            </p>
+            <p>
               The analytics server uses your IP address to look up your
               country, region and city and to compute a session hash. It
               stores the page views and clicks above together with that
@@ -195,6 +204,9 @@ export default function PrivacyPage() {
               <li>
                 <strong>Cloudflare</strong> serves the site; every request
                 passes through it.
+              </li>
+              <li>
+                <strong>Netcup</strong> hosts the server this site runs on.
               </li>
               <li>
                 <strong>GitHub</strong>: when the site shows sponsor avatars,
