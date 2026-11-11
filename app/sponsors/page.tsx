@@ -57,11 +57,7 @@ export const metadata: Metadata = {
 };
 
 /** Tier ladder. Single source - same shape feeds the table render and
- *  the JSON-LD Offer blocks below. Keep label + benefits in lowercase.
- *
- *  ``slug`` is the Umami prop value for the
- *  ``sponsors-tier-click`` event (compact + stable so the report
- *  groupings don't churn when copy is edited). */
+ *  the JSON-LD Offer blocks below. Keep label + benefits in lowercase. */
 const TIER_LADDER = [
   {
     price: '$5/mo',
@@ -187,9 +183,7 @@ export default async function SponsorsPage() {
               bernstein is the apache 2.0 implementation of an
               HMAC-chained audit log for parallel CLI coding agents. every
               scheduling decision is plain python, every agent action is
-              tamper-evidently logged. the audit chain maps cleanly to EU AI
-              Act Article 12 automatic event-logging and DORA Article 8-15
-              ICT-incident-reporting evidence.
+              tamper-evidently logged.
             </p>
             <p>
               {realCount === 0
@@ -225,10 +219,8 @@ export default async function SponsorsPage() {
               </thead>
               <tbody>
                 {/* Each row's tier label cell is an anchor to the
-                    GH-sponsors deep link with the tier preselected. The
-                    cell carries both ``sponsors-tier-click`` (per-tier)
-                    and ``gh-sponsors-click`` (every sponsors anchor), so
-                    either name can be read on its own. ``rel="external"``
+                    GH-sponsors deep link with the tier preselected.
+                    ``rel="external"``
                     flags this as leaving the site without breaking the
                     GitHub page's auth flow. */}
                 {TIER_LADDER.map((tier) => (
@@ -239,10 +231,6 @@ export default async function SponsorsPage() {
                         href={tierHref(tier)}
                         rel="external noopener noreferrer"
                         target="_blank"
-                        data-umami-event="sponsors-tier-click"
-                        data-umami-event-tier={tier.slug}
-                        data-umami-event-surface="sponsors-page-tier"
-                        data-umami-event-conversion="sponsor-conversion"
                         aria-label={`sponsor at ${tier.price} tier - ${tier.label}`}
                       >
                         &ldquo;{tier.label}&rdquo;
@@ -265,10 +253,6 @@ export default async function SponsorsPage() {
             href={SPONSOR_URL}
             rel="external noopener noreferrer"
             target="_blank"
-            data-umami-event="gh-sponsors-click"
-            data-umami-event-source="sponsors-page-cta"
-            data-umami-event-surface="sponsors-page-cta"
-            data-umami-event-conversion="sponsor-conversion"
           >
             github.com/sponsors/chernistry &rarr;
           </a>

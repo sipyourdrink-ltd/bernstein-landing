@@ -67,9 +67,6 @@ export function ShareButtons({ url, title, variant = 'compact' }: Props) {
           className="share-btn"
           aria-label={`Share on ${target.name}`}
           title={`Share on ${target.name}`}
-          data-umami-event="click-share"
-          data-umami-event-target={target.name.toLowerCase()}
-          data-umami-event-source={`blog-${variant}`}
         >
           {target.icon}
         </a>

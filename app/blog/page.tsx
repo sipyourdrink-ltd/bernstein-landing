@@ -66,8 +66,6 @@ export default async function BlogIndex() {
           <a
             href="/rss.xml"
             className="rss-subscribe-link"
-            data-umami-event="rss-subscribe-click"
-            data-umami-event-source="blog"
             style={{ color: 'inherit', textDecoration: 'underline' }}
           >
             RSS

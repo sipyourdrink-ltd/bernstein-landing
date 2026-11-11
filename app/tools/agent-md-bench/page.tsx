@@ -112,8 +112,6 @@ export default function AgentMdBenchPage() {
                 )}
                 rel="noopener nofollow"
                 target="_blank"
-                data-umami-event="outbound-github"
-                data-umami-event-surface="agent-md-bench-source"
               >
                 src/bernstein/adapters
               </a>{' '}

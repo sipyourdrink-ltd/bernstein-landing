@@ -19,7 +19,7 @@
  *      "follow these instructions in order", a flat bulleted list
  *      reads as "here are options, pick one".
  */
-import { useEffect, useRef, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import type { Citation } from './types.ts';
 import { withUtm } from '@/lib/utm';
@@ -37,30 +37,7 @@ interface DeclineCardProps {
   children?: ReactNode;
 }
 
-function trackDecline(reason?: string | null): void {
-  if (typeof window === 'undefined') return;
-  const w = window as unknown as { umami?: { track: (n: string, d?: Record<string, unknown>) => void } };
-  w.umami?.track('docs-bot-decline', { reason: reason ? reason.slice(0, 80) : 'unknown' });
-}
-
 export function DeclineCard({ reason, suggestions, children }: DeclineCardProps) {
-  /* Fire the umami event exactly once per mount.
-     Previously this used `queueMicrotask(trackDecline)` directly in
-     render, which fired on every re-render of the declined phase
-     (research-005 brief found this inflated `docs-bot-decline` counts
-     above `docs-bot-ask`). React 18 StrictMode also double-invokes
-     effects in dev - `firedRef` guards against the second invocation
-     so the event fires exactly once per real mount. */
-  const firedRef = useRef(false);
-  useEffect(() => {
-    if (firedRef.current) return;
-    firedRef.current = true;
-    trackDecline(reason);
-    /* `reason` is intentionally not a dep: we want one fire per mount,
-       not one per reason change. The card unmounts/remounts when the
-       reducer transitions in/out of `phase === 'declined'`. */
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   return (
     <aside className="docs-bot-decline-card" aria-live="polite">
       <p className="docs-bot-decline-kicker">no grounded answer.</p>
@@ -87,8 +64,6 @@ export function DeclineCard({ reason, suggestions, children }: DeclineCardProps)
             })}
             target="_blank"
             rel="noopener noreferrer"
-            data-umami-event="outbound-github"
-            data-umami-event-surface="docs-bot-decline"
           >
             open an issue
           </a>{' '}
@@ -111,7 +86,6 @@ export function DeclineCard({ reason, suggestions, children }: DeclineCardProps)
               <li key={s.url}>
                 <a
                   href={s.url}
-                  data-umami-event="docs-bot-decline-suggestion"
                 >
                   {s.title}
                 </a>

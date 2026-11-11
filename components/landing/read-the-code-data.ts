@@ -15,8 +15,6 @@ export type ReadTheCodeEntry = {
   /** Visible label. Lowercase — the strip sits in the mono voice. */
   label: string;
   href: string;
-  /** Umami event name. One per entry so the surfaces stay separable. */
-  event: string;
 };
 
 export const READ_THE_CODE_LABEL = 'read the code';
@@ -30,12 +28,10 @@ export const READ_THE_CODE_ENTRIES: readonly ReadTheCodeEntry[] = [
   {
     label: 'github',
     href: 'https://github.com/sipyourdrink-ltd/bernstein',
-    event: 'read-the-code-github',
   },
   {
     label: 'ask deepwiki',
     href: 'https://deepwiki.com/sipyourdrink-ltd/bernstein',
-    event: 'read-the-code-deepwiki',
   },
 ] as const;
 

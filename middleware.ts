@@ -7,7 +7,7 @@ import {
 } from '@/lib/markdown-negotiation';
 
 /* The named-crawler list lives in lib/seo/ai-bots.ts (single source of
-   truth, shared with robots.txt and the analytics bot-filter). The
+   truth, shared with robots.txt). The
    previous local 16-entry copy had drifted: OAI-SearchBot,
    Claude-SearchBot, Claude-User, Perplexity-User, Amazonbot and others
    never received the ai-content Link discovery headers below. The

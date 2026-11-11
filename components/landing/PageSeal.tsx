@@ -14,7 +14,6 @@ export function PageSeal() {
       className="page-seal"
       href={`/.well-known/page-receipt?p=${encodeURIComponent(pathname)}`}
       rel="nofollow"
-      data-umami-event="page-seal-verify"
     >
       <svg
         className="page-seal-check"

@@ -7,16 +7,11 @@
  * Trigger: DocsBot wires this in after it sees a non-declined `done`
  * event AND localStorage flag SPONSOR_NOTE_KEY isn't set. The flag is
  * written when this component first mounts; dismissing or clicking the
- * sponsor link doesn't change anything (the show is already counted).
+ * sponsor link doesn't change anything.
  *
  * Voice: lowercase, concrete, vulnerable-not-whining. The dollar
  * figure was removed (issue #30) so personal-finance numbers stay
  * off the public landing; the rest of the framing is the operator's.
- *
- * Telemetry:
- *   sponsor-note-shown   - fires on mount once (the act of being seen)
- *   sponsor-note-click   - fires on the link click
- *   sponsor-note-dismiss - fires on the X button
  *
  * Out of scope:
  *   - showing again on a return visit (we accept "once per browser"
@@ -31,18 +26,10 @@ import { useEffect, useState, type ReactElement } from 'react';
 const SPONSOR_NOTE_KEY = 'bernstein:sponsor-note-seen-v1';
 const SPONSOR_URL = 'https://github.com/sponsors/chernistry';
 
-function trackUmami(name: string): void {
-  if (typeof window === 'undefined') return;
-  const w = window as unknown as {
-    umami?: { track: (n: string) => void };
-  };
-  w.umami?.track(name);
-}
-
 export function SponsorNote(): ReactElement | null {
   const [dismissed, setDismissed] = useState(false);
 
-  /* Mark seen on first mount AND fire the show-event. We do this in an
+  /* Mark seen on first mount. We do this in an
      effect so it doesn't run during SSR / build-time prerender. */
   useEffect(() => {
     try {
@@ -51,7 +38,6 @@ export function SponsorNote(): ReactElement | null {
       /* private mode / storage disabled - show anyway, just won't
          persist. The dismiss state still works in-session. */
     }
-    trackUmami('sponsor-note-shown');
   }, []);
 
   if (dismissed) return null;
@@ -74,14 +60,6 @@ export function SponsorNote(): ReactElement | null {
           href={SPONSOR_URL}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => {
-            trackUmami('sponsor-note-click');
-            // Aggregate sponsor-anchor metric (introduced 2026-05-08).
-            // Distinct from ``sponsor-note-click`` because the funnel
-            // groups by anchor target, not by surface.
-            trackUmami('gh-sponsors-click');
-          }}
-          data-umami-event="sponsor-note-click"
         >
           github.com/sponsors/chernistry →
         </a>
@@ -90,10 +68,7 @@ export function SponsorNote(): ReactElement | null {
       <button
         type="button"
         className="docs-bot-sponsor-note-x"
-        onClick={() => {
-          setDismissed(true);
-          trackUmami('sponsor-note-dismiss');
-        }}
+        onClick={() => setDismissed(true)}
         aria-label="dismiss note"
       >
         ×

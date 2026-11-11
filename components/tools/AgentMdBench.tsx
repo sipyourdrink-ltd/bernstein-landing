@@ -279,8 +279,6 @@ export function AgentMdBench() {
           )}
           rel="noopener"
           target="_blank"
-          data-umami-event="outbound-github"
-          data-umami-event-surface="agent-md-bench-disclaimer"
         >
           parser rules sourced from the bernstein adapters
         </a>

@@ -17,14 +17,6 @@ interface FollowUpsProps {
   onSelect: (question: string) => void;
 }
 
-function trackFollowUp(question: string): void {
-  if (typeof window === 'undefined') return;
-  const w = window as unknown as { umami?: { track: (n: string, d?: Record<string, unknown>) => void } };
-  /* Only the first 80 chars to keep umami payload small; the full
-     question is in the URL/state anyway. */
-  w.umami?.track('docs-bot-followup-click', { question: question.slice(0, 80) });
-}
-
 export function FollowUps({ suggestions, onSelect }: FollowUpsProps) {
   if (!suggestions.length) return null;
   /* Cap at three: matches gateway contract and gives a predictable
@@ -41,7 +33,6 @@ export function FollowUps({ suggestions, onSelect }: FollowUpsProps) {
               type="button"
               className="docs-bot-followup-pill"
               onClick={() => {
-                trackFollowUp(q);
                 onSelect(q);
               }}
             >

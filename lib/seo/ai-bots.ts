@@ -4,16 +4,11 @@
  * Consumed by:
  *   - app/robots.txt/route.ts - renders one ``User-agent: <name>`` /
  *     ``Allow: /`` block per entry, in the order declared here.
- *   - lib/analytics/bot-filter.ts - builds a single case-insensitive
- *     regex at module load that matches any of these tokens inside a
- *     ``navigator.userAgent`` string, so the analytics emitter
- *     classifies the visitor as ``bot`` instead of ``human``.
+ *   - middleware.ts - sends the ai-content Link discovery headers to
+ *     these user agents.
  *
- * Before this module existed the two sites of truth drifted: robots.txt
- * listed 30+ entries while the bot-filter regex listed 13, so 17 named
- * crawlers were silently classified as human by the analytics emitter.
- * Keeping the array here and importing it on both sides closes that
- * gap.
+ * Keeping the array here and importing it on both sides stops the two
+ * lists from drifting apart.
  *
  * Ordering note: the bucketed comments and the order below mirror the
  * original in-line array. Append new entries inside the appropriate

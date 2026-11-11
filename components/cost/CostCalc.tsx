@@ -34,7 +34,7 @@
  * (no jsx pipeline) can import them without dragging React in.
  */
 
-import { useEffect, useMemo, useRef, useState, useId } from 'react';
+import { useMemo, useState, useId } from 'react';
 import {
   DEFAULT_CLAUDE,
   DEFAULT_CODEX,
@@ -47,12 +47,6 @@ import {
   formatPct,
   sponsorUrl,
 } from './cost-math';
-import {
-  track,
-  UmamiEvent,
-  magnitudeBucket,
-  savingBandBucket,
-} from '@/lib/analytics/events';
 
 /* Re-export so consumers that only import the component file still get
  * the helpers (back-compat for any tooling that scans the .tsx). */
@@ -87,46 +81,13 @@ export function CostCalc() {
   const codexId = useId();
   const cursorId = useId();
 
-  // Engagement instrumentation - debounced 1s so a number-spinner click
-  // doesn't fire 50 events. The bucket helpers (magnitudeBucket /
-  // savingBandBucket) keep PII out of the wire by reporting only the
-  // coarse range, never the literal dollar amount.
-  const inputDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastInputBucket = useRef<{ which: string; bucket: string } | null>(null);
-  const trackInput = (which: 'claude' | 'codex' | 'cursor', value: number) => {
-    if (inputDebounceRef.current) clearTimeout(inputDebounceRef.current);
-    inputDebounceRef.current = setTimeout(() => {
-      const bucket = magnitudeBucket(value);
-      // Skip if the bucket hasn't changed AND it's the same input (the
-      // user fiddled within a band - that's not a new engagement signal).
-      const last = lastInputBucket.current;
-      if (last && last.which === which && last.bucket === bucket) return;
-      lastInputBucket.current = { which, bucket };
-      track(UmamiEvent.CostInputChange, { input: which, bucket });
-    }, 1000);
-  };
-
   const onChange =
-    (setter: (v: number) => void, which: 'claude' | 'codex' | 'cursor') =>
+    (setter: (v: number) => void) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const parsed = Number(e.target.value);
       const next = Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
       setter(next);
-      trackInput(which, next);
     };
-
-  // Fire ``cost-result-shown`` exactly once per page load when the band
-  // first resolves to a non-zero saving (i.e. the visitor has put real
-  // numbers in). The ref guards against re-fire on subsequent renders.
-  const resultShownOnce = useRef(false);
-  useEffect(() => {
-    if (resultShownOnce.current) return;
-    if (band.savingHigh <= 0) return;
-    resultShownOnce.current = true;
-    track(UmamiEvent.CostResultShown, {
-      band: savingBandBucket(band.savingHigh),
-    });
-  }, [band.savingHigh]);
 
   return (
     <section className="cost-calc" aria-labelledby="cost-calc-heading">
@@ -162,7 +123,7 @@ export function CostCalc() {
                 max={100000}
                 step={10}
                 value={claude}
-                onChange={onChange(setClaude, 'claude')}
+                onChange={onChange(setClaude)}
                 aria-label="claude monthly spend in usd"
               />
             </div>
@@ -182,7 +143,7 @@ export function CostCalc() {
                 max={100000}
                 step={10}
                 value={codex}
-                onChange={onChange(setCodex, 'codex')}
+                onChange={onChange(setCodex)}
                 aria-label="codex or openai monthly spend in usd"
               />
             </div>
@@ -202,7 +163,7 @@ export function CostCalc() {
                 max={100000}
                 step={10}
                 value={cursor}
-                onChange={onChange(setCursor, 'cursor')}
+                onChange={onChange(setCursor)}
                 aria-label="cursor monthly spend in usd"
               />
             </div>
@@ -313,8 +274,6 @@ export function CostCalc() {
               <a
                 href={sponsorUrl()}
                 rel="noopener"
-                data-umami-event="gh-sponsors-click"
-                data-umami-event-source="cost-calc"
               >
                 &rarr; github.com/sponsors/chernistry
               </a>
@@ -330,8 +289,6 @@ export function CostCalc() {
               <a
                 href={sponsorUrl()}
                 rel="noopener"
-                data-umami-event="gh-sponsors-click"
-                data-umami-event-source="cost-calc"
               >
                 &rarr; github.com/sponsors/chernistry
               </a>

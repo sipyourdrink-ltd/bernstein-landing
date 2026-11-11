@@ -1,32 +1,15 @@
 'use client';
 
-import { useRef, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { ScrollReveal } from '@/components/ScrollReveal';
-import { track, UmamiEvent } from '@/lib/analytics/events';
-import { useInViewOnce } from '@/lib/analytics/useInView';
 
 export function EmailCapture() {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-  const sectionRef = useInViewOnce<HTMLDivElement>(UmamiEvent.NewsletterView, 0.4);
-  /* First-focus flag: gates ``newsletter-focus`` so the event fires
-     exactly once per mount even if the user tabs in and out. Ref (not
-     state) so we don't trigger a re-render on flip. */
-  const focusFiredRef = useRef(false);
-
-  const onFirstFocus = () => {
-    if (focusFiredRef.current) return;
-    focusFiredRef.current = true;
-    track(UmamiEvent.NewsletterFocus, { source: 'email-capture' });
-  };
-
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const email = new FormData(form).get('email_address') as string;
     setStatus('submitting');
-    /* newsletter-submit fires on EVERY attempt - the legacy
-       email-capture-submit (success-only goal) is preserved below. */
-    track(UmamiEvent.NewsletterSubmit, { source: 'email-capture' });
     try {
       const resp = await fetch('/api/notify', {
         method: 'POST',
@@ -34,9 +17,8 @@ export function EmailCapture() {
         body: JSON.stringify({ email }),
       });
       // Parse body so we can distinguish real subscribe from dev-noop. The
-      // route now returns ok:false for dev-noop and 503 in prod when the
-      // audience env var is unset, but we double-check status here so any
-      // future fallback can't quietly count as a conversion.
+      // route returns ok:false for dev-noop and 503 in prod when the
+      // audience env var is unset.
       let body: { ok?: unknown; status?: unknown } = {};
       try {
         body = (await resp.json()) as typeof body;
@@ -49,35 +31,17 @@ export function EmailCapture() {
         (body.status === 'subscribed' || body.status === 'already_subscribed');
       if (confirmed) {
         setStatus('success');
-        // Umami goal fires ONLY on confirmed Resend subscription. Dev-noop
-        // and 503 audience-not-configured never increment the goal.
-        if (typeof window !== 'undefined' && (window as unknown as { umami?: { track: (n: string) => void } }).umami) {
-          (window as unknown as { umami: { track: (n: string) => void } }).umami.track('email-capture-submit');
-        }
-        track(UmamiEvent.NewsletterSuccess, { source: 'email-capture' });
-        /* Also emit the shared ``signup`` event alongside the
-           form-specific one. The ``source`` prop names the form that
-           produced it; today the monthly newsletter is the only one. */
-        track(UmamiEvent.Signup, { source: 'email-capture', surface: 'newsletter' });
       } else {
         setStatus('error');
-        track(UmamiEvent.NewsletterError, {
-          source: 'email-capture',
-          code: resp.status,
-        });
       }
     } catch {
       setStatus('error');
-      track(UmamiEvent.NewsletterError, {
-        source: 'email-capture',
-        code: 'network',
-      });
     }
   }
 
   return (
     <ScrollReveal>
-      <div ref={sectionRef} className={`email-section${status === 'success' ? ' success' : ''}`}>
+      <div className={`email-section${status === 'success' ? ' success' : ''}`}>
         <div className="email-inner">
           <p className="email-kicker">Monthly newsletter</p>
           <h2>
@@ -92,7 +56,6 @@ export function EmailCapture() {
               required
               aria-label="Email address"
               aria-invalid={status === 'error' ? true : undefined}
-              onFocus={onFirstFocus}
             />
             <button
               type="submit"

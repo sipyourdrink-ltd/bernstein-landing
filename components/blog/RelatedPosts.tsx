@@ -1,16 +1,10 @@
-'use client';
-
-import { track, UmamiEvent } from '@/lib/analytics/events';
-
 /**
  * Sibling-link strip rendered below every /blog/<slug> body.
  *
  * The picker (lib/clusters.ts) supplies a deterministic 3-5 entry list
  * pulled from a hand-curated topic-cluster map at
  * content/blog/_clusters.yaml. The server passes us already-resolved
- * cards so this stays a thin presentational client component - the
- * only reason it isn't a server component is the onClick handler that
- * emits the InternalLinkClick Umami event.
+ * cards so this stays a thin presentational server component.
  *
  * Style note: re-uses the existing .blog-nextprev-card chrome the
  * read-next strip already uses, plus a small .blog-related-grid wrapper
@@ -33,10 +27,8 @@ export interface RelatedPostCard {
 
 interface RelatedPostsProps {
   /** Slug of the current post. Stamped onto the wrapper as a
-   *  data-current-slug attribute so Playwright snapshots / heatmap
-   *  exports can correlate the strip to the source page without
-   *  reading the URL. Not emitted on the Umami event (Umami already
-   *  records the source URL via the pageview). */
+   *  data-current-slug attribute so Playwright snapshots can
+   *  correlate the strip to the source page without reading the URL. */
   currentSlug: string;
   cards: RelatedPostCard[];
 }
@@ -67,17 +59,6 @@ export function RelatedPosts({ currentSlug, cards }: RelatedPostsProps) {
             key={card.slug}
             href={`/blog/${card.slug}`}
             className="blog-nextprev-card"
-            onClick={() => {
-              /* Fires before navigation. We don't preventDefault: the
-                 auto-tracker enqueues asynchronously and a navigation
-                 pause would feel laggy. Per the events.ts contract,
-                 props are enums + booleans + slugs only - no free-form
-                 text, no PII. */
-              track(UmamiEvent.InternalLinkClick, {
-                target_blog: card.slug,
-                source: 'related-posts',
-              });
-            }}
           >
             <div className="blog-nextprev-eyebrow">read next</div>
             <div className="blog-nextprev-title">{card.title}</div>

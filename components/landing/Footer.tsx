@@ -1,7 +1,5 @@
 'use client';
 
-import { track, UmamiEvent, emitFunnelStep } from '@/lib/analytics/events';
-import { trackOutbound } from '@/components/site/track-outbound';
 import { withUtm } from '@/lib/utm';
 import { ReadTheCode } from './ReadTheCode';
 import { PageSeal } from './PageSeal';
@@ -23,41 +21,27 @@ export function Footer() {
                 medium: 'outbound-link',
                 campaign: 'footer-product',
               })}
-              data-umami-event="outbound-github"
-              data-umami-event-surface="footer-product"
-              data-umami-event-source="footer"
-              onClick={() => {
-                emitFunnelStep('ghClick', { source: 'footer-product', repeatable: true });
-                trackOutbound('github.com', 'site-footer', 'product-gh');
-              }}
             >
               GitHub
             </a>
             <a
               href="https://www.linkedin.com/company/bernstein-run/"
               aria-label="LinkedIn"
-              data-umami-event="outbound-linkedin"
-              data-umami-event-surface="footer-product"
-              data-umami-event-source="footer"
-              onClick={() => trackOutbound('linkedin.com', 'site-footer', 'product-li')}
             >
               LinkedIn
             </a>
             <a
               href="https://pypi.org/project/bernstein/"
-              data-umami-event="click-pypi-out"
-              data-umami-event-source="footer"
-              onClick={() => trackOutbound('pypi.org', 'site-footer', 'product-pypi')}
             >
               PyPI
             </a>
-            <a href="https://docs.bernstein.run/" data-umami-event="click-docs-out" data-umami-event-source="footer">Docs</a>
+            <a href="https://docs.bernstein.run/">Docs</a>
             {/* /#how used to have its own Nav entry; it moved here when
                 the primary nav was trimmed to Install / Verify / Docs /
                 Ask (plus GitHub) - the section itself still lives on the
                 home page, unchanged. */}
-            <a href="/#how" data-umami-event="click-how-it-works" data-umami-event-source="footer">How it works</a>
-            <a href="/blog" data-umami-event="click-blog-internal" data-umami-event-source="footer">Blog</a>
+            <a href="/#how">How it works</a>
+            <a href="/blog">Blog</a>
             {/* RSS subscribe - surfaced as a primary subscribe option
                 (conv-003, 2026-05-17). The <link rel="alternate"> in
                 <head> handles auto-discovery; this link gives the
@@ -65,9 +49,6 @@ export function Footer() {
             <a
               href="/rss.xml"
               className="rss-subscribe-link"
-              data-umami-event="rss-subscribe-click"
-              data-umami-event-source="footer"
-              onClick={() => track(UmamiEvent.RssSubscribeClick, { source: 'footer' })}
             >
               <span className="rss-subscribe-link__icon" aria-hidden="true">
                 <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
@@ -80,18 +61,18 @@ export function Footer() {
           </div>
           <div className="footer-col">
             <h4>Resources</h4>
-            <a href="/#ask" data-umami-event="click-ask-internal" data-umami-event-source="footer">Ask the docs</a>
-            <a href="https://mcp.bernstein.run/verify" target="_blank" rel="noopener noreferrer" data-umami-event="click-verify-out" data-umami-event-source="footer">Verify a run receipt</a>
+            <a href="/#ask">Ask the docs</a>
+            <a href="https://mcp.bernstein.run/verify" target="_blank" rel="noopener noreferrer">Verify a run receipt</a>
             {/* Was a top-level Nav entry before the nav was trimmed to
                 Install / Verify / Docs / Ask; kept reachable here since
                 it is a real per-adapter comparison surface, not a link
                 to prune. */}
-            <a href="/compare" data-umami-event="click-compare-internal" data-umami-event-source="footer">compare adapters</a>
-            <a href="/benchmarks" data-umami-event="click-benchmarks-internal" data-umami-event-source="footer">benchmarks</a>
-            <a href="/cost" data-umami-event="click-cost-internal" data-umami-event-source="footer">cost calculator</a>
-            <a href="/llms-full.txt" data-umami-event="click-llms-full" data-umami-event-source="footer">llms-full.txt</a>
-            <a href="/ai.txt" data-umami-event="click-ai-txt" data-umami-event-source="footer">ai.txt</a>
-            <a href="/sitemap.xml" data-umami-event="click-sitemap" data-umami-event-source="footer">Sitemap</a>
+            <a href="/compare">compare adapters</a>
+            <a href="/benchmarks">benchmarks</a>
+            <a href="/cost">cost calculator</a>
+            <a href="/llms-full.txt">llms-full.txt</a>
+            <a href="/ai.txt">ai.txt</a>
+            <a href="/sitemap.xml">Sitemap</a>
             {/* Browsable views of the source - github / deepwiki. See
                 read-the-code-data.ts; this is the strip's only mount
                 point now (RightRail's hero copy was removed). */}
@@ -105,43 +86,31 @@ export function Footer() {
                 medium: 'outbound-link',
                 campaign: 'footer-discussions',
               })}
-              data-umami-event="outbound-github"
-              data-umami-event-surface="footer-discussions"
-              data-umami-event-source="footer"
             >
               GitHub Discussions
             </a>
             <a
               href="https://github.com/sponsors/chernistry"
-              data-umami-event="click-gh-sponsors-out"
-              data-umami-event-source="footer"
-              onClick={() => {
-                track(UmamiEvent.GhSponsorsClick, { source: 'footer' });
-                track(UmamiEvent.SponsorsFooterClick, { target: 'gh-sponsors' });
-              }}
             >
               GitHub Sponsors
             </a>
             <a
               href="/sponsors"
-              data-umami-event="click-sponsors-internal"
-              data-umami-event-source="footer"
-              onClick={() => track(UmamiEvent.SponsorsFooterClick, { target: 'sponsors-page' })}
             >
               Sponsor tiers
             </a>
-            <a href="https://star-history.com/#sipyourdrink-ltd/bernstein" data-umami-event="click-star-history-out" data-umami-event-source="footer">Star history</a>
-            <a href="/llms.txt" className="footer-llms-link" data-umami-event="click-llms" data-umami-event-source="footer">/llms.txt</a>
+            <a href="https://star-history.com/#sipyourdrink-ltd/bernstein">Star history</a>
+            <a href="/llms.txt" className="footer-llms-link">/llms.txt</a>
           </div>
           <div className="footer-col">
             <h4>Legal &amp; meta</h4>
-            <a href="/about" data-umami-event="click-about" data-umami-event-source="footer">About</a>
-            <a href="mailto:forte@bernstein.run" data-umami-event="click-mailto" data-umami-event-source="footer">forte@bernstein.run</a>
-            <a href="https://www.apache.org/licenses/LICENSE-2.0" data-umami-event="click-license-out" data-umami-event-source="footer">Apache 2.0</a>
-            <a href="/privacy" data-umami-event="click-privacy" data-umami-event-source="footer">Privacy</a>
-            <a href="/terms" data-umami-event="click-terms" data-umami-event-source="footer">Terms</a>
-            <a href="/.well-known/security.txt" data-umami-event="click-security-txt" data-umami-event-source="footer">Security</a>
-            <a href="/humans.txt" data-umami-event="click-humans-txt" data-umami-event-source="footer">Humans</a>
+            <a href="/about">About</a>
+            <a href="mailto:forte@bernstein.run">forte@bernstein.run</a>
+            <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
+            <a href="/.well-known/security.txt">Security</a>
+            <a href="/humans.txt">Humans</a>
           </div>
           <div className="footer-col">
             <h4>Identity</h4>
@@ -149,9 +118,6 @@ export function Footer() {
               href="https://alexchernysh.com"
               target="_blank"
               rel="noopener me author"
-              data-umami-event="click-author-site-out"
-              data-umami-event-source="footer"
-              onClick={() => trackOutbound('alexchernysh.com', 'site-footer', 'author-site')}
             >
               alexchernysh.com
             </a>
@@ -159,9 +125,6 @@ export function Footer() {
               href="https://github.com/chernistry"
               target="_blank"
               rel="noopener me author"
-              data-umami-event="click-author-gh-out"
-              data-umami-event-source="footer"
-              onClick={() => trackOutbound('github.com', 'site-footer', 'author-gh')}
             >
               GitHub @chernistry
             </a>
@@ -169,8 +132,6 @@ export function Footer() {
               href="https://x.com/alex_chernysh"
               target="_blank"
               rel="noopener me author"
-              data-umami-event="click-author-x-out"
-              data-umami-event-source="footer"
             >
               X @alex_chernysh
             </a>
@@ -183,9 +144,6 @@ export function Footer() {
             <a
               href="https://alexchernysh.com"
               rel="author"
-              data-umami-event="click-author-site-out"
-              data-umami-event-source="footer-bottom"
-              onClick={() => trackOutbound('alexchernysh.com', 'site-footer', 'byline')}
             >
               Alex Chernysh
             </a>
@@ -193,14 +151,11 @@ export function Footer() {
             <a
               href="https://github.com/chernistry"
               rel="me"
-              data-umami-event="click-author-gh-out"
-              data-umami-event-source="footer-bottom"
-              onClick={() => trackOutbound('github.com', 'site-footer', 'byline-gh')}
             >
               github.com/chernistry
             </a>
             {' · '}
-            <a href="mailto:forte@bernstein.run" data-umami-event="click-mailto" data-umami-event-source="footer-bottom">forte@bernstein.run</a>
+            <a href="mailto:forte@bernstein.run">forte@bernstein.run</a>
           </p>
           <p>
             Named for Leonard Bernstein, the original orchestrator. Apache 2.0.

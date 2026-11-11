@@ -20,9 +20,7 @@
  * The links come from READ_THE_CODE_ENTRIES; adding a surface is a
  * one-line data change, not new JSX.
  *
- * Server component — no state, no effects. Umami tracks clicks through
- * `data-umami-event` attributes, which the auto-tracker reads without
- * a client bundle.
+ * Server component — no state, no effects.
  */
 
 import {
@@ -51,8 +49,6 @@ export function ReadTheCode({ surface }: { surface: 'hero' | 'footer' }) {
             {...(isExternalEntry(entry)
               ? { target: '_blank', rel: 'noopener noreferrer' }
               : {})}
-            data-umami-event={entry.event}
-            data-umami-event-source={surface}
           >
             {entry.label}
           </a>

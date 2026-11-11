@@ -10,63 +10,22 @@
  * Single-purpose strip, not a popup. Both successes and errors render
  * inline (no toast, no overlay) so the visitor never loses scroll
  * position.
- *
- * Umami events emitted:
- *   - newsletter-view       (form scrolled into view, once per session)
- *   - newsletter-focus      (input first-focus, once per mount)
- *   - email-capture-submit  (older name - fires only on confirmed sub)
- *   - newsletter-submit     (attempt counter - every submit)
- *   - newsletter-success    (success - confirmed sub)
- *   - email-capture-error   (older error name)
- *   - newsletter-error      (error counter)
- *
- * The ``newsletter-*`` trio exists so attempts and results are counted
- * separately; before it, only confirmed successes were recorded.
- * ``newsletter-focus`` separates "saw and ignored" from "tried and
- * bailed"; a ref-flag gates it to first-focus per mount so tab-in and
- * tab-out cannot inflate it.
  */
 
-import { useRef, useState } from 'react';
-import { track as trackEvent, UmamiEvent } from '@/lib/analytics/events';
-import { useInViewOnce } from '@/lib/analytics/useInView';
+import { useState } from 'react';
 
 type Status = 'idle' | 'submitting' | 'ok' | 'error';
-
-function track(name: string, data?: Record<string, unknown>): void {
-  if (typeof window === 'undefined') return;
-  const w = window as unknown as {
-    umami?: { track: (n: string, d?: Record<string, unknown>) => void };
-  };
-  w.umami?.track(name, data);
-}
 
 export function EmailStrip() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [errMsg, setErrMsg] = useState<string | null>(null);
-  const sectionRef = useInViewOnce<HTMLElement>(UmamiEvent.NewsletterView, 0.4);
-  /* First-focus flag: gates ``newsletter-focus`` so the event fires
-     exactly once per mount even if the user tabs in and out. Ref (not
-     state) so we don't trigger a re-render on flip. */
-  const focusFiredRef = useRef(false);
-
-  const onFirstFocus = () => {
-    if (focusFiredRef.current) return;
-    focusFiredRef.current = true;
-    trackEvent(UmamiEvent.NewsletterFocus, { source: 'email-strip' });
-  };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (status === 'submitting') return;
     setStatus('submitting');
     setErrMsg(null);
-    /* newsletter-submit fires on EVERY attempt so (success + error) /
-       submit reads as the API health rate. email-capture-submit keeps
-       its older success-only semantic so past reports stay comparable. */
-    trackEvent(UmamiEvent.NewsletterSubmit, { source: 'email-strip' });
-
     try {
       /* /api/notify is the live capture endpoint - the same one
          EmailCapture uses. Body shape: { email }. The route returns
@@ -92,33 +51,19 @@ export function EmailStrip() {
       if (confirmed) {
         setStatus('ok');
         setEmail('');
-        /* Mirror EmailCapture: fire ONLY on confirmed subscription. */
-        track('email-capture-submit', { source: 'email-strip' });
-        trackEvent(UmamiEvent.NewsletterSuccess, { source: 'email-strip' });
       } else {
         setErrMsg(typeof body.error === 'string' ? body.error : 'subscribe failed. try again.');
         setStatus('error');
-        track('email-capture-error', { code: res.status });
-        trackEvent(UmamiEvent.NewsletterError, {
-          source: 'email-strip',
-          code: res.status,
-        });
       }
     } catch {
       setErrMsg('network error. try again.');
       setStatus('error');
-      track('email-capture-error', { code: 'network' });
-      trackEvent(UmamiEvent.NewsletterError, {
-        source: 'email-strip',
-        code: 'network',
-      });
     }
   };
 
   return (
     <section
       id="subscribe"
-      ref={sectionRef}
       className="v2-email"
       aria-labelledby="email-strip-heading"
     >
@@ -145,7 +90,6 @@ export function EmailStrip() {
             placeholder="you@company.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            onFocus={onFirstFocus}
             aria-label="email address"
             aria-invalid={status === 'error' ? true : undefined}
             disabled={status === 'submitting' || status === 'ok'}
