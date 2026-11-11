@@ -8,39 +8,31 @@ import { NextResponse } from 'next/server';
    work has nothing to migrate here. Future write-paths under /api/stats
    should use the envelope. */
 
-const PYPI_URL = 'https://pypistats.org/api/packages/bernstein/recent';
 const GITHUB_URL = 'https://api.github.com/repos/sipyourdrink-ltd/bernstein';
 const UA = 'bernstein-landing/1.0 (+https://bernstein.run)';
 const REVALIDATE_SECONDS = 30 * 60; // 30 minutes - tighter during launch period
 const FAILURE_RETRY_SECONDS = 60;   // retry sooner if upstream is broken
-/* Hard upstream timeout. Without this, a slow pypi/github call can keep the
+/* Hard upstream timeout. Without this, a slow GitHub call can keep the
    route handler open until CF's 100s edge timeout fires → 504. We'd rather
-   serve last-known-good (or a sentinel) than hang. Keep it short: both APIs
-   normally respond in <500ms; 5s is already a generous ceiling. */
+   serve last-known-good (or a sentinel) than hang. The API normally
+   responds in <500ms; 5s is already a generous ceiling. */
 const UPSTREAM_TIMEOUT_MS = 5000;
 
 interface CachedStats {
-  monthly_downloads: number;
   stars: number;
   fetched_at: string;
 }
 
 interface FetchResult {
-  monthly?: number;
   stars?: number;
 }
 
 let cache: CachedStats | null = null;
 let cacheTime = 0;
-/* When the last fetch was partial (one upstream returned data but the other
-   didn't), we keep the merged response in `cache` so the route can still
-   answer - but we MUST NOT honour the full REVALIDATE_SECONDS window for
-   the in-memory short-circuit on line 86, otherwise a single bad cycle
-   (e.g. GitHub IP rate-limit at 60/h unauth) pins a stale star count for
-   30 minutes regardless of the short HTTP s-maxage we emit. We track the
-   partial flag so the early-return path uses FAILURE_RETRY_SECONDS instead,
-   matching the cache-control we already advertise. */
-let cachePartial = false;
+/* Set after a failed cycle. The Next.js fetch-data-cache may hold the bad
+   upstream body (e.g. a 200 with zero stars) for the full revalidate
+   window, so the next cycle must bypass it to recover. */
+let lastFailed = false;
 
 async function fetchFresh(bypassDataCache: boolean): Promise<FetchResult> {
   /* Authorise the GitHub call when GITHUB_TOKEN (or GH_TOKEN) is set.
@@ -56,18 +48,16 @@ async function fetchFresh(bypassDataCache: boolean): Promise<FetchResult> {
 
   /* The Next.js fetch-data-cache lives between our in-memory `cache` and
      the network. Without bypass, a cached fetch body keeps coming back
-     for the full revalidate window - which means the in-memory cache
-     gets refreshed on schedule but with the same stale body. When we're
-     in a recovery cycle (`bypassDataCache`) we force a real network hit
-     so the upstream value can move forward. */
+     for the full revalidate window. When the operator forces a refresh
+     (`bypassDataCache`) we force a real network hit so the upstream value
+     can move forward. */
   const fetchInit = bypassDataCache
     ? ({ cache: 'no-store' } as const)
     : ({ next: { revalidate: REVALIDATE_SECONDS } } as const);
 
   /* Per-request AbortController so a stuck upstream can't pin the route
-     handler open. One controller per fetch - sharing one would cancel both
-     when either timer fires. We clear the timer in `finally` so a fast
-     response doesn't leak a pending Timeout into the event loop. */
+     handler open. We clear the timer in `finally` so a fast response
+     doesn't leak a pending Timeout into the event loop. */
   const fetchWithTimeout = async (url: string, init: RequestInit) => {
     const ac = new AbortController();
     const t = setTimeout(() => ac.abort(), UPSTREAM_TIMEOUT_MS);
@@ -78,11 +68,7 @@ async function fetchFresh(bypassDataCache: boolean): Promise<FetchResult> {
     }
   };
 
-  const [pypiRes, ghRes] = await Promise.allSettled([
-    fetchWithTimeout(PYPI_URL, {
-      ...fetchInit,
-      headers: { 'User-Agent': UA, Accept: 'application/json' },
-    }),
+  const [ghRes] = await Promise.allSettled([
     fetchWithTimeout(GITHUB_URL, {
       ...fetchInit,
       headers: ghHeaders,
@@ -90,20 +76,6 @@ async function fetchFresh(bypassDataCache: boolean): Promise<FetchResult> {
   ]);
 
   const out: FetchResult = {};
-
-  if (pypiRes.status === 'fulfilled' && pypiRes.value.ok) {
-    try {
-      const data = await pypiRes.value.json();
-      if (typeof data?.data?.last_month === 'number') out.monthly = data.data.last_month;
-    } catch (e) {
-      console.error('[stats] pypi parse failed:', e);
-    }
-  } else {
-    const why = pypiRes.status === 'rejected'
-      ? pypiRes.reason
-      : `HTTP ${pypiRes.value.status}`;
-    console.error('[stats] pypi fetch failed:', why);
-  }
 
   if (ghRes.status === 'fulfilled' && ghRes.value.ok) {
     try {
@@ -130,9 +102,8 @@ async function fetchFresh(bypassDataCache: boolean): Promise<FetchResult> {
 export async function GET(req: Request) {
   const now = Date.now();
   /* Operator escape hatch: `/api/stats?force=1` bypasses the in-memory
-     short-circuit so a fresh GitHub/pypi cycle runs immediately. Cache-
-     Control headers downstream still apply; this only nudges the process
-     cache. Cheap because we already gate on the same rate-limited APIs. */
+     short-circuit so a fresh GitHub cycle runs immediately. Cache-Control
+     headers downstream still apply; this only nudges the process cache. */
   const force = (() => {
     try {
       return new URL(req.url).searchParams.get('force') !== null;
@@ -140,60 +111,36 @@ export async function GET(req: Request) {
       return false;
     }
   })();
-  const effectiveTtlMs =
-    (cachePartial ? FAILURE_RETRY_SECONDS : REVALIDATE_SECONDS) * 1000;
-  if (!force && cache && now - cacheTime < effectiveTtlMs) {
-    const ttlSec = cachePartial ? FAILURE_RETRY_SECONDS : REVALIDATE_SECONDS;
+  if (!force && cache && now - cacheTime < REVALIDATE_SECONDS * 1000) {
     return NextResponse.json(cache, {
       headers: {
-        'Cache-Control': `public, s-maxage=${ttlSec}, stale-while-revalidate=${
-          cachePartial ? 300 : 3600
-        }`,
+        'Cache-Control': `public, s-maxage=${REVALIDATE_SECONDS}, stale-while-revalidate=3600`,
       },
     });
   }
 
-  /* Bypass the Next.js fetch-data-cache when the operator forced a refresh
-     OR when the previous cycle was partial - in both cases the cached
-     fetch body is suspect and we want a live read. Normal cycles use
-     `next.revalidate` so we still get dedupe + edge-cache friendliness. */
-  const fresh = await fetchFresh(force || cachePartial);
+  const fresh = await fetchFresh(force || lastFailed);
 
-  // Merge fresh data over last-known-good. If we got at least one number fresh,
-  // cache the merged result; otherwise back off with a short retry window.
-  // We use a SHORT cache TTL when either upstream is missing so partial
-  // freshness (e.g. pypi ok, gh rate-limited) doesn't pin a zero/stale
-  // value for the full 30-minute revalidate window.
-  if (fresh.monthly !== undefined || fresh.stars !== undefined) {
+  // Cache a fresh positive star count for the full revalidation window.
+  if (fresh.stars !== undefined) {
     const merged: CachedStats = {
-      monthly_downloads: fresh.monthly ?? cache?.monthly_downloads ?? 0,
-      /* Prefer fresh > positive cached > 0. The `> 0` guard prevents a
-         zero from a prior partial fetch from cementing in cache.stars
-         and blocking the next live value. Symptom we're fixing:
-         /api/stats returning stars=0 after gh rate-limit on cold boot. */
-      stars:
-        fresh.stars && fresh.stars > 0
-          ? fresh.stars
-          : cache?.stars && cache.stars > 0
-            ? cache.stars
-            : 0,
+      stars: fresh.stars,
       fetched_at: new Date().toISOString(),
     };
-    const partial = fresh.monthly === undefined || fresh.stars === undefined;
     cache = merged;
     cacheTime = now;
-    cachePartial = partial;
-    const ttl = partial ? FAILURE_RETRY_SECONDS : REVALIDATE_SECONDS;
+    lastFailed = false;
     return NextResponse.json(merged, {
-      headers: { 'Cache-Control': `public, s-maxage=${ttl}, stale-while-revalidate=${partial ? 300 : 3600}` },
+      headers: { 'Cache-Control': `public, s-maxage=${REVALIDATE_SECONDS}, stale-while-revalidate=3600` },
     });
   }
 
-  // Both upstreams failed (or timed out). Serve last-known cache if we have
+  // The upstream failed (or timed out). Serve last-known cache if we have
   // it, otherwise a sentinel the client can detect. We return 200 in both
   // cases so CF doesn't propagate a 5xx for what is effectively a planned
   // graceful degradation - the client checks `fallback`/zero values.
   console.warn('[stats] upstream fetch failed or timed out; serving fallback');
+  lastFailed = true;
   if (cache) {
     return NextResponse.json(cache, {
       headers: {
@@ -205,7 +152,6 @@ export async function GET(req: Request) {
 
   return NextResponse.json(
     {
-      monthly_downloads: 0,
       stars: 0,
       fetched_at: new Date(0).toISOString(),
       fallback: true,

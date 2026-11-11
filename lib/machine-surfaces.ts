@@ -240,10 +240,10 @@ export const MACHINE_ENDPOINTS: readonly MachineEndpoint[] = [
     method: 'GET',
     name: 'project-stats',
     description:
-      'Current package downloads and repository stars for the Bernstein project, cached upstream-side. Serves last-known-good rather than failing when an upstream is rate-limited.',
+      'Current repository stars for the Bernstein project, cached upstream-side. Serves last-known-good rather than failing when GitHub is rate-limited.',
     input: 'no parameters',
     output:
-      'application/json: { monthly_downloads: number, stars: number, fetched_at: string (ISO 8601) }',
+      'application/json: { stars: number, fetched_at: string (ISO 8601) }',
     agentCapability: true,
   },
   {

@@ -123,7 +123,6 @@ mapper.
 {
   "ok": true,
   "data": {
-    "monthly_downloads": 1234,
     "stars": 42,
     "fetched_at": "2026-05-20T09:00:00Z"
   }

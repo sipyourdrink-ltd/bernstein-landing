@@ -389,9 +389,9 @@
   border-radius: var(--radius);
   padding: 12px 14px;
 }
-/* The downloads stat is a link to pypistats; keep it visually identical
-   to its non-link siblings (no underline, same color) but make hover
-   subtle so it still reads as interactive on focus. */
+/* Linked stats stay visually identical to their non-link siblings (no
+   underline, same color), with a subtle hover so they still read as
+   interactive on focus. */
 .v2-mini-stats a.v2-ms-link {
   display: block;
   text-decoration: none;
