@@ -106,11 +106,6 @@ all welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Ideas about the
 orchestrator itself go to
 [its tracker](https://github.com/sipyourdrink-ltd/bernstein/issues) instead.
 
-## Sponsor
-
-If bernstein routed a model that saved you a bill, $25 covers a month of coffee.
-[github.com/sponsors/chernistry →](https://github.com/sponsors/chernistry)
-
 ---
 
 Brand assets belong to Alex Chernysh; the brand
