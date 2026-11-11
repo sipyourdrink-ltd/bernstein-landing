@@ -39,7 +39,6 @@ export const UmamiEvent = {
   ClickInstallPs1: 'click-install-ps1',
   ClickLlms: 'click-llms',
   ClickLlmsFull: 'click-llms-full',
-  ClickPypistatsOut: 'click-pypistats-out',
   ClickPypiOut: 'click-pypi-out',
   SponsorNoteShown: 'sponsor-note-shown',
   SponsorTileClick: 'sponsor-tile-click',

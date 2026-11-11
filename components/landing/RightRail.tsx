@@ -10,11 +10,9 @@
  *   2. GitHub star row - paper-surface row with the 7-day delta. Star
  *      count fetched via /api/stats (same source the Nav uses) so the
  *      number stays consistent across nav & rail.
- *   3. Mini-stats grid (2×2) - adapters / closed PRs / downloads-or-
- *      contributors / $0. The third slot prefers monthly PyPI downloads
- *      and degrades to contributor count when upstream is unavailable.
- *      Both values are server-fetched at the page level and threaded
- *      through as props so this component stays presentational.
+ *   3. Mini-stats grid (2×2) - adapters / closed PRs / contributors / $0.
+ *      PR and contributor counts are server-fetched at the page level
+ *      and threaded through as props.
  *   4. Fact list - verb→object table answering "what is bernstein".
  *
  * The column carries equal vertical weight to the ask box (its own bg +
@@ -153,9 +151,7 @@ interface RightRailProps {
    */
   closedPrs: number | null;
   /**
-   * Live contributor count from GitHub. null on outage; falls back to
-   * the hardcoded const. Renders in the slot vacated by the downloads
-   * tile (operator moved downloads to the hero eyebrow).
+   * Live contributor count from GitHub. null on outage; renders an em dash.
    */
   contributors: number | null;
 }
