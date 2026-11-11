@@ -47,15 +47,6 @@ export interface SponsorPlaceholder {
 
 export type WallSlot = (Sponsor & { kind: 'sponsor' }) | SponsorPlaceholder;
 
-/** Visual width target for the sponsor row. The wall renders one of:
- *  - empty state (count 0): a single full-width placeholder card.
- *  - small state (1..MIN_VISIBLE-1): real avatars + N placeholders.
- *  - normal state (>= MIN_VISIBLE): real avatars only.
- *  MIN_VISIBLE is 5 because the research file draws the line at
- *  "compounding levers wait until the first 5-10 sponsors land."
- */
-export const MIN_VISIBLE = 5;
-
 /**
  * Order rule: recognizability score descending, then login ascending.
  * Returns a NEW array; the input is left untouched so we don't surprise
@@ -72,31 +63,12 @@ export function orderSponsors<T extends Sponsor>(input: readonly T[]): T[] {
 }
 
 /**
- * Build the slot list rendered by the wall. When `sponsors` is empty
- * we return a single placeholder; otherwise we order the real ones and
- * top up with placeholders to reach MIN_VISIBLE cells. Placeholders sit
- * AFTER the real avatars so the eye lands on real names first.
+ * Build the slot list rendered by the wall: the real sponsors, ordered.
+ * An empty list renders an empty wall.
  */
 export function buildWallSlots(sponsors: readonly Sponsor[]): WallSlot[] {
-  if (sponsors.length === 0) {
-    return [
-      {
-        kind: 'placeholder',
-        caption: 'no sponsors yet.',
-      },
-    ];
-  }
   const ordered = orderSponsors(sponsors);
   const cells: WallSlot[] = ordered.map((s) => ({ ...s, kind: 'sponsor' }));
-  if (cells.length < MIN_VISIBLE) {
-    const fillerCount = MIN_VISIBLE - cells.length;
-    for (let i = 0; i < fillerCount; i++) {
-      cells.push({
-        kind: 'placeholder',
-        caption: 'open slot.',
-      });
-    }
-  }
   return cells;
 }
 

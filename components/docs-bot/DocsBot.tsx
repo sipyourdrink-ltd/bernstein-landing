@@ -28,7 +28,6 @@ import { CitationChip } from './CitationChip.tsx';
 import { DeclineCard } from './DeclineCard.tsx';
 import { FollowUps } from './FollowUps.tsx';
 import { CopyAsMarkdown } from './CopyAsMarkdown.tsx';
-import { SponsorNote, shouldShowSponsorNote } from './SponsorNote.tsx';
 import { CtaStrip } from './CtaStrip.tsx';
 import { ThinkingShimmer } from './ThinkingShimmer.tsx';
 
@@ -157,14 +156,6 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
   const [state, dispatch] = useReducer(reducer, initialState);
   const [query, setQuery] = useState(initialQuery);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  /* Sponsor note: render once per browser, on the first non-declined
-     `done` event. We latch the decision so it doesn't flicker if the
-     reducer's phase oscillates during the same render pass. */
-  const [showSponsor, setShowSponsor] = useState(false);
-  /* `done` may arrive multiple times across multi-turn conversations.
-     Only the FIRST (per browser) opens the note; the localStorage
-     check inside SponsorNote handles cross-session memory. */
-  const sponsorChecked = useRef(false);
   /* Tracks whether `meta` arrived this stream so we know when to mark
      `first-token`. We mark on the *first token*, not meta - TTFT is
      about visible content. */
@@ -183,14 +174,6 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
       firstTokenMarkedRef.current = true;
     }
     dispatch({ kind: 'EVENT', event });
-    if (event.type === 'done') {
-      /* On the first non-declined done of this session, mount the
-         SponsorNote if the visitor hasn't seen it yet (localStorage). */
-      if (!event.declined && !sponsorChecked.current) {
-        sponsorChecked.current = true;
-        if (shouldShowSponsorNote()) setShowSponsor(true);
-      }
-    }
     if (event.type === 'error') {
     }
   }, []);
@@ -574,8 +557,7 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
         ) : null}
 
         {/* Per-answer conversion strip - shows below every settled,
-            non-declined answer. Distinct from SponsorNote (one-time-
-            per-browser, deeper, vulnerable-tone). Hidden during
+            non-declined answer. Hidden during
             streaming so it doesn't shift layout while tokens arrive.
             Hidden on the declined phase so the bot's "i don't have
             docs" line doesn't get followed by a "buy our thing" pitch
@@ -583,10 +565,6 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
             in the answer text itself. */}
         {state.phase === 'done' ? <CtaStrip /> : null}
 
-        {/* One-time sponsor note. Mounts only on the FIRST non-declined
-            done of this browser (latched in onEvent). SponsorNote owns
-            the localStorage flag so a second mount no-ops. */}
-        {showSponsor ? <SponsorNote /> : null}
 
         {state.phase === 'done' && state.followUps.length > 0 ? (
           <FollowUps suggestions={state.followUps} onSelect={onFollowUp} />

@@ -43,9 +43,6 @@ export const ROUTABLE_FRACTION_LOW = 0.4;
 export const ROUTABLE_FRACTION_HIGH = 0.8;
 export const PER_TASK_DISCOUNT = 0.75;
 
-/* Github sponsors profile + source tag. `metadata_source=token_calc`
- * marks a sponsorship that started on /cost. */
-export const SPONSOR_BASE_URL = 'https://github.com/sponsors/chernistry';
 
 export interface SavingBand {
   /** Total monthly LLM spend across the three inputs, in USD. */
@@ -92,8 +89,3 @@ export function formatPct(n: number): string {
   return `${Math.round(n * 100)}%`;
 }
 
-/** Compose the github sponsors URL with the tracking metadata_source
- * appended. Used in the cta and asserted in the test. */
-export function sponsorUrl(): string {
-  return `${SPONSOR_BASE_URL}?metadata_source=token_calc`;
-}

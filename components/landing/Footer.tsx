@@ -90,11 +90,6 @@ export function Footer() {
               GitHub Discussions
             </a>
             <a
-              href="https://github.com/sponsors/chernistry"
-            >
-              GitHub Sponsors
-            </a>
-            <a
               href="/sponsors"
             >
               Sponsors

@@ -9,18 +9,15 @@
  * is verified manually with `next dev` and `next build`.
  *
  * Cases covered (matching the operator's spec):
- *   - 0-count: single full-width placeholder, no avatars rendered.
- *   - 1-count: real avatar + (MIN_VISIBLE - 1) placeholder filler.
- *   - 5-count: real avatars only, no placeholders.
+ *   - 0-count: no slots.
+ *   - 1-count and 4-count: real avatars only, no filler.
  *   - 5-count: ordered by recognizability desc, then login asc.
- *   - placeholder copy is voice-correct (lowercase, no banned words).
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildWallSlots,
   isZeroCount,
-  MIN_VISIBLE,
   orderSponsors,
   type Sponsor,
 } from '../components/landing/sponsor-wall-data.ts';
@@ -39,90 +36,25 @@ function mkSponsor(over: Partial<Sponsor> & { login: string }): Sponsor {
 /* zero-count behaviour                                                 */
 /* -------------------------------------------------------------------- */
 
-test('0 sponsors: returns a single placeholder slot', () => {
-  const slots = buildWallSlots([]);
-  assert.equal(slots.length, 1);
-  assert.equal(slots[0].kind, 'placeholder');
-});
-
-test('0 sponsors: placeholder copy says there are no sponsors yet', () => {
-  const slots = buildWallSlots([]);
-  assert.equal(slots[0].kind, 'placeholder');
-  if (slots[0].kind !== 'placeholder') return; /* type-narrow */
-  assert.match(
-    slots[0].caption,
-    /no sponsors yet/i,
-  );
+test('0 sponsors: returns no slots', () => {
+  assert.equal(buildWallSlots([]).length, 0);
 });
 
 test('0 sponsors: isZeroCount returns true', () => {
   assert.equal(isZeroCount([]), true);
 });
 
-test('placeholder copy is lowercase (voice rule from research)', () => {
-  const slots = buildWallSlots([]);
-  for (const slot of slots) {
-    if (slot.kind !== 'placeholder') continue;
-    /* Allow $ digits dollar amounts but no uppercase letters in the
-       lowercase-voice copy — research file: "lowercase casual copy". */
-    assert.equal(
-      slot.caption,
-      slot.caption.toLowerCase(),
-      `placeholder caption should be all lowercase: ${JSON.stringify(slot.caption)}`,
-    );
-  }
-});
-
-test('placeholder copy avoids banned marketing words', () => {
-  const banned = [
-    'delve',
-    'leverage',
-    'harness',
-    'robust',
-    'comprehensive',
-    'seamless',
-    'transform',
-    'unlock',
-    'engagement',
-    '10x',
-    'roi',
-    'thrilled',
-  ];
-  const slots = buildWallSlots([]);
-  for (const slot of slots) {
-    if (slot.kind !== 'placeholder') continue;
-    const lc = slot.caption.toLowerCase();
-    for (const word of banned) {
-      assert.ok(
-        !new RegExp(`\\b${word}\\b`).test(lc),
-        `placeholder caption uses banned word "${word}": ${JSON.stringify(slot.caption)}`,
-      );
-    }
-  }
-});
-
 /* -------------------------------------------------------------------- */
-/* small-count behaviour (1 sponsor → 1 real + filler)                  */
+/* small-count behaviour (1 sponsor → 1 real cell, no filler)         */
 /* -------------------------------------------------------------------- */
 
-test('1 sponsor: returns 1 real cell + (MIN_VISIBLE - 1) placeholders', () => {
+test('1 sponsor: returns exactly 1 real cell', () => {
   const slots = buildWallSlots([mkSponsor({ login: 'alice' })]);
-  assert.equal(slots.length, MIN_VISIBLE);
+  assert.equal(slots.length, 1);
   assert.equal(slots[0].kind, 'sponsor');
   if (slots[0].kind === 'sponsor') {
     assert.equal(slots[0].login, 'alice');
   }
-  /* Slots after the real sponsor are placeholders. */
-  for (let i = 1; i < slots.length; i++) {
-    assert.equal(slots[i].kind, 'placeholder', `slot ${i} should be a placeholder`);
-  }
-});
-
-test('1 sponsor: real cell precedes filler cells (no leading placeholder)', () => {
-  const slots = buildWallSlots([mkSponsor({ login: 'alice' })]);
-  /* The very first cell must be the real sponsor — eye lands on a
-     real name first, never on a placeholder. */
-  assert.equal(slots[0].kind, 'sponsor');
 });
 
 test('1 sponsor: isZeroCount returns false', () => {
@@ -199,23 +131,20 @@ test('orderSponsors does not mutate the input array', () => {
 });
 
 /* -------------------------------------------------------------------- */
-/* edge: 4-count (one below MIN_VISIBLE) gets exactly one filler        */
+/* edge: 4-count gets no filler                                        */
 /* -------------------------------------------------------------------- */
 
-test('4 sponsors: 4 real cells + 1 placeholder = MIN_VISIBLE total', () => {
+test('4 sponsors: 4 real cells, no placeholders', () => {
   const sponsors: Sponsor[] = ['alice', 'bob', 'carol', 'dave'].map(
     (login) => mkSponsor({ login }),
   );
   const slots = buildWallSlots(sponsors);
-  assert.equal(slots.length, MIN_VISIBLE);
-  const realCount = slots.filter((s) => s.kind === 'sponsor').length;
-  const placeholderCount = slots.filter((s) => s.kind === 'placeholder').length;
-  assert.equal(realCount, 4);
-  assert.equal(placeholderCount, 1);
+  assert.equal(slots.length, 4);
+  assert.equal(slots.every((s) => s.kind === 'sponsor'), true);
 });
 
 /* -------------------------------------------------------------------- */
-/* edge: > MIN_VISIBLE returns all real, no filler                      */
+/* edge: 10-count returns all real                                     */
 /* -------------------------------------------------------------------- */
 
 test('10 sponsors: 10 real cells, no placeholders', () => {

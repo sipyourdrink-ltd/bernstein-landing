@@ -21,11 +21,10 @@ import { JsonLd } from '@/components/seo/JsonLd';
 import { fetchPublicSponsors } from '@/lib/sponsors';
 import { SITE_URL, AUTHOR } from '@/lib/seo';
 
-const PAGE_TITLE = 'sponsor Bernstein, github.com/sponsors/chernistry';
+const PAGE_TITLE = 'sponsor Bernstein';
 const PAGE_DESC =
-  'Sponsor Bernstein on GitHub. The Apache 2.0 implementation of an HMAC-chained audit log for CLI coding agents.';
+  'The Apache 2.0 implementation of an HMAC-chained audit log for CLI coding agents.';
 const PAGE_URL = `${SITE_URL}/sponsors`;
-const SPONSOR_URL = 'https://github.com/sponsors/chernistry';
 
 /* The page is server-rendered with sponsor data refreshed via
    fetch-cache (see lib/sponsors.ts:REVALIDATE_SECONDS). When no token
@@ -70,7 +69,6 @@ function buildJsonLd() {
         'https://alexchernysh.com',
         'https://github.com/chernistry',
         'https://x.com/alex_chernysh',
-        'https://github.com/sponsors/chernistry',
       ],
     },
     {
@@ -105,11 +103,11 @@ export default async function SponsorsPage() {
               scheduling decision is plain python, every agent action is
               tamper-evidently logged.
             </p>
-            <p>
-              {realCount === 0
-                ? 'no sponsors yet.'
-                : `${realCount} ${realCount === 1 ? 'sponsor' : 'sponsors'} so far. ordered by recognizability, then alphabetical. real avatars only.`}
-            </p>
+            {realCount > 0 ? (
+              <p>
+                {`${realCount} ${realCount === 1 ? 'sponsor' : 'sponsors'} so far. ordered by recognizability, then alphabetical. real avatars only.`}
+              </p>
+            ) : null}
             <p>
               <strong>stage honesty.</strong> one
               maintainer. no production reference customer. no SOC 2 / ISO
@@ -122,19 +120,6 @@ export default async function SponsorsPage() {
 
         <SponsorWall sponsors={sponsors} heading={null} />
 
-        <section className="sponsors-page__cta">
-          <p>
-            sponsor on github. 0% fee on personal-account sponsorships,
-            stripe payouts, no middleman.
-          </p>
-          <a
-            href={SPONSOR_URL}
-            rel="external noopener noreferrer"
-            target="_blank"
-          >
-            github.com/sponsors/chernistry &rarr;
-          </a>
-        </section>
       </main>
       <Footer />
       <BackToTop />

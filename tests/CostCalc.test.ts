@@ -15,9 +15,6 @@
  *   - `computeSavingBand` does not throw and does not divide-by-zero on
  *     {0, 0, 0} input; it returns zeros for both the band and the
  *     fractions.
- *   - `sponsorUrl()` includes `metadata_source=token_calc` (research
- *     §1.2 falsifier — the calculator is judged by sponsor checkouts
- *     correlated via this query param).
  *   - Negative or NaN inputs are sanitised to zero rather than
  *     producing nonsense.
  *   - The band is monotonically increasing with total spend.
@@ -34,7 +31,6 @@ import {
   sanitizeNumber,
   formatUsd,
   formatPct,
-  sponsorUrl,
 } from '../components/cost/cost-math.ts';
 
 test('default operator inputs (claude=400, codex=200, cursor=0) produce a band inside [180, 480]', () => {
@@ -83,13 +79,6 @@ test('negative and NaN inputs are sanitised to zero', () => {
   assert.equal(band.totalSpend, 100);
 });
 
-test('sponsor URL includes the metadata_source=token_calc query param', () => {
-  const url = sponsorUrl();
-  /* Sponsorships arriving from /cost carry this param, so a link that
-     drops it makes them indistinguishable from the rest. */
-  assert.match(url, /metadata_source=token_calc/);
-  assert.match(url, /^https:\/\/github\.com\/sponsors\/chernistry/);
-});
 
 test('band scales monotonically with total spend', () => {
   const small = computeSavingBand(100, 0, 0);
@@ -117,15 +106,3 @@ test('formatPct rounds to a whole percent', () => {
   assert.equal(formatPct(0.999), '100%');
 });
 
-test('claude=400 codex=200 cursor=0 default renders a CTA URL with the tracking source', () => {
-  /* Sanity check the cta link assembly: the component renders
-     `sponsorUrl()` directly, so the assertion mirrors what the rendered
-     html would contain. */
-  const url = sponsorUrl();
-  const band = computeSavingBand(400, 200, 0);
-  /* Plan-specified band check: at the default inputs, the calculator
-     output is in the band [180-480] for the savings line AND the cta
-     URL includes metadata_source=token_calc. Both must hold. */
-  assert.ok(band.savingLow >= 180 && band.savingHigh <= 480);
-  assert.match(url, /metadata_source=token_calc/);
-});

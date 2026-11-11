@@ -45,7 +45,6 @@ import {
   computeSavingBand,
   formatUsd,
   formatPct,
-  sponsorUrl,
 } from './cost-math';
 
 /* Re-export so consumers that only import the component file still get
@@ -54,7 +53,6 @@ export {
   computeSavingBand,
   formatUsd,
   formatPct,
-  sponsorUrl,
   sanitizeNumber,
 } from './cost-math';
 
@@ -242,42 +240,6 @@ export function CostCalc() {
         </p>
       </div>
 
-      {/* CTA - direct lift from the research-anchored example. The X and
-          Y are substituted in real time from the inputs. */}
-      <div className="cost-calc-cta" aria-label="sponsor cta">
-        {band.totalSpend > 0 ? (
-          <>
-            <p>
-              your last month's bill was{' '}
-              <strong>{formatUsd(band.totalSpend)}</strong>.
-            </p>
-            <p>bernstein keeps routing the cheapest model that passes tests.</p>
-            <p className="cost-calc-cta-link">
-              <a
-                href={sponsorUrl()}
-                rel="noopener"
-              >
-                &rarr; github.com/sponsors/chernistry
-              </a>
-            </p>
-          </>
-        ) : (
-          <>
-            <p>
-              put a number in any field above and this block will show the
-              math and a link.
-            </p>
-            <p className="cost-calc-cta-link">
-              <a
-                href={sponsorUrl()}
-                rel="noopener"
-              >
-                &rarr; github.com/sponsors/chernistry
-              </a>
-            </p>
-          </>
-        )}
-      </div>
     </section>
   );
 }

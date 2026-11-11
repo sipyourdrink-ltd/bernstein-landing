@@ -5,12 +5,7 @@
  *   - 64px circular avatars (plain <img>; no avatar lib, no new deps).
  *   - rel="external noopener noreferrer" on every link out to GitHub.
  *   - Each slot has aria-label + alt text with the sponsor's GH login.
- *   - When the input array is empty we render a single placeholder card
- *     reading "no sponsors yet."
- *   - When the input array is non-empty but below MIN_VISIBLE (=5), we
- *     render the real avatars and top up with neutral placeholder cards
- *     so the row doesn't look broken at low counts. Placeholders never
- *     assert they are sponsors.
+ *   - Renders the real sponsors only; an empty list renders an empty wall.
  *
  * Reuse:
  *   The component is consumable from /sponsors today and from the
