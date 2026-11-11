@@ -7,13 +7,6 @@
  *
  * Voice: lowercase, no marketing copy. Footer is the single subtle
  * "powered by bernstein.run" line - no popups, no email gate.
- *
- * Why exists (per traffic-amplification-2026-05-09):
- *   - 2500+ repos ship AGENTS.md (GitHub blog, 2026)
- *   - generators exist (codewithclaude, exampleconfig, ncreighton)
- *   - none of them check parser quirks across CLI agents
- *   - bernstein already encodes those quirks in src/bernstein/adapters/
- *   - surface that as a free linter
  */
 
 import type { Metadata } from 'next';

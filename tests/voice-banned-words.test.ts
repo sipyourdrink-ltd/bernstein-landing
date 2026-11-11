@@ -8,10 +8,8 @@
  *
  * Files in scope:
  *   - app/page.tsx (homepage server component)
- *   - app/why-bernstein/page.tsx (decision-support page)
  *   - app/cost/page.tsx (token-bill calculator)
  *   - components/landing/* (landing surfaces)
- *   - content/evaluation/index.mdx (why-bernstein body content)
  *
  * Files out of scope:
  *   - app/sponsors/*
@@ -57,9 +55,7 @@ const REPO_ROOT = process.cwd();
  * dropped into one of these directories is immediately covered. */
 const SCOPE_FILES: string[] = [
   'app/page.tsx',
-  'app/why-bernstein/page.tsx',
   'app/cost/page.tsx',
-  'content/evaluation/index.mdx',
 ];
 
 const SCOPE_DIRS: string[] = [

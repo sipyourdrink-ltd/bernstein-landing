@@ -156,7 +156,6 @@ function makePost(over: Partial<SitemapPost> & { slug: string }): SitemapPost {
 const FIXTURE_MTIMES: Record<string, string> = {
   'app/page.tsx': '2026-04-01',
   'app/cli-quickstart/page.tsx': '2026-04-05',
-  'app/why-bernstein/page.tsx': '2026-04-10',
   'app/cost/page.tsx': '2026-04-12',
   'app/sponsors/page.tsx': '2026-04-15',
   'app/tools/agent-md-bench/page.tsx': '2026-04-20',

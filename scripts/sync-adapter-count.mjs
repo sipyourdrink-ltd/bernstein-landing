@@ -25,7 +25,6 @@
  *                                   (runs after scripts/extract-cli.mjs
  *                                   so a fresh extract is corrected too)
  *   README.md                       repo blurb
- *   content/evaluation/index.mdx    /why-bernstein body copy
  *   app/about/page.tsx              /about body copy
  *
  * A failed upstream lookup is NEVER fatal - it degrades to the constant
@@ -73,24 +72,6 @@ const PROSE_COUNTERS = [
     label: 'adapter count',
     displayCount: '50+',
     re: /(— )(\d+\+?)( adapters ship with)/,
-  },
-  {
-    file: 'content/evaluation/index.mdx',
-    label: 'parallel-agents claim',
-    displayCount: '50+',
-    re: /(does the same thing across )(\d+\+?)( different cli agents)/,
-  },
-  {
-    file: 'content/evaluation/index.mdx',
-    label: 'claude-code-is-one-of claim',
-    displayCount: '50+',
-    re: /(claude code included as one of the )(\d+\+?)(,)/,
-  },
-  {
-    file: 'content/evaluation/index.mdx',
-    label: 'registry-size claim',
-    displayCount: '50+',
-    re: /(there are )(\d+\+?)( adapters in the registry)/,
   },
   {
     file: 'app/about/page.tsx',

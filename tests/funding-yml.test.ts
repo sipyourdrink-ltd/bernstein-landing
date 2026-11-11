@@ -110,8 +110,7 @@ test('FUNDING.yml github value is `chernistry`', () => {
 test('FUNDING.yml polar value is `bernstein` when polar is configured', () => {
   /* polar is optional; the test only enforces the value shape WHEN
      the key is present. If a future operator removes polar this test
-     stays green (intentional — polar is monetization optionality, not
-     a hard requirement). */
+     stays green (intentional — polar is not a hard requirement). */
   const raw = fs.readFileSync(FUNDING_PATH, 'utf8');
   const parsed = parseFundingYml(raw);
   if ('polar' in parsed.byKey) {

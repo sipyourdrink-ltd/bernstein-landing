@@ -86,7 +86,6 @@ export type OutboundSurface =
   | 'blog-body'
   | 'blog-card'
   | 'docs-body'
-  | 'why-bernstein'
   | 'sponsors'
   | 'cost'
   | 'other';
@@ -126,28 +125,6 @@ export function trackOutbound(
     window.umami?.track('outbound-click', payload as unknown as Record<string, string>);
   } catch {
     /* tracker not loaded / blocked / extension noise - never throw. */
-  }
-  /* gh-star-confirmed plumbing (EVENT_TAXONOMY 2026-05-17 row #5):
-     when the outbound destination is github.com, stamp a short-lived
-     cookie carrying the originating surface. RightRail's mount-time
-     helper reads this cookie on the next page load and, if
-     document.referrer is github.com, emits ``gh-star-confirmed`` with
-     the original surface as the ``source`` prop. Cookie TTL is 2
-     minutes - long enough for a real round-trip (star, optional
-     scroll-around) without leaving a stale flag for hours of session
-     drift. Path=/ so any return landing surface (/, /sponsors, a blog
-     post that linked out) sees it. SameSite=Lax keeps it attached on
-     top-level return navigation but excluded from third-party
-     requests. Heuristic only - true star confirmation requires the
-     GH webhook bridge tracked in EVENT_TAXONOMY §4 row 5. */
-  if (canon === 'github.com' && typeof document !== 'undefined') {
-    try {
-      const value = encodeURIComponent(`${surface}${slug ? `-${slug}` : ''}`);
-      document.cookie = `bernstein:gh-pending=${value}; Path=/; Max-Age=120; SameSite=Lax`;
-    } catch {
-      /* document.cookie can throw in some sandboxed contexts -
-         cookie set is best-effort by design. */
-    }
   }
 }
 

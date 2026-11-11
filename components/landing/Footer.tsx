@@ -87,7 +87,6 @@ export function Footer() {
                 it is a real per-adapter comparison surface, not a link
                 to prune. */}
             <a href="/compare" data-umami-event="click-compare-internal" data-umami-event-source="footer">compare adapters</a>
-            <a href="/why-bernstein" data-umami-event="click-why-bernstein" data-umami-event-source="footer">why this over X</a>
             <a href="/benchmarks" data-umami-event="click-benchmarks-internal" data-umami-event-source="footer">benchmarks</a>
             <a href="/cost" data-umami-event="click-cost-internal" data-umami-event-source="footer">cost calculator</a>
             <a href="/llms-full.txt" data-umami-event="click-llms-full" data-umami-event-source="footer">llms-full.txt</a>
@@ -123,10 +122,6 @@ export function Footer() {
             >
               GitHub Sponsors
             </a>
-            {/* Internal /sponsors link - addresses the audit finding that
-                /sponsors got 1 organic landing in 3 days because nothing
-                links to it. Distinct ``sponsors-footer-click`` lets the
-                report attribute footer-driven /sponsors traffic. */}
             <a
               href="/sponsors"
               data-umami-event="click-sponsors-internal"

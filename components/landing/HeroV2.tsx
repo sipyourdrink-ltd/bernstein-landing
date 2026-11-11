@@ -14,13 +14,6 @@
  * phone is high-friction; mobile users want install first). See
  * variant-2 README §5.
  *
- * Above-fold conversion targets hit (4 of 5):
- *   #1 github star - right rail black row
- *   #2 install     - right rail snippet (copy-on-click)
- *   #3 ask the bot - left column DocsBot variant=hero
- *   #4 email cap   - below fold
- *   #5 read a blog - below fold (DocsBot citations link to posts)
- *
  * The DocsBot is mounted in a Suspense-boundary-safe wrapper at the page
  * level; HeroV2 renders the kicker and ask-h heading then leaves a
  * `<slot />`-shaped div for the page to drop the bot into. This keeps the
@@ -148,10 +141,6 @@ export async function HeroV2({
 
   return (
     <section className="v2-hero" aria-labelledby="hero-heading">
-      {/* Funnel step 1 - fires once per session when the hero CTA region
-          first crosses the viewport. RightRail mount now fires
-          ``cta-hero-mount`` (see action-002); this is the canonical
-          "scrolled-to" denominator. */}
       <InViewTracker eventName={UmamiEvent.HeroCtaInView} ratio={0.2} />
       {/* LEFT COLUMN - preamble + H1 + sub + ask-first slot */}
       <div className="v2-hero-lede">

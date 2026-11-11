@@ -26,7 +26,7 @@ export interface ReadingProgressProps {
   /** Article word count, used to compute the article-aware dwell floor
    *  per ANALYTICS-002 §5:
    *    max(45s, words / 250 wpm * 0.6 * 60s)
-   *  When omitted (e.g. on /, /why-bernstein where the prop wasn't
+   *  When omitted (e.g. on / where the prop wasn't
    *  threaded through yet), we fall back to a flat 60s - same as the
    *  pre-recon behaviour, so an un-updated call site doesn't lose
    *  read-complete tracking. */

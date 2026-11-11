@@ -123,7 +123,6 @@ const LITERAL_SURFACES: string[] = [
   'public/manifest.json',
   'components/seo/SoftwareApplicationJsonLd.tsx',
   'components/seo/OrganizationJsonLd.tsx',
-  'app/why-bernstein/page.tsx',
   /* The homepage hero H1/sub - the first copy a human visitor reads,
      and the one surface in this list nobody runs a crawler-parity
      check against. It hand-types the phrase rather than importing it

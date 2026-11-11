@@ -31,110 +31,6 @@ import { UmamiEvent, emitFunnelStep, track } from '@/lib/analytics/events';
 import { formatStars } from '@/lib/format-stars';
 import { withUtm } from '@/lib/utm';
 
-/**
- * day-2-return + gh-star-confirmed detection.
- *
- * Inlined here rather than split into a module - it is used by this
- * component only. Both checks run exactly once per session via
- * sessionStorage gates so a re-render of RightRail can't double-count.
- *
- * day-2-return:
- *   localStorage["bernstein:first-seen"] = ms timestamp of first paint.
- *   On every mount, if the key exists AND is >=24h old AND the session
- *   gate hasn't fired yet, emit ``day-2-return`` with a coarse
- *   ``days_since`` bucket. New visitors set the key and skip the emit.
- *
- * gh-star-confirmed:
- *   ``trackOutbound`` (see components/site/track-outbound.ts) sets a
- *   2-minute cookie ``bernstein:gh-pending`` carrying the original
- *   ``source`` value when destination is github.com. On the next page
- *   load, if (a) the cookie is still fresh AND (b)
- *   ``document.referrer`` host is github.com, we treat the round-trip
- *   as a heuristic confirmation that the visitor reached the repo
- *   before coming back. Confirming an actual star needs a GitHub
- *   webhook, which this app does not have.
- */
-const FIRST_SEEN_KEY = 'bernstein:first-seen';
-const DAY2_SESSION_GATE = 'bernstein:day2-emitted';
-const GH_RETURN_SESSION_GATE = 'bernstein:gh-return-emitted';
-const GH_PENDING_COOKIE = 'bernstein:gh-pending';
-
-function daysSinceBucket(daysSince: number): '1' | '2' | '3-7' | '7-30' | '30+' {
-  if (daysSince < 2) return '1';
-  if (daysSince < 3) return '2';
-  if (daysSince < 7) return '3-7';
-  if (daysSince < 30) return '7-30';
-  return '30+';
-}
-
-function readCookie(name: string): string | null {
-  if (typeof document === 'undefined') return null;
-  const prefix = `${name}=`;
-  for (const raw of document.cookie.split(';')) {
-    const c = raw.trim();
-    if (c.startsWith(prefix)) return decodeURIComponent(c.slice(prefix.length));
-  }
-  return null;
-}
-
-function clearCookie(name: string): void {
-  if (typeof document === 'undefined') return;
-  document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax`;
-}
-
-function maybeEmitCohortEvents(): void {
-  if (typeof window === 'undefined') return;
-  try {
-    /* ---- day-2-return ---- */
-    const ls = window.localStorage;
-    const ss = window.sessionStorage;
-    const now = Date.now();
-    const firstSeenRaw = ls?.getItem(FIRST_SEEN_KEY);
-    if (!firstSeenRaw) {
-      ls?.setItem(FIRST_SEEN_KEY, String(now));
-    } else {
-      const firstSeenMs = Number(firstSeenRaw);
-      if (Number.isFinite(firstSeenMs) && firstSeenMs > 0) {
-        const ageMs = now - firstSeenMs;
-        const oneDayMs = 24 * 60 * 60 * 1000;
-        if (ageMs >= oneDayMs && ss?.getItem(DAY2_SESSION_GATE) !== '1') {
-          ss?.setItem(DAY2_SESSION_GATE, '1');
-          const days = Math.floor(ageMs / oneDayMs);
-          track(UmamiEvent.Day2Return, {
-            source: 'right-rail-mount',
-            days_since: daysSinceBucket(days),
-          });
-        }
-      }
-    }
-
-    /* ---- gh-star-confirmed ---- */
-    const pending = readCookie(GH_PENDING_COOKIE);
-    if (pending && ss?.getItem(GH_RETURN_SESSION_GATE) !== '1') {
-      const referrerHost = (() => {
-        try {
-          return document.referrer
-            ? new URL(document.referrer).hostname.replace(/^www\./i, '').toLowerCase()
-            : '';
-        } catch {
-          return '';
-        }
-      })();
-      if (referrerHost === 'github.com') {
-        ss?.setItem(GH_RETURN_SESSION_GATE, '1');
-        track(UmamiEvent.GhStarConfirmed, { source: pending || 'unknown' });
-        /* Clear the pending cookie so a later page load (e.g. an in-app
-           nav back to /) doesn't double-emit. */
-        clearCookie(GH_PENDING_COOKIE);
-      }
-    }
-  } catch {
-    /* localStorage / sessionStorage can throw in iframe-sandbox or
-       private-mode contexts; the cohort events are best-effort by
-       design - never let a tracker failure throw into the component. */
-  }
-}
-
 interface RightRailProps {
   /**
    * Live adapter count, server-fetched from the bernstein registry.
@@ -247,11 +143,6 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
       viewport_width: window.innerWidth,
     });
     emitFunnelStep('cta', { source: 'hero-rail-mount' });
-    /* day-2-return + gh-star-confirmed checks. Fire once per session
-       via sessionStorage gates inside the helper so a re-mount can't
-       double-count. See the helper docstring above for the full
-       contract. */
-    maybeEmitCohortEvents();
   }, []);
 
   const tab = INSTALL_TABS.find((t) => t.id === activeTab) ?? INSTALL_TABS[0];

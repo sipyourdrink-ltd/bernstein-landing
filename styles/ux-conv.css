@@ -5,19 +5,10 @@
      .social-proof-strip      — `as featured in` badge row.
      .watch-cta               — github star+watch CTA near hero.
      .rss-subscribe-link      — visible RSS subscribe links.
-     .cost-headline-ab        — A/B variant heading wrapper.
      .beta-notice             — slim dismissible beta status strip on `/`.
 
    No collisions with .v2-*, .cost-*, .sponsor-wall, or legacy classes.
    ============================================================================ */
-
-/* ----- 1. CostHeadlineAb wrapper ----- */
-
-.cost-headline-ab {
-  /* Inherit the H1 styles from .cost-page-header h1 — the wrapper is
-     just the A/B variant carrier. No new sizing here on purpose. */
-  text-transform: lowercase;
-}
 
 /* ----- 2. SponsorStrip — compact in-fold row ----- */
 

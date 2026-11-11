@@ -60,7 +60,6 @@ const repoRoot = path.resolve(__dirname, '..');
 const TRACKED_PATHS = [
   'app/page.tsx',
   'app/cli-quickstart/page.tsx',
-  'app/why-bernstein/page.tsx',
   'app/cost/page.tsx',
   'app/sponsors/page.tsx',
   'app/tools/agent-md-bench/page.tsx',
