@@ -1,0 +1,76 @@
+---
+title: "bernstein 2.16: the output-economy suite, and a Windows adapter path that finally holds"
+description: "The 2.4 through 2.16 arc, grouped: an output-economy suite that caps and attributes token spend per task, deterministic auditable orchestration hardened end to end, and a Windows adapter path fix so the dominant install route stops failing silently for a whole platform."
+date: "2026-07-06"
+draft: true
+featured: false
+tags:
+  - "multi-agent orchestration"
+  - "release"
+  - "cost control"
+  - "output economy"
+  - "deterministic replay"
+  - "audit log"
+  - "Windows"
+  - "adapters"
+schemaType: "TechArticle"
+techDependencies:
+  - "Python 3.12+ with `pipx install --upgrade bernstein` (or `pip install --upgrade bernstein`)"
+  - "An existing `bernstein.yaml` from a 2.x install; configs and plans run unchanged"
+  - "Windows 10/11 users: a working `PATH` entry for the wrapped agent binary (the adapter now surfaces a structured error when it is missing rather than exiting silently)"
+---
+
+<Lead>
+Twelve point releases since the 2.x recap. Same posture as every recap before it: not a roadmap, not a refactor. This is the list of things that started to hurt once the orchestrator was running real work on real machines, plus the one platform bug that had been quietly failing for every Windows operator who tried the standard install.
+</Lead>
+
+Grouped so the trajectory reads from one page. Three themes carry the cycle: an output-economy suite that turns token spend from a post-hoc surprise into a per-task budget with an attributed ledger; the deterministic, auditable core hardened so a run replays byte for byte and the audit chain covers the parts that used to fall outside it; and a Windows adapter path fix that stops the dominant install route from failing without a message on a whole platform.
+
+## the output-economy suite
+
+The problem was never the total bill. It was that the total arrived at the end, unattributed, with no line item you could point at. A plan would spend more than expected and there was no per-task answer to where it went.
+
+The 2.16 suite makes output spend a first-class, bounded quantity:
+
+- **Per-task budgets that actually stop the task.** `--max-cost-usd` was a run-level cap. It is now enforced per step and per task, so a single runaway agent gets halted at its own envelope instead of eating the whole run's headroom before anything trips.
+- **An attributed ledger, not a total.** Every token charge is written against the task, the step, the adapter, and the model that incurred it. `bernstein costs` reads back a line-item breakdown, so "the run cost more than I planned" becomes "this task on this model was 60 percent of it."
+- **A calibrated forecast, scored.** The cost guard forecasts spend before a step runs and logs the forecast next to the actual. The forecast log is Brier-scored, so the guard's confidence is measured against outcomes rather than asserted. A guard that is systematically over- or under-confident shows up as a number, not a vibe.
+
+Honest framing: this is an economy of *output* - the tokens the agents emit and the calls they make - not a model-pricing oracle. It reads the usage each adapter reports and holds you to a budget against it. It does not renegotiate anyone's per-token rate. What it removes is the class of surprise where the spend was real, correct, and completely un-attributed until the invoice.
+
+## deterministic, auditable orchestration - hardened end to end
+
+The determinism was the point from the first release. This cycle spent its correctness budget making it hold under the cases that used to slip.
+
+The coordinator has no model in the loop: given the same seed, the same plan, and the same state, it schedules the byte-identical task graph. That property is now tested as a property, not a hope - two runs from the same inputs are compared by hash, and a divergence is a failure, not a flaky retry. The audit chain follows the same rule. Every scheduling decision, every task transition, and every artefact edit lands as an HMAC-chained entry, and the coverage gaps that used to sit *outside* the chain - a state move here, a merge there - were closed so the log reads back as one continuous record.
+
+The compliance surface ships a verifier you do not have to trust the orchestrator to run. `bernstein compliance pack` produces a signed bundle; the standalone `bernstein-verify` wheel checks it with `cryptography` and `click` as its only dependencies, and its own test asserts that `import bernstein` raises `ModuleNotFoundError` from inside its venv - because independence from the thing it audits is the property an external reviewer actually wants.
+
+Same caveat as the 2.x recap, restated because it still holds: this is code an evaluator can stand up and read, with tests and runbooks. It has not been through an external regulatory audit. Treat it as a verifiable artefact, not an attestation.
+
+## the Windows adapter path fix
+
+This is the unglamorous one, and it is the most important line in the release for anyone on Windows.
+
+The standard install path - `pipx install bernstein`, point it at a wrapped agent, run a plan - was failing on Windows in a way that produced no useful signal. The adapter's binary discovery resolved the agent executable using a cascade that was implicitly POSIX-shaped: it did not account for the `.exe` / `.cmd` / `.bat` extension resolution that Windows applies through `PATHEXT`, so a binary that was genuinely present and on `PATH` read as absent. Worse, the failure surfaced as a silent exit rather than a "could not find the agent binary" error, so the operator got no traceback, no hint, and no obvious next step.
+
+The fix does two things:
+
+- **Extension-aware discovery.** The binary resolver now walks the platform's executable-extension rules, so a Windows agent binary on `PATH` resolves the same way its POSIX sibling does. The discovery cascade - operator override wins, then the preferred binary, then the fallback - is unchanged; only the platform-correct lookup underneath it was wrong.
+- **A structured error instead of a silent exit.** When discovery genuinely fails, the adapter raises `BinaryNotInstalledError` with the binary name it looked for and where it looked, routed through the same first-run categorisation guard the rest of the CLI uses. The operator gets a hint panel and a `sysexits.h` exit code, not a blank prompt.
+
+Why this matters more than a normal bug: the platform install path most people follow is the one that has to work without a support thread, and on Windows it silently did not. A regression that only surfaces through user reports is exactly the class that costs the most to run down, because by the time it reaches you it has already cost someone else an afternoon. This closes it, and the adapter conformance suite now exercises the Windows discovery path so it stays closed.
+
+## upgrading
+
+```bash
+pipx install --upgrade bernstein     # or: pip install --upgrade bernstein
+```
+
+That is the whole upgrade. 2.x configs and plans run unchanged - `bernstein run`, `bernstein conduct`, `bernstein live`, `bernstein gui serve` all behave as before. The new cost surfaces are opt-in through `--max-cost-usd` and the existing `bernstein costs` view; nothing you already have needs to move.
+
+## related
+
+- [bernstein 2.x recap](/blog/v2-x-recap): the cycle this one picks up from - lineage, ten trackers, A2A cards, the standalone verifier.
+- [v2.0 release notes](/blog/v2-0-release): when the web UI landed in the wheel.
+- [cost-aware routing](/blog/cost-aware-routing): the bandit that decides which arm gets the work, which the per-task budget now bounds.
