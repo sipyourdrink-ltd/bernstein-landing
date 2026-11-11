@@ -60,7 +60,7 @@ export const PROJECT_ALTERNATE_NAME = `${PROJECT_NAME} Governance Layer`;
  * `/agents.txt`. Every other description on the site is a longer or
  * shorter projection of this one.
  */
-export const PROJECT_DESCRIPTION = `${PROJECT_TAGLINE} - no model in the coordination loop, so replaying a plan reproduces its task graph byte-identically; signed lineage and an opt-in HMAC audit chain, air-gap friendly`;
+export const PROJECT_DESCRIPTION = `${PROJECT_TAGLINE} - no model in the coordination loop, so replaying a plan reproduces the same task graph; signed lineage and an opt-in HMAC audit chain, air-gap friendly`;
 
 /**
  * Classification for `/agents.txt`. A directory that ingests this file
@@ -99,7 +99,7 @@ export const PROJECT_TAGS = [
  * Offline verifiability is the property, and it is the phrasing the
  * paper uses.
  */
-export const PROJECT_SITE_DESCRIPTION = `${PROJECT_TAGLINE}. Deterministic task graphs replay byte-identically; offline-verifiable run receipts let a reviewer check a run without rerunning it.`;
+export const PROJECT_SITE_DESCRIPTION = `${PROJECT_TAGLINE}. Replaying a plan reproduces the same task graph; offline-verifiable run receipts let a reviewer check a run without rerunning it.`;
 
 /** Closing line of the `/llms-full.txt` summary block. */
 export const PROJECT_ONE_LINER = 'Govern any agent workload. Any model. One command.';

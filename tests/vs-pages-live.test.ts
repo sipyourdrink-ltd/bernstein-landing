@@ -227,8 +227,8 @@ test('no live /vs page overstates the receipt guarantee', async (t) => {
     assert.ok(
       !page.haystack.includes(OVERSTATED_RECEIPT_CLAIM),
       `${page.url} overstates the receipt guarantee; receipts are ` +
-        `offline-verifiable, and it is the run that replays ` +
-        `byte-identically (${coverage(r)})`,
+        `offline-verifiable, and replaying a plan reproduces ` +
+        `the same task graph (${coverage(r)})`,
     );
   }
 });

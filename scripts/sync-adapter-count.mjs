@@ -64,32 +64,38 @@ const OUT_FILE = path.join(repoRoot, 'data', 'adapter-count.json');
  * re-worded rather than a release later.
  *
  * The capture groups are (prefix)(number)(suffix) - only the middle
- * group is rewritten, so surrounding wording is untouched.
+ * group is rewritten, so surrounding wording is untouched. Public marketing
+ * copy pins displayCount to "50+"; generated data keeps the resolved count.
  */
 const PROSE_COUNTERS = [
   {
     file: 'README.md',
     label: 'adapter count',
+    displayCount: '50+',
     re: /(— )(\d+\+?)( adapters ship with)/,
   },
   {
     file: 'content/evaluation/index.mdx',
     label: 'parallel-agents claim',
+    displayCount: '50+',
     re: /(does the same thing across )(\d+\+?)( different cli agents)/,
   },
   {
     file: 'content/evaluation/index.mdx',
     label: 'claude-code-is-one-of claim',
+    displayCount: '50+',
     re: /(claude code included as one of the )(\d+\+?)(,)/,
   },
   {
     file: 'content/evaluation/index.mdx',
     label: 'registry-size claim',
+    displayCount: '50+',
     re: /(there are )(\d+\+?)( adapters in the registry)/,
   },
   {
     file: 'app/about/page.tsx',
     label: 'about-page adapter claim',
+    displayCount: '50+',
     re: /(bernstein ships )(\d+\+?)( cli adapters)/,
   },
 ];
@@ -191,13 +197,13 @@ async function writeCountJson(count) {
   await writeIfChanged(OUT_FILE, next, prev, 'count');
 }
 
-async function syncCounter({ file, label, re }, count) {
+async function syncCounter({ file, label, re, displayCount }, count) {
   const absPath = path.join(repoRoot, file);
   const raw = await readFile(absPath, 'utf8');
   if (!re.test(raw)) {
     throw new Error(`${file}: could not locate the ${label} counter (${re})`);
   }
-  const next = raw.replace(re, `$1${count}$3`);
+  const next = raw.replace(re, `$1${displayCount ?? count}$3`);
   await writeIfChanged(absPath, next, raw, label);
 }
 

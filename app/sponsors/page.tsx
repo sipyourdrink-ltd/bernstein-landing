@@ -33,7 +33,7 @@ import { SITE_URL, SITE_NAME, AUTHOR } from '@/lib/seo';
 
 const PAGE_TITLE = 'sponsor Bernstein, github.com/sponsors/chernistry';
 const PAGE_DESC =
-  'Sponsor Bernstein on GitHub. Apache 2.0 reference implementation of HMAC-chained audit logs for CLI coding agents. Four monthly tiers plus one one-time tier.';
+  'Sponsor Bernstein on GitHub. The Apache 2.0 implementation of an HMAC-chained audit log for CLI coding agents. Four monthly tiers plus one one-time tier.';
 const PAGE_URL = `${SITE_URL}/sponsors`;
 const SPONSOR_URL = 'https://github.com/sponsors/chernistry';
 
@@ -193,7 +193,7 @@ export default async function SponsorsPage() {
           <header className="sponsors-page__intro">
             <h1>sponsor bernstein</h1>
             <p>
-              bernstein is the apache 2.0 reference implementation of an
+              bernstein is the apache 2.0 implementation of an
               HMAC-chained audit log for parallel CLI coding agents. every
               scheduling decision is plain python, every agent action is
               tamper-evidently logged. the audit chain maps cleanly to EU AI
@@ -211,7 +211,7 @@ export default async function SponsorsPage() {
               docs bot. infrastructure that keeps the audit-chain reference
               alive while the project waits for production users. the bet is
               that tamper-evident logging becomes table-stakes for regulated
-              AI coding pipelines, and that an apache-licensed reference
+              AI coding pipelines, and that an apache-licensed
               implementation is useful to have around when it does.
             </p>
             <p>
@@ -239,7 +239,7 @@ export default async function SponsorsPage() {
                 you work somewhere DORA, NIS2, EU AI Act Article 12, SR 11-7,
                 or ISO 42001 lands on your plate. the audit chain is the
                 primitive your compliance team actually needs from an AI
-                coding pipeline. back the reference implementation so it
+                coding pipeline. back the project so it
                 stays around when procurement asks for one.
               </p>
               <p className="audience-tier-hint">$100/mo tier fits, see below.</p>

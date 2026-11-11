@@ -1,6 +1,6 @@
 {
   "name": "Bernstein",
-  "description": "The open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, +40 more). No model in the coordination loop, so replaying a plan reproduces its task graph byte-identically. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy.",
+  "description": "The open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, +40 more). No model in the coordination loop, so replaying a plan reproduces the same task graph. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy.",
   "url": "https://bernstein.run/api/a2a",
   "preferredTransport": "JSONRPC",
   "supportedInterfaces": [
@@ -11,7 +11,7 @@
   ],
   "schemaVersion": "1.0",
   "protocolVersion": "0.3.0",
-  "adapterCount": 45,
+  "adapterCount": 53,
   "provider": {
     "organization": "Bernstein",
     "url": "https://bernstein.run",

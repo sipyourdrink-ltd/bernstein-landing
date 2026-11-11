@@ -1,10 +1,3 @@
-/* Adapter count comes from the build-baked figure in
-   data/adapter-count.json, written by scripts/sync-adapter-count.mjs
-   from the same registry parse the request-time helper uses. It used to
-   be a literal here and disagreed with the CLI catalogue, the repo
-   README and the /why-bernstein copy at the same time. */
-import adapterCount from '../../data/adapter-count.json' with { type: 'json' };
-
 const CONTENT = `# AI Information for bernstein.run
 
 User-agent: *
@@ -46,7 +39,7 @@ Primary-use-cases: Parallel feature work across many CLI agents, reproducible un
 Install-command: pipx install bernstein
 Supported-agents: Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, OpenHands, Open Interpreter, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Kimchi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral, Muse Code, Plandex, Junie, gptme, Letta Code, Devin terminal, Amazon Q Developer, CLM, agy, aichat, Pydantic AI, Antigravity, Python runtime, Computer use, Autohand, Forge, Hermes, Generic
 Delegated-orchestrators: Composio (@aoagents/ao), Ralphex (umputun/ralphex)
-Total-adapters: ${adapterCount.count}
+Total-adapters: 50+
 Agent-plugin-manifests: plugin.json and mcp.json at the repository root (Agent Plugins v1.0.0 schema)
 Cloud-execution: Cloudflare Workers, Durable Workflows, V8 sandboxes
 MCP-transport: HTTP remote transport for cloud-based MCP servers

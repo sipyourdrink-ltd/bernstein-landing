@@ -205,7 +205,7 @@ function trackUmami(name: string, data?: Record<string, unknown>): void {
   w.umami?.track(name, data);
 }
 
-export function RightRail({ adapterCount, closedPrs, contributors }: RightRailProps) {
+export function RightRail({ closedPrs, contributors }: RightRailProps) {
   const resolvedClosedPrs: number | null = closedPrs ?? CLOSED_PR_FALLBACK;
   const resolvedContributors: number | null = contributors ?? CONTRIBUTORS_FALLBACK;
   const [activeTab, setActiveTab] = useState<string>('pipx');
@@ -480,7 +480,7 @@ export function RightRail({ adapterCount, closedPrs, contributors }: RightRailPr
         <p className="v2-rc-label">today</p>
         <div className="v2-mini-stats" role="list">
           <div className="v2-ms" role="listitem">
-            <div className="v2-ms-n">{adapterCount}</div>
+            <div className="v2-ms-n">50+</div>
             <div className="v2-ms-l">cli adapters</div>
           </div>
           <a

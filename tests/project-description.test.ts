@@ -186,7 +186,7 @@ test('receipts are described as offline-verifiable, not byte-identical', () => {
   for (const file of DESCRIBING_SURFACES) {
     assert.ok(
       !read(file).includes(OVERSTATED_RECEIPT_CLAIM),
-      `${file} overstates the receipt guarantee; receipts are offline-verifiable, and it is the run that replays byte-identically`,
+      `${file} overstates the receipt guarantee; receipts are offline-verifiable, and replaying a plan reproduces the same task graph`,
     );
   }
 });

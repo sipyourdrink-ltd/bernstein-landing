@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
   const isDefault = !searchParams.get('title');
   const [stats, font] = await Promise.all([fetchLiveStats(), loadFont()]);
   const starsLabel = `${formatStarsBadge(stats.stars)} stars`;
-  const adaptersLabel = `${stats.adapters} adapters`;
+  const adaptersLabel = '50+ adapters';
 
   return new ImageResponse(
     (
