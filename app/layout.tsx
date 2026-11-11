@@ -191,7 +191,7 @@ export default function RootLayout({
         <link rel="me" href="https://alexchernysh.com" />
         <link rel="me" href="https://github.com/chernistry" />
         <link rel="me" href="https://x.com/alex_chernysh" />
-        {/* Analytics opt-out - defines the before-send hook the tracker
+        {/* Analytics before-send hook (opt-out, docs-assistant text) - the tracker
               below calls before every request. With
               ``localStorage.setItem('umami:disabled','true')`` set in a
               browser, the hook returns null and that browser sends
