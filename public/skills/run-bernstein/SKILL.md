@@ -29,7 +29,7 @@ bernstein run "add input validation to the checkout form"
 
 `init` writes the project seed; `run` plans the goal into tasks and
 spawns agents in per-task git worktrees. No model sits in the
-coordination loop, so a rerun of the same plan replays byte-identically
+coordination loop, so a plan replays to the same task graph
 and diverging runs are detectable by hash.
 
 ## Watch and control

@@ -160,18 +160,9 @@ export async function HeroV2({
             <span className="pulse" aria-hidden="true" />
             {versionTag} shipping
           </span>
-          {/* Sourced from resolvedAdapterCount, the same figure the rail's
-              mini-stats tile renders, so the two surfaces in this viewport
-              agree instead of each carrying its own guess. Falls back to
-              the "40+" floor only when the resolved figure is not a
-              usable positive number: a literal here drifted out of step
-              with the registry once, which is why a hand-typed count
-              never belongs in this line. */}
+          {/* Keep the public adapter claim approximate, matching the rail. */}
           <span className="v2-meta">
-            {Number.isFinite(resolvedAdapterCount) && resolvedAdapterCount > 0
-              ? resolvedAdapterCount
-              : '40+'}{' '}
-            cli adapters · apache 2.0 · on-prem
+            50+ cli adapters · apache 2.0 · on-prem
           </span>
         </div>
 
@@ -197,8 +188,8 @@ export async function HeroV2({
         <p className="v2-sub">
           bernstein is the open-source governance layer for ai agents:
           a deterministic python scheduler runs them in parallel, with
-          no model in the coordination loop, so the same plan replays
-          byte-identically. it runs on policy as code: you write the
+          no model in the coordination loop, so a plan replays to the
+          same task graph. it runs on policy as code: you write the
           policy, bernstein enforces it, and produces the verifiable
           record.
         </p>
