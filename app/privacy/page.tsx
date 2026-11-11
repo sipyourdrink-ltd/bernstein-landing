@@ -145,7 +145,8 @@ export default function PrivacyPage() {
               These records are deleted after 90 days. A separate integrity
               log keeps, for each answer, a hash of the question and of the
               session, the model, the cost, the documentation passages cited
-              and timing. It holds no question or answer text.
+              and timing. It holds no question or answer text. No deletion
+              period is set for this log yet.
             </p>
 
             <h2>The e-mail form</h2>
@@ -196,6 +197,11 @@ export default function PrivacyPage() {
                 <strong>Resend</strong> stores newsletter addresses and sends
                 the newsletter.
               </li>
+              <li>
+                The provider of the language model receives your question, the
+                earlier messages sent with it and the documentation passages
+                used for the answer.
+              </li>
             </ul>
 
             <h2>Your rights</h2>
@@ -203,8 +209,10 @@ export default function PrivacyPage() {
               Under GDPR (Article 15-22) you can request access to, correction
               of, deletion of, or a copy of any data we hold on you. Email{' '}
               <a href="mailto:forte@bernstein.run">forte@bernstein.run</a> with
-              the request and we will action it within 30 days. If we hold no
-              data on you (the common case), we will tell you that.
+              the request and we will action it within 30 days. Most records
+              described here carry no name or address. Tell us the date and
+              what you asked or which page you opened, and we will look for
+              them.
             </p>
 
             <h2>Changes</h2>
