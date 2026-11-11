@@ -20,7 +20,7 @@ import { BackToTop } from '@/components/landing/BackToTop';
 import { SponsorWall } from '@/components/landing/SponsorWall';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { fetchPublicSponsors } from '@/lib/sponsors';
-import { SITE_URL, SITE_NAME, AUTHOR } from '@/lib/seo';
+import { SITE_URL, AUTHOR } from '@/lib/seo';
 
 const PAGE_TITLE = 'sponsor Bernstein, github.com/sponsors/chernistry';
 const PAGE_DESC =
@@ -158,9 +158,9 @@ function buildJsonLd() {
       },
       url: SPONSOR_URL,
       seller: {
-        '@type': 'Organization',
-        name: SITE_NAME,
-        url: SITE_URL,
+        '@type': 'Person',
+        '@id': 'https://alexchernysh.com/#person',
+        name: AUTHOR,
       },
     })),
   ];
@@ -248,6 +248,11 @@ export default async function SponsorsPage() {
           <p>
             sponsor on github. 0% fee on personal-account sponsorships,
             stripe payouts, no middleman.
+          </p>
+          <p>
+            sponsorships are paid to Alex Chernysh, an individual. Sip Your
+            Drink is the studio name of Alex Chernysh. It is not a registered
+            company.
           </p>
           <a
             href={SPONSOR_URL}

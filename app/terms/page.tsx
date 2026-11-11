@@ -4,7 +4,7 @@ import { Footer } from '@/components/landing/Footer';
 import { StaticPageBreadcrumb } from '@/components/seo/BreadcrumbListJsonLd';
 
 const SITE_URL = 'https://bernstein.run';
-const LAST_UPDATED = '2026-05-08';
+const LAST_UPDATED = '2026-11-11';
 
 export const metadata: Metadata = {
   title: 'Terms',
@@ -35,6 +35,11 @@ export default function TermsPage() {
               at <code>/#ask</code>). The Bernstein software itself is licensed
               under <a href="https://www.apache.org/licenses/LICENSE-2.0" rel="noopener">Apache 2.0</a>;
               that licence governs the code, not this page.
+            </p>
+            <p>
+              The site is run by Alex Chernysh, an individual, in Haifa,
+              Israel. Sip Your Drink is the studio name of Alex Chernysh. It
+              is not a registered company.
             </p>
 
             <h2>What you can do</h2>
@@ -93,7 +98,7 @@ export default function TermsPage() {
             <h2>Governing law</h2>
             <p>
               These terms are governed by the law of the State of Israel.
-              Disputes are venued in the competent courts of Tel Aviv-Yafo. If
+              Disputes are venued in the competent courts of Haifa. If
               any clause here is unenforceable, the rest still stand.
             </p>
 

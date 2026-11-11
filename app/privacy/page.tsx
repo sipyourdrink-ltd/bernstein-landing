@@ -4,12 +4,12 @@ import { Footer } from '@/components/landing/Footer';
 import { StaticPageBreadcrumb } from '@/components/seo/BreadcrumbListJsonLd';
 
 const SITE_URL = 'https://bernstein.run';
-const LAST_UPDATED = '2026-09-24';
+const LAST_UPDATED = '2026-11-11';
 
 export const metadata: Metadata = {
   title: 'Privacy',
   description:
-    'What bernstein.run collects, how long it is kept, and how to ask for deletion. Plain English. No third-party trackers.',
+    'What bernstein.run records, what it keeps in your browser, and how to turn analytics off. Plain English.',
   alternates: { canonical: `${SITE_URL}/privacy` },
   robots: { index: true, follow: true },
 };
@@ -31,70 +31,242 @@ export default function PrivacyPage() {
             <h2>Who runs this site</h2>
             <p>
               bernstein.run is the project site for Bernstein, the
-              open-source governance layer for AI agents. It is operated as a personal
-              project by Alex Chernysh (Tel Aviv, Israel). Contact for any
-              privacy matter:{' '}
+              open-source governance layer for AI agents. It is run by Alex
+              Chernysh, an individual, in Haifa, Israel. Sip Your Drink is the
+              studio name of Alex Chernysh. It is not a registered company.
+              Contact for any privacy matter:{' '}
               <a href="mailto:forte@bernstein.run">forte@bernstein.run</a>.
             </p>
 
-            <h2>What we collect</h2>
+            <h2>Cookies</h2>
+            <p>
+              The code of this site sets no cookies and reads none. The
+              analytics script described below sets no cookies and sends its
+              requests without cookies. Cloudflare, which serves the site, may
+              set its own security cookie.
+            </p>
+
+            <h2>Storage in your browser</h2>
+            <p>
+              The site keeps these entries in your browser&rsquo;s local
+              storage. They stay on your device; the site does not send them
+              anywhere.
+            </p>
             <ul>
               <li>
-                <strong>Pageview events.</strong> We use a self-hosted Umami
-                instance at{' '}
-                <a href="https://analytics.bernstein.run" rel="noopener">
-                  analytics.bernstein.run
-                </a>{' '}
-                to count page visits and outbound link clicks. Umami is
-                cookieless and does not store IP addresses, device
-                fingerprints, or personal identifiers; the IP address is used
-                only at the moment of the visit to look up country and city.
-                A visit record holds the page, time, referring site, browser,
-                operating system, device type, language, country and city.
-                Records older than 24 months are deleted.
+                <code>beta-notice:dismissed</code> is set to{' '}
+                <code>1</code> when you close the beta notice on the home
+                page, so the notice stays closed.
               </li>
               <li>
-                <strong>Email, if you opt in.</strong> If you submit your email
-                to subscribe to updates, it is stored in Resend (our delivery
-                provider) and used only to send the newsletter. You can
-                unsubscribe from any email; that removes you from the list.
+                <code>bernstein:sponsor-note-seen-v1</code> is set to{' '}
+                <code>1</code> the first time the docs assistant shows its
+                sponsor note under an answer, so the note is shown once.
               </li>
               <li>
-                <strong>Server logs.</strong> Our reverse proxy keeps short
-                access logs for at most 14 days, used to debug outages and
-                abuse: URL, status, response size, user agent, and the IP
-                address shortened to its network (the last 8 bits of an IPv4
-                address and the last 80 bits of an IPv6 address are removed).
-                The referring page is not logged. We do not join these logs
-                to any other identifier.
+                <code>umami:disabled</code> is only read by the site, never
+                written. Set it yourself to turn analytics off, as described
+                below.
               </li>
             </ul>
+            <p>The site uses no session storage.</p>
 
-            <h2>What we do not collect</h2>
+            <h2>Analytics</h2>
             <p>
-              No advertising trackers, no Google Analytics, no Facebook pixel,
-              no session replay, no fingerprinting. Cookies are not used for
-              tracking. The site sets one cookie only if you choose to dismiss
-              the locale-hint banner; it stores a yes/no flag, no identifier.
+              The site uses Umami, an open-source analytics tool, on a
+              self-hosted instance at{' '}
+              <a href="https://analytics.bernstein.run" rel="noopener">
+                analytics.bernstein.run
+              </a>
+              . It records two things:
             </p>
+            <ul>
+              <li>
+                <strong>Page views.</strong> For each page you open, your
+                browser sends the page address, the page title, the address
+                of the page you came from, your screen size and your browser
+                language. Text you type into the docs assistant is removed
+                from these addresses before they are sent.
+              </li>
+              <li>
+                <strong>Clicks on links to other sites.</strong> One event
+                named <code>outbound-click</code>. It carries the same fields
+                as a page view, plus the host name of the site the link points
+                to (for example <code>github.com</code>). Nothing else about
+                the link is sent.
+              </li>
+            </ul>
+            <p>
+              Nothing else is recorded: no scrolling, no time on page, no
+              clicks inside the site, no form contents. The script does not
+              compute a device fingerprint. Like any web request, each request
+              to the analytics server carries your IP address and your
+              browser&rsquo;s user agent.
+            </p>
+            <p>
+              Until 11 November 2026 the site also sent one event to the
+              analytics server for each answer of the docs assistant: the
+              model, timing, the lengths of the question and the answer, token
+              counts, your locale, the position of the message in the
+              conversation, a score for how closely the documentation matched
+              the question, and whether the answer came from a cache or was
+              declined. Those events carry no question or answer text. Your IP
+              address, your browser&rsquo;s user agent and your browser
+              language were sent with them and were used as for a page view.
+              They are kept and deleted like the other analytics records.
+            </p>
+            <p>
+              Until 11 November 2026 the analytics script also recorded
+              actions on this site: clicks on the site&rsquo;s own links and
+              buttons, copying of install commands, which sections of a page
+              came into view, whether a blog post was read to the end, views
+              and use of the newsletter form (never the address), changes in
+              the cost calculator (as value ranges), page load timings and the
+              time spent on a page, the width of your browser window, and
+              whether a visit looked automated. For the docs assistant it
+              recorded the length of each question, clicks on its buttons and
+              on cited pages, error codes, the reason a question was declined
+              (up to 80 characters), and, when you clicked a suggested
+              follow-up question, the first 80 characters of that suggestion.
+              These records are kept and deleted like the other analytics
+              records.
+            </p>
+            <p>
+              Until 11 November 2026 the docs assistant also put the text
+              being typed into the page address, and the analytics script
+              reported every change of the address as a page view. Analytics
+              records from that time can therefore hold text typed into the
+              assistant, including text that was never sent. They are kept and
+              deleted like the other analytics records.
+            </p>
+            <p>
+              The analytics server uses your IP address to look up your
+              country, region and city and to compute a session hash. It
+              stores the page views and clicks above together with that
+              location, the session hash, and your browser, operating system
+              and device type, which it works out from the user agent and the
+              screen size. Records older than 24 months are deleted every day.
+            </p>
+
+            <h2>Turning analytics off</h2>
+            <p>
+              Open your browser&rsquo;s developer console on this site and
+              run{' '}
+              <code>localStorage.setItem(&apos;umami:disabled&apos;, &apos;true&apos;)</code>
+              . From then on the analytics script in that browser sends
+              nothing, neither page views nor clicks. To turn it back on, run{' '}
+              <code>localStorage.removeItem(&apos;umami:disabled&apos;)</code>.
+              Blocking <code>analytics.bernstein.run</code> in your browser or
+              network has the same effect.
+            </p>
+
+            <h2>The docs assistant</h2>
+            <p>
+              When you ask the docs assistant a question, your browser sends
+              the question to <code>/api/ask</code> on this site, together
+              with up to the last eight messages of the current conversation
+              (your earlier questions and the answers). The service that
+              answers is not part of this site&rsquo;s published source code.
+            </p>
+            <p>
+              That service sends the text of your question to Jina AI, which
+              computes embeddings used to find the matching documentation.
+              The answer is generated by a language model reached through the
+              site operator&rsquo;s own gateway. Until 6 November 2026 the
+              answers were written by models of other providers, among them
+              models reached through OpenRouter. Questions and answers are held
+              in a cache for up to 24 hours.
+            </p>
+            <p>
+              For each question the service stores the first 200 characters
+              of the question, a hash of the question, a hash of your IP
+              address made with a salt that changes daily, your locale, the
+              model, timing, whether the question was declined, and the time.
+              These records are deleted after 90 days. A separate integrity
+              log keeps, for each answer, a hash of the question and of the
+              session, the model, the cost, your locale, the documentation
+              passages cited, timing, whether the question was declined, and
+              the category a filter gave it. It holds no question or answer
+              text. No deletion period is set for this log yet.
+            </p>
+            <p>
+              Until 19 September 2026 the assistant also wrote the full text
+              of questions and answers to a log on the server, together with a
+              session identifier, the country, a shortened browser name and a
+              daily-salted hash of
+              the IP address. That logging is switched off. The file from that
+              period still exists. It is not read or used.
+            </p>
+
+            <h2>The e-mail form</h2>
+            <p>
+              The newsletter form sends the e-mail address you enter to{' '}
+              <code>/api/notify</code> on this site, which adds it to the
+              newsletter list. The address is stored with Resend, which also
+              sends the confirmation e-mail and the newsletter. The address is
+              used to send that newsletter.
+              To be removed, use the unsubscribe link in any newsletter e-mail
+              or write to{' '}
+              <a href="mailto:forte@bernstein.run">forte@bernstein.run</a>.
+            </p>
+
+            <h2>Server logs</h2>
+            <p>
+              The web server keeps an access log of requests to bernstein.run.
+              IP addresses in it are shortened to their network (the first 24
+              bits of an IPv4 address, the first 48 bits of an IPv6 address)
+              and the referring page is removed. Log files are kept for 14
+              days. The log records the address requested. A question that is
+              in a page address, after a reload or in a shared link, is
+              recorded with it.
+            </p>
+            <p>
+              If your browser blocks something on this site under its content
+              security policy, it may send a report to{' '}
+              <code>/api/csp-report</code>. The site writes the policy
+              directive, the blocked address, the page address, the source
+              file and line, and a short code sample from that report to its
+              server log. Your IP address is used in memory to limit how many
+              reports are accepted and is not written to that log.
+            </p>
+
+            <h2>Third parties</h2>
+            <ul>
+              <li>
+                <strong>Cloudflare</strong> serves the site; every request
+                passes through it.
+              </li>
+              <li>
+                <strong>Netcup</strong> hosts the server this site runs on.
+              </li>
+              <li>
+                <strong>GitHub</strong>: when the site shows sponsor avatars,
+                your browser loads those images from GitHub.
+              </li>
+              <li>
+                <strong>Jina AI</strong> receives the text of questions asked
+                in the docs assistant.
+              </li>
+              <li>
+                <strong>Resend</strong> stores newsletter addresses and sends
+                the newsletter.
+              </li>
+              <li>
+                <strong>Groq</strong> runs the language model that writes the
+                answers. It receives your question, the earlier messages sent
+                with it and the documentation passages used for the answer.
+              </li>
+            </ul>
 
             <h2>Your rights</h2>
             <p>
               Under GDPR (Article 15-22) you can request access to, correction
               of, deletion of, or a copy of any data we hold on you. Email{' '}
               <a href="mailto:forte@bernstein.run">forte@bernstein.run</a> with
-              the request and we will action it within 30 days. If we hold no
-              data on you (the common case), we will tell you that.
-            </p>
-
-            <h2>Third parties</h2>
-            <p>
-              Four external services receive data when you use this site:
-              Cloudflare (the CDN and proxy in front of the site, so it
-              handles every request), GitHub (when you click GitHub links),
-              Resend (when you subscribe to email), and Netcup, the data
-              centre that hosts our servers. None of them get analytics
-              events; only the request they directly need to serve.
+              the request and we will action it within 30 days. Most records
+              described here carry no name or address. Tell us the date and
+              what you asked or which page you opened, and we will look for
+              them.
             </p>
 
             <h2>Changes</h2>
