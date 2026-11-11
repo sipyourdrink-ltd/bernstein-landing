@@ -94,7 +94,7 @@ export function GET() {
     'Language: TypeScript, Python',
     'Hosting: Netcup VPS, Caddy, Docker',
     'CDN: Cloudflare',
-    'Email: Kit (ConvertKit)',
+    'Email: Resend',
     'Design: OKLCH color space, Inter + JetBrains Mono',
     'Build: Node.js 20, standalone Docker output',
     LAST_UPDATED ? `Last updated: ${LAST_UPDATED}` : null,

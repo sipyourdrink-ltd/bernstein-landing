@@ -151,3 +151,24 @@ test('the analytics script tag matches the page', () => {
   assert.doesNotMatch(layout, /data-performance|data-tag=|data-auto-track="false"/);
   assert.match(layout, /data-before-send=/, 'the opt-out hook is not wired to the tracker');
 });
+
+test('the routes that receive visitor input are named on the page', () => {
+  /* Text typed into the docs assistant and the e-mail form goes to these
+     same-origin routes; the page says so by path. */
+  const ask = sources.get('components/docs-bot/useSseStream.ts') ?? '';
+  assert.match(ask, /const ENDPOINT = '\/api\/ask'/, 'docs assistant endpoint moved; update this test and /privacy');
+  const notifyCallers = [...sources].filter(([, src]) => /fetch\('\/api\/notify'/.test(src));
+  assert.ok(notifyCallers.length > 0, 'no caller of /api/notify found; update this test and /privacy');
+  for (const route of ['/api/ask', '/api/notify', '/api/csp-report']) {
+    assert.ok(privacy.includes(route), `/privacy does not name ${route}`);
+  }
+});
+
+test('humans.txt names the same mail service and CDN as /privacy', () => {
+  const humans = sources.get('app/humans.txt/route.ts')!;
+  for (const field of ['Email', 'CDN']) {
+    const value = new RegExp(`'${field}: ([^']+)'`).exec(humans)?.[1];
+    assert.ok(value, `humans.txt has no ${field} line`);
+    assert.ok(privacy.includes(value), `humans.txt says ${field}: ${value}, which /privacy does not name`);
+  }
+});
