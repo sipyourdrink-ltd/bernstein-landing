@@ -53,9 +53,8 @@ export function SponsorNote(): ReactElement | null {
       </div>
       <p className="docs-bot-sponsor-note-body">
         bernstein is open-source. free for everyone. running it costs
-        real money each month (claude max, openrouter, jina, qdrant,
-        the ovh box that hosts this). it stays free either way. if
-        it's worth more to you than that:{' '}
+        real money each month. it stays free either way. if it's
+        worth more to you than that:{' '}
         <a
           href={SPONSOR_URL}
           target="_blank"
