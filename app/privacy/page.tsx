@@ -90,9 +90,10 @@ export default function PrivacyPage() {
               </li>
               <li>
                 <strong>Clicks on links to other sites.</strong> One event
-                named <code>outbound-click</code>, with the host name of the
-                site the link points to (for example <code>github.com</code>)
-                and nothing else.
+                named <code>outbound-click</code>. It carries the same fields
+                as a page view, plus the host name of the site the link points
+                to (for example <code>github.com</code>). Nothing else about
+                the link is sent.
               </li>
             </ul>
             <p>
@@ -107,16 +108,44 @@ export default function PrivacyPage() {
               analytics server for each answer of the docs assistant: the
               model, timing, the lengths of the question and the answer, token
               counts, your locale, the position of the message in the
-              conversation, and whether the answer came from a cache or was
-              declined. Those events carry no question or answer text. They
-              are kept and deleted like the other analytics records.
+              conversation, a score for how closely the documentation matched
+              the question, and whether the answer came from a cache or was
+              declined. Those events carry no question or answer text. Your IP
+              address, your browser&rsquo;s user agent and your browser
+              language were sent with them and were used as for a page view.
+              They are kept and deleted like the other analytics records.
+            </p>
+            <p>
+              Until 11 November 2026 the analytics script also recorded
+              actions on this site: clicks on the site&rsquo;s own links and
+              buttons, copying of install commands, which sections of a page
+              came into view, whether a blog post was read to the end, views
+              and use of the newsletter form (never the address), changes in
+              the cost calculator (as value ranges), page load timings and the
+              time spent on a page, the width of your browser window, and
+              whether a visit looked automated. For the docs assistant it
+              recorded the length of each question, clicks on its buttons and
+              on cited pages, error codes, the reason a question was declined
+              (up to 80 characters), and, when you clicked a suggested
+              follow-up question, the first 80 characters of that suggestion.
+              These records are kept and deleted like the other analytics
+              records.
+            </p>
+            <p>
+              Until 11 November 2026 the docs assistant also put the text
+              being typed into the page address, and the analytics script
+              reported every change of the address as a page view. Page-view
+              records from that time can therefore hold text typed into the
+              assistant, including text that was never sent. They are kept and
+              deleted like the other analytics records.
             </p>
             <p>
               The analytics server uses your IP address to look up your
               country, region and city and to compute a session hash. It
               stores the page views and clicks above together with that
-              location and the session hash. Records older than 24 months are
-              deleted every day.
+              location, the session hash, and your browser, operating system
+              and device type, which it works out from the user agent and the
+              screen size. Records older than 24 months are deleted every day.
             </p>
 
             <h2>Turning analytics off</h2>
@@ -187,7 +216,9 @@ export default function PrivacyPage() {
               IP addresses in it are shortened to their network (the first 24
               bits of an IPv4 address, the first 48 bits of an IPv6 address)
               and the referring page is removed. Log files are kept for 14
-              days.
+              days. The log records the address requested. A question that is
+              in a page address, after a reload or in a shared link, is
+              recorded with it.
             </p>
             <p>
               If your browser blocks something on this site under its content

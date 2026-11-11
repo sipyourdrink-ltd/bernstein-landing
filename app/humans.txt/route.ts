@@ -83,7 +83,7 @@ export function GET() {
     'Site: https://alexchernysh.com',
     'GitHub: https://github.com/chernistry',
     'X: https://x.com/alex_chernysh',
-    'Location: Europe',
+    'Location: Haifa, Israel',
     '',
     '/* THANKS */',
     'Bernstein orchestrates: Claude Code, Codex CLI, Gemini CLI, and 40+ more agents',
