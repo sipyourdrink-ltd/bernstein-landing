@@ -82,7 +82,7 @@ export function buildWallSlots(sponsors: readonly Sponsor[]): WallSlot[] {
     return [
       {
         kind: 'placeholder',
-        caption: 'first three sponsors get listed by name on the homepage.',
+        caption: 'no sponsors yet.',
       },
     ];
   }
@@ -93,7 +93,7 @@ export function buildWallSlots(sponsors: readonly Sponsor[]): WallSlot[] {
     for (let i = 0; i < fillerCount; i++) {
       cells.push({
         kind: 'placeholder',
-        caption: 'open slot. sponsor at $5/mo and your name lands here.',
+        caption: 'open slot.',
       });
     }
   }

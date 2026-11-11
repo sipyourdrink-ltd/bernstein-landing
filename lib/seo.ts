@@ -138,7 +138,7 @@ Cloud artifact sinks, progressive skill packs, and Cloudflare cloud execution ar
 - [Adapter comparisons](${SITE_URL}/vs): Index of side-by-side feature matrices for every supported CLI agent (Aider, Claude Code, Codex, Cursor, Gemini, OpenAI Agents SDK, and more)
 - [CLI quickstart](${SITE_URL}/cli-quickstart): Minimal walkthrough. Installing pipx, running the first task, reading the audit log
 - [Ask the docs](${SITE_URL}/#ask): DocsBot question surface backed by the readthedocs index plus blog content; cite-style answers with source chips
-- [Sponsors](${SITE_URL}/sponsors): Public sponsors wall (GitHub Sponsors) and the sponsorship tier breakdown
+- [Sponsors](${SITE_URL}/sponsors): Public sponsors wall (GitHub Sponsors)
 - [Tools - agent.md bench](${SITE_URL}/tools/agent-md-bench): Free utility. Paste a project's agent file and get a token-cost estimate per supported model
 - [Benchmarks](${SITE_URL}/benchmarks): Simulated parallel-scheduling speedup model plus a community cost benchmark, each labelled by source
 

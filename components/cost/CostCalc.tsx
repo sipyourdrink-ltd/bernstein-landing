@@ -68,15 +68,6 @@ export function CostCalc() {
     [claude, codex, cursor],
   );
 
-  /* CTA percent - what $25/mo represents as a fraction of the user's
-   * total spend. Cap at 999% so the line stays readable when total is
-   * tiny (or zero). */
-  const sponsorPct = useMemo(() => {
-    if (band.totalSpend <= 0) return null;
-    const raw = (25 / band.totalSpend) * 100;
-    return raw > 999 ? null : Math.round(raw);
-  }, [band.totalSpend]);
-
   const claudeId = useId();
   const codexId = useId();
   const cursorId = useId();
@@ -259,15 +250,6 @@ export function CostCalc() {
             <p>
               your last month's bill was{' '}
               <strong>{formatUsd(band.totalSpend)}</strong>.
-            </p>
-            <p>
-              sponsoring at $25/mo is{' '}
-              {sponsorPct !== null ? (
-                <strong>{sponsorPct}%</strong>
-              ) : (
-                <strong>a small slice</strong>
-              )}{' '}
-              of {formatUsd(band.totalSpend)}.
             </p>
             <p>bernstein keeps routing the cheapest model that passes tests.</p>
             <p className="cost-calc-cta-link">

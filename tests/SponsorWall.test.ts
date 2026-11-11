@@ -45,13 +45,13 @@ test('0 sponsors: returns a single placeholder slot', () => {
   assert.equal(slots[0].kind, 'placeholder');
 });
 
-test('0 sponsors: placeholder copy mentions the homepage promise', () => {
+test('0 sponsors: placeholder copy says there are no sponsors yet', () => {
   const slots = buildWallSlots([]);
   assert.equal(slots[0].kind, 'placeholder');
   if (slots[0].kind !== 'placeholder') return; /* type-narrow */
   assert.match(
     slots[0].caption,
-    /first three sponsors get listed by name/i,
+    /no sponsors yet/i,
   );
 });
 

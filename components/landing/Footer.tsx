@@ -97,7 +97,7 @@ export function Footer() {
             <a
               href="/sponsors"
             >
-              Sponsor tiers
+              Sponsors
             </a>
             <a href="https://star-history.com/#sipyourdrink-ltd/bernstein">Star history</a>
             <a href="/llms.txt" className="footer-llms-link">/llms.txt</a>

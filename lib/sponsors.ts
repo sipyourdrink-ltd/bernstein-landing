@@ -8,7 +8,7 @@
  *      `read:user` scope; we drop any record whose `privacyLevel` is
  *      `PRIVATE`.
  *   2) Hardcoded fallback (currently empty). The page renders the
- *      "first three sponsors get listed by name" placeholder copy in
+ *      "no sponsors yet." placeholder copy in
  *      that case - no fake data, no manufactured count.
  *
  * Why scrape is NOT used here:

@@ -2,8 +2,7 @@
  * /cost - token-bill calculator.
  *
  * Surfaces the loss-frame copy for visitors who already pay claude /
- * codex / cursor monthly: "your last bill was $X. sponsoring at $25/mo
- * is Y% of $X." The widget shows the math step by step and the dated
+ * codex / cursor monthly: "your last bill was $X." The widget shows the math step by step and the dated
  * model-prices source table so an engineer can audit the inputs.
  *
  * Voice rules:

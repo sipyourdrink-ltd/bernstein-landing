@@ -15,9 +15,7 @@
 }
 
 /* The global `section { margin: 0 auto }` in ux-layout.css turns off grid
-   stretch, so a section sizes to its min-content instead of the track. The
-   tier table's min-content is ~470px, which scrolled the whole page sideways
-   on a 375px viewport; with stretch back, only .tier-table-wrap scrolls. */
+   stretch, so a section sizes to its min-content instead of the track. */
 .sponsors-page > * {
   min-width: 0;
   margin-inline: 0;
@@ -160,101 +158,6 @@
   font-size: var(--text-sm);
   max-width: 56ch;
   color: var(--ink-soft);
-}
-
-/* ---------- tier table ---------- */
-
-.tier-table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-lg);
-  background: var(--bg-paper-2);
-}
-
-.tier-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--text-base);
-}
-
-.tier-table caption {
-  text-align: left;
-  padding: var(--space-3) var(--space-4);
-  font-family: var(--font-display);
-  font-weight: 600;
-  color: var(--ink);
-  border-bottom: 1px solid var(--rule);
-  background: var(--bg-paper);
-}
-
-.tier-table th,
-.tier-table td {
-  text-align: left;
-  padding: var(--space-3) var(--space-4);
-  vertical-align: top;
-  border-bottom: 1px solid var(--rule);
-}
-
-.tier-table th {
-  font-weight: 600;
-  color: var(--ink-soft);
-  font-size: var(--text-sm);
-  text-transform: lowercase;
-  letter-spacing: 0.02em;
-}
-
-.tier-table td:first-child {
-  font-family: var(--font-mono);
-  white-space: nowrap;
-  color: var(--ink);
-}
-
-.tier-table tr:last-child th,
-.tier-table tr:last-child td {
-  border-bottom: 0;
-}
-
-/* Narrow screens: three columns leave the benefits text a few characters
-   wide or behind a sideways scroll. Each row becomes a block - price and
-   label on one line, benefits underneath at full width. The column headers
-   are hidden visually only; the caption still names the table. */
-@media (max-width: 560px) {
-  .tier-table,
-  .tier-table tbody,
-  .tier-table tr,
-  .tier-table td {
-    display: block;
-  }
-  .tier-table caption {
-    display: block;
-  }
-  .tier-table thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-  .tier-table tr {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    column-gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
-    border-bottom: 1px solid var(--rule);
-  }
-  .tier-table tr:last-child {
-    border-bottom: 0;
-  }
-  .tier-table td {
-    padding: 0;
-    border-bottom: 0;
-  }
-  .tier-table td:last-child {
-    grid-column: 1 / -1;
-    margin-top: var(--space-2);
-    color: var(--ink-soft);
-  }
 }
 
 /* ---------- cta block ---------- */
