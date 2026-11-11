@@ -148,6 +148,13 @@ export default function PrivacyPage() {
               and timing. It holds no question or answer text. No deletion
               period is set for this log yet.
             </p>
+            <p>
+              Until 19 September 2026 the assistant also wrote the full text
+              of questions and answers to a log on the server, together with
+              the country, a shortened browser name and a daily-salted hash of
+              the IP address. That logging is switched off. The file from that
+              period still exists. It is not read or used.
+            </p>
 
             <h2>The e-mail form</h2>
             <p>
