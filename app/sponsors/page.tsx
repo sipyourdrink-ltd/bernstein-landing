@@ -6,21 +6,12 @@
  * hardcoded list (currently empty - that is the legitimate "no
  * sponsors yet" state, and the wall renders the placeholder copy).
  *
- * Why not /why-bernstein-style MDX render: this page is short and
- * structural (a wall + a table + a single CTA). MDX would add a build
- * step and a content file for one screen of copy. Keeping the prose
- * inline lets the operator edit voice in one place.
- *
  * JSON-LD on this page (per the research plan):
  *   - Person (Alex) - links into the existing Organization graph in
  *     layout.tsx via @id, so the /sponsors page contributes a Person
  *     node without duplicating the Organization block.
  *   - WebPage - anchors the URL and breadcrumb.
  *   - Offer (per tier) - gives AI crawlers a structured tier list.
- *
- *   The sister agent (#28) owns the FAQPage + SoftwareSourceCode
- *   blocks on /why-bernstein and the homepage; we deliberately do
- *   NOT emit either type here so the graph stays single-sourced.
  */
 import type { Metadata } from 'next';
 import { Nav } from '@/components/landing/Nav';
@@ -206,15 +197,6 @@ export default async function SponsorsPage() {
                 : `${realCount} ${realCount === 1 ? 'sponsor' : 'sponsors'} so far. ordered by recognizability, then alphabetical. real avatars only.`}
             </p>
             <p>
-              <strong>what your sponsorship actually funds.</strong> one human
-              running an audit-grade orchestrator. tokens going through the
-              docs bot. infrastructure that keeps the audit-chain reference
-              alive while the project waits for production users. the bet is
-              that tamper-evident logging becomes table-stakes for regulated
-              AI coding pipelines, and that an apache-licensed
-              implementation is useful to have around when it does.
-            </p>
-            <p>
               <strong>stage honesty.</strong> a few hundred github stars. one
               maintainer. no production reference customer. no SOC 2 / ISO
               27001 / FedRAMP. tiers below are picked by who you are, not how
@@ -224,60 +206,6 @@ export default async function SponsorsPage() {
             </p>
           </header>
         </div>
-
-        <section aria-labelledby="audiences-heading" className="sponsors-audiences">
-          <h2 id="audiences-heading" className="sponsor-wall__heading">
-            if you are <em>...</em>
-          </h2>
-          {/* One card per kind of reader, each naming the tier that
-              matches. Slugs match the umami sponsors-tier-click names so
-              tier clicks stay attributable to the card that led to them. */}
-          <div className="audience-grid">
-            <article className="audience-card">
-              <h3>...a regulated-industry engineer or OSPO contact</h3>
-              <p>
-                you work somewhere DORA, NIS2, EU AI Act Article 12, SR 11-7,
-                or ISO 42001 lands on your plate. the audit chain is the
-                primitive your compliance team actually needs from an AI
-                coding pipeline. back the project so it
-                stays around when procurement asks for one.
-              </p>
-              <p className="audience-tier-hint">$100/mo tier fits, see below.</p>
-            </article>
-            <article className="audience-card">
-              <h3>...an AI safety or reliability researcher</h3>
-              <p>
-                you study agent behaviour and need a deterministic substrate
-                that does not change the experiment when you re-run it.
-                bernstein is plain python on the coordination path, zero LLM
-                tokens on scheduling, every decision is in the HMAC chain.
-                replayable end to end.
-              </p>
-              <p className="audience-tier-hint">$25/mo tier fits.</p>
-            </article>
-            <article className="audience-card">
-              <h3>...a devtool founder building in this space</h3>
-              <p>
-                you compete on a different axis (TUI, swarm, kanban,
-                hosted SaaS). the audit-grade column is empty in every one
-                of the bigger projects&apos; readmes. backing this means the
-                column stays in the public commons rather than getting
-                absorbed into a closed-source vendor.
-              </p>
-              <p className="audience-tier-hint">$100/mo tier fits.</p>
-            </article>
-            <article className="audience-card">
-              <h3>...an indie dev who likes the shape of it</h3>
-              <p>
-                bernstein saved you a few claude bills, or you starred it
-                and want it to keep shipping. $5 or $25 a month covers a
-                meaningful slice of openrouter tokens. lowercase voice. no
-                growth-hack ladder.
-              </p>
-              <p className="audience-tier-hint">$5/mo or $25 one-time tier fits.</p>
-            </article>
-          </div>
-        </section>
 
         <SponsorWall sponsors={sponsors} heading={null} />
 

@@ -316,7 +316,7 @@ const nextConfig = {
       },
       /* OPS-2026-05-17 - cache-control for the hot mostly-static surfaces.
          CF cache hit rate sat at 20.5% (24h) because Next.js standalone
-         did not emit Cache-Control for `/`, `/cost`, `/why-bernstein` or
+         did not emit Cache-Control for `/`, `/cost` or
          `/blog/*`, so every uncached bot/visitor hit re-rendered SSR and
          was a 504 candidate when the origin was warming. 10-min edge
          cache + 1-hour stale-while-revalidate keeps the surface warm and
@@ -355,12 +355,6 @@ const nextConfig = {
       },
       {
         source: '/cost',
-        headers: [
-          { key: 'Cache-Control', value: 'public, s-maxage=600, stale-while-revalidate=3600' },
-        ],
-      },
-      {
-        source: '/why-bernstein',
         headers: [
           { key: 'Cache-Control', value: 'public, s-maxage=600, stale-while-revalidate=3600' },
         ],

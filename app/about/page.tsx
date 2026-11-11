@@ -5,8 +5,7 @@
  * ---------------------
  * The Google E-E-A-T framework (Dec 2025 update) reads an explicit
  * /about page as the canonical "who is making these claims" signal.
- * Without one, comparison-shaped queries land on /why-bernstein and
- * /vs/* with no anchor for author identity. This page is the anchor:
+ * Without one, comparison-shaped queries land on /vs/* with no anchor for author identity. This page is the anchor:
  * one paragraph each on who, why, authority, sourcing, contact.
  *
  * Voice: lowercase senior-engineer copy. No marketing voice, no
@@ -168,9 +167,7 @@ export default function AboutPage() {
             <p>
               every blog post carries a publish date in its frontmatter
               and is dated in the visible header. comparisons (the{' '}
-              <a href="/vs">/vs</a> hub, the{' '}
-              <a href="/why-bernstein">/why-bernstein</a> decision page,
-              and the per-adapter pages under{' '}
+              <a href="/vs">/vs</a> hub and the per-adapter pages under{' '}
               <a href="/vs">/vs/&lt;adapter&gt;</a>) cite the upstream
               project&apos;s own documentation as the source of feature
               claims wherever the claim is about the other tool. where i
@@ -190,9 +187,7 @@ export default function AboutPage() {
               rather than hidden: the{' '}
               <a href="/benchmarks">benchmark page</a>{' '}
               labels its scheduling figures as a simulation, not measured
-              runs, the{' '}
-              <a href="/why-bernstein">/why-bernstein</a> page includes
-              explicit &ldquo;who this is not for&rdquo; sections, and
+              runs, and
               the comparison source memo is the{' '}
               <a href="/vs">/vs</a> hub itself - each comparison
               page links the upstream tool&apos;s docs at the top so a

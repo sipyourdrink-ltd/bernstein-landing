@@ -23,7 +23,6 @@ import { Nav } from '@/components/landing/Nav';
 import { Footer } from '@/components/landing/Footer';
 import { BackToTop } from '@/components/landing/BackToTop';
 import { CostCalc } from '@/components/cost/CostCalc';
-import { CostHeadlineAb } from '@/components/cost/CostHeadlineAb';
 import { SITE_URL, AUTHOR } from '@/lib/seo';
 import { fetchModelPrices } from '@/lib/model-prices/fetch';
 import { formatUsd, groupByBrand } from '@/lib/model-prices/select';
@@ -95,10 +94,7 @@ export default async function CostPage() {
                 &larr; back home
               </a>
             </p>
-            {/* conv-001 A/B headline (2026-05-17). The H1 swap is the
-                only difference between variants; lede, calc, prices,
-                methodology are identical. Cookie-pinned 50/50 split. */}
-            <CostHeadlineAb />
+            <h1>cost</h1>
             <p className="cost-page-lede">
               the bernstein router picks the cheapest model that still
               passes your tests on each task. this page lets you put your

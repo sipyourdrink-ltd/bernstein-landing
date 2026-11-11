@@ -14,7 +14,6 @@
  *  - HowTo step `text` stays under a soft 320-char cap so the total
  *    schema block fits the size envelope.
  *
- * Mirrors the existing tests/json-ld-why-bernstein.test.ts style —
  * node:test + assert/strict, no test framework deps.
  */
 import { test } from 'node:test';

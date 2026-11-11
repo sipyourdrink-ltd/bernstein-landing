@@ -258,7 +258,6 @@ test('the resolver is not vacuously passing', () => {
   assert.equal(resolve('/openapi.yaml'), 'public/openapi.yaml');
   assert.equal(resolve('/api/health'), path.join('app', 'api', 'health', 'route.ts'));
   assert.equal(resolve('/api/og'), path.join('app', 'api', 'og', 'route.tsx'));
-  assert.equal(resolve('/why-bernstein'), path.join('app', 'why-bernstein', 'page.tsx'));
   assert.equal(resolve('/api/_markdown'), path.join('app', 'api', '%5Fmarkdown', 'route.ts'));
   assert.equal(resolve('/no-such-surface'), null);
   assert.equal(resolve('/api/nope'), null);

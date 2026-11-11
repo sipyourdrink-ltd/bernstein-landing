@@ -134,7 +134,6 @@ Cloud artifact sinks, progressive skill packs, and Cloudflare cloud execution ar
 
 ## Site pages
 
-- [Why Bernstein](${SITE_URL}/why-bernstein): What the governance layer covers, and what an auditable run buys you
 - [Cost calculator](${SITE_URL}/cost): Token-bill estimator for a Bernstein run with the contextual bandit router enabled; shows the per-model cost band against an unrouted baseline
 - [Adapter comparisons](${SITE_URL}/vs): Index of side-by-side feature matrices for every supported CLI agent (Aider, Claude Code, Codex, Cursor, Gemini, OpenAI Agents SDK, and more)
 - [CLI quickstart](${SITE_URL}/cli-quickstart): Minimal walkthrough. Installing pipx, running the first task, reading the audit log

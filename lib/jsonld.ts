@@ -31,9 +31,7 @@
  * Implementation notes
  * --------------------
  * - We do NOT take the ``schema-dts`` dependency. The strict types in
- *   that package are useful but every operator has the existing
- *   ``tests/json-ld-why-bernstein.test.ts`` style validator that
- *   catches structural drift. Adding a runtime dep for compile-time
+ *   that package are useful. Adding a runtime dep for compile-time
  *   typing would violate the zero-new-dep rule (operator brief).
  * - Builders are pure functions - no I/O, no env reads - so they're
  *   trivial to unit-test and safe to call from server components.

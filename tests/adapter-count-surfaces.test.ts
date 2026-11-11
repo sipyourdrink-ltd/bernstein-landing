@@ -1,5 +1,5 @@
 /**
- * Generated catalogues and evaluation content retain the resolved count.
+ * Generated catalogues retain the resolved count.
  * Public marketing copy uses the approximate "50+" claim instead.
  * Keep both contracts in sync without changing the generated data.
  */
@@ -48,18 +48,6 @@ test('the CLI catalogue blurb matches the resolved count', async () => {
     );
     assert.ok(m, `${file} must carry the adapter-count blurb`);
     assert.equal(Number(m![1]), count, `${file} states ${m![1]}, expected ${count}`);
-  }
-});
-
-test('the evaluation copy uses the approximate public claim', async () => {
-  const raw = await fs.readFile(path.join(root, 'content', 'evaluation', 'index.mdx'), 'utf8');
-  const claims = [
-    /does the same thing across 50\+ different cli agents/,
-    /claude code included as one of the 50\+,/,
-    /there are 50\+ adapters in the registry/,
-  ];
-  for (const re of claims) {
-    assert.match(raw, re, `content/evaluation/index.mdx must keep the counter matching ${re}`);
   }
 });
 

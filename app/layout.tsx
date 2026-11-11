@@ -22,7 +22,7 @@ import "@/styles/ux-cost.css";
 import "@/styles/ux-tools.css";
 /* Sponsor strip, social proof, watch CTA, RSS links, and status strips.
    Scoped under .sponsor-strip-fold / .social-proof-strip /
-   .watch-cta / .rss-subscribe-link / .cost-headline-ab / .beta-notice. */
+   .watch-cta / .rss-subscribe-link / .beta-notice. */
 import "@/styles/ux-conv.css";
 
 const SITE_URL = "https://bernstein.run";

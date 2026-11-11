@@ -19,7 +19,6 @@
  *   - direct technical language
  *   - no marketing adjectives ("powerful", "revolutionary", etc.)
  *   - no em-dashes; use " - " or rewrite
- *   - no Claude attribution anywhere
  */
 
 import type { Metadata } from 'next';
@@ -300,8 +299,7 @@ bernstein stop          # graceful shutdown of the running orchestra`}</code>
             <p>
               For the full reference, including every adapter, every
               quality gate, and the YAML workflow schema, see the{' '}
-              <a href="/why-bernstein">why Bernstein</a> decision FAQ, the{' '}
-              <a href="/cost">cost calculator</a>, and the{' '}
+              <a href="/cost">cost calculator</a> and the{' '}
               <a href="/llms-full.txt">llms-full.txt</a> dump (consumed by
               other LLMs the same way as this page).
             </p>

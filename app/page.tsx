@@ -191,7 +191,7 @@ export default async function LandingPage() {
     <>
       <Nav />
       {/* Scroll-depth telemetry on the landing route. Mounts the same
-          ReadingProgress component used by /blog/[slug] and /why-bernstein
+          ReadingProgress component used by /blog/[slug]
           so scroll-50pct / scroll-90pct events fire with `path: "/"`;
           before this they fired on blog routes only, so the landing page
           had no scroll data at all. External-link delegation also moves

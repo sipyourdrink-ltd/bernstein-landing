@@ -7,8 +7,7 @@
  *  - all required fields populated
  *  - no undefined leaks (every value either present or omitted)
  *
- * Mirrors the existing tests/json-ld-why-bernstein.test.ts
- * style — node:test + assert/strict, no test framework deps.
+ * node:test + assert/strict, no test framework deps.
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -82,7 +81,7 @@ test('organizationLD sameAs lists >= 3 operator-controlled profiles', () => {
  * from unrelated "Bernstein" references.
  *
  * We read the source file directly and pull the const literal via
- * regex - same approach as json-ld-why-bernstein.test.ts, which keeps
+ * regex, which keeps
  * us free of next.js / JSX runtime in unit tests.
  * --------------------------------------------------------------------- */
 

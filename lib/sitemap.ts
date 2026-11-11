@@ -167,7 +167,6 @@ export async function buildSitemapUrls(
     homeLastMod,
     indexLastMod,
     cliQuickstartLastMod,
-    whyBernsteinLastMod,
     costLastMod,
     sponsorsLastMod,
     toolsAgentMdBenchLastMod,
@@ -178,7 +177,6 @@ export async function buildSitemapUrls(
     lastModFromSource(['app/page.tsx']),
     blogIndexLastMod(posts, buildAt),
     lastModFromSource(['app/cli-quickstart/page.tsx']),
-    lastModFromSource(['app/why-bernstein/page.tsx']),
     lastModFromSource(['app/cost/page.tsx']),
     lastModFromSource(['app/sponsors/page.tsx']),
     lastModFromSource(['app/tools/agent-md-bench/page.tsx']),
@@ -220,12 +218,6 @@ export async function buildSitemapUrls(
       lastmod: specDrivenLastMod,
       changefreq: 'monthly',
       priority: 0.7,
-    },
-    {
-      loc: `${SITEMAP_SITE_URL}/why-bernstein`,
-      lastmod: whyBernsteinLastMod,
-      changefreq: 'monthly',
-      priority: 0.8,
     },
     {
       loc: `${SITEMAP_SITE_URL}/cost`,
