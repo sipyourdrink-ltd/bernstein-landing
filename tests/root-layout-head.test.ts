@@ -69,9 +69,8 @@ test('the tags that moved are still emitted', () => {
 });
 
 test('the tracker still follows the exclusion script', () => {
-  /* The inline script installs a no-op `window.umami` when the operator
-     flag is set; it only wins if it parses before the deferred tracker
-     boots. Their relative order is the whole mechanism, and moving both
+  /* The inline script defines the before-send hook the tracker calls;
+     it only works if it parses before the deferred tracker boots. Their relative order is the whole mechanism, and moving both
      out of <head> is exactly the kind of edit that reverses it. */
   const exclusion = layout.indexOf('OPERATOR_EXCLUDE_INLINE_SCRIPT');
   const tracker = layout.indexOf('analytics.bernstein.run/script.js');
@@ -79,6 +78,6 @@ test('the tracker still follows the exclusion script', () => {
   assert.ok(
     exclusion < tracker,
     'the deferred tracker is now emitted before the exclusion script, so the ' +
-      'operator flag can no longer install its stub in time',
+      'opt-out hook may not exist when the tracker boots',
   );
 });

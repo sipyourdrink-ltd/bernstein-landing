@@ -1,40 +1,30 @@
 /**
- * Operator-traffic exclusion bootstrap.
+ * Analytics opt-out.
  *
- * Loaded as an inline ``<script>`` in ``app/layout.tsx`` BEFORE the
- * Umami tracker so the kill-switch wins the race. When
- * ``localStorage["umami:disabled"] === "true"`` we install a no-op
- * ``window.umami`` stub. Both vectors get neutered:
- *   1. The ``data-umami-event`` auto-tracker calls ``window.umami.
- *      track`` after the script.js boots - it sees our stub and posts
- *      nothing.
- *   2. Programmatic ``track()`` from lib/analytics/events.ts re-checks
- *      localStorage on every call (so the operator can flip the flag
- *      mid-session via DevTools and watch live events stop).
+ * Stamped as an inline `<script>` in `app/layout.tsx` before the
+ * analytics script tag. It defines `window[UMAMI_BEFORE_SEND]`, which
+ * the tracker calls (via its `data-before-send` attribute) before every
+ * request it would send - page views and events alike. When
+ * `localStorage["umami:disabled"] === "true"` the hook returns null and
+ * the tracker sends nothing. The flag is read on every call, so setting
+ * or clearing it takes effect without a reload.
  *
- * Why inline + not a module: this needs to execute synchronously before
- * the Umami script.js, which is loaded with ``defer`` from a CDN. A JS
- * module would race the defer load. Inline string ships the tiniest
- * possible amount of JS into the head.
- *
- * The literal string returned here is what gets stamped into the head
- * of every page. Keep it short and self-contained - no imports, no
- * comments inside the string (parsing surprises). Audit:
- *   - ``localStorage`` access wrapped in try/catch (private mode / iframe).
- *   - The stub ``track``/``identify`` accept any args and return void.
- *   - We DO NOT mutate ``window.umami`` if it is already set (defensive,
- *     because tracker might be inlined by some future build step).
+ * Keep the string short and self-contained - no imports, no comments
+ * inside it. `localStorage` access is wrapped in try/catch (private mode,
+ * sandboxed iframe).
  */
 
+export const UMAMI_DISABLED_KEY = 'umami:disabled';
+
+export const UMAMI_BEFORE_SEND = 'umamiBeforeSend';
+
 export const OPERATOR_EXCLUDE_INLINE_SCRIPT = `(() => {
-  try {
-    if (window.localStorage && window.localStorage.getItem('umami:disabled') === 'true') {
-      if (!window.umami) {
-        window.umami = {
-          track: function () {},
-          identify: function () {}
-        };
+  window.${UMAMI_BEFORE_SEND} = function (type, payload) {
+    try {
+      if (window.localStorage && window.localStorage.getItem('${UMAMI_DISABLED_KEY}') === 'true') {
+        return null;
       }
-    }
-  } catch (_) { /* private mode / sandboxed iframe - bail */ }
+    } catch (_) { /* private mode / sandboxed iframe */ }
+    return payload;
+  };
 })();`;

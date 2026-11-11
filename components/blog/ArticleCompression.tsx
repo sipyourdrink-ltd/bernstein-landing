@@ -200,7 +200,6 @@ export function ArticleCompressionTrigger({ className }: { className?: string })
       disabled={Boolean(loadingMode)}
       aria-pressed={view === 'summary'}
       aria-label="compress this article"
-      data-umami-event="blog-compress-open"
     >
       {/* The button label is one verb - mirrors alex's "compress" choice.
           A bracketed glyph keeps it visually distinct from the share/back

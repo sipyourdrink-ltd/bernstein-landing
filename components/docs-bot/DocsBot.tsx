@@ -15,7 +15,6 @@
  *   - useReducer( sse-reducer ) for state.
  *   - useSseStream() for the wire.
  *   - performance.mark for the latency timeline (devtools traces).
- *   - umami.track for click events.
  *
  * Vertical-space pre-allocation: the answer region has a `min-height`
  * so the layout doesn't shift when streaming begins. CLS spec calls
@@ -32,7 +31,6 @@ import { CopyAsMarkdown } from './CopyAsMarkdown.tsx';
 import { SponsorNote, shouldShowSponsorNote } from './SponsorNote.tsx';
 import { CtaStrip } from './CtaStrip.tsx';
 import { ThinkingShimmer } from './ThinkingShimmer.tsx';
-import { track, UmamiEvent } from '@/lib/analytics/events';
 
 /* AnswerStream + AnswerMarkdown pull in react-markdown / remark-gfm /
    rehype-sanitize - ~150 kB minified, all of it dead weight before the
@@ -109,8 +107,7 @@ const PLACEHOLDER: string =
 
 /* Scope hint copy. ≤90 chars per ticket; this is 69. Signals corpus
    bounds before a visitor types so off-topic queries (which return
-   ungrounded refusals) drop. Mitigates the 254/176 decline/submit
-   ratio observed lifetime.
+   ungrounded refusals) drop.
 
    No post count here on purpose: this is a client component, so it
    cannot read content/blog at render time, and the hardcoded figure
@@ -119,24 +116,6 @@ const PLACEHOLDER: string =
    without counting it keeps the two from contradicting each other. */
 const SCOPE_HINT =
   'answers limited to: bernstein source, blog posts, install + cli docs.';
-const SCOPE_HINT_SESSION_KEY = 'docs-bot-scope-hint-view-fired';
-
-/* Fire the scope-hint-view event exactly once per session. Gated by
-   sessionStorage so tab-in/tab-out of the input doesn't inflate the
-   count. Wrapped in try/catch because sessionStorage throws in private
-   mode / iframe sandboxes. */
-function fireScopeHintViewOnce(): void {
-  if (typeof window === 'undefined') return;
-  try {
-    if (window.sessionStorage.getItem(SCOPE_HINT_SESSION_KEY)) return;
-    window.sessionStorage.setItem(SCOPE_HINT_SESSION_KEY, '1');
-  } catch {
-    /* sessionStorage unavailable - fire anyway; the worst case is
-       multiple events from the same session, which the report can
-       de-duplicate by visitor-id. */
-  }
-  track(UmamiEvent.DocsBotScopeHintView);
-}
 
 /* TTFT pre-warm. Fires once per page session on the first signal of
    intent (chip hover/focus or input focus). Sends a tiny `OPTIONS` to
@@ -146,10 +125,9 @@ function fireScopeHintViewOnce(): void {
    - the bot's API is same-origin POST so the browser→Next socket is
    already alive after page load, and the Next→FastAPI gateway socket
    on 127.0.0.1 is process-resident. The real TTFT win lives in a
-   backend two-tier (cheap-model preview → full RAG swap); see
-   `.sdd/backlog/open/2026-05-09-research-006-progressive-ttft-two-tier.md`.
-   The pre-warm here is cheap, idempotent, and doesn't dirty Umami -
-   keep it as a no-cost belt-and-suspenders. */
+   backend two-tier (cheap-model preview → full RAG swap).
+   The pre-warm here is cheap and idempotent - keep it as a no-cost
+   belt-and-suspenders. */
 let prewarmFired = false;
 function prewarmAsk(): void {
   if (typeof window === 'undefined' || prewarmFired) return;
@@ -173,18 +151,6 @@ function prewarmAsk(): void {
        the URL is malformed; same-origin static path makes that
        impossible here, but we guard anyway. */
   }
-}
-
-function trackAsk(query: string): void {
-  if (typeof window === 'undefined') return;
-  const w = window as unknown as { umami?: { track: (n: string, d?: Record<string, unknown>) => void } };
-  w.umami?.track('docs-bot-ask', { length: query.length });
-}
-
-function trackError(code: string): void {
-  if (typeof window === 'undefined') return;
-  const w = window as unknown as { umami?: { track: (n: string, d?: Record<string, unknown>) => void } };
-  w.umami?.track('docs-bot-error', { code });
 }
 
 export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false }: DocsBotProps) {
@@ -226,13 +192,11 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
       }
     }
     if (event.type === 'error') {
-      trackError(event.code);
     }
   }, []);
 
   const onAborted = useCallback(() => {
     dispatch({ kind: 'ABORTED' });
-    trackError('ABORTED');
   }, []);
 
   const onError = useCallback((code: string, message: string, retryAfterSec?: number) => {
@@ -243,7 +207,6 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
       kind: 'EVENT',
       event: { type: 'error', code, message, retryAfterSec },
     });
-    trackError(code);
   }, []);
 
   const { ask, stop, isStreaming } = useSseStream(onEvent, onAborted, onError);
@@ -328,7 +291,6 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
       } catch {
         /* swallow */
       }
-      trackAsk(q);
       dispatch({ kind: 'ASK', query: q });
       setShimmerHeld(true);
       setTimeout(() => setShimmerHeld(false), SHIMMER_MIN_MS);
@@ -447,7 +409,6 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
               onClick={() => onExampleClick(q)}
               onPointerEnter={prewarmAsk}
               onFocus={prewarmAsk}
-              data-umami-event="docs-bot-example-click"
             >
               {q}
             </button>
@@ -466,10 +427,7 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
           name="q"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => {
-            prewarmAsk();
-            fireScopeHintViewOnce();
-          }}
+          onFocus={() => prewarmAsk()}
           placeholder={PLACEHOLDER}
           autoComplete="off"
           spellCheck={false}
@@ -484,7 +442,6 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
           type="submit"
           className="docs-bot-submit"
           disabled={isStreaming || query.trim().length === 0}
-          data-umami-event="docs-bot-submit"
         >
           {isStreaming ? '…' : 'ask'}
         </button>
@@ -657,7 +614,6 @@ export function DocsBot({ variant = 'page', initialQuery = '', autoFocus = false
                  user can still re-submit the form when ready; this
                  button only stops being the primary affordance. */
               disabled={state.error?.code === 'RATE_LIMITED'}
-              data-umami-event="docs-bot-retry"
             >
               retry
             </button>

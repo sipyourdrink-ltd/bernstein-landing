@@ -12,7 +12,6 @@ import { EmailCapture } from '@/components/landing/EmailCapture';
 import { ShareButtons } from '@/components/blog/ShareButtons';
 import { TocSidebar } from '@/components/blog/TocSidebar';
 import { ReadingProgress } from '@/components/blog/ReadingProgress';
-import { ReadingComplete } from '@/components/blog/ReadingComplete';
 import { RelatedPosts, type RelatedPostCard } from '@/components/blog/RelatedPosts';
 import { pickSiblings } from '@/lib/clusters';
 import { withUtm } from '@/lib/utm';
@@ -181,7 +180,7 @@ export default async function BlogPost({ params }: Props) {
   return (
     <>
       <Nav />
-      <ReadingProgress wordCount={post.readingMinutes * 250} />
+      <ReadingProgress />
       <div className="blog-post-layout">
         <div>
           <ArticleCompressionRoot slug={slug}>
@@ -239,15 +238,6 @@ export default async function BlogPost({ params }: Props) {
               <div itemProp="articleBody">
                 {post.mdx}
               </div>
-              {/* ANALYTICS-002 sentinel: invisible bottom-of-article
-                  marker the IntersectionObserver in ReadingComplete uses
-                  to trigger ``blog-post-read-complete``. Lives INSIDE
-                  the article body so it intersects only after the reader
-                  actually finishes the post - distinct from the
-                  document-bottom 95% scroll heuristic that older builds
-                  used (which fires before the article ends because of
-                  footer + related-posts). */}
-              <ReadingComplete />
             </ArticleCompressionBody>
             {/* Hidden microdata for publisher - schema.org requires it on
                 Article-family types but it doesn't need to render. */}
@@ -278,8 +268,6 @@ export default async function BlogPost({ params }: Props) {
                 href="https://alexchernysh.com"
                 rel="author noopener"
                 target="_blank"
-                data-umami-event="click-author-site-out"
-                data-umami-event-source="blog-author"
               >
                 {AUTHOR}
               </a>
@@ -292,9 +280,6 @@ export default async function BlogPost({ params }: Props) {
                 })}
                 rel="noopener"
                 target="_blank"
-                data-umami-event="outbound-github"
-                data-umami-event-surface="blog-author-bio"
-                data-umami-event-source="blog-author"
               >
                 Bernstein
               </a>
@@ -303,8 +288,6 @@ export default async function BlogPost({ params }: Props) {
                 href="https://github.com/chernistry"
                 rel="me noopener"
                 target="_blank"
-                data-umami-event="click-author-gh-out"
-                data-umami-event-source="blog-author"
               >
                 GitHub
               </a>
@@ -345,11 +328,7 @@ export default async function BlogPost({ params }: Props) {
                 blog-footer surface without a schema change. */}
             <p className="blog-digest-line">
               Prefer a weekly recap?{' '}
-              <a
-                href="/#subscribe"
-                data-umami-event="digest-signup-impression"
-                data-umami-event-source="blog-footer"
-              >
+              <a href="/#subscribe">
                 Subscribe to the weekly digest
               </a>
               .

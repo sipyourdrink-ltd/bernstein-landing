@@ -83,9 +83,6 @@ export function SponsorWall({ sponsors, heading = 'who sponsors bernstein' }: Sp
                 target="_blank"
                 aria-label={`${slot.name} on github`}
                 title={slot.name}
-                data-umami-event="sponsor-avatar-click"
-                data-umami-event-source="sponsor-wall"
-                data-umami-event-login={slot.login}
               >
                 {/* plain <img> on purpose: no next/image because the
                     avatar URLs are off-domain and we want server-only

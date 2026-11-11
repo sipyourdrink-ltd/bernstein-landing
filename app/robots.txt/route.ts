@@ -61,8 +61,8 @@ const CONTENT_SIGNAL = 'Content-Signal: search=yes, ai-input=yes, ai-train=yes';
  * Bot validators show a green tick instead of a "no rule found"
  * warning.
  *
- * The list itself lives in `lib/seo/ai-bots.ts` so the analytics
- * bot-filter regex can be derived from the same source. Append new
+ * The list itself lives in `lib/seo/ai-bots.ts`, which middleware.ts
+ * also reads. Append new
  * entries there; the rendered robots.txt is built from the array
  * order verbatim.
  */

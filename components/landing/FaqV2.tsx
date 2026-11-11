@@ -7,14 +7,7 @@
  *
  * The id `faq` is preserved so /#faq deep-links from blog posts still
  * land here.
- *
- * Inview tracker: emits `faq-inview` on first scroll-into-view, which
- * distinguishes readers who reach the end of the page from those who
- * scroll straight past to the footer.
  */
-
-import { InViewTracker } from '@/components/InViewTracker';
-import { UmamiEvent } from '@/lib/analytics/events';
 
 interface Qa {
   q: string;
@@ -83,7 +76,6 @@ export function FaqV2() {
       id="faq"
       aria-labelledby="faq-heading"
     >
-      <InViewTracker eventName={UmamiEvent.FaqInView} />
       <p className="v2-kicker">frequently asked</p>
       <h2 id="faq-heading">
         the four questions <em>that block install</em>.

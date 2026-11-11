@@ -31,15 +31,7 @@
  * chrome title and aria-label both name `bernstein audit verify`, and the
  * receipt verdict is emitted by a different command. Adding those lines
  * under this title would attribute output to a command that never prints it.
- *
- * Inview tracker: emits `audit-log-evidence-inview` on first scroll-into-
- * view. Added per research-003 (audit 2026-05-09) - the centerpiece
- * artifact had no telemetry. Highest-priority dark-zone fix per the
- * audit's "buried gold" classification.
  */
-
-import { InViewTracker } from '@/components/InViewTracker';
-import { UmamiEvent } from '@/lib/analytics/events';
 
 export function AuditLogEvidence() {
   return (
@@ -48,7 +40,6 @@ export function AuditLogEvidence() {
       id="audit"
       aria-labelledby="audit-evidence-heading"
     >
-      <InViewTracker eventName={UmamiEvent.AuditLogEvidenceInView} />
       <div>
         <p className="v2-kicker">evidence, not vibes</p>
         <h2 id="audit-evidence-heading">

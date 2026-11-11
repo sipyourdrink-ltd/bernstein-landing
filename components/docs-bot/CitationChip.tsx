@@ -90,14 +90,6 @@ function stripMarkdownForExcerpt(s: string): string {
    without resolving react / react-dom. See that file for `safeHref`
    and `chipHrefState`. */
 
-/* Telemetry helper. Keeps the component free of conditional imports
-   and works in SSR by guarding `window`. */
-function trackCiteClick(n: number, url: string): void {
-  if (typeof window === 'undefined') return;
-  const w = window as unknown as { umami?: { track: (name: string, data?: Record<string, unknown>) => void } };
-  w.umami?.track('docs-bot-cite-click', { n, url });
-}
-
 export function CitationChip({ n, citation }: CitationChipProps) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
@@ -190,10 +182,6 @@ export function CitationChip({ n, citation }: CitationChipProps) {
     };
   }, [open, positionPopover]);
 
-  const onClick = useCallback(() => {
-    if (citation) trackCiteClick(n, citation.url);
-  }, [citation, n]);
-
   /* The popover has room for the whole title; an ellipsised one hid
      which wiki section a chip pointed at. `TITLE_CAP` still bounds the
      open-link label below so a runaway title cannot stretch the card. */
@@ -246,7 +234,6 @@ export function CitationChip({ n, citation }: CitationChipProps) {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={onClick}
             >
               {openLabel} →
             </a>
@@ -288,7 +275,6 @@ export function CitationChip({ n, citation }: CitationChipProps) {
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={onClick}
         >
           [{n}]
         </a>

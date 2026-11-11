@@ -39,19 +39,14 @@ test('every entry is fully populated and lowercase-voiced', () => {
       /^(https?:\/\/|\/)/.test(e.href),
       `href for "${e.label}" must be absolute-external or root-relative`,
     );
-    assert.ok(
-      /^read-the-code-[a-z0-9-]+$/.test(e.event),
-      `event "${e.event}" must be a read-the-code-* slug`,
-    );
   }
 });
 
-test('labels, hrefs and events are unique', () => {
+test('labels and hrefs are unique', () => {
   const uniq = (xs: string[]) => new Set(xs).size === xs.length;
   const es = READ_THE_CODE_ENTRIES;
   assert.ok(uniq(es.map((e) => e.label)), 'duplicate label');
   assert.ok(uniq(es.map((e) => e.href)), 'duplicate href');
-  assert.ok(uniq(es.map((e) => e.event)), 'duplicate umami event');
 });
 
 test('the generated code-map surface is present and points at the repo', () => {
@@ -64,12 +59,10 @@ test('isExternalEntry drives the target/rel treatment off the href alone', () =>
   const ext: ReadTheCodeEntry = {
     label: 'x',
     href: 'https://example.com',
-    event: 'read-the-code-x',
   };
   const internal: ReadTheCodeEntry = {
     label: 'y',
     href: '/docs/cli',
-    event: 'read-the-code-y',
   };
   assert.equal(isExternalEntry(ext), true);
   assert.equal(isExternalEntry(internal), false);

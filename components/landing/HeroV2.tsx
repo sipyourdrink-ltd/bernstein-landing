@@ -23,8 +23,6 @@
 
 import { ReactNode } from 'react';
 import { RightRail } from './RightRail';
-import { InViewTracker } from '@/components/InViewTracker';
-import { UmamiEvent } from '@/lib/analytics/events';
 /* Both figures are baked at build time by the prebuild step - the
    adapter count from the bernstein registry, the version from the
    latest release tag. They are the fallbacks used when the
@@ -141,7 +139,6 @@ export async function HeroV2({
 
   return (
     <section className="v2-hero" aria-labelledby="hero-heading">
-      <InViewTracker eventName={UmamiEvent.HeroCtaInView} ratio={0.2} />
       {/* LEFT COLUMN - preamble + H1 + sub + ask-first slot */}
       <div className="v2-hero-lede">
         <div className="v2-hero-pre" role="note" aria-label="release status">

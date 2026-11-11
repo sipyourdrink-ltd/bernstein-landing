@@ -177,9 +177,7 @@
 }
 
 /* ---- BLOG digest one-liner — footer subscribe prompt ----
-   Appears in the bottom chrome of every blog post. The anchor carries
-   `data-umami-event="digest-signup-impression"` so the existing event
-   taxonomy is reused (no new event names). Sized to read as a quiet
+   Appears in the bottom chrome of every blog post. Sized to read as a quiet
    one-line invitation, not a CTA strip. */
 .blog-digest-line {
   margin-top: var(--space-6, 24px);

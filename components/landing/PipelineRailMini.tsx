@@ -10,10 +10,6 @@
  * The id `how` is preserved so the existing Nav scroll-spy keeps lighting
  * up "how it works" as the visitor scrolls past this band.
  *
- * Inview tracker: emits `pipeline-rail-inview` on first scroll-into-view.
- * Added per research-003 (audit 2026-05-09) - this section was a dark
- * zone with zero telemetry despite being the second slot on the page.
- *
  * This band is the page's only presentation of the four stages. A prose
  * explainer used to restate the same decompose/spawn/verify/merge
  * sequence in the slot directly above it; the one fact it carried that
@@ -21,9 +17,6 @@
  * gate - is folded into stage 03 below. The long-form answer still
  * ships to extraction surfaces via /llms-full.txt and the /ask corpus.
  */
-
-import { InViewTracker } from '@/components/InViewTracker';
-import { UmamiEvent } from '@/lib/analytics/events';
 
 interface Stage {
   n: string;
@@ -49,7 +42,6 @@ export function PipelineRailMini() {
       id="how"
       aria-labelledby="pipeline-rail-mini-heading"
     >
-      <InViewTracker eventName={UmamiEvent.PipelineRailInView} />
       <div className="v2-rail-inner">
         <h3 id="pipeline-rail-mini-heading">
           one run, <em>four stages</em>.

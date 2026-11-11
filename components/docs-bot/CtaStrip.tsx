@@ -14,12 +14,6 @@
  * glyphs. The install slot copies the command to the clipboard
  * (existing CopyButton pattern); the github + sponsor slots are
  * external links opening in a new tab.
- *
- * Telemetry: each slot fires a distinct umami event so the operator
- * can see which CTA shape converts. Names match the ticket spec:
- *   cta-strip-install
- *   cta-strip-github
- *   cta-strip-sponsor
  */
 import { useCallback, useState, type ReactElement } from 'react';
 
@@ -33,22 +27,13 @@ const GITHUB_URL = withUtm('https://github.com/sipyourdrink-ltd/bernstein', {
 });
 const SPONSOR_URL = 'https://github.com/sponsors/chernistry';
 
-function trackUmami(name: string): void {
-  if (typeof window === 'undefined') return;
-  const w = window as unknown as {
-    umami?: { track: (n: string) => void };
-  };
-  w.umami?.track(name);
-}
-
 export function CtaStrip(): ReactElement {
   const [copied, setCopied] = useState(false);
 
   const onCopy = useCallback(async () => {
     if (typeof navigator === 'undefined' || !navigator.clipboard) {
-      /* No clipboard API - fire telemetry anyway and let the user
-         select the visible text manually. */
-      trackUmami('cta-strip-install');
+      /* No clipboard API - let the user select the visible text
+         manually. */
       return;
     }
     try {
@@ -59,7 +44,6 @@ export function CtaStrip(): ReactElement {
       /* Clipboard write can fail on insecure-context tabs; degrade
          silently - the user can still select + copy manually. */
     }
-    trackUmami('cta-strip-install');
   }, []);
 
   return (
@@ -72,7 +56,6 @@ export function CtaStrip(): ReactElement {
         type="button"
         className="docs-bot-cta-strip-item docs-bot-cta-strip-install"
         onClick={onCopy}
-        data-umami-event="cta-strip-install"
         aria-label={
           copied
             ? `copied: ${INSTALL_CMD}`
@@ -90,9 +73,6 @@ export function CtaStrip(): ReactElement {
         href={GITHUB_URL}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() => trackUmami('cta-strip-github')}
-        data-umami-event="outbound-github"
-        data-umami-event-surface="docs-bot-cta-strip"
       >
         star on github
       </a>
@@ -104,12 +84,6 @@ export function CtaStrip(): ReactElement {
         href={SPONSOR_URL}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() => {
-          trackUmami('cta-strip-sponsor');
-          // Aggregate sponsor-anchor metric (lib/analytics/events.ts).
-          trackUmami('gh-sponsors-click');
-        }}
-        data-umami-event="cta-strip-sponsor"
       >
         sponsor (alex)
       </a>

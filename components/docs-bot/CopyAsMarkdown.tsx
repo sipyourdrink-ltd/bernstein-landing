@@ -52,7 +52,6 @@ export function CopyAsMarkdown({ text, citations }: CopyAsMarkdownProps) {
       type="button"
       className="docs-bot-copy-md"
       onClick={onClick}
-      data-umami-event="docs-bot-copy-markdown"
       aria-label={copied ? 'copied as markdown' : 'copy answer as markdown'}
     >
       {copied ? 'copied' : 'copy as markdown'}

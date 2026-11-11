@@ -24,8 +24,6 @@
  * where the project is listed - no claims are made about it.
  */
 
-import { useEffect, useRef } from 'react';
-import { track, UmamiEvent } from '@/lib/analytics/events';
 import { SOCIAL_PROOF_ITEMS } from './social-proof-data';
 
 interface SocialProofStripProps {
@@ -86,38 +84,6 @@ const PRESS_MENTIONS: readonly PressMention[] = [
 ];
 
 export function SocialProofStrip(_props: SocialProofStripProps) {
-  const ref = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    const key = 'umami:social-proof:imp';
-    try {
-      if (window.sessionStorage?.getItem(key) === '1') return;
-    } catch {
-      /* fall through */
-    }
-    const el = ref.current;
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
-            try {
-              window.sessionStorage?.setItem(key, '1');
-            } catch {
-              /* fall through */
-            }
-            track(UmamiEvent.SocialProofImpression);
-            io.disconnect();
-            return;
-          }
-        }
-      },
-      { threshold: [0.4] },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
   const hasBadges = SOCIAL_PROOF_ITEMS.length > 0;
   const hasMentions = PRESS_MENTIONS.length > 0;
 
@@ -127,7 +93,7 @@ export function SocialProofStrip(_props: SocialProofStripProps) {
   }
 
   return (
-    <section ref={ref} className="social-proof-strip" aria-label="External listings">
+    <section className="social-proof-strip" aria-label="External listings">
       {hasBadges && (
         <>
           <p id="social-proof-label" className="social-proof-strip__label">

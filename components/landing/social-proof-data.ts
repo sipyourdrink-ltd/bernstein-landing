@@ -13,7 +13,7 @@
  */
 
 export interface SocialProofItem {
-  /** Canonical id used by the umami event prop. */
+  /** Stable id for the entry. */
   id: string;
   /** Display label in the strip. lowercase. */
   label: string;

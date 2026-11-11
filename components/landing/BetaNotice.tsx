@@ -17,11 +17,6 @@
  *   - Motion budget: the only motion is a link-underline colour
  *     transition, disabled under prefers-reduced-motion in
  *     ux-conv.css.
- *
- * Umami: `beta-notice-contribute-click` / `beta-notice-sponsor-click`
- * via data attributes (auto-tracked); no impression event — the strip
- * renders on every un-dismissed page view, so an impression would
- * duplicate the pageview count.
  */
 
 import { useEffect, useState } from 'react';
@@ -77,7 +72,6 @@ export function BetaNotice() {
             href={CONTRIBUTING_URL}
             rel="noopener noreferrer"
             target="_blank"
-            data-umami-event="beta-notice-contribute-click"
           >
             {BETA_NOTICE_COPY.codeLabel}
           </a>
@@ -85,7 +79,6 @@ export function BetaNotice() {
           <a
             className="beta-notice__link"
             href={SPONSORS_PATH}
-            data-umami-event="beta-notice-sponsor-click"
           >
             {BETA_NOTICE_COPY.sponsorLabel}
           </a>

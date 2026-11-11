@@ -37,8 +37,6 @@
  *   - voice rules - lowercase, italic emphasis, periods, no banned words
  *   - DocsBot UI conventions (kicker, citation chip, model + ms footer,
  *     copy-as-markdown)
- *   - umami event names (github-click, install-snippet-copy,
- *     email-capture-submit, docs-bot-ask) so reports stay continuous
  */
 
 import { SoftwareApplicationJsonLd } from '@/components/seo/SoftwareApplicationJsonLd';
@@ -190,13 +188,6 @@ export default async function LandingPage() {
   return (
     <>
       <Nav />
-      {/* Scroll-depth telemetry on the landing route. Mounts the same
-          ReadingProgress component used by /blog/[slug]
-          so scroll-50pct / scroll-90pct events fire with `path: "/"`;
-          before this they fired on blog routes only, so the landing page
-          had no scroll data at all. External-link delegation also moves
-          to /, surfacing un-tagged outbound clicks via
-          `external-link-click`. */}
       <ReadingProgress />
       <main id="main">
         <HeroV2

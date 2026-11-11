@@ -19,15 +19,9 @@
  * border + 24 px padding) so it reads as a peer column, not a sidebar.
  * Below 1280 px css gives the ask box a bit more dominance; below 900 px
  * the column promotes above the ask block.
- *
- * Copy-on-click for both install rows logs `install-snippet-copy` to
- * Umami - the same event name the earlier hero used, so reports stay
- * continuous.
  */
 
 import { useEffect, useState } from 'react';
-import { trackOutbound } from '@/components/site/track-outbound';
-import { UmamiEvent, emitFunnelStep, track } from '@/lib/analytics/events';
 import { formatStars } from '@/lib/format-stars';
 import { withUtm } from '@/lib/utm';
 
@@ -93,14 +87,6 @@ const INSTALL_TABS: Tab[] = [
 const STAR_FALLBACK: number | null = null;
 const DELTA_FALLBACK = 0;
 
-function trackUmami(name: string, data?: Record<string, unknown>): void {
-  if (typeof window === 'undefined') return;
-  const w = window as unknown as {
-    umami?: { track: (n: string, d?: Record<string, unknown>) => void };
-  };
-  w.umami?.track(name, data);
-}
-
 export function RightRail({ closedPrs, contributors }: RightRailProps) {
   const resolvedClosedPrs: number | null = closedPrs ?? CLOSED_PR_FALLBACK;
   const resolvedContributors: number | null = contributors ?? CONTRIBUTORS_FALLBACK;
@@ -130,52 +116,12 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
     };
   }, []);
 
-  // Emits cta-hero-mount, plus cta-hero-view via emitFunnelStep. Both
-  // are needed: cta-hero-mount counts every mount, cta-hero-view is the
-  // name reports have always read. A rename dropped cta-hero-view for a
-  // week; re-emitting it here keeps both series populated.
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const w = window as unknown as {
-      umami?: { track: (n: string, d?: Record<string, unknown>) => void };
-    };
-    w.umami?.track(UmamiEvent.CtaHeroMount, {
-      viewport_width: window.innerWidth,
-    });
-    emitFunnelStep('cta', { source: 'hero-rail-mount' });
-  }, []);
-
   const tab = INSTALL_TABS.find((t) => t.id === activeTab) ?? INSTALL_TABS[0];
 
-  /** Per-installer event name. Maps the install-snippet variant to the
-   *  ``pypi-install-{installer}-copy`` event (lib/analytics/events.ts →
-   *  UmamiEvent). ``install-snippet-copy`` is fired alongside it so
-   *  older reports keep working. */
-  const installEventName: Record<string, string> = {
-    pip: 'pypi-install-pip-copy',
-    pipx: 'pypi-install-pipx-copy',
-    uv: 'pypi-install-uv-copy',
-    docker: 'pypi-install-docker-copy',
-    brew: 'pypi-install-brew-copy',
-  };
-
-  const onCopy = (id: string, cmd: string, eventName: string) => {
+  const onCopy = (id: string, cmd: string) => {
     if (typeof navigator === 'undefined' || !navigator.clipboard) return;
     void navigator.clipboard.writeText(cmd).then(() => {
       setCopiedId(id);
-      trackUmami(eventName, { variant: id });
-      // Fire the canonical per-installer event for the install-snippet
-      // family. The init-row keeps using ``install-init-copy`` only
-      // because there's no installer there.
-      if (eventName === 'install-snippet-copy') {
-        const perInstaller = installEventName[id];
-        if (perInstaller) trackUmami(perInstaller, { source: 'hero-rail' });
-        /* Re-emit through emitFunnelStep, which applies the bot
-           filter. The trackUmami call above bypasses that filter, so
-           its series includes bot traffic; the raw emit stays only so
-           older reports keep working. */
-        emitFunnelStep('install', { source: 'hero-rail', variant: id, repeatable: true });
-      }
       window.setTimeout(() => {
         setCopiedId((cur) => (cur === id ? null : cur));
       }, 1400);
@@ -226,7 +172,7 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
             <button
               type="button"
               className={`v2-install-copy ${copiedId === tab.id ? 'is-copied' : ''} !text-[length:var(--text-xs)] !py-2 !px-3 !font-semibold !bg-[color:var(--accent)] !text-[color:var(--bg-paper)] !border-[color:var(--accent)] hover:!bg-[color:var(--ink)] hover:!border-[color:var(--ink)]`.trim()}
-              onClick={() => onCopy(tab.id, tab.cmd, 'install-snippet-copy')}
+              onClick={() => onCopy(tab.id, tab.cmd)}
               aria-label={`Copy command: ${tab.cmd}`}
             >
               {copiedId === tab.id ? 'copied' : 'Copy command'}
@@ -247,7 +193,7 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
             <button
               type="button"
               className={`v2-install-copy ${copiedId === 'init' ? 'is-copied' : ''}`.trim()}
-              onClick={() => onCopy('init', 'bernstein init', 'install-init-copy')}
+              onClick={() => onCopy('init', 'bernstein init')}
               aria-label="copy bernstein init command"
             >
               {copiedId === 'init' ? 'copied' : 'copy'}
@@ -277,26 +223,6 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
           className="v2-gh-row"
           target="_blank"
           rel="noopener noreferrer"
-          /* Two event names on one anchor: `github-click` is the older
-             one, kept so existing reports keep working; `outbound-github`
-             is the name shared across properties. The click handler also
-             fires `github-star-click` for the star-specific series. */
-          data-umami-event="outbound-github"
-          data-umami-event-surface="hero-rail-star"
-          data-umami-event-source="hero-rail"
-          onClick={() => {
-            /* Three event names on a single anchor:
-               - ``outbound-github`` (auto-tracker via data-umami-event) -
-                 the name shared across properties.
-               - ``github-star-click`` - specific to this row.
-               - ``github-click`` (via emitFunnelStep) - the generic
-                 GitHub-click name. Without it that series reads zero,
-                 because the auto-tracker only emits the first name. */
-            trackUmami('github-star-click', { source: 'hero-rail' });
-            emitFunnelStep('ghClick', { source: 'hero-rail-star', repeatable: true });
-            emitFunnelStep('ghStar', { source: 'hero-rail', repeatable: true });
-            trackOutbound('github.com', 'hero', 'star');
-          }}
           /* No custom aria-label: the visible content (star icon is
              aria-hidden below, "star on github", the live count, and the
              7-day delta chip when shown) already reads as a complete
@@ -332,9 +258,7 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
           </div>
         </a>
         <a
-          /* Anchors the README's `### mentioned in` section. The umami
-             event name stays `featured-in-click` so the series is
-             continuous across the README heading rename. */
+          /* Anchors the README's `### mentioned in` section. */
           href={withUtm('https://github.com/sipyourdrink-ltd/bernstein#mentioned-in', {
             source: 'bernstein.run',
             medium: 'outbound-link',
@@ -343,10 +267,6 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
           className="v2-gh-tooltip"
           target="_blank"
           rel="noopener noreferrer"
-          data-umami-event="outbound-github"
-          data-umami-event-surface="hero-rail-featured"
-          data-umami-event-source="hero-rail"
-          onClick={() => trackUmami('featured-in-click', { source: 'hero-rail' })}
         >
           <span className="v2-gh-tooltip-body">
             also picked up by awesome lists, newsletters &amp; peer projects
@@ -387,8 +307,6 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
             )}
             target="_blank"
             rel="noopener noreferrer"
-            data-umami-event="outbound-github"
-            data-umami-event-surface="hero-rail-prs"
             aria-label={
               resolvedClosedPrs === null
                 ? 'closed pull requests on github'
@@ -415,8 +333,6 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
             )}
             target="_blank"
             rel="noopener noreferrer"
-            data-umami-event="outbound-github"
-            data-umami-event-surface="hero-rail-contributors"
             aria-label={
               resolvedContributors === null
                 ? 'contributors on github'
@@ -429,35 +345,13 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
           {/* Sponsor tile (replaces the older "$0 to install").
               Quiet invitation, not a price tag. The headline reflects the
               real out-of-pocket development+host cost; the label invites
-              without demanding. Whole tile is the link target.
-              Two event names: ``sponsor-tile-click`` keeps older
-              reports working; ``gh-sponsors-click`` (lib/analytics/
-              events.ts) is the shared name for every GitHub-sponsors
-              anchor, readable independently of where the click
-              originated. */}
+              without demanding. Whole tile is the link target. */}
           <a
             href="https://github.com/sponsors/chernistry"
             target="_blank"
             rel="noopener noreferrer"
             className="v2-ms v2-ms-link"
             role="listitem"
-            data-umami-event="sponsor-tile-click"
-            data-umami-event-source="hero-rail"
-            data-umami-event-surface="hero-rail-sponsor-tile"
-            onClick={() => {
-              trackUmami('gh-sponsors-click', { source: 'hero-rail' });
-              /* Also emit ``sponsor-conversion``. Distinct from
-                 ``sponsor-tile-click`` (the click on this tile) and
-                 ``gh-sponsors-click`` (any sponsors anchor): this one
-                 records that the visitor left for GitHub Sponsors. A
-                 GitHub webhook would report the actual outcome; this
-                 app has no such webhook. The other two keep firing. */
-              track(UmamiEvent.SponsorConversion, {
-                source: 'hero-rail',
-                surface: 'sponsor-tile',
-              });
-              trackOutbound('github.com', 'hero', 'sponsor');
-            }}
             aria-label="sponsor on github · helps if it helped you"
           >
             <div className="v2-ms-n">~$0</div>
@@ -473,8 +367,6 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
             className="v2-ms v2-ms-link"
             role="listitem"
             style={{ gridColumn: '1 / -1' }}
-            data-umami-event="cost-tile-click"
-            data-umami-event-source="hero-rail"
             aria-label="/cost · what does it cost to run?"
           >
             <div className="v2-ms-n">/cost</div>

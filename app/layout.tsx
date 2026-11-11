@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
 import { fraunces, inter, jetbrainsMono } from "@/lib/fonts";
-import { OPERATOR_EXCLUDE_INLINE_SCRIPT } from "@/lib/analytics/disable";
+import { OPERATOR_EXCLUDE_INLINE_SCRIPT, UMAMI_BEFORE_SEND } from "@/lib/analytics/disable";
+import { OutboundClicks } from "@/components/site/OutboundClicks";
 import "@/styles/globals.css";
 import "@/styles/ux-typography.css";
 import "@/styles/ux-layout.css";
@@ -190,19 +191,18 @@ export default function RootLayout({
         <link rel="me" href="https://alexchernysh.com" />
         <link rel="me" href="https://github.com/chernistry" />
         <link rel="me" href="https://x.com/alex_chernysh" />
-        {/* Operator-traffic exclusion - runs synchronously before the
-              Umami tracker so a stub ``window.umami`` is in place when
-              ``script.js`` boots. Toggle by running
-              ``localStorage.setItem('umami:disabled','true')`` in the
-              operator's own browser console. Visitor traffic is unaffected
-              because their localStorage flag is unset. */}
+        {/* Analytics opt-out - defines the before-send hook the tracker
+              below calls before every request. With
+              ``localStorage.setItem('umami:disabled','true')`` set in a
+              browser, the hook returns null and that browser sends
+              nothing. It must parse before the deferred tracker boots. */}
         <script
           // eslint-disable-next-line react/no-danger -- inline string is a
           // hardcoded constant from lib/analytics/disable.ts; not user input.
           dangerouslySetInnerHTML={{ __html: OPERATOR_EXCLUDE_INLINE_SCRIPT }}
         />
-        {/* Umami self-host (analytics.bernstein.run) - cookieless RUM,
-              grouped by UTM parameters on inbound links.
+        {/* Umami self-host (analytics.bernstein.run) - page views only,
+              plus the outbound-click event from <OutboundClicks />.
               Defer-loaded; zero impact on LCP. UUID lives in
               NEXT_PUBLIC_UMAMI_WEBSITE_ID (build-time env var) so a
               registration in the Umami DB is the single source of truth
@@ -220,9 +220,10 @@ export default function RootLayout({
             src="https://analytics.bernstein.run/script.js"
             data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
             data-domains="bernstein.run,www.bernstein.run,getbernstein.com,www.getbernstein.com"
-            data-performance="true"
+            data-before-send={UMAMI_BEFORE_SEND}
           />
         ) : null}
+        <OutboundClicks />
         {children}
         {/* Organization JSON-LD lives at the layout level so every page
               (landing, blog, blog post, llms.txt-ish surfaces) emits a
