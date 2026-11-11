@@ -4,11 +4,6 @@
  * CtaStrip - one-line three-slot conversion strip rendered below
  * every NON-DECLINED answer card.
  *
- * Differs from <SponsorNote> on two axes:
- *   - SponsorNote is one-time-per-browser, deeper, vulnerable-tone
- *   - CtaStrip is every-answer, shallow, action-tone
- * They render together on the FIRST done; on subsequent dones only
- * the strip shows.
  *
  * Visual: monospace small font, three slots separated by middle-dot
  * glyphs. The install slot copies the command to the clipboard
@@ -25,7 +20,6 @@ const GITHUB_URL = withUtm('https://github.com/sipyourdrink-ltd/bernstein', {
   medium: 'outbound-link',
   campaign: 'docs-bot-cta-strip',
 });
-const SPONSOR_URL = 'https://github.com/sponsors/chernistry';
 
 export function CtaStrip(): ReactElement {
   const [copied, setCopied] = useState(false);
@@ -75,17 +69,6 @@ export function CtaStrip(): ReactElement {
         rel="noopener noreferrer"
       >
         star on github
-      </a>
-      <span className="docs-bot-cta-strip-sep" aria-hidden="true">
-        ·
-      </span>
-      <a
-        className="docs-bot-cta-strip-item"
-        href={SPONSOR_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        sponsor (alex)
       </a>
     </nav>
   );

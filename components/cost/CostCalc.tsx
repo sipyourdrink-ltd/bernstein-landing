@@ -45,7 +45,6 @@ import {
   computeSavingBand,
   formatUsd,
   formatPct,
-  sponsorUrl,
 } from './cost-math';
 
 /* Re-export so consumers that only import the component file still get
@@ -54,7 +53,6 @@ export {
   computeSavingBand,
   formatUsd,
   formatPct,
-  sponsorUrl,
   sanitizeNumber,
 } from './cost-math';
 
@@ -67,15 +65,6 @@ export function CostCalc() {
     () => computeSavingBand(claude, codex, cursor),
     [claude, codex, cursor],
   );
-
-  /* CTA percent - what $25/mo represents as a fraction of the user's
-   * total spend. Cap at 999% so the line stays readable when total is
-   * tiny (or zero). */
-  const sponsorPct = useMemo(() => {
-    if (band.totalSpend <= 0) return null;
-    const raw = (25 / band.totalSpend) * 100;
-    return raw > 999 ? null : Math.round(raw);
-  }, [band.totalSpend]);
 
   const claudeId = useId();
   const codexId = useId();
@@ -251,51 +240,6 @@ export function CostCalc() {
         </p>
       </div>
 
-      {/* CTA - direct lift from the research-anchored example. The X and
-          Y are substituted in real time from the inputs. */}
-      <div className="cost-calc-cta" aria-label="sponsor cta">
-        {band.totalSpend > 0 ? (
-          <>
-            <p>
-              your last month's bill was{' '}
-              <strong>{formatUsd(band.totalSpend)}</strong>.
-            </p>
-            <p>
-              sponsoring at $25/mo is{' '}
-              {sponsorPct !== null ? (
-                <strong>{sponsorPct}%</strong>
-              ) : (
-                <strong>a small slice</strong>
-              )}{' '}
-              of {formatUsd(band.totalSpend)}.
-            </p>
-            <p>bernstein keeps routing the cheapest model that passes tests.</p>
-            <p className="cost-calc-cta-link">
-              <a
-                href={sponsorUrl()}
-                rel="noopener"
-              >
-                &rarr; github.com/sponsors/chernistry
-              </a>
-            </p>
-          </>
-        ) : (
-          <>
-            <p>
-              put a number in any field above and this block will show the
-              math and a link.
-            </p>
-            <p className="cost-calc-cta-link">
-              <a
-                href={sponsorUrl()}
-                rel="noopener"
-              >
-                &rarr; github.com/sponsors/chernistry
-              </a>
-            </p>
-          </>
-        )}
-      </div>
     </section>
   );
 }

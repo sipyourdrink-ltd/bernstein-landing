@@ -342,21 +342,10 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
             <div className="v2-ms-n">{resolvedContributors ?? '-'}</div>
             <div className="v2-ms-l">contributors</div>
           </a>
-          {/* Sponsor tile (replaces the older "$0 to install").
-              Quiet invitation, not a price tag. The headline reflects the
-              real out-of-pocket development+host cost; the label invites
-              without demanding. Whole tile is the link target. */}
-          <a
-            href="https://github.com/sponsors/chernistry"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="v2-ms v2-ms-link"
-            role="listitem"
-            aria-label="sponsor on github · helps if it helped you"
-          >
+          <div className="v2-ms" role="listitem">
             <div className="v2-ms-n">~$0</div>
-            <div className="v2-ms-l">to install · sponsor →</div>
-          </a>
+            <div className="v2-ms-l">to install</div>
+          </div>
           {/* Cost-calculator companion tile. Sits as a full-width row under
               the 2×2 grid (gridColumn: 1 / -1) so it visually pairs with the
               sponsor tile above without reshuffling the grid rhythm.

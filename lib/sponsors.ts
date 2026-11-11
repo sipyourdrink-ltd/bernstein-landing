@@ -7,9 +7,8 @@
  *      isPublic. Public-sponsor detection works without the elevated
  *      `read:user` scope; we drop any record whose `privacyLevel` is
  *      `PRIVATE`.
- *   2) Hardcoded fallback (currently empty). The page renders the
- *      "first three sponsors get listed by name" placeholder copy in
- *      that case - no fake data, no manufactured count.
+ *   2) Hardcoded fallback (currently empty). The wall then renders
+ *      nothing - no fake data, no manufactured count.
  *
  * Why scrape is NOT used here:
  *   The sponsorkit ecosystem documents both GraphQL and HTML scrape
@@ -75,7 +74,7 @@ interface GraphResponse {
  * Fetch the public sponsor list for `chernistry`. Returns the empty
  * array on any non-200, missing token, parse failure, or zero
  * sponsors. The page renders the placeholder copy when this returns
- * empty - that is the legitimate "no sponsors yet" path.
+ * empty - that is the legitimate empty-list path.
  */
 export async function fetchPublicSponsors(): Promise<Sponsor[]> {
   const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
