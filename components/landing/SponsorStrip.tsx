@@ -8,8 +8,8 @@
  *     ≤80px row immediately under the hero. Monochrome by default,
  *     hover restores colour. Each cell links out to the sponsor's
  *     GitHub profile with `rel="sponsored noopener"`.
- *   - When the sponsor list is empty (no token configured, zero
- *     sponsors yet) the component renders nothing. The full
+ *   - When the sponsor list is empty (no token configured, an
+ *     empty list) the component renders nothing. The full
  *     `<SponsorWall/>` on /sponsors handles the empty state; the fold
  *     strip is an additive surface, not the canonical wall.
  *

@@ -27,8 +27,8 @@ import {
 } from './sponsor-wall-data';
 
 interface SponsorWallProps {
-  /** Server-fetched sponsors. Empty array is the legitimate "no
-   *  sponsors yet" state - we render the placeholder copy, not a
+  /** Server-fetched sponsors. Empty array is the legitimate "an
+   *  empty list" state - we render the placeholder copy, not a
    *  manufactured count. */
   sponsors: readonly Sponsor[];
   /** Optional heading rendered above the grid. The /sponsors page

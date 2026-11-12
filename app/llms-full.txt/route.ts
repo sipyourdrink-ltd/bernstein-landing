@@ -531,7 +531,7 @@ Bernstein tracks costs at multiple levels:
 
 ## Security Features
 
-- **HMAC audit logs**: Tamper-evident logging of all orchestration actions
+- **HMAC audit logs**: Tamper-evident logging of all orchestration actions (opt-in)
 - **Policy engine**: Define policies for what agents can and cannot do
 - **PII gating**: Prevent agents from accessing files containing PII
 - **Credential scoping**: Each agent gets only the credentials it needs
