@@ -53,19 +53,7 @@ export interface WithUtmOpts {
  * values win. Returns the input unchanged if it can't be parsed.
  */
 export function withUtm(url: string, opts: WithUtmOpts): string {
-  if (!url) return url;
-  /* mailto:, tel:, javascript:, and other non-http schemes get no UTM
-     - passing them through ``URL`` works, but appending search params
-     is meaningless for those targets. Detect and short-circuit. */
-  const lower = url.toLowerCase();
-  if (
-    lower.startsWith('mailto:') ||
-    lower.startsWith('tel:') ||
-    lower.startsWith('javascript:') ||
-    lower.startsWith('#')
-  ) {
-    return url;
-  }
+  if (!url || url.startsWith('#')) return url;
 
   let parsed: URL;
   try {
@@ -77,6 +65,9 @@ export function withUtm(url: string, opts: WithUtmOpts): string {
   } catch {
     return url;
   }
+
+  // Use the URL parser's normalized protocol before changing its query.
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return url;
 
   const desired: Array<[string, string | undefined]> = [
     ['utm_source', opts.source],
@@ -102,6 +93,7 @@ export function withUtm(url: string, opts: WithUtmOpts): string {
      contract that internal relative hrefs round-trip unchanged. The
      short-circuit at the top of the function should already cover most
      relative inputs, but defend against the edge case explicitly. */
+  const lower = url.toLowerCase();
   if (
     !lower.startsWith('http://') &&
     !lower.startsWith('https://') &&

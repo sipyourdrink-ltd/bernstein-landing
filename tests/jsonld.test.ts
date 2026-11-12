@@ -170,6 +170,7 @@ test('site-wide Organization JSON-LD sameAs lists >= 3 operator-controlled profi
   const sameAs = node.sameAs as unknown;
   assert.ok(Array.isArray(sameAs), 'sameAs must be an array');
   const list = sameAs as string[];
+  const profiles = new Set(list);
   assert.ok(
     list.length >= 3,
     'sameAs needs >= 3 entries for Knowledge-Graph disambiguation',
@@ -183,15 +184,15 @@ test('site-wide Organization JSON-LD sameAs lists >= 3 operator-controlled profi
      the site-wide Organization block so Knowledge-Graph crawlers see a
      single coherent identity cluster. */
   assert.ok(
-    list.includes('https://mastodon.social/@alexchernysh'),
+    profiles.has('https://mastodon.social/@alexchernysh'),
     'sameAs must include the operator Mastodon handle',
   );
   assert.ok(
-    list.includes('https://bsky.app/profile/alex-chernysh.bsky.social'),
+    profiles.has('https://bsky.app/profile/alex-chernysh.bsky.social'),
     'sameAs must include the operator Bluesky handle',
   );
   assert.ok(
-    list.includes('https://github.com/chernistry'),
+    profiles.has('https://github.com/chernistry'),
     'sameAs must include the operator GitHub profile',
   );
 });

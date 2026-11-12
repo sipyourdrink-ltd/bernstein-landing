@@ -50,9 +50,11 @@ test('labels and hrefs are unique', () => {
 });
 
 test('the generated code-map surface is present and points at the repo', () => {
-  const deepwiki = READ_THE_CODE_ENTRIES.find((e) => e.href.includes('deepwiki.com'));
+  const deepwiki = READ_THE_CODE_ENTRIES
+    .map((e) => new URL(e.href, 'https://bernstein.run'))
+    .find((url) => url.origin === 'https://deepwiki.com');
   assert.ok(deepwiki, 'deepwiki entry missing');
-  assert.ok(deepwiki.href.includes('sipyourdrink-ltd/bernstein'));
+  assert.equal(deepwiki.pathname, '/sipyourdrink-ltd/bernstein');
 });
 
 test('isExternalEntry drives the target/rel treatment off the href alone', () => {
