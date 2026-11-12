@@ -72,11 +72,9 @@ function extractStringConst(source: string, name: string): string {
   /* Decode a small set of escape sequences that show up in our copy:
      \' \" \\ and \n. Everything else is left as-is — these are
      hand-written literals, not arbitrary user input. */
-  return m[2]
-    .replace(/\\'/g, "'")
-    .replace(/\\"/g, '"')
-    .replace(/\\\\/g, '\\')
-    .replace(/\\n/g, '\n');
+  return m[2].replace(/\\(['"\\n])/g, (_match, escaped: string) => (
+    escaped === 'n' ? '\n' : escaped
+  ));
 }
 
 test('the PAGE_DESC discovery is not vacuously passing', () => {

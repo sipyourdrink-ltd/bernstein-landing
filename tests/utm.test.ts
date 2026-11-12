@@ -99,6 +99,8 @@ test('non-http schemes pass through unchanged', () => {
   for (const url of [
     'mailto:forte@bernstein.run',
     'tel:+15551234567',
+    'ftp://example.com/archive',
+    'custom:destination',
     'javascript:void(0)',
     '#anchor',
   ]) {

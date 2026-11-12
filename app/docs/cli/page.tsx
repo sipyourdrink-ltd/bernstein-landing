@@ -15,13 +15,12 @@
  */
 import type { Metadata } from 'next';
 import { permanentRedirect } from 'next/navigation';
-import { SITE_URL, AUTHOR, SITE_NAME } from '@/lib/seo';
+import { AUTHOR, SITE_NAME } from '@/lib/seo';
 
 export const dynamic = 'force-static';
 export const revalidate = false;
 
 const CANONICAL_DOCS = 'https://docs.bernstein.run/en/latest/';
-const PAGE_URL = `${SITE_URL}/docs/cli`;
 
 export const metadata: Metadata = {
   title: `${SITE_NAME} - CLI docs (moved)`,
