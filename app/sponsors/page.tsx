@@ -3,8 +3,8 @@
  *
  * Server component. Fetches the public sponsor list via GitHub GraphQL
  * when a GITHUB_TOKEN is present in env; otherwise falls back to a
- * hardcoded list (currently empty - that is the legitimate "no
- * sponsors yet" state, and the wall renders the placeholder copy).
+ * hardcoded list (currently empty - that is the legitimate "an empty
+ * list" state, and the wall renders the placeholder copy).
  *
  * JSON-LD on this page (per the research plan):
  *   - Person (Alex) - links into the existing Organization graph in
@@ -23,7 +23,7 @@ import { SITE_URL, AUTHOR } from '@/lib/seo';
 
 const PAGE_TITLE = 'sponsor Bernstein';
 const PAGE_DESC =
-  'The Apache 2.0 implementation of an HMAC-chained audit log for CLI coding agents.';
+  'An Apache 2.0 governance layer for AI agents.';
 const PAGE_URL = `${SITE_URL}/sponsors`;
 
 /* The page is server-rendered with sponsor data refreshed via
@@ -86,7 +86,6 @@ function buildJsonLd() {
 
 export default async function SponsorsPage() {
   const sponsors = await fetchPublicSponsors();
-  const realCount = sponsors.length;
   const jsonLd = buildJsonLd();
 
   return (
@@ -98,16 +97,8 @@ export default async function SponsorsPage() {
           <header className="sponsors-page__intro">
             <h1>sponsor bernstein</h1>
             <p>
-              bernstein is the apache 2.0 implementation of an
-              HMAC-chained audit log for parallel CLI coding agents. every
-              scheduling decision is plain python, every agent action is
-              tamper-evidently logged.
+              {'bernstein is an apache 2.0 governance layer for AI agents. every scheduling decision is plain python. the replay journal records every run; the HMAC-chained audit log is opt-in.'}
             </p>
-            {realCount > 0 ? (
-              <p>
-                {`${realCount} ${realCount === 1 ? 'sponsor' : 'sponsors'} so far. ordered by recognizability, then alphabetical. real avatars only.`}
-              </p>
-            ) : null}
             <p>
               <strong>stage honesty.</strong> one
               maintainer. no production reference customer. no SOC 2 / ISO
