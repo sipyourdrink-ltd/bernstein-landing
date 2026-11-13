@@ -153,7 +153,7 @@ export function Footer() {
             <a href="mailto:forte@bernstein.run">forte@bernstein.run</a>
           </p>
           <p>
-            Named for Leonard Bernstein, the original orchestrator. Apache 2.0.
+            Named for Leonard Bernstein. Apache 2.0.
           </p>
         </div>
       </div>
