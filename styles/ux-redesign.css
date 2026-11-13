@@ -324,7 +324,7 @@
   flex-direction: column;
   gap: 4px;
   background: var(--bg-deep);
-  color: var(--bg-paper);
+  color: var(--ink-on-deep);
   border-radius: var(--radius);
   text-decoration: none;
   font-family: var(--font-body);
@@ -810,7 +810,7 @@
 .v2-email-form input[aria-invalid="true"] { box-shadow: var(--ring-invalid); }
 .v2-email-form button {
   background: var(--bg-deep);
-  color: var(--bg-paper);
+  color: var(--ink-on-deep);
   border: 0;
   padding: 12px 22px;
   border-radius: var(--radius-sm);
@@ -920,3 +920,40 @@
   .v2-email { padding: 48px 28px; }
 }
 
+
+.spines-hero-intro {
+  display: grid;
+  gap: var(--syd-space-5);
+  align-items: start;
+}
+
+.spines-hero-panel {
+  width: 160px;
+  height: 160px;
+}
+
+.spines-hero-rule {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-block: var(--syd-space-4);
+}
+
+.v2-hero .spines-hero-intro h1,
+.v2-hero .spines-hero-intro h1 em {
+  font-style: normal;
+  color: var(--syd-ink);
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+@media (min-width: 1200px) {
+  .spines-hero-intro {
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+
+  .spines-hero-panel {
+    width: 240px;
+    height: 240px;
+  }
+}

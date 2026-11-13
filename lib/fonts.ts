@@ -1,26 +1,22 @@
-import { Inter, JetBrains_Mono, Fraunces } from 'next/font/google';
+import localFont from 'next/font/local';
 
-/* Display serif used for hero, section headlines, italic accents.
-   Variable font - restrained weight + style coverage to stay inside the
-   ≤120KB total font-payload budget set in the redesign spec. */
-export const fraunces = Fraunces({
-  subsets: ['latin'],
-  variable: '--font-fraunces',
-  display: 'swap',
-  weight: ['400', '500', '700'],
-  style: ['normal', 'italic'],
-});
-
-export const inter = Inter({
-  subsets: ['latin'],
+export const inter = localFont({
+  src: './fonts/spines/inter-latin-wght-normal.woff2',
+  weight: '100 900',
   variable: '--font-inter',
   display: 'swap',
-  weight: ['400', '500', '600'],
 });
 
-export const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
+export const jetbrainsMono = localFont({
+  src: './fonts/spines/jetbrains-mono-latin-400-normal.woff2',
+  weight: '400',
   variable: '--font-jetbrains',
   display: 'swap',
-  weight: ['400', '500'],
+});
+
+export const sourceSerif = localFont({
+  src: './fonts/spines/source-serif-4-latin-standard-normal.woff2',
+  weight: '200 900',
+  variable: '--font-source-serif',
+  display: 'swap',
 });

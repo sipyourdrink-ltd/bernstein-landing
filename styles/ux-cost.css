@@ -189,7 +189,7 @@
 /* OUTPUT BLOCK */
 .cost-calc-output {
   background: var(--bg-deep);
-  color: var(--bg-paper);
+  color: var(--ink-on-deep);
   border-radius: var(--radius);
   padding: 20px 24px;
   display: flex;

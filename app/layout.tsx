@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { OrganizationJsonLd } from "@/components/seo/OrganizationJsonLd";
-import { fraunces, inter, jetbrainsMono } from "@/lib/fonts";
+import { inter, jetbrainsMono, sourceSerif } from "@/lib/fonts";
 import { OPERATOR_EXCLUDE_INLINE_SCRIPT, UMAMI_BEFORE_SEND } from "@/lib/analytics/disable";
 import { OutboundClicks } from "@/components/site/OutboundClicks";
+import "@/styles/syd-tokens.css";
 import "@/styles/globals.css";
 import "@/styles/ux-typography.css";
 import "@/styles/ux-layout.css";
@@ -37,7 +38,10 @@ const SITE_DESCRIPTION =
 export const viewport: Viewport = {
   /* Cream paper background - matches --bg-paper. Hex fallback for browsers
      that ignore OKLCH in <meta theme-color>. */
-  themeColor: "#f4ecdc",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FFFFFF" },
+    { media: "(prefers-color-scheme: dark)", color: "#0D1117" },
+  ],
 };
 
 export const metadata: Metadata = {
@@ -58,9 +62,9 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: [
       {
-        url: "/api/og",
-        width: 1200,
-        height: 630,
+        url: "/brand/spines/social-light.png",
+        width: 1280,
+        height: 640,
         alt: "Bernstein - the open-source governance layer for AI agents: Claude Code, Codex, Gemini CLI, and 40+ more, with runs a reviewer can verify offline",
       },
     ],
@@ -71,34 +75,20 @@ export const metadata: Metadata = {
     creator: "@alex_chernysh",
     title: "Bernstein - the open-source governance layer for AI agents",
     description: SITE_DESCRIPTION,
-    images: ["/api/og"],
+    images: ["/brand/spines/social-light.png"],
   },
   icons: {
     icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/spines/favicon.svg", type: "image/svg+xml" },
+      { url: "/brand/spines/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/brand/spines/favicon-32.png", sizes: "32x32", type: "image/png" },
     ],
-    shortcut: "/favicon.ico",
+    shortcut: "/brand/spines/favicon.ico",
     apple: {
-      url: "/apple-touch-icon.png",
+      url: "/brand/spines/favicon-180.png",
       sizes: "180x180",
       type: "image/png",
     },
-    other: [
-      {
-        rel: "icon",
-        url: "/android-chrome-192x192.png",
-        sizes: "192x192",
-        type: "image/png",
-      },
-      {
-        rel: "icon",
-        url: "/android-chrome-512x512.png",
-        sizes: "512x512",
-        type: "image/png",
-      },
-    ],
   },
   manifest: "/manifest.json",
   alternates: {
@@ -136,7 +126,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      data-product="bernstein"
+      className={`${sourceSerif.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <body>
         {/* No explicit <head> element.

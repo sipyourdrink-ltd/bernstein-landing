@@ -86,6 +86,12 @@ function formatStarsBadge(n: number): string {
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
+  if (!searchParams.has('title')) {
+    return new Response(null, {
+      status: 307,
+      headers: { Location: '/brand/spines/social-light.png' },
+    });
+  }
   const raw = searchParams.get('title') ?? '';
   const title = renderableOgText(raw.slice(0, 200)) || 'Bernstein';
   const isDefault = !searchParams.get('title');
