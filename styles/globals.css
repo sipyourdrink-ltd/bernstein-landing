@@ -15,32 +15,33 @@
 
 :root {
   /* Surfaces */
-  --bg-paper:    oklch(96% 0.015 75);
-  --bg-paper-2:  oklch(94% 0.02 75);
+  --bg-paper: var(--syd-page);
+  --bg-paper-2: var(--syd-surface);
   --bg-deep:     oklch(20% 0.005 60);
+  --ink-on-deep: var(--syd-on-accent);
 
   /* Ink (text) */
-  --ink:         oklch(20% 0.005 60);
-  --ink-soft:    oklch(45% 0.005 60);
+  --ink: var(--syd-ink);
+  --ink-soft: var(--syd-muted);
   /* Was 60% L (~3.3-3.5:1 on --bg-paper/--bg-paper-2, below the 4.5:1
      WCAG AA text minimum - axe/Lighthouse audit 2026-09-23). 50% L
      clears 4.5:1 against both paper tokens with margin. */
-  --ink-faint:   oklch(50% 0.005 60);
+  --ink-faint: var(--syd-muted);
 
   /* Accent — single muted terracotta-bronze */
   /* Was 55% L: 4.51:1 on --bg-paper (barely) but 4.25:1 on --bg-paper-2
      (fails) - same audit as --ink-faint above. 50% L clears 4.5:1 on
      both. */
-  --accent:      oklch(50% 0.10 35);
-  --accent-soft: oklch(70% 0.06 35);
+  --accent: var(--syd-accent-text);
+  --accent-soft: var(--syd-accent-tone);
 
   /* Rules / staff lines */
-  --rule:        oklch(85% 0.01 75);
-  --rule-strong: oklch(70% 0.01 75);
+  --rule: var(--syd-rule);
+  --rule-strong: var(--syd-edge);
 
   /* Code surface — slightly darker than the paper card so monospace blocks
      read as a distinct, "etched" element. Still warm. */
-  --code-paper:  oklch(91% 0.018 75);
+  --code-paper: var(--syd-surface);
 
   /* Status colours — used very sparingly. Same hue family as accent. */
   --ok:          oklch(45% 0.08 145);
@@ -74,20 +75,20 @@
   --text-secondary: var(--ink-soft);
   --text-muted:     var(--ink-faint);
   --accent-hover:   var(--accent);
-  --accent-subtle:  oklch(90% 0.04 35);
+  --accent-subtle: var(--syd-surface);
   --green:          var(--ok);
   --red:            oklch(50% 0.12 25);
   --code-bg:        var(--code-paper);
 
   /* Typography stacks */
-  --font-display: var(--font-fraunces), 'Iowan Old Style', 'Charter', Georgia, serif;
+  --font-display: var(--font-source-serif), var(--syd-font-serif);
   --font-body:    var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   --font-mono:    var(--font-jetbrains), 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
 
   /* Type scale — every font-size in the site stylesheets is one of these.
      UI and body steps are fixed; the three heading steps are fluid, so
      components need no breakpoint overrides for size. */
-  --text-xs:   0.6875rem; /* 11px: mono labels, eyebrows, terminal text */
+  --text-xs:   var(--syd-size-caption); /* 11px: mono labels, eyebrows, terminal text */
   --text-sm:   0.875rem;  /* 14px: UI text - nav, buttons, inputs, secondary copy */
   --text-base: 1rem;      /* 16px: body copy and ledes */
   --text-lg:   1.25rem;   /* 20px: logo, card titles, small headings */
@@ -123,9 +124,9 @@
   --ring-invalid: inset 0 0 0 1px var(--warn);
 
   /* Corner radii. Round dots use 50% directly. */
-  --radius-sm: 4px;   /* small controls: copy buttons, inline code, focus rings, pills */
-  --radius:    8px;   /* cards, inputs, buttons */
-  --radius-lg: 12px;  /* panels, the terminal, the hero status stamp */
+  --radius-sm: var(--syd-radius-badge);
+  --radius: var(--syd-radius-control);
+  --radius-lg: var(--syd-radius-control);
 
   /* Motion — every transition and animation duration uses one of these.
      Pair with ease-out for enter and hover. Nothing loops at idle; the
@@ -204,14 +205,14 @@ input:focus-visible,
   z-index: 200;
   padding: 8px 16px;
   background: var(--bg-deep);
-  color: var(--bg-paper);
+  color: var(--ink-on-deep);
   font-size: var(--text-sm);
   font-weight: 600;
   border-radius: var(--radius);
   transform: translateY(-120%);
   transition: transform var(--dur-3) ease-out;
 }
-.skip-to-content:focus { transform: translateY(0); color: var(--bg-paper); }
+.skip-to-content:focus { transform: translateY(0); color: var(--ink-on-deep); }
 
 .sr-only {
   position: absolute;

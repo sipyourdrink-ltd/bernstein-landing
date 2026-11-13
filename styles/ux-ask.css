@@ -116,8 +116,9 @@
   transition: background 0.15s ease-out, border-color 0.15s ease-out, transform 0.05s ease-out;
 }
 .ask-form-submit:hover {
-  background: oklch(48% 0.10 35);
-  border-color: oklch(48% 0.10 35);
+  background: var(--syd-accent-tone);
+  border-color: var(--syd-accent-tone);
+  color: var(--syd-on-accent);
 }
 .ask-form-submit:active {
   transform: translateY(1px);
@@ -326,7 +327,7 @@
   font-style: normal;
 }
 .ask-state a:hover {
-  color: oklch(48% 0.10 35);
+  color: var(--syd-ink);
 }
 
 /* ---- RESULT CARDS ---- */
@@ -483,8 +484,9 @@
   transition: background 0.15s ease-out, border-color 0.15s ease-out;
 }
 .ask-summary-trigger:hover {
-  background: oklch(48% 0.10 35);
-  border-color: oklch(48% 0.10 35);
+  background: var(--syd-accent-tone);
+  border-color: var(--syd-accent-tone);
+  color: var(--syd-on-accent);
 }
 .ask-summary-trigger:focus-visible {
   outline: 2px solid var(--accent);

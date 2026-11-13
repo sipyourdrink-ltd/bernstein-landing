@@ -22,6 +22,7 @@
  */
 
 import { ReactNode } from 'react';
+import Image from 'next/image';
 import { RightRail } from './RightRail';
 /* Both figures are baked at build time by the prebuild step - the
    adapter count from the bernstein registry, the version from the
@@ -141,44 +142,57 @@ export async function HeroV2({
     <section className="v2-hero" aria-labelledby="hero-heading">
       {/* LEFT COLUMN - preamble + H1 + sub + ask-first slot */}
       <div className="v2-hero-lede">
-        <div className="v2-hero-pre" role="note" aria-label="release status">
-          <span className="v2-stamp">
-            <span className="pulse" aria-hidden="true" />
-            {versionTag} shipping
-          </span>
-          {/* Keep the public adapter claim approximate, matching the rail. */}
-          <span className="v2-meta">
-            50+ cli adapters · apache 2.0 · on-prem
-          </span>
+        <div className="spines-hero-intro">
+          <Image
+            className="spines-hero-panel"
+            src="/brand/spines/hero-panel.svg"
+            alt="Bernstein: four lines converging to one"
+            width={240}
+            height={240}
+            preload
+          />
+          <div>
+            <div className="v2-hero-pre" role="note" aria-label="release status">
+              <span className="v2-stamp">
+                <span className="pulse" aria-hidden="true" />
+                {versionTag} shipping
+              </span>
+              {/* Keep the public adapter claim approximate, matching the rail. */}
+              <span className="v2-meta">
+                50+ cli adapters · apache 2.0 · on-prem
+              </span>
+            </div>
+
+            {/* H1 lockup. Each visual line is its own <span className="v2-h1-line">
+                so word boundaries survive naive tag-strip tokenizers (older
+                crawlers, embedding pipelines, AI scrapers) that don't insert
+                whitespace where a tag boundary sat. Italic accent words are
+                wrapped as whole-word <em>...</em> with explicit surrounding
+                whitespace inside the parent text node, never around fragments
+                of a word. CSS turns each .v2-h1-line into a block to replace
+                the old <br/>. The leading/trailing space between lines below
+                keeps the rendered text node a tokenizer-safe single string. */}
+            <h1 id="hero-heading">
+              <span className="v2-h1-line">
+                <em>several</em> ai agents.
+              </span>
+              {' '}
+              <span className="v2-h1-line">
+                one governance layer. <em>every run</em> provable.
+              </span>
+            </h1>
+
+            <Image className="spines-hero-rule" src="/brand/spines/rule.svg" alt="" width={640} height={24} />
+            <p className="v2-sub">
+              bernstein is the open-source governance layer for ai agents:
+              a deterministic python scheduler runs them in parallel, with
+              no model in the coordination loop, so a plan replays to the
+              same task graph. it runs on policy as code: you write the
+              policy, bernstein enforces it, and produces the verifiable
+              record.
+            </p>
+          </div>
         </div>
-
-        {/* H1 lockup. Each visual line is its own <span className="v2-h1-line">
-            so word boundaries survive naive tag-strip tokenizers (older
-            crawlers, embedding pipelines, AI scrapers) that don't insert
-            whitespace where a tag boundary sat. Italic accent words are
-            wrapped as whole-word <em>...</em> with explicit surrounding
-            whitespace inside the parent text node, never around fragments
-            of a word. CSS turns each .v2-h1-line into a block to replace
-            the old <br/>. The leading/trailing space between lines below
-            keeps the rendered text node a tokenizer-safe single string. */}
-        <h1 id="hero-heading">
-          <span className="v2-h1-line">
-            <em>several</em> ai agents.
-          </span>
-          {' '}
-          <span className="v2-h1-line">
-            one governance layer. <em>every run</em> provable.
-          </span>
-        </h1>
-
-        <p className="v2-sub">
-          bernstein is the open-source governance layer for ai agents:
-          a deterministic python scheduler runs them in parallel, with
-          no model in the coordination loop, so a plan replays to the
-          same task graph. it runs on policy as code: you write the
-          policy, bernstein enforces it, and produces the verifiable
-          record.
-        </p>
 
         {/* Each item carries its own leading separator; the row is pulled
             left by one separator width and the kicker clips it, so the

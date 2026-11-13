@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { withUtm } from '@/lib/utm';
-import { MARK_AMBER, MARK_PATH, MARK_VIEWBOX } from '@/lib/brand';
+import Image from 'next/image';
 import { formatStars } from '@/lib/format-stars';
 
 /* Primary nav is one entry point per job: Install, Verify, Docs, Ask, plus
@@ -98,9 +98,7 @@ export function Nav() {
         </nav>
         <div className="nav-inner">
           <a href="/" className="nav-logo" aria-label="bernstein.run home">
-            <svg className="nav-mark" viewBox={MARK_VIEWBOX} aria-hidden="true" focusable="false">
-              <path fill={MARK_AMBER} fillRule="evenodd" d={MARK_PATH} />
-            </svg>
+            <Image className="nav-mark" src="/brand/spines/favicon.svg" alt="" width={32} height={32} />
             bernstein<span className="run">.run</span>
           </a>
           <nav className="nav-links" aria-label="Primary">

@@ -201,8 +201,9 @@
   transition: background 0.15s ease-out, border-color 0.15s ease-out, transform 0.05s ease-out;
 }
 .docs-bot-submit:hover:not(:disabled) {
-  background: oklch(48% 0.10 35);
-  border-color: oklch(48% 0.10 35);
+  background: var(--syd-accent-tone);
+  border-color: var(--syd-accent-tone);
+  color: var(--syd-on-accent);
 }
 .docs-bot-submit:active:not(:disabled) {
   transform: translateY(1px);
@@ -419,14 +420,14 @@
   text-underline-offset: 2px;
 }
 .docs-bot-answer a:hover {
-  color: oklch(48% 0.10 35);
+  color: var(--syd-ink);
 }
 .docs-bot-answer code {
   font-family: var(--font-mono);
   font-size: 0.92em;
   padding: 1px 5px;
   border-radius: var(--radius-sm);
-  background: oklch(94% 0.01 75);
+  background: var(--syd-surface);
   color: var(--ink);
 }
 .docs-bot-answer pre {
@@ -755,7 +756,7 @@
   transition: background 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out;
 }
 .docs-bot-followup-pill:hover {
-  background: oklch(91% 0.018 75);
+  background: var(--syd-surface);
   border-color: var(--accent-soft);
   color: var(--accent);
 }
@@ -848,7 +849,7 @@
   padding: var(--space-4) var(--space-5) var(--space-4);
   border: 1px dashed oklch(70% 0.06 35 / 0.55);
   border-radius: var(--radius-lg, 12px);
-  background: var(--bg-paper-3, oklch(96% 0.008 75));
+  background: var(--syd-surface);
   font-family: var(--font-body);
   font-size: var(--text-sm);
   line-height: 1.6;
@@ -882,7 +883,7 @@
   text-underline-offset: 2px;
 }
 .docs-bot-sponsor-note-body a:hover {
-  color: oklch(48% 0.10 35);
+  color: var(--syd-ink);
 }
 .docs-bot-sponsor-note-sig {
   margin: var(--space-3) 0 0;
@@ -947,7 +948,7 @@
 }
 .docs-bot-cta-strip-item:hover,
 .docs-bot-cta-strip-item:focus-visible {
-  color: oklch(48% 0.10 35);
+  color: var(--syd-ink);
   text-decoration-thickness: 2px;
 }
 .docs-bot-cta-strip-item code {
