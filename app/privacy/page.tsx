@@ -9,7 +9,7 @@ const LAST_UPDATED = '2026-11-17';
 export const metadata: Metadata = {
   title: 'Privacy',
   description:
-    'What bernstein.run records, what it keeps in your browser, and how to turn analytics off. Plain English.',
+    'What bernstein.run records, what it keeps in your browser, and how to turn browser analytics off. Plain English.',
   alternates: { canonical: `${SITE_URL}/privacy` },
   robots: { index: true, follow: true },
 };
@@ -48,8 +48,8 @@ export default function PrivacyPage() {
 
             <h2>Storage in your browser</h2>
             <p>
-              The site keeps these entries in your browser&rsquo;s local
-              storage. They stay on your device; the site does not send them
+              The site&rsquo;s own code keeps these entries in your
+              browser&rsquo;s local storage. They stay on your device; the site does not send them
               anywhere.
             </p>
             <ul>
@@ -64,7 +64,7 @@ export default function PrivacyPage() {
                 below.
               </li>
             </ul>
-            <p>The site uses no session storage.</p>
+            <p>The site&rsquo;s own code uses no session storage.</p>
 
             <h2>Analytics</h2>
             <p>
@@ -74,10 +74,10 @@ export default function PrivacyPage() {
                 analytics.bernstein.run
               </a>
               {' '}when an analytics website ID is configured. It is set up
-              for page views and one custom browser event:
+              for page views and one custom browser event:{' '}
               <code>outbound-click</code>, for clicks on links to other sites.
               The event&rsquo;s only custom property is <code>destination</code>,
-              the host name of the site the link points to (for example
+              the host name of the site the link points to (for example{' '}
               <code>github.com</code>), without the link&rsquo;s path or query.
             </p>
             <p>
@@ -97,7 +97,7 @@ export default function PrivacyPage() {
             <p>
               The docs assistant&rsquo;s server proxy also has a separate
               analytics path, enabled when an analytics website ID is
-              configured. After a completed answer it sends a
+              configured. After a completed answer it sends a{' '}
               <code>chat.message</code> event with the model, timing, question
               and answer lengths, token counts, language, message position,
               cache status, similarity score and whether the answer was
