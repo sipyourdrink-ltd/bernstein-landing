@@ -32,3 +32,6 @@ jobs:
           # The site is MIT; a copyleft transitive dependency would make
           # the published bundle undistributable under that licence.
           deny-licenses: AGPL-3.0, AGPL-3.0-only, AGPL-3.0-or-later, GPL-3.0, GPL-3.0-only
+          # elkjs (used by mermaid) is offered under EPL-2.0 OR GPL-3.0-or-later.
+          # We use it under EPL-2.0, as we did with 0.9.3.
+          allow-dependencies-licenses: pkg:npm/elkjs
