@@ -122,12 +122,3 @@ jobs:
           if [ -f "$RUNNER_TEMP/llms-server.pid" ]; then
             kill "$(cat "$RUNNER_TEMP/llms-server.pid")"
           fi
-
-      - name: Blog freeze
-        if: github.event_name == 'pull_request'
-        env:
-          BASE_REF: ${{ github.base_ref }}
-        # Remove this step in the same commit that lifts the freeze.
-        run: |
-          git fetch --depth=1 origin "$BASE_REF"
-          git diff --exit-code FETCH_HEAD -- content/blog
