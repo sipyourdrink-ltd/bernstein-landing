@@ -1,6 +1,26 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Preserve the unlayered cascade used by the site's existing stylesheets.
+   The Tailwind config still defines the app, component, and library sources. */
+@import "tailwindcss/theme.css";
+@import "tailwindcss/preflight.css";
+@import "tailwindcss/utilities.css" source(none);
+@config "../tailwind.config.ts";
+
+/* Retain the v3 defaults for borders, placeholders, and the upload button. */
+*, ::before, ::after, ::backdrop {
+  border-color: #e5e7eb;
+}
+
+input::placeholder,
+textarea::placeholder {
+  opacity: 1;
+  color: #9ca3af;
+}
+
+input[type="file"]::file-selector-button {
+  all: revert;
+  appearance: button;
+  font: inherit;
+}
 
 /* ============================================================================
    Editorial Capital — Bernstein landing redesign tokens (2026-05-05).
@@ -251,72 +271,83 @@ input:focus-visible,
  * Sibling utility names (`.display-*`, `.mono-*`, `.prose-body`) from the
  * foundation agent remain valid — these are ADDITIVE aliases.
  * ─────────────────────────────────────────────────────────────────── */
-@layer utilities {
-  /* === design-tokens — start === */
-  .type-display-1 {
-    @apply text-display-1 font-display;
-    font-feature-settings: 'kern' 1, 'liga' 1, 'clig' 1, 'dlig' 1, 'calt' 1, 'ss01' 1;
-    text-wrap: balance;
-  }
-  .type-display-2 {
-    @apply text-display-2 font-display;
-    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
-    text-wrap: balance;
-  }
-  .type-display-3 {
-    @apply text-display-3 font-display;
-    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
-    text-wrap: balance;
-  }
-  .type-title-1 {
-    @apply text-title-1 font-display;
-    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
-    text-wrap: balance;
-  }
-  .type-title-2 {
-    @apply text-title-2 font-display;
-    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
-    text-wrap: balance;
-  }
-  .type-body-lg {
-    @apply text-body-lg font-sans;
-    text-wrap: pretty;
-    hyphens: auto;
-    -webkit-hyphens: auto;
-  }
-  .type-body {
-    @apply text-body font-sans;
-    text-wrap: pretty;
-  }
-  .type-body-sm {
-    @apply text-body-sm font-sans;
-    text-wrap: pretty;
-  }
-  .type-ui {
-    @apply text-ui font-sans;
-    font-feature-settings: 'kern' 1, 'ss01' 1, 'cv11' 1;
-  }
-  .type-ui-lg {
-    @apply text-ui-lg font-sans;
-    font-feature-settings: 'kern' 1, 'ss01' 1, 'cv11' 1;
-  }
-  .type-mono-eyebrow {
-    @apply text-mono-eyebrow font-mono uppercase;
-    font-feature-settings: 'kern' 1, 'ss01' 1, 'zero' 1;
-    font-variant-numeric: tabular-nums;
-  }
-  .type-mono-stat {
-    @apply text-mono-stat font-mono;
-    font-feature-settings: 'kern' 1, 'tnum' 1, 'zero' 1;
-    font-variant-numeric: tabular-nums;
-  }
-  .type-mono-tag {
-    @apply text-mono-tag font-mono;
-    font-feature-settings: 'kern' 1, 'ss01' 1;
-  }
-  .type-mono-kbd {
-    @apply text-mono-kbd font-mono;
-    font-feature-settings: 'kern' 1, 'ss01' 1;
-  }
-  /* === design-tokens — end === */
+/* === design-tokens — start === */
+@utility type-display-1 {
+  @apply text-display-1 font-display;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'clig' 1, 'dlig' 1, 'calt' 1, 'ss01' 1;
+  text-wrap: balance;
 }
+
+@utility type-display-2 {
+  @apply text-display-2 font-display;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  text-wrap: balance;
+}
+
+@utility type-display-3 {
+  @apply text-display-3 font-display;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  text-wrap: balance;
+}
+
+@utility type-title-1 {
+  @apply text-title-1 font-display;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  text-wrap: balance;
+}
+
+@utility type-title-2 {
+  @apply text-title-2 font-display;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  text-wrap: balance;
+}
+
+@utility type-body-lg {
+  @apply text-body-lg font-sans;
+  text-wrap: pretty;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+@utility type-body {
+  @apply text-body font-sans;
+  text-wrap: pretty;
+}
+
+@utility type-body-sm {
+  @apply text-body-sm font-sans;
+  text-wrap: pretty;
+}
+
+@utility type-ui {
+  @apply text-ui font-sans;
+  font-feature-settings: 'kern' 1, 'ss01' 1, 'cv11' 1;
+}
+
+@utility type-ui-lg {
+  @apply text-ui-lg font-sans;
+  font-feature-settings: 'kern' 1, 'ss01' 1, 'cv11' 1;
+}
+
+@utility type-mono-eyebrow {
+  @apply text-mono-eyebrow font-mono uppercase;
+  font-feature-settings: 'kern' 1, 'ss01' 1, 'zero' 1;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility type-mono-stat {
+  @apply text-mono-stat font-mono;
+  font-feature-settings: 'kern' 1, 'tnum' 1, 'zero' 1;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility type-mono-tag {
+  @apply text-mono-tag font-mono;
+  font-feature-settings: 'kern' 1, 'ss01' 1;
+}
+
+@utility type-mono-kbd {
+  @apply text-mono-kbd font-mono;
+  font-feature-settings: 'kern' 1, 'ss01' 1;
+}
+/* === design-tokens — end === */
