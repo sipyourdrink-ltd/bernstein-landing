@@ -2,7 +2,7 @@
  * Extract adapter metadata from the bernstein repo into a single SoT JSON.
  *
  * Source of truth is the bernstein adapters directory (sibling clone) +
- * the registry's `_ADAPTERS` dict. Output: `data/adapters.json`,
+ * the registry's `_ADAPTERS` dict and factory profiles. Output: `data/adapters.json`,
  * consumed by `app/vs/[slug]/page.tsx` at build time via
  * `generateStaticParams`.
  *
@@ -12,9 +12,8 @@
  *     the per-page narrative (install command, model recommendation,
  *     "last verified" date) and the JSON-LD schema. Scanning the
  *     local clone is the simplest deterministic input.
- *   - the operator owns the bernstein repo on the same machine; this
- *     script never reaches the network. CI runs `git clone` of the
- *     bernstein master branch into a sibling dir.
+ *   - this script never reaches the network. A checkout without the
+ *     sibling repository retains the committed catalogue.
  *
  * The output JSON honours the `ready: true|false` flag per adapter so
  * the operator can ramp pages weekly per the brief — only `ready`
@@ -77,6 +76,7 @@ async function parseRegistry() {
   while ((m = re.exec(block)) !== null) {
     out.push({ name: m[1], cls: m[2] });
   }
+  // The upstream registry merges factory declarations after its literal.
   const profiles = await fs.readFile(PROFILES_PATH, 'utf8').catch((error) => {
     if (error.code === 'ENOENT') return '';
     throw error;
