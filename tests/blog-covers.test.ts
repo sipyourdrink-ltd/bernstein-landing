@@ -10,8 +10,16 @@ import matter from 'gray-matter';
 import ts from 'typescript';
 
 const require = createRequire(import.meta.url);
-const fixtures: Array<{ slug: string; cover: string; sha256: string }> =
+const fixtures: Array<{ slug: string; cover: string; sha256: string; coverAlt: string }> =
   JSON.parse(readFileSync('tests/fixtures/blog-covers.json', 'utf8'));
+
+const correctedAlts: Record<string, string> = {
+  'v3-x-recap': 'Document cards linked by angled lines beside a ringed target.',
+  'output-economy-and-agent-lifecycle': 'A central circle branching to smaller circles, with a document card at the lower right.',
+  'v2-0-release': 'A browser window and a dark terminal panel in front of circular outlines.',
+  'getting-started': 'A terminal with a check mark above a folded map and connected task bars.',
+  'cost-aware-routing': 'A document branching to task cards above a panel with stacked discs and sliders.',
+};
 
 function load(file: string, mocks: Record<string, unknown> = {}) {
   const exports: Record<string, any> = {};
@@ -22,6 +30,7 @@ function load(file: string, mocks: Record<string, unknown> = {}) {
     exports, module: { exports }, React, console, process,
     require: (name: string) => {
       if (name in mocks) return mocks[name];
+      if (name === '@/lib/blog-covers') return load('lib/blog-covers.ts');
       if (name === 'next/image') {
         return function TestImage({ unoptimized: _unoptimized, preload: _preload, ...props }: any) {
           return React.createElement('img', props);
@@ -68,12 +77,30 @@ test('each selected post references its unchanged cover with dimensions and alt 
   }
 });
 
-test('blog cards show the selected cover and retain cards without covers', () => {
+test('14 approved cover descriptions stay byte-identical', () => {
+  const unchanged = fixtures.filter((fixture) => !(fixture.slug in correctedAlts));
+  assert.equal(unchanged.length, 14);
+  for (const fixture of unchanged) {
+    const data = matter(readFileSync(`content/blog/${fixture.slug}/index.mdx`, 'utf8')).data;
+    assert.deepEqual(Buffer.from(data.coverAlt), Buffer.from(fixture.coverAlt), fixture.slug);
+  }
+});
+
+test('five corrected cover descriptions match the review exactly', () => {
+  assert.equal(Object.keys(correctedAlts).length, 5);
+  for (const [slug, expected] of Object.entries(correctedAlts)) {
+    const data = matter(readFileSync(`content/blog/${slug}/index.mdx`, 'utf8')).data;
+    assert.equal(data.coverAlt, expected, slug);
+  }
+});
+
+test('blog cards render explicitly decorative covers and retain cards without covers', () => {
   const { BlogCard } = load('components/blog/BlogCard.tsx');
   const post = { slug: 'example', fm, readingMinutes: 1 };
   const html = renderToStaticMarkup(BlogCard({ post }));
   assert.ok(html.includes(`src="${fm.cover}"`));
-  assert.ok(html.includes(`alt="${fm.coverAlt}"`));
+  assert.match(html, /<img\b[^>]*\balt=""/);
+  assert.ok(html.includes(fm.title));
   assert.ok(html.includes('width="1200" height="630"'));
   const noCover = renderToStaticMarkup(BlogCard({ post: { ...post, fm: { ...fm, cover: undefined, coverAlt: undefined } } }));
   assert.ok(!noCover.includes('<img'));
@@ -93,15 +120,30 @@ test('articles use the cover for the visible image and both social cards, with a
   const metadata = await generateMetadata(props);
   for (const kind of ['openGraph', 'twitter']) {
     assert.equal(metadata[kind].images[0].url, fm.cover);
-    assert.equal(metadata[kind].images[0].alt, fm.coverAlt);
+    assert.equal(metadata[kind].images[0].alt, `Title: "${fm.title}". ${fm.coverAlt}`);
   }
   const html = renderToStaticMarkup(await BlogPost(props));
   assert.ok(html.includes(`src="${fm.cover}"`));
-  assert.ok(html.includes(`alt="${fm.coverAlt}"`));
+  assert.match(html, /<img\b[^>]*\balt=""/);
+  assert.ok(html.includes(fm.title));
   currentFm = { ...fm, cover: undefined, coverAlt: undefined };
   const fallback = await generateMetadata(props);
   for (const kind of ['openGraph', 'twitter']) {
     assert.equal(fallback[kind].images[0].url, `/api/og?title=${encodeURIComponent(fm.title)}`);
   }
   assert.ok(!renderToStaticMarkup(await BlogPost(props)).includes('<img'));
+});
+
+test('social cover alt includes the full frontmatter title and reviewed description for two posts', async () => {
+  for (const slug of ['v3-14-159-pi', 'v3-x-recap']) {
+    const data = matter(readFileSync(`content/blog/${slug}/index.mdx`, 'utf8')).data;
+    const { generateMetadata } = load('app/blog/[slug]/page.tsx', {
+      '@/lib/mdx': { getPost: async () => ({ fm: { ...data, seo_title: 'Short search title' } }) },
+      '@/lib/seo': { SITE_URL: 'https://bernstein.run', AUTHOR: 'Example author' },
+    });
+    const metadata = await generateMetadata({ params: Promise.resolve({ slug }) });
+    const expected = `Title: "${data.title}". ${data.coverAlt}`;
+    assert.equal(metadata.openGraph.images[0].alt, expected, slug);
+    assert.equal(metadata.twitter.images[0].alt, expected, slug);
+  }
 });

@@ -23,7 +23,7 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
         <Image
           className="blog-card-cover"
           src={post.fm.cover}
-          alt={post.fm.coverAlt}
+          alt=""
           width={1200}
           height={630}
           unoptimized

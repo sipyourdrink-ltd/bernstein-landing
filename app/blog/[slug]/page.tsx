@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getAllPosts, getPost, getSlugs, type PostIndex } from '@/lib/mdx';
 import { SITE_URL, AUTHOR } from '@/lib/seo';
+import { blogCoverSocialAlt } from '@/lib/blog-covers';
 import { BlogPostingJsonLd } from '@/components/seo/BlogPostingJsonLd';
 import { BlogHowToJsonLd } from '@/components/seo/BlogHowToJsonLd';
 import { BlogTechArticleJsonLd } from '@/components/seo/BlogTechArticleJsonLd';
@@ -98,7 +99,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     url: post.fm.cover ?? `/api/og?title=${encodeURIComponent(post.fm.title)}`,
     width: 1200,
     height: 630,
-    ...(post.fm.coverAlt ? { alt: post.fm.coverAlt } : {}),
+    ...(post.fm.coverAlt ? { alt: blogCoverSocialAlt(post.fm.title, post.fm.coverAlt) } : {}),
   };
   return {
     title: metaTitle,
@@ -245,7 +246,7 @@ export default async function BlogPost({ params }: Props) {
               <Image
                 className="blog-post-cover"
                 src={post.fm.cover}
-                alt={post.fm.coverAlt}
+                alt=""
                 width={1200}
                 height={630}
                 unoptimized
