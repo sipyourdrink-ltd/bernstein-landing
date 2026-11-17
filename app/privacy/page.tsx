@@ -4,12 +4,12 @@ import { Footer } from '@/components/landing/Footer';
 import { StaticPageBreadcrumb } from '@/components/seo/BreadcrumbListJsonLd';
 
 const SITE_URL = 'https://bernstein.run';
-const LAST_UPDATED = '2026-09-24';
+const LAST_UPDATED = '2026-11-17';
 
 export const metadata: Metadata = {
   title: 'Privacy',
   description:
-    'What bernstein.run collects, how long it is kept, and how to ask for deletion. Plain English. No third-party trackers.',
+    'What bernstein.run records, what it keeps in your browser, and how to turn browser analytics off. Plain English.',
   alternates: { canonical: `${SITE_URL}/privacy` },
   robots: { index: true, follow: true },
 };
@@ -31,76 +31,200 @@ export default function PrivacyPage() {
             <h2>Who runs this site</h2>
             <p>
               bernstein.run is the project site for Bernstein, the
-              open-source governance layer for AI agents. It is operated as a personal
-              project by Alex Chernysh (Tel Aviv, Israel). Contact for any
-              privacy matter:{' '}
+              open-source governance layer for AI agents. It is run by Alex
+              Chernysh, an individual, in Haifa, Israel. Sip Your Drink is the
+              studio name of Alex Chernysh. It is not a registered company.
+              Contact for any privacy matter:{' '}
               <a href="mailto:forte@bernstein.run">forte@bernstein.run</a>.
             </p>
 
-            <h2>What we collect</h2>
-            <ul>
-              <li>
-                <strong>Pageview events.</strong> We use a self-hosted Umami
-                instance at{' '}
-                <a href="https://analytics.bernstein.run" rel="noopener">
-                  analytics.bernstein.run
-                </a>{' '}
-                to count page visits and outbound link clicks. Umami is
-                cookieless and does not store IP addresses, device
-                fingerprints, or personal identifiers; the IP address is used
-                only at the moment of the visit to look up country and city.
-                A visit record holds the page, time, referring site, browser,
-                operating system, device type, language, country and city.
-                Records older than 24 months are deleted.
-              </li>
-              <li>
-                <strong>Email, if you opt in.</strong> If you submit your email
-                to subscribe to updates, it is stored in Resend (our delivery
-                provider) and used only to send the newsletter. You can
-                unsubscribe from any email; that removes you from the list.
-              </li>
-              <li>
-                <strong>Server logs.</strong> Our reverse proxy keeps short
-                access logs for at most 14 days, used to debug outages and
-                abuse: URL, status, response size, user agent, and the IP
-                address shortened to its network (the last 8 bits of an IPv4
-                address and the last 80 bits of an IPv6 address are removed).
-                The referring page is not logged. We do not join these logs
-                to any other identifier.
-              </li>
-            </ul>
-
-            <h2>What we do not collect</h2>
+            <h2>Cookies</h2>
             <p>
-              No advertising trackers, no Google Analytics, no Facebook pixel,
-              no session replay, no fingerprinting. Cookies are not used for
-              tracking. The site sets one cookie only if you choose to dismiss
-              the locale-hint banner; it stores a yes/no flag, no identifier.
+              The code of this site sets no cookies and reads none. The
+              analytics script is loaded from a separate service; this
+              statement covers the site&rsquo;s own code, not cookies that
+              external services may set.
             </p>
 
-            <h2>Your rights</h2>
+            <h2>Storage in your browser</h2>
             <p>
-              Under GDPR (Article 15-22) you can request access to, correction
-              of, deletion of, or a copy of any data we hold on you. Email{' '}
-              <a href="mailto:forte@bernstein.run">forte@bernstein.run</a> with
-              the request and we will action it within 30 days. If we hold no
-              data on you (the common case), we will tell you that.
+              The site&rsquo;s own code keeps these entries in your
+              browser&rsquo;s local storage. They stay on your device; the site does not send them
+              anywhere.
+            </p>
+            <ul>
+              <li>
+                <code data-storage-key>beta-notice:dismissed</code> is set to{' '}
+                <code>1</code> when you close the beta notice on the home
+                page, so the notice stays closed.
+              </li>
+              <li>
+                <code data-storage-key>umami:disabled</code> is only read by
+                the site, never written. Set it yourself to turn analytics off, as described
+                below.
+              </li>
+            </ul>
+            <p>The site&rsquo;s own code uses no session storage.</p>
+
+            <h2>Analytics</h2>
+            <p>
+              The site is configured to load Umami, an open-source analytics
+              tool, from{' '}
+              <a href="https://analytics.bernstein.run" rel="noopener">
+                analytics.bernstein.run
+              </a>
+              {' '}when an analytics website ID is configured. It is set up
+              for page views and one custom browser event:{' '}
+              <code>outbound-click</code>, for clicks on links to other sites.
+              The event&rsquo;s only custom property is <code>destination</code>,
+              the host name of the site the link points to (for example{' '}
+              <code>github.com</code>), without the link&rsquo;s path or query.
+            </p>
+            <p>
+              Before the browser tracker sends a request, the site&rsquo;s
+              hook removes the <code>q</code> and <code>ask</code> query
+              parameters from the page and referrer addresses. It drops a
+              page view when its cleaned address matches the previous one.
+              Other URL parameters are not removed by that hook.
+            </p>
+            <p>
+              Like any web request, a browser request to the analytics server
+              exposes your IP address and browser&rsquo;s user agent to that
+              server. Its storage, location lookup, session identification
+              and deletion schedule are not defined by this site&rsquo;s
+              published code; no retention period is confirmed here.
+            </p>
+            <p>
+              The docs assistant&rsquo;s server proxy also has a separate
+              analytics path, enabled when an analytics website ID is
+              configured. After a completed answer it sends a{' '}
+              <code>chat.message</code> event with the model, timing, question
+              and answer lengths, token counts, language, message position,
+              cache status, similarity score and whether the answer was
+              declined. It forwards the IP address, user agent and browser
+              language with that event, but no question or answer text.
+              The browser opt-out below does not control this server request.
+            </p>
+
+            <h2>Turning analytics off</h2>
+            <p>
+              Open your browser&rsquo;s developer console on this site and
+              run{' '}
+              <code>localStorage.setItem(&apos;umami:disabled&apos;, &apos;true&apos;)</code>
+              . The site&rsquo;s browser hook then drops tracker requests,
+              including page views and outbound clicks. This does not stop
+              the docs assistant&rsquo;s server analytics. To turn browser
+              analytics back on, run{' '}
+              <code>localStorage.removeItem(&apos;umami:disabled&apos;)</code>.
+              Blocking <code>analytics.bernstein.run</code> in your browser
+              blocks browser requests to that host; it does not block
+              requests made by the site&rsquo;s server.
+            </p>
+
+            <h2>The docs assistant</h2>
+            <p>
+              When you ask the docs assistant a question, your browser sends
+              the question to <code>/api/ask</code> on this site, together
+              with up to the last eight messages of the current conversation
+              (your earlier questions and the answers). The service that
+              answers is not part of this site&rsquo;s published source code.
+            </p>
+            <p>
+              The site&rsquo;s proxy forwards the question (trimmed to 500
+              characters), up to eight earlier messages (each capped at 2,000
+              characters), and the locale <code>en</code> to the answering
+              service. When completion logging is configured, it also sends
+              the question, response identifier, model, timing, locale and
+              whether the answer was declined to that service in a completion
+              record. The proxy&rsquo;s separate full-text conversation log
+              writer is disabled. The downstream model and embedding
+              providers, cache duration and record deletion periods are not
+              established by this proxy code.
+            </p>
+            <p>
+              Outside the dialog, a submitted question is written into the
+              page address as <code>?q=</code>; text still being typed is not.
+              Opening or reloading a link with that parameter automatically
+              sends its question to the assistant. The dialog can put its
+              initial question in <code>?ask=</code>. Those addresses can be
+              shared or sent to the site when loaded, even though the browser
+              analytics hook removes those parameters from its own requests.
+            </p>
+
+            <p>
+              The blog&rsquo;s summary buttons send the article slug and
+              summary mode to <code>/api/blog/summary</code>. They do not send
+              a free-text question.
+            </p>
+
+            <h2>The e-mail form</h2>
+            <p>
+              The newsletter form sends the e-mail address you enter to{' '}
+              <code>/api/notify</code> on this site. When configured, that
+              service adds the address to the newsletter list stored with
+              Resend and sends a confirmation e-mail through Resend. The
+              address is collected for the newsletter.
+              The unsubscribe link marks your contact as unsubscribed; it
+              does not delete the stored address. To request deletion, write
+              to{' '}
+              <a href="mailto:forte@bernstein.run">forte@bernstein.run</a>.
+            </p>
+
+            <h2>Server logs</h2>
+            <p>
+              A question included in a page address can reach servers when
+              that address is requested. The web server&rsquo;s access-log
+              fields and retention period are not specified by the site code.
+            </p>
+            <p>
+              If your browser blocks something on this site under its content
+              security policy, it may send a report to{' '}
+              <code>/api/csp-report</code>. The site writes the policy
+              directive, the blocked address, the page address, the policy
+              disposition, the source file and line, and a code sample from
+              accepted reports to its server log, limiting each field to
+              300 characters. Your IP address is used in memory to limit how
+              many reports are accepted; the handler does not add it as a
+              separate log field.
             </p>
 
             <h2>Third parties</h2>
+            <ul>
+              <li>
+                <strong>Cloudflare</strong> and <strong>Netcup</strong> are
+                named in the site&rsquo;s service information as its CDN and
+                hosting providers. This code does not establish their request
+                logging or cookie behaviour.
+              </li>
+              <li>
+                <strong>GitHub</strong>: when the site shows sponsor avatars,
+                your browser loads those images from GitHub.
+              </li>
+              <li>
+                <strong>Resend</strong> stores newsletter addresses and sends
+                the confirmation e-mail. The newsletter uses that list.
+              </li>
+              <li>
+                The docs assistant sends questions and conversation history
+                to its answering service as described above. This page does
+                not name downstream providers whose current configuration
+                cannot be verified from the site code.
+              </li>
+            </ul>
+
+            <h2>Your rights</h2>
             <p>
-              Four external services receive data when you use this site:
-              Cloudflare (the CDN and proxy in front of the site, so it
-              handles every request), GitHub (when you click GitHub links),
-              Resend (when you subscribe to email), and Netcup, the data
-              centre that hosts our servers. None of them get analytics
-              events; only the request they directly need to serve.
+              To request access to, correction of, deletion of, or a copy of
+              data held about you, email{' '}
+              <a href="mailto:forte@bernstein.run">forte@bernstein.run</a> with
+              the request. Tell us the date and what you asked or which page
+              you opened, so we can look for the relevant records.
             </p>
 
             <h2>Changes</h2>
             <p>
               If this policy changes, the &ldquo;Last updated&rdquo; date at
-              the top will move and a note will be posted on the blog.
+              the top will move.
             </p>
           </div>
         </article>
