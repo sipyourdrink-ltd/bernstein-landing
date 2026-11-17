@@ -129,7 +129,7 @@ export const BERNSTEIN_FACTS = {
   homepage: 'https://bernstein.run',
   repoUrl: 'https://github.com/sipyourdrink-ltd/bernstein',
   language: 'Python',
-  category: 'Multi-agent orchestrator',
+  category: 'open-source governance layer for AI agents',
   parallelSafe: true,
   mcpSupport: true,
   auditChain: true,
