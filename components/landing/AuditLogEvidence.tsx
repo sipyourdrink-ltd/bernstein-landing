@@ -46,7 +46,7 @@ export function AuditLogEvidence() {
           every step <em>signed</em>, in order, on disk.
         </h2>
         <p>
-          run with <span className="v2-mono-inline">--audit</span> and
+          run <span className="v2-mono-inline">bernstein run --audit --goal &quot;your task&quot;</span> and
           bernstein writes an hmac-chained event log under{' '}
           <span className="v2-mono-inline">.sdd/audit/</span>, one jsonl
           file per utc day. each entry references the previous hash.
