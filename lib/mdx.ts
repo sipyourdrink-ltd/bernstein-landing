@@ -55,6 +55,8 @@ export const Frontmatter = z.object({
    */
   featured: z.boolean().optional(),
   hero: z.string().optional(),
+  cover: z.string().regex(/^\/blog\/covers\/[a-z0-9-]+\.png$/).optional(),
+  coverAlt: z.string().trim().min(1).optional(),
   /**
    * JSON-LD tier for the post. Drives the secondary `<script>` block
    * emitted alongside the universal BlogPosting node. `HowTo` posts
@@ -84,6 +86,9 @@ export const Frontmatter = z.object({
    * separator-joined string per schema.org guidance.
    */
   techDependencies: z.array(z.string().min(1)).optional(),
+}).refine((fm) => Boolean(fm.cover) === Boolean(fm.coverAlt), {
+  message: 'cover and coverAlt must be provided together',
+  path: ['coverAlt'],
 });
 export type FrontmatterT = z.infer<typeof Frontmatter>;
 

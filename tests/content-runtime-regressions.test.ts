@@ -13,6 +13,7 @@ function loadModule(file: string, react: Record<string, unknown> = {}, extra = '
   vm.runInNewContext(code, {
     exports, module: { exports }, React: react, Error, Date, AbortController,
     require: (name: string) => {
+      if (name === 'next/image') return () => null;
       assert.equal(name, 'react');
       return react;
     },

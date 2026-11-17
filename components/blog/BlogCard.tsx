@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import type { PostIndex } from '@/lib/mdx';
 
 function formatDate(iso: string): string {
@@ -18,6 +19,17 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
       href={`/blog/${post.slug}`}
       className={featured ? 'blog-card blog-card--featured' : 'blog-card'}
     >
+      {post.fm.cover && post.fm.coverAlt && (
+        <Image
+          className="blog-card-cover"
+          src={post.fm.cover}
+          alt=""
+          width={1200}
+          height={630}
+          unoptimized
+          loading={featured ? 'eager' : 'lazy'}
+        />
+      )}
       {featured && (
         <div className="blog-card-eyebrow">Featured · read first</div>
       )}
