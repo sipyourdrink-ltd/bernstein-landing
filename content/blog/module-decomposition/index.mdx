@@ -87,7 +87,7 @@ Tests are the safety net. Each step ran the suite. We caught fourteen import err
 Before: one file, 4,198 lines, 47 imports, constant merge fights.
 After: 15 sub-packages on the first pass (22 by mid-April), ~280 lines on average, clean boundaries, multiple agents can edit different packages without colliding.
 
-Source: [github.com/sipyourdrink-ltd/bernstein/tree/main/src/bernstein/core](https://github.com/sipyourdrink-ltd/bernstein/tree/main/src/bernstein/core). Re-export shims live in `orchestrator.py`, `spawner.py`, `task_lifecycle.py`.
+Source: [github.com/sipyourdrink-ltd/bernstein/tree/main/src/bernstein/core](https://github.com/sipyourdrink-ltd/bernstein/tree/main/src/bernstein/core). The re-export shims (`orchestrator.py`, `spawner.py`, `task_lifecycle.py`) have since been removed; the code now lives in `core/orchestration/orchestrator.py`, `core/agents/spawner.py` and `core/tasks/task_lifecycle.py`.
 
 ## further
 

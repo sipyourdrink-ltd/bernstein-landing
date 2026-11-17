@@ -21,7 +21,7 @@
     {
       "slug": "how-does-bernstein-work",
       "q": "how does bernstein work",
-      "a": "the orchestrator runs a tick loop: read the open backlog under .sdd/backlog/open, pick the next ready task, spawn a fresh cli agent in its own git worktree, wait for the agent to exit, run quality gates against the worktree, retry with an escalated model on failure, dead-letter after max retries, merge passing worktrees. agents are short-lived (1-3 tasks each) so context never grows. a contextual-bandit router learns which model fits which task class. a lineage spine and replay journal record every step by default; the hmac-chained audit log is opt-in (bernstein run --audit) and adds a signed record on top. routing, scheduling, retries, and merge order are pure python; the model only writes code inside the worktree.",
+      "a": "the orchestrator runs a tick loop: read the open backlog under .sdd/backlog/open, pick the next ready task, spawn a fresh cli agent in its own git worktree, wait for the agent to exit, run quality gates against the worktree, retry with an escalated model on failure, dead-letter after max retries, merge passing worktrees. agents are short-lived (1-3 tasks each) so context never grows. with --routing bandit, a contextual-bandit router learns which model fits which task class. a lineage spine and replay journal record every step by default; the hmac-chained audit log is opt-in (bernstein run --audit) and adds a signed record on top. routing, scheduling, retries, and merge order are pure python; the model only writes code inside the worktree.",
       "tags": [
         "architecture",
         "tick-loop"
@@ -59,7 +59,7 @@
     {
       "slug": "how-to-run-multiple-claude-code-agents-in-parallel",
       "q": "how to run multiple claude code agents in parallel",
-      "a": "install bernstein (pipx install bernstein), cd into your repo, write a plan.yaml with one stage that lists several steps, then run bernstein run --from-plan plan.yaml. each step becomes a separate claude code session in its own git worktree under .sdd/worktrees/<session-id>. bernstein spawns them concurrently up to orchestration.max_agents in .sdd/config.yaml (default 5, or set BERNSTEIN_MAX_AGENTS), tracks per-agent cost, runs quality gates on each worktree, and merges only the worktrees that pass. for one-shot parallelism: bernstein run -g \"goal\" lets bernstein decompose the goal into parallel tasks itself. step-by-step at https://bernstein.run/cli-quickstart.",
+      "a": "install bernstein (pipx install bernstein), cd into your repo, write a plan.yaml with one stage that lists several steps, then run bernstein run --from-plan plan.yaml. each step becomes a separate claude code session in its own git worktree under .sdd/worktrees/<session-id>. bernstein spawns them concurrently up to max_agents in bernstein.yaml (default 6, or set BERNSTEIN_MAX_AGENTS), tracks per-agent cost, runs quality gates on each worktree, and merges only the worktrees that pass. for one-shot parallelism: bernstein -g \"goal\" lets bernstein decompose the goal into parallel tasks itself. step-by-step at https://bernstein.run/cli-quickstart.",
       "tags": [
         "claude-code",
         "parallel",
@@ -73,7 +73,7 @@
     {
       "slug": "how-to-install-bernstein",
       "q": "how to install bernstein",
-      "a": "pipx install bernstein is the recommended path: pipx isolates dependencies so bernstein never collides with the rest of your tooling. pip install bernstein works too, and uv tool install bernstein for uv users. requires python 3.12 or later. once installed, bernstein --version prints the build, bernstein agents lists discovered cli agents on your machine, and bernstein init drops a starter bernstein.yaml plus .sdd/ into the current repo. apache 2.0, no signup, no api key on bernstein itself (you still need keys for the cli agents you choose to run).",
+      "a": "pipx install bernstein is the recommended path: pipx isolates dependencies so bernstein never collides with the rest of your tooling. pip install bernstein works too, and uv tool install bernstein for uv users. requires python 3.12 or later. once installed, bernstein --version prints the build, bernstein agents list lists available cli agents, and bernstein init drops a starter bernstein.yaml plus .sdd/ into the current repo. apache 2.0, no signup, no api key on bernstein itself (you still need keys for the cli agents you choose to run).",
       "tags": [
         "install",
         "setup"
@@ -86,7 +86,7 @@
     {
       "slug": "how-to-add-a-cli-adapter",
       "q": "how to add a cli adapter",
-      "a": "subclass bernstein.adapters.base.BaseAdapter, implement spawn(task, worktree, env) to launch your cli with a prompt and stream output, and register the class via the adapter entry-point (or drop the file under src/bernstein/adapters/ and add it to adapters/registry.py for in-tree changes). the contract is a python protocol; bernstein.adapters._contract enforces capability checks. existing adapters under src/bernstein/adapters/ (aider.py, claude.py, codex.py, ollama.py, generic.py) are the reference. for unknown cli tools, use generic.py and parameterise it through bernstein.yaml. the plugin sdk in src/bernstein/adapters/plugin_sdk.py lets you ship adapters as separate pip packages.",
+      "a": "subclass bernstein.adapters.base.CLIAdapter, implement spawn(prompt, workdir, model_config, session_id, ...) to launch your cli with a prompt and stream output, and register the class via the adapter entry-point (or drop the file under src/bernstein/adapters/ and add it to adapters/registry.py for in-tree changes). bernstein.adapters._contract enforces capability checks. existing adapters under src/bernstein/adapters/ (aider.py, claude.py, codex.py, ollama.py, generic.py) are the reference. for unknown cli tools, use generic.py and parameterise it through bernstein.yaml. the plugin sdk in src/bernstein/adapters/plugin_sdk.py lets you ship adapters as separate pip packages.",
       "tags": [
         "adapters",
         "extension"
@@ -206,7 +206,7 @@
     {
       "slug": "what-is-the-dead-letter-queue",
       "q": "what is the bernstein dead letter queue",
-      "a": "tasks that fail their quality gates after max retries do not merge. instead they move to .sdd/backlog/dead-letter/, with the full agent transcripts, last-known worktree path, gate output, and a synth-generated failure-class label from the eval taxonomy. you can inspect each entry, fix the prompt or split the task, and re-queue. the dead-letter pile is bernstein's escape hatch: rather than burn budget retrying a broken brief, the orchestrator parks it for a human. the eval harness also pulls from this directory to build regression cases for future runs. source: src/bernstein/core/tasks/dead_letter.py.",
+      "a": "tasks that fail their quality gates after max retries do not merge. instead they move to the dead-letter queue (.sdd/runtime/dlq.jsonl), with the full agent transcripts, last-known worktree path, gate output, and a synth-generated failure-class label from the eval taxonomy. you can inspect each entry, fix the prompt or split the task, and re-queue. the dead-letter pile is bernstein's escape hatch: rather than burn budget retrying a broken brief, the orchestrator parks it for a human. the eval harness also pulls from these entries to build regression cases for future runs. source: src/bernstein/core/tasks/dead_letter_queue.py.",
       "tags": [
         "safety",
         "dead-letter"
@@ -219,7 +219,7 @@
     {
       "slug": "how-does-cost-tracking-work",
       "q": "how does bernstein cost tracking work",
-      "a": "every agent run reports per-model token usage back to the task server. bernstein attributes that cost to the task, the role (backend, qa, security ...) and the model. bernstein cost prints the breakdown per run (--by agent|model|task|day, --last 24h, --json). .sdd/metrics/cost.jsonl is the raw record. set cost.budget_limit in .sdd/config.yaml to cap a run; at cost.alert_threshold (default 0.8) the orchestrator warns, at 100 percent it drains (finish in-flight tasks, start nothing new). per-agent anomaly detection flags context-growth or token-spike behaviour so a stuck agent gets reaped before it burns the budget. source: src/bernstein/core/cost/.",
+      "a": "every agent run reports per-model token usage back to the task server. bernstein attributes that cost to the task, the role (backend, qa, security ...) and the model. bernstein cost prints the breakdown per run (--by agent|model|task|day, --last 24h, --json). .sdd/metrics/cost.jsonl is the raw record. set budget in bernstein.yaml (or pass --budget) to cap a run; at 80 percent of the cap the orchestrator warns, at 100 percent it drains (finish in-flight tasks, start nothing new). per-agent anomaly detection flags context-growth or token-spike behaviour so a stuck agent gets reaped before it burns the budget. source: src/bernstein/core/cost/.",
       "tags": [
         "cost",
         "budget"
@@ -232,7 +232,7 @@
     {
       "slug": "what-models-does-bernstein-use",
       "q": "what models does bernstein use",
-      "a": "bernstein itself does not call an llm; the cli agents you configure do. you decide which models per role in bernstein.yaml. the contextual-bandit router picks among the models you allow for a given task class and learns from outcomes. typical configurations: claude opus 4.7 for architect, claude sonnet 4.6 for backend, claude haiku 4.5 for docs, gpt-5.5 for review, gemini-3.1-pro for ml. local-only setups can route everything through ollama. bernstein cost prints the realised mix after each run. routing source: src/bernstein/core/routing/.",
+      "a": "bernstein itself does not call an llm; the cli agents you configure do. you decide which models per role in bernstein.yaml. with --routing bandit, the contextual-bandit router picks among the models you allow for a given task class and learns from outcomes. typical configurations: claude opus 4.7 for architect, claude sonnet 4.6 for backend, claude haiku 4.5 for docs, gpt-5.5 for review, gemini-3.1-pro for ml. local-only setups can route everything through ollama. bernstein cost prints the realised mix after each run. routing source: src/bernstein/core/routing/.",
       "tags": [
         "models",
         "routing"
@@ -245,7 +245,7 @@
     {
       "slug": "does-bernstein-support-local-models",
       "q": "does bernstein support local models",
-      "a": "yes. the ollama adapter targets the ollama daemon (or any openai-compatible local endpoint), so you can route every task through a locally hosted model with zero outbound api calls. mix local and cloud in the same plan: cheap, low-stakes tasks on a local llama or qwen, harder tasks on a paid model. configure under agents: in bernstein.yaml with the endpoint url and model name. ollama adapter source: src/bernstein/adapters/ollama.py. the clm adapter (sovereign llm gateway) is the production-grade variant for teams running mtls-fronted internal endpoints.",
+      "a": "yes. the ollama adapter targets the ollama daemon (or any openai-compatible local endpoint), so you can route every task through a locally hosted model with zero outbound api calls. mix local and cloud in the same plan: cheap, low-stakes tasks on a local llama or qwen, harder tasks on a paid model. select it with bernstein run --cli ollama --model <model>. ollama adapter source: src/bernstein/adapters/ollama.py. the clm adapter (sovereign llm gateway) is the production-grade variant for teams running mtls-fronted internal endpoints.",
       "tags": [
         "local",
         "ollama",
@@ -259,7 +259,7 @@
     {
       "slug": "what-quality-gates-does-bernstein-run",
       "q": "what quality gates does bernstein run",
-      "a": "by default: ruff (lint), pyright or mypy (types), pytest (tests). the security gate (bandit or semgrep) is opt-in, as is cross-model review. each gate runs inside the agent's worktree before the merge queue considers it. failed gates trigger a retry, optionally with an escalated model (sonnet -> opus). after the retry budget is exhausted the task moves to the dead-letter queue. gates are pluggable via the pluggy hookspecs in src/bernstein/plugins/, so you can add a custom gate (terraform plan, openapi diff, license check) without forking the core. configure which gates run under quality.gates in bernstein.yaml.",
+      "a": "by default: ruff (lint), pyright or mypy (types), pytest (tests). the security gate (bandit or semgrep) is opt-in, as is cross-model review. each gate runs inside the agent's worktree before the merge queue considers it. failed gates trigger a retry, optionally with an escalated model (sonnet -> opus). after the retry budget is exhausted the task moves to the dead-letter queue. gates are pluggable via the pluggy hookspecs in src/bernstein/plugins/, so you can add a custom gate (terraform plan, openapi diff, license check) without forking the core. configure which gates run under quality_gates in bernstein.yaml.",
       "tags": [
         "quality",
         "gates"
@@ -272,7 +272,7 @@
     {
       "slug": "how-does-bernstein-pick-tasks-for-agents",
       "q": "how does bernstein pick tasks for agents",
-      "a": "the scheduler reads .sdd/backlog/open/ each tick, filters out tasks whose dependencies are not yet satisfied, applies a fair-priority ordering (critical -> high -> medium -> low, with starvation guards), and emits the next ready task. the router then chooses the model and the cli agent: a contextual bandit with epsilon-greedy exploration over a feature vector (role, complexity, file scope, historical outcomes). bernstein trace <task-id> prints the step-by-step decision trail for a task, including which agent and model it landed on. source: src/bernstein/core/orchestration/ and src/bernstein/core/routing/.",
+      "a": "the scheduler reads .sdd/backlog/open/ each tick, filters out tasks whose dependencies are not yet satisfied, applies a fair-priority ordering (critical -> high -> medium -> low, with starvation guards), and emits the next ready task. the router then chooses the model and the cli agent: with --routing bandit, a contextual linucb bandit over a feature vector (role, complexity, file scope, historical outcomes). bernstein trace <task-id> prints the step-by-step decision trail for a task, including which agent and model it landed on. source: src/bernstein/core/orchestration/ and src/bernstein/core/routing/.",
       "tags": [
         "scheduler",
         "routing"
@@ -324,7 +324,7 @@
     {
       "slug": "what-sandbox-backends-does-bernstein-support",
       "q": "what sandbox backends does bernstein support",
-      "a": "the default backend is a local git worktree. swap it via sandbox.backend in bernstein.yaml: docker (containerised), e2b (cloud sandbox), modal, blaxel, cloudflare workers sandboxes, daytona, runloop, vercel sandboxes. each is a plug-in implementing the sandboxbackend protocol in src/bernstein/core/sandbox/. install the matching extra (pip install \"bernstein[e2b]\", [modal], [cloudflare], ...). the orchestrator and adapters are unchanged; only the place where the agent's filesystem and process live changes. useful when you want hard isolation, or when the agent needs a different os than the orchestrator host.",
+      "a": "the default backend is a local git worktree. swap it with bernstein run --sandbox <backend>: docker or podman (containerised), microvm, or the paid cloud backends e2b, modal, daytona, blaxel, runloop and vercel (these need --allow-paid). each is a plug-in implementing the sandboxbackend protocol in src/bernstein/core/sandbox/. install the matching extra (pip install \"bernstein[e2b]\", [modal], [docker]). the orchestrator and adapters are unchanged; only the place where the agent's filesystem and process live changes. useful when you want hard isolation, or when the agent needs a different os than the orchestrator host.",
       "tags": [
         "sandbox",
         "isolation"
@@ -337,7 +337,7 @@
     {
       "slug": "does-bernstein-have-a-tui",
       "q": "does bernstein have a tui",
-      "a": "yes. bernstein dashboard or bernstein live opens a textual-based tui with the task list, live agent logs, cost sparkline, quality-gate panel, scheduling visualiser, and approval overlay. bindings are vim-friendly, themable, and configurable per project (tui keybindings live under src/bernstein/tui/). a rich-based fallback renders on terminals that do not support textual. for plain text, bernstein status prints a one-shot snapshot. the tui talks to the same task server (127.0.0.1:8052) the cli uses, so you can run it in a separate terminal against a long-running orchestration.",
+      "a": "yes. bernstein live opens a textual-based tui with the task list, live agent logs, cost sparkline, quality-gate panel, scheduling visualiser, and approval overlay. bindings are vim-friendly, themable, and configurable per project (tui keybindings live under src/bernstein/tui/). a rich-based fallback renders on terminals that do not support textual. for plain text, bernstein status prints a one-shot snapshot. the tui talks to the same task server (127.0.0.1:8052) the cli uses, so you can run it in a separate terminal against a long-running orchestration.",
       "tags": [
         "tui",
         "ui"
@@ -349,7 +349,7 @@
     {
       "slug": "how-do-i-stop-or-pause-bernstein",
       "q": "how do i stop bernstein",
-      "a": "bernstein stop sends a graceful drain signal: in-flight tasks finish, no new tasks start, the orchestrator exits clean. bernstein stop --hard kills the process group via the pid file under .sdd/runtime/. never grep for the word bernstein and kill matches; you risk hitting unrelated processes that contain the substring. on relaunch the orchestrator reads .sdd/ back, sees the unfinished tasks, and resumes from the last persisted checkpoint (wal in src/bernstein/core/persistence/). worktrees and logs from the previous run are preserved.",
+      "a": "bernstein stop sends a graceful drain signal: in-flight tasks finish, no new tasks start, the orchestrator exits clean. bernstein stop --hard kills the process group via the pid file under .sdd/runtime/. never grep for the word bernstein and kill matches; you risk hitting unrelated processes that contain the substring. on relaunch the orchestrator reads .sdd/ back, sees the unfinished tasks, and resumes from the last persisted checkpoint (wal files under .sdd/runtime/wal/, code in src/bernstein/core/persistence/). worktrees and logs from the previous run are preserved.",
       "tags": [
         "lifecycle",
         "stop"
@@ -375,7 +375,7 @@
     {
       "slug": "how-to-resume-a-killed-bernstein-run",
       "q": "how to resume bernstein after a crash",
-      "a": "bernstein writes a write-ahead log to .sdd/persistence/ on every state transition. when you restart with bernstein run, the orchestrator loads the wal, rebuilds the task table, re-attaches to live worktrees under .sdd/worktrees/, and continues from the last persisted checkpoint. tasks that were mid-flight when the process died are re-queued with a +1 attempt counter; the prior worktree is preserved so you can diff it before the retry overwrites the branch. bernstein verify --wal-integrity <run-id> checks the log's hash chain before you resume. never grep for the literal string bernstein and kill matches; use the pid file under .sdd/runtime/ instead (bernstein stop --hard does this for you).",
+      "a": "bernstein writes a write-ahead log to .sdd/runtime/wal/<run-id>.wal.jsonl on every state transition. when you restart with bernstein run, the orchestrator loads the wal, rebuilds the task table, re-attaches to live worktrees under .sdd/worktrees/, and continues from the last persisted checkpoint. tasks that were mid-flight when the process died are re-queued with a +1 attempt counter; the prior worktree is preserved so you can diff it before the retry overwrites the branch. bernstein verify --wal-integrity <run-id> checks the log's hash chain before you resume. never grep for the literal string bernstein and kill matches; use the pid file under .sdd/runtime/ instead (bernstein stop --hard does this for you).",
       "tags": [
         "recovery",
         "lifecycle"
@@ -388,7 +388,7 @@
     {
       "slug": "how-to-keep-claude-code-from-blowing-context",
       "q": "how to keep claude code from blowing context window",
-      "a": "the cause of context blow-up is one long-lived agent doing many tasks. bernstein addresses it structurally: each task gets a fresh claude code subprocess in its own git worktree and exits when the task finishes (typically 1-3 tasks per agent). nothing carries over between tasks except the file system, so context starts near-empty every time. for tasks where you do want a longer thread (large refactors), bernstein.orchestration.context_window_strategy can be set to extend or stream, and the caching_adapter prefix-dedups across spawns. tokens still grow inside one task; the win is that you stop paying for hour-old prose to be re-attended. source: src/bernstein/core/streaming_merge.py, src/bernstein/adapters/caching_adapter.py.",
+      "a": "the cause of context blow-up is one long-lived agent doing many tasks. bernstein addresses it structurally: each task gets a fresh claude code subprocess in its own git worktree and exits when the task finishes (typically 1-3 tasks per agent). nothing carries over between tasks except the file system, so context starts near-empty every time. the caching_adapter prefix-dedups across spawns. tokens still grow inside one task; the win is that you stop paying for hour-old prose to be re-attended. source: src/bernstein/core/streaming_merge.py, src/bernstein/adapters/caching_adapter.py.",
       "tags": [
         "claude-code",
         "context",
@@ -402,7 +402,7 @@
     {
       "slug": "can-bernstein-use-local-ollama-llama-qwen",
       "q": "can bernstein use ollama for coding agents",
-      "a": "yes. set agents.<name>.adapter: ollama in bernstein.yaml with endpoint (default http://127.0.0.1:11434) and model (e.g. qwen2.5-coder:32b, llama3.1:70b, deepseek-coder:33b). the ollama adapter at src/bernstein/adapters/ollama.py speaks the ollama or any openai-compatible /v1/chat/completions endpoint, so vllm, llama.cpp server, lm studio, and tabbyapi all work. mix-mode is supported: route docs through ollama and architecture through claude opus in the same plan; bernstein.cost prints the realised split. zero outbound api calls when every agent in a run points at ollama, which is what teams under strict data residency rules ask for.",
+      "a": "yes. select it with bernstein run --cli ollama --model <model> (the adapter defaults to http://localhost:11434; e.g. qwen2.5-coder:32b, llama3.1:70b, deepseek-coder:33b). the ollama adapter at src/bernstein/adapters/ollama.py speaks the ollama or any openai-compatible /v1/chat/completions endpoint, so vllm, llama.cpp server, lm studio, and tabbyapi all work. mix-mode is supported: route docs through ollama and architecture through claude opus in the same plan; bernstein cost prints the realised split. zero outbound api calls when every agent in a run points at ollama, which is what teams under strict data residency rules ask for.",
       "tags": [
         "local",
         "ollama",
@@ -430,7 +430,7 @@
     {
       "slug": "how-to-handle-merge-conflicts-between-agents",
       "q": "how does bernstein handle merge conflicts between parallel agents",
-      "a": "the merge queue serializes worktree merges in dependency order, so two passing worktrees never run their merges concurrently. if a worktree's branch has drifted from main while the agent worked, bernstein attempts a 3-way merge; on conflict it triggers the resolver role with a prompt that includes both sides of the diff and the merge-base. if the resolver fails, the task moves to dead-letter rather than committing a botched merge (fail-closed). speculative worktrees (the optional plan-ahead mode) are rebased and re-gated before they enter the queue. source: src/bernstein/core/git/ and src/bernstein/core/orchestration/merge_queue.py.",
+      "a": "the merge queue serializes worktree merges in dependency order, so two passing worktrees never run their merges concurrently. if a worktree's branch has drifted from main while the agent worked, bernstein attempts a 3-way merge; on conflict it triggers the resolver role with a prompt that includes both sides of the diff and the merge-base. if the resolver fails, the task moves to dead-letter rather than committing a botched merge (fail-closed). speculative worktrees (the optional plan-ahead mode) are rebased and re-gated before they enter the queue. source: src/bernstein/core/git/ and src/bernstein/core/git/merge_queue.py.",
       "tags": [
         "git",
         "merge",
@@ -444,7 +444,7 @@
     {
       "slug": "what-is-the-cheapest-way-to-run-bernstein",
       "q": "cheapest way to run bernstein",
-      "a": "free tier: route every task through ollama against a local model (qwen2.5-coder or deepseek-coder); zero api spend, only your electricity. cheap cloud: claude haiku 4.5 for docs, claude sonnet 4.6 for backend, only escalate to opus on retry; cap with cost.budget_limit in .sdd/config.yaml, or bernstein run --max-cost-usd for a single run. mixed: pin the architect role to a paid model, run the rest on ollama. the caching_adapter (src/bernstein/adapters/caching_adapter.py) deduplicates prompt prefixes across spawns so repeat work does not get re-billed. bernstein cost --last 1h tracks recent spend; the alert threshold (default 0.8) warns before you blow the cap.",
+      "a": "free tier: route every task through ollama against a local model (qwen2.5-coder or deepseek-coder); zero api spend, only your electricity. cheap cloud: claude haiku 4.5 for docs, claude sonnet 4.6 for backend, only escalate to opus on retry; cap with budget in bernstein.yaml, or bernstein run --max-cost-usd for a single run. mixed: pin the architect role to a paid model, run the rest on ollama. the caching_adapter (src/bernstein/adapters/caching_adapter.py) deduplicates prompt prefixes across spawns so repeat work does not get re-billed. bernstein cost --last 1h tracks recent spend; the 80 percent warning fires before you blow the cap.",
       "tags": [
         "cost",
         "budget",
@@ -458,7 +458,7 @@
     {
       "slug": "how-to-write-a-bernstein-plan-yaml",
       "q": "how to write a bernstein plan yaml",
-      "a": "minimal plan.yaml: a top-level stages list, each stage holds steps, each step has a name, a role (backend, qa, docs, ...), and an instruction string. file paths under files: scope the worktree. dependencies via depends_on: keep ordering tight. example: stages: [{ name: feat-x, steps: [{ name: design, role: architect, instruction: ...}, { name: implement, role: backend, depends_on: [design], instruction: ...}]}]. run with bernstein run plan.yaml, or bernstein run --plan-only to print the decomposed plan without executing. for ad-hoc goals skip the yaml entirely: bernstein run -g \"goal\" builds a synthetic plan on the fly. command reference: https://bernstein.run/docs/cli.",
+      "a": "minimal plan.yaml: a top-level stages list, each stage holds steps, each stage has a name, each step has a title, a role (backend, qa, docs, ...), and a description string. file paths under files: scope the worktree. stage-level depends_on: keeps ordering tight. example: stages: [{ name: design, steps: [{ title: design, role: architect, description: ...}]}, { name: implement, depends_on: [design], steps: [{ title: implement, role: backend, description: ...}]}]. run with bernstein run plan.yaml, or bernstein run --plan-only to print the decomposed plan without executing. for ad-hoc goals skip the yaml entirely: bernstein -g \"goal\" builds a synthetic plan on the fly. command reference: https://bernstein.run/docs/cli.",
       "tags": [
         "plan",
         "yaml",
@@ -485,7 +485,7 @@
     {
       "slug": "does-bernstein-have-an-mcp-client",
       "q": "does bernstein use mcp servers",
-      "a": "yes. each agent worktree gets its own .mcp.json built from the merged config in bernstein.yaml mcp: section plus the agent's own discovery (claude code reads ~/.config/claude/mcp.json, codex reads its own). bernstein passes mcp tool calls through transparently; it does not proxy them. the merger lives in src/bernstein/adapters/claude_mcp_loader.py. you can also expose bernstein itself as an mcp server (see mcp-server-for-multi-agent-coding) so a claude desktop session can dispatch coding tasks into a bernstein fleet via tool calls. mcp config is per task, so a security task can be given a different toolset than a docs task.",
+      "a": "yes. each agent worktree gets its own .mcp.json built from the merged config in bernstein.yaml mcp_servers: section plus the agent's own discovery (claude code reads ~/.config/claude/mcp.json, codex reads its own). bernstein passes mcp tool calls through transparently; it does not proxy them. the merger lives in src/bernstein/adapters/claude_mcp_loader.py. you can also expose bernstein itself as an mcp server (see mcp-server-for-multi-agent-coding) so a claude desktop session can dispatch coding tasks into a bernstein fleet via tool calls. mcp config is per task, so a security task can be given a different toolset than a docs task.",
       "tags": [
         "mcp",
         "client",

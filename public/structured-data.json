@@ -134,7 +134,7 @@
           "name": "What AI coding agents does Bernstein support?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Bernstein ships 40+ CLI agent adapters including Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, Cloudflare Agents, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral Vibe, Autohand, Forge, Hermes, OpenHands, Open Interpreter, gptme, Plandex, AIChat, Letta Code, and a generic adapter for wrapping any CLI tool."
+            "text": "Bernstein ships 40+ CLI agent adapters including Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral Vibe, Autohand, Forge, Hermes, OpenHands, Open Interpreter, gptme, Plandex, AIChat, Letta Code, and a generic adapter for wrapping any CLI tool."
           }
         },
         {

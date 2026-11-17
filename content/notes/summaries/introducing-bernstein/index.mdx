@@ -16,7 +16,7 @@ summary_modes:
     title: "What bernstein 1.0 actually ships"
     items:
       - "No LLM in the scheduling loop; the orchestrator is a deterministic state machine that only calls a model for goal decomposition."
-      - "18 CLI adapters at launch (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Aider, Cursor, Amp, Kiro, Kilo, Qwen, Goose, and more); new adapters are roughly 100 lines of Python."
+      - "Seven adapters at launch (Claude Code, Codex, Gemini CLI, Aider, Amp, Qwen, Roo Code) plus a generic wrapper, grown to eighteen within weeks; new adapters are roughly 100 lines of Python."
       - "State lives in .sdd/ as YAML and JSON, so cat, grep, and git all work on orchestrator state with no database required."
       - "1.0 ships a tick-based orchestrator, task store with retry plus dead-letter queue, quality gates, cost tracking, HMAC-signed audit log, task server on port 8052, and a TUI."
     whyItMatters: "Operators can audit, replay, and reason about runs with the tools they already use; no proprietary state plane."
@@ -26,7 +26,7 @@ summary_modes:
       - "The scheduler is a plain-Python loop that ticks at a fixed cadence, dispatches tasks to short-lived agent processes (one to three tasks each to avoid token rot), and collects results into a merge queue; no LLM decides what runs next."
       - "Each agent gets its own git worktree, so two agents editing the same path are physically isolated until merge time; the merge queue applies what passes quality gates and rolls back what does not."
       - "State persistence is .sdd/ files (YAML and JSON), with no Redis or database hop; the entire system can be inspected by reading the directory, which keeps debugging boring and the audit trail HMAC-chained."
-      - "The 18 launch adapters share one base class, so new CLIs (Claude Code, Codex, Gemini CLI, Aider, Cursor, Amp, Goose, and the rest) plug in at roughly 100 lines each; the cost tracker meters every dispatch against a per-repo cap."
+      - "The adapters share one base class, so new CLIs (Claude Code, Codex, Gemini CLI, Aider, Amp, Qwen, Roo Code) plug in at roughly 100 lines each; the cost tracker meters every dispatch against a per-repo cap."
     whyItMatters: "Each design choice is one less reason for an operator to hit a black box; the orchestrator is observable by the same tools that observe a normal codebase."
 ---
 
@@ -37,7 +37,7 @@ bernstein 1.0 is an open-source orchestrator for CLI coding agents - Claude Code
 ## key takeaways
 
 - no LLM in the scheduling loop - the orchestrator is a plain state machine; only the goal decomposition step calls a model.
-- 18 adapters at launch (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Aider, Cursor, Amp, Kiro, Kilo, Qwen, Goose, and more); new adapters are roughly 100 lines of Python.
+- seven adapters at launch (Claude Code, Codex, Gemini CLI, Aider, Amp, Qwen, Roo Code) plus a generic wrapper, grown to eighteen within weeks; new adapters are roughly 100 lines of Python.
 - state in `.sdd/` files means `cat`, `grep`, and `git` all work on orchestrator state - no Redis, no database.
 - 1.0 ships: tick-based orchestrator, task store with retry and dead-letter queue, quality gates, cost tracking, HMAC-signed audit log, task server on port 8052, and a TUI.
 

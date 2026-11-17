@@ -2,7 +2,7 @@
 
 All notable changes to this spec are listed below. The spec follows semantic versioning at the document level.
 
-The canonical URL for the current version is documented in the version page itself; previous versions remain reachable at their original URL forever.
+Each version page documents its own canonical URL; previous versions remain reachable at their original URL forever.
 
 ## v0.1.0 - 2026-05-19
 
@@ -21,4 +21,4 @@ Initial public release.
 - A change to the set of categories (add, remove, rename) is a major version (e.g. v1.0).
 - A change to severity tiers or priority ordering is a minor version (e.g. v0.2).
 - A change to definitions, examples, or RMF/42001 cross-references that does not alter classification behaviour is a patch version (e.g. v0.1.1).
-- The current and all previous versions remain reachable at their original URL. The canonical "current" URL is `bernstein.run/spec/agent-failure-taxonomy/current` (alias to the highest stable version).
+- The current and all previous versions remain reachable at their original URL. The latest version is v0.1 at `bernstein.run/spec/agent-failure-taxonomy/v0.1`.

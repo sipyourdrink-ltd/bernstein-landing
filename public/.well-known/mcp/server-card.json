@@ -18,39 +18,67 @@
   "tools": [
     {
       "name": "bernstein_run",
-      "description": "Start an orchestration run with a goal"
+      "description": "Start an orchestration run. A run does real work and takes minutes to hours; the call returns once the run is queued, not when it finishes. Do not re-issue it while waiting, that starts a second run. Follow the run with bernstein_run_status, passing either the returned task_id or the returned run_id, after waiting the returned poll_after_ms. Pass parent_task_id to create the run as a subtask of an existing task. The queued orchestration writes project state and starts agent work. Host effects: writes files; spawns agent processes; makes network requests. Set template=administrative to create an empty audited manual container without a planner or agent processes; goal may be omitted for this template."
     },
     {
       "name": "bernstein_status",
-      "description": "Get current orchestration status"
+      "description": "Liveness, task counts, and cost in one read. Pass status to include the matching tasks; pass detail=true for full per-role and per-task rows. Retrieves data from the Bernstein server without changing it. Host effects: makes network requests."
     },
     {
-      "name": "bernstein_tasks",
-      "description": "List all tasks and their states"
-    },
-    {
-      "name": "bernstein_cost",
-      "description": "Get cost breakdown for current run"
-    },
-    {
-      "name": "bernstein_stop",
-      "description": "Stop the current orchestration"
+      "name": "bernstein_run_status",
+      "description": "Poll a verifiable handle for a run started with bernstein_run. Accepts either identifier that call returned: the task_id or the run_id. Reads the local run journal and audit evidence without changing them. Host effects: reads files."
     },
     {
       "name": "bernstein_approve",
-      "description": "Approve a task that needs human review"
+      "description": "Sign off a finished result only when the task is in pending_approval; every other status is refused. This completes the task on the Bernstein server. Host effects: makes network requests."
     },
     {
-      "name": "bernstein_health",
-      "description": "Check system health"
+      "name": "bernstein_complete",
+      "description": "Report a task result only from a worker-held state: open, claimed, or in_progress; every other status is refused. This completes the task on the Bernstein server. Host effects: makes network requests."
     },
     {
-      "name": "bernstein_create_subtask",
-      "description": "Create a child task scoped to the current orchestration run"
+      "name": "bernstein_cancel",
+      "description": "Cancel one task and its subtask tree; the orchestrator keeps running. Cancellable statuses: open, claimed, in_progress, blocked, waiting_for_subtasks, planned. An already-terminal task is reported, not treated as an error. This changes task state on the Bernstein server. Host effects: makes network requests."
+    },
+    {
+      "name": "bernstein_claim",
+      "description": "Claim the next eligible task for an agent. This changes task assignment state on the Bernstein server. Host effects: makes network requests."
+    },
+    {
+      "name": "bernstein_subscribe",
+      "description": "Wait for one future role task notification over authenticated SSE, then unsubscribe. Host effects: makes network requests."
+    },
+    {
+      "name": "bernstein_post_message",
+      "description": "Post a progress message to a task mailbox on the Bernstein server. Host effects: makes network requests."
+    },
+    {
+      "name": "bernstein_post_artifact",
+      "description": "Post a versioned artifact to a task on the Bernstein server. Host effects: makes network requests."
+    },
+    {
+      "name": "bernstein_task_capsule",
+      "description": "Read a task capsule together with its local journal and audit evidence. With verify=true, verification may create the install audit key if it is absent. Host effects: reads files; writes files."
+    },
+    {
+      "name": "bernstein_shutdown_orchestrator",
+      "description": "Shut down the ENTIRE Bernstein orchestrator for this project, including every run and worker; use bernstein_cancel to stop one task while the orchestrator keeps running. Writes the local SHUTDOWN signal file. Host effects: writes files."
+    },
+    {
+      "name": "bernstein_create_task",
+      "description": "Create a bare task without triggering orchestration or spawning agents. The task enters the backlog and is immediately claimable via bernstein_claim by any session matching its role. Host effects: writes files; makes network requests."
     },
     {
       "name": "load_skill",
-      "description": "Progressively load a role skill pack on demand (backend, qa, security, etc.) - keeps system prompts small"
+      "description": "List available skills when name is omitted, or load a named skill body, reference, or script file contents. Returns file contents as text; executes nothing. Host effects: reads files."
+    },
+    {
+      "name": "bernstein_scenario",
+      "description": "List, run, or poll Bernstein scenarios. action=list reads packaged scenario definitions; action=run queues file-writing agent work and returns the same pollable handle shape as bernstein_run; action=status queries the task server and needs orchestration_id. Host effects: reads files; writes files; spawns agent processes; makes network requests."
+    },
+    {
+      "name": "bernstein_verify_lineage",
+      "description": "Verify one artifact's lineage chain by reading its local lineage log without changing it. Host effects: reads files."
     }
   ]
 }

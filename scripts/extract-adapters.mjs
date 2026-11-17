@@ -2,7 +2,7 @@
  * Extract adapter metadata from the bernstein repo into a single SoT JSON.
  *
  * Source of truth is the bernstein adapters directory (sibling clone) +
- * the registry's `_ADAPTERS` dict. Output: `data/adapters.json`,
+ * the registry's `_ADAPTERS` dict and factory profiles. Output: `data/adapters.json`,
  * consumed by `app/vs/[slug]/page.tsx` at build time via
  * `generateStaticParams`.
  *
@@ -12,9 +12,8 @@
  *     the per-page narrative (install command, model recommendation,
  *     "last verified" date) and the JSON-LD schema. Scanning the
  *     local clone is the simplest deterministic input.
- *   - the operator owns the bernstein repo on the same machine; this
- *     script never reaches the network. CI runs `git clone` of the
- *     bernstein master branch into a sibling dir.
+ *   - this script never reaches the network. A checkout without the
+ *     sibling repository retains the committed catalogue.
  *
  * The output JSON honours the `ready: true|false` flag per adapter so
  * the operator can ramp pages weekly per the brief — only `ready`
@@ -26,6 +25,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { factoryProfileNames, NON_AGENT_KEYS } from '../lib/adapter-count-core.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,6 +42,7 @@ const ADAPTER_DIR = path.join(
   'adapters',
 );
 const REGISTRY_PATH = path.join(ADAPTER_DIR, 'registry.py');
+const PROFILES_PATH = path.join(ADAPTER_DIR, 'capability_profile.py');
 const OUT_FILE = path.join(ROOT, 'data', 'adapters.json');
 const READY_FILE = path.join(ROOT, 'data', 'adapters-ready.json');
 const OVERLAY_FILE = path.join(ROOT, 'data', 'adapters-overlay.json');
@@ -74,6 +75,24 @@ async function parseRegistry() {
   let m;
   while ((m = re.exec(block)) !== null) {
     out.push({ name: m[1], cls: m[2] });
+  }
+  // The upstream registry merges factory declarations after its literal.
+  const profiles = await fs.readFile(PROFILES_PATH, 'utf8').catch((error) => {
+    if (error.code === 'ENOENT') return '';
+    throw error;
+  });
+  for (const name of factoryProfileNames(profiles)) {
+    const declaration = profiles.split('AdapterCapabilityProfile(').find((chunk) =>
+      chunk.match(/\bname="([a-z_][a-z0-9_-]*)"/)?.[1] === name,
+    );
+    const displayName = declaration?.match(/\bdisplay_name="([^"]+)"/)?.[1];
+    if (!displayName) throw new Error(`Missing display_name for factory profile ${name}`);
+    const camel = name.split(/[_-]/).filter(Boolean).map((part) =>
+      part[0].toUpperCase() + part.slice(1).toLowerCase(),
+    ).join('');
+    const index = out.findIndex((entry) => entry.name === name);
+    if (index >= 0) out.splice(index, 1);
+    out.push({ name, cls: `${camel}ProfileAdapter`, displayName, factory: true });
   }
   return out;
 }
@@ -241,15 +260,17 @@ async function main() {
   const ready = await loadReadyList();
   const overlay = await loadOverlay();
   const adapters = [];
-  for (const { name, cls } of reg) {
-    if (name === 'mock') continue;
-    const file = await resolveAdapterFile(name, cls);
+  for (const { name, cls, displayName, factory } of reg) {
+    if (NON_AGENT_KEYS.has(name)) continue;
+    const file = factory ? PROFILES_PATH : await resolveAdapterFile(name, cls);
     if (!file) {
       console.warn(`[adapters] no source file resolved for ${name} (${cls})`);
       continue;
     }
     const src = await fs.readFile(file, 'utf8');
-    const doc = extractTopDocstring(src);
+    const doc = factory
+      ? `Adapter for ${displayName}, built from its capability profile.`
+      : extractTopDocstring(src);
     const install = extractInstall(doc);
     const verified = extractVerified(doc);
     const slug = toSlug(name);
@@ -258,7 +279,7 @@ async function main() {
       slug,
       name,
       cls,
-      displayName: ov.displayName ?? DISPLAY_NAME_OVERRIDES[name] ?? cls.replace(/Adapter$/, ''),
+      displayName: ov.displayName ?? displayName ?? DISPLAY_NAME_OVERRIDES[name] ?? cls.replace(/Adapter$/, ''),
       docstring: doc,
       install: ov.install ?? install,
       verified: ov.verified ?? verified,
