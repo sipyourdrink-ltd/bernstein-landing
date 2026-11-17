@@ -55,7 +55,7 @@ export function BlogPostingJsonLd({
     },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     url,
-    image: `${SITE_URL}/api/og?title=${encodeURIComponent(fm.title)}`,
+    image: `${SITE_URL}${fm.cover ?? `/api/og?title=${encodeURIComponent(fm.title)}`}`,
     timeRequired: `PT${readingMinutes}M`,
     inLanguage: 'en',
     ...(fm.tags && fm.tags.length > 0 ? { keywords: fm.tags.join(', ') } : {}),

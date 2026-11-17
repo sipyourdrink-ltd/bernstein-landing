@@ -50,7 +50,7 @@ export function BlogTechArticleJsonLd({
       },
     },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
-    image: `${SITE_URL}/api/og?title=${encodeURIComponent(fm.title)}`,
+    image: `${SITE_URL}${fm.cover ?? `/api/og?title=${encodeURIComponent(fm.title)}`}`,
     timeRequired: `PT${readingMinutes}M`,
     inLanguage: 'en',
     /* Architecture / comparison posts assume the reader is a working

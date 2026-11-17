@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getAllPosts, getPost, getSlugs, type PostIndex } from '@/lib/mdx';
 import { SITE_URL, AUTHOR } from '@/lib/seo';
@@ -93,6 +94,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
      `seo_title` is used verbatim; otherwise use the 70-char trim. */
   const ogTitle = seoTitleOverride ?? capAtWordBoundary(post.fm.title, OG_TITLE_CAP);
   const metaDescription = capAtWordBoundary(post.fm.description, DESCRIPTION_CAP);
+  const socialImage = {
+    url: post.fm.cover ?? `/api/og?title=${encodeURIComponent(post.fm.title)}`,
+    width: 1200,
+    height: 630,
+    ...(post.fm.coverAlt ? { alt: post.fm.coverAlt } : {}),
+  };
   return {
     title: metaTitle,
     description: metaDescription,
@@ -105,13 +112,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: `${SITE_URL}/blog/${slug}`,
       publishedTime: post.fm.date,
       authors: [AUTHOR],
-      images: [{ url: `/api/og?title=${encodeURIComponent(post.fm.title)}`, width: 1200, height: 630 }],
+      images: [socialImage],
     },
     twitter: {
       card: 'summary_large_image',
       title: ogTitle,
       description: metaDescription,
-      images: [`/api/og?title=${encodeURIComponent(post.fm.title)}`],
+      images: [socialImage],
     },
     other: {
       /* OpenGraph article metadata - picked up by Pocket / Instapaper /
@@ -234,6 +241,17 @@ export default async function BlogPost({ params }: Props) {
                 <PageSeal />
               </p>
             </header>
+            {post.fm.cover && post.fm.coverAlt && (
+              <Image
+                className="blog-post-cover"
+                src={post.fm.cover}
+                alt={post.fm.coverAlt}
+                width={1200}
+                height={630}
+                unoptimized
+                loading="eager"
+              />
+            )}
             <ArticleCompressionBody className="prose">
               <div itemProp="articleBody">
                 {post.mdx}

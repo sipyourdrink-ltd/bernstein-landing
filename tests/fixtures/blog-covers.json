@@ -1,0 +1,97 @@
+[
+  {
+    "slug": "v3-14-159-pi",
+    "cover": "/blog/covers/01-strangers-ninety-minutes.png",
+    "sha256": "83f26a68ebc4fbd1e8ab186e45dacbed2f7a164612c455372787e74af455c957"
+  },
+  {
+    "slug": "v3-x-recap",
+    "cover": "/blog/covers/02-3x-recap.png",
+    "sha256": "df3c614a3e74e4937f566c7923adfbeddcc715e259358b1b666da3c5603070d9"
+  },
+  {
+    "slug": "output-economy-and-agent-lifecycle",
+    "cover": "/blog/covers/03-output-economy.png",
+    "sha256": "bfdc6df9022f472432b206101866d8649bd4857255e1dabf01bc5b6ab62c3086"
+  },
+  {
+    "slug": "v2-x-recap",
+    "cover": "/blog/covers/04-2x-recap.png",
+    "sha256": "a012d330a64553d28f964cfca199d8486c877c719dc3449bacc12ffdf45135fb"
+  },
+  {
+    "slug": "v2-0-release",
+    "cover": "/blog/covers/05-web-ui-in-wheel.png",
+    "sha256": "12487dca1e1103cad44761e9666772356e4a7393aa9ee1c10e7ecae3a13bfc7a"
+  },
+  {
+    "slug": "v1-10-x-recap",
+    "cover": "/blog/covers/06-1-10-recap.png",
+    "sha256": "cdd23a3f811b48ef0335d7389c0276ac5b5bbc0d7ff9ee0289de1b6a5f54e8e3"
+  },
+  {
+    "slug": "orchestrator-on-someone-elses-box",
+    "cover": "/blog/covers/07-on-prem-box.png",
+    "sha256": "1896ab1729dfbdf6fef3cd1cfb2bde5d20586b64785a95b0fafd44ae49d8e80d"
+  },
+  {
+    "slug": "orchestrate-the-orchestrators",
+    "cover": "/blog/covers/08-orchestrators.png",
+    "sha256": "a7851a19c2468b9f6bf1547d1302e0958722f8347a2f3a22002dfceea0c96495"
+  },
+  {
+    "slug": "autofix-daemon",
+    "cover": "/blog/covers/09-ci-autofix-daemon.png",
+    "sha256": "cff1e9e1217c85e4c64e8c414cd095947bdc8ba0be0c44094b67c058b570d33a"
+  },
+  {
+    "slug": "v1-9-release",
+    "cover": "/blog/covers/10-acp-bridge.png",
+    "sha256": "e66569614f4d514aa0a5cbc629fd74976b4f2e8398a614a7818c77bdaa8b185c"
+  },
+  {
+    "slug": "operator-pack",
+    "cover": "/blog/covers/11-four-commands-glue.png",
+    "sha256": "7b92fea8b1132a44b356896c0814bffee75b21c4ad9023f7fda811457477bb54"
+  },
+  {
+    "slug": "operator-commands",
+    "cover": "/blog/covers/12-four-commands-service.png",
+    "sha256": "15c12b001144c62b37ce81a476d791148fb594bd2f01c226f0fb8779841cf13d"
+  },
+  {
+    "slug": "frictionless-install",
+    "cover": "/blog/covers/13-install.png",
+    "sha256": "f9afd6aa7274c6a4d1dcb30ad5556a3ec794bf58a35f3e6e44e615d069fa72e0"
+  },
+  {
+    "slug": "getting-started",
+    "cover": "/blog/covers/14-getting-started.png",
+    "sha256": "435cf912c1e8ee2443fd2445e919d92a589ca69ecac28581e30cead8a1b50ffe"
+  },
+  {
+    "slug": "community-spotlight-april-2026",
+    "cover": "/blog/covers/15-contributors.png",
+    "sha256": "a923baac54ee259a7dbeb916aebea731f82348f20dfe33184155272cc1f40d87"
+  },
+  {
+    "slug": "cloudflare-cloud-execution",
+    "cover": "/blog/covers/16-cloudflare.png",
+    "sha256": "7c72de56cc515656283c1c1a6ffecbbfb43bcb7f4e0bfa47196bc9f9ce108556"
+  },
+  {
+    "slug": "module-decomposition",
+    "cover": "/blog/covers/17-refactor.png",
+    "sha256": "9d01c973e6ce4018730b159ffaf6e87d23d78165822f349e9561efd6189c72e6"
+  },
+  {
+    "slug": "cost-aware-routing",
+    "cover": "/blog/covers/18-model-routing.png",
+    "sha256": "3175379f592525ade29a3c3912c769d73bd37f112d06e2cdc827a9f464a077db"
+  },
+  {
+    "slug": "introducing-bernstein",
+    "cover": "/blog/covers/19-original-launch.png",
+    "sha256": "baf527c2f64a534783197a7d9374240fae547bd3d95caa8e602e4bf8bedeeb35"
+  }
+]

@@ -89,6 +89,14 @@
 }
 
 /* ---- BLOG CARD (regular listing card) ---- */
+.blog-card-cover,
+.blog-post-cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: var(--space-5);
+}
+
 .blog-card {
   display: block;
   padding: var(--space-5) 0;

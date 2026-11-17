@@ -36,7 +36,7 @@ export function buildBlogPostJsonLd(slug: string, fm: FrontmatterT, readingMinut
     },
     url: `${SITE_URL}/blog/${slug}`,
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/blog/${slug}` },
-    image: `${SITE_URL}/api/og?title=${encodeURIComponent(fm.title)}`,
+    image: `${SITE_URL}${fm.cover ?? `/api/og?title=${encodeURIComponent(fm.title)}`}`,
     timeRequired: `PT${readingMinutes}M`,
     inLanguage: 'en',
     ...(fm.tags ? { keywords: fm.tags.join(', ') } : {}),
