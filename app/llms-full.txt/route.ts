@@ -546,6 +546,8 @@ Bernstein can run as an MCP server (\`bernstein mcp\`, stdio or HTTP transport),
 
 Repo-root \`plugin.json\` and \`mcp.json\` manifests (Agent Plugins v1.0.0 schema) let plugin-aware clients discover and launch the server.
 
+Plugins: bernstein-addons on GitHub (https://github.com/sipyourdrink-ltd/bernstein-addons)
+
 ### A2A (Agent-to-Agent Protocol)
 Support for Google's A2A protocol for inter-agent communication and task delegation.
 
