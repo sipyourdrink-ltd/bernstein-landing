@@ -36,6 +36,7 @@ export function Footer() {
               PyPI
             </a>
             <a href="https://docs.bernstein.run/">Docs</a>
+            <a href="https://github.com/sipyourdrink-ltd/bernstein-addons">Plugins</a>
             {/* /#how used to have its own Nav entry; it moved here when
                 the primary nav was trimmed to Install / Verify / Docs /
                 Ask (plus GitHub) - the section itself still lives on the
