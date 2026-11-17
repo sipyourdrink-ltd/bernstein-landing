@@ -16,7 +16,7 @@ import path from 'node:path';
 
 const DATA = path.resolve(process.cwd(), 'data', 'adapters.json');
 
-const MIN_ADAPTERS = 40; /* the extraction currently yields 45 (46 registry keys minus mock, which has no adapter module); the floor leaves room for upstream churn */
+const MIN_ADAPTERS = 40; /* The release catalogue contains 53 real adapters; the floor leaves room for upstream changes. */
 
 test('data/adapters.json exists', async () => {
   const exists = await fs.access(DATA).then(() => true).catch(() => false);
@@ -31,6 +31,15 @@ test('adapters.json has the expected adapter count', async () => {
     data.adapters.length >= MIN_ADAPTERS,
     `expected >= ${MIN_ADAPTERS} adapters, got ${data.adapters.length}; investigate before publishing`,
   );
+});
+
+test('adapter and comparison catalogues contain the same real adapters', async () => {
+  const adapters = JSON.parse(await fs.readFile(DATA, 'utf8'));
+  const metadata = JSON.parse(await fs.readFile(path.resolve(process.cwd(), 'data/adapters-meta.json'), 'utf8'));
+  const slugs = adapters.adapters.map((entry: { slug: string }) => entry.slug).sort();
+  const compared = metadata.entries.map((entry: { slug: string }) => entry.slug).sort();
+  assert.deepEqual(slugs, compared);
+  assert.ok(!slugs.includes('generic') && !slugs.includes('mock'));
 });
 
 test('every adapter has a slug, displayName, category, sourceFile', async () => {

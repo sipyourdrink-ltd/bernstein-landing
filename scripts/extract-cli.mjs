@@ -144,6 +144,8 @@ function parseClickHelp(body) {
 
   function flushFlag() {
     if (pendingFlag) {
+      const dm = pendingFlag.help.match(/\[default:\s*([^\]]+)\]/);
+      if (dm) pendingFlag.default = dm[1].trim();
       flags.push(pendingFlag);
       pendingFlag = null;
     }
@@ -169,13 +171,30 @@ function parseClickHelp(body) {
     }
 
     if (mode === 'options') {
-      const m = line.match(/^\s{2,}(--?[a-zA-Z0-9_][a-zA-Z0-9_-]*(?:[,\s]+--?[a-zA-Z0-9_][a-zA-Z0-9_-]*)?)\s*([A-Z][A-Z0-9_]*(?:\[[^\]]+\])?)?\s+(.*)$/);
-      if (m) {
+      /* A flag line starts at the option column (two spaces) with `-`.
+         Anything indented deeper is a continuation of the preceding
+         option's help, wrapped by Click at the help column; joining it
+         here keeps prose such as "--dry-run makes that one request."
+         from being read as a second flag. */
+      if (/^ {2}-/.test(line)) {
         flushFlag();
-        const flagSpec = m[1].trim();
-        const type = m[2] ? m[2].trim() : '';
-        const help = m[3].trim();
-        const flagNames = flagSpec.split(/[,\s]+/).filter(Boolean);
+        const body = line.trim();
+        /* Click separates the option spec from its help with two or more
+           spaces; a spec too long for the column has no help on this line. */
+        const gap = body.match(/^(.*?)(?:\s{2,}(.*))?$/);
+        const specText = gap[1];
+        const help = (gap[2] ?? '').trim();
+        const flagNames = [];
+        let rest = specText;
+        for (;;) {
+          const nm = rest.match(/^(--?[a-zA-Z0-9_][a-zA-Z0-9_-]*)(?:\s*(?:,|\/)\s*)?/);
+          if (!nm) break;
+          flagNames.push(nm[1]);
+          rest = rest.slice(nm[0].length);
+        }
+        if (flagNames.length === 0) continue;
+        const type = rest.trim();
+        const flagSpec = specText.slice(0, specText.length - rest.length).replace(/[,\s/]+$/, '');
         pendingFlag = {
           spec: flagSpec,
           flags: flagNames,
@@ -184,9 +203,7 @@ function parseClickHelp(body) {
           help,
           default: null,
         };
-        const dm = help.match(/\[default:\s*([^\]]+)\]/);
-        if (dm) pendingFlag.default = dm[1].trim();
-      } else if (pendingFlag && /^\s{4,}/.test(line)) {
+      } else if (pendingFlag && /^\s{4,}\S/.test(line)) {
         pendingFlag.help = `${pendingFlag.help} ${line.trim()}`.trim();
       }
       continue;

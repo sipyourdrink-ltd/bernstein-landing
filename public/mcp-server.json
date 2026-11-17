@@ -356,6 +356,96 @@
       }
     },
     {
+      "name": "bernstein_create_task",
+      "description": "Create a bare task without triggering orchestration or spawning agents. The task enters the backlog and is immediately claimable via bernstein_claim by any session matching its role. Host effects: writes files; makes network requests.",
+      "input_schema": {
+        "timeoutSeconds": 30,
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "description"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "run_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^admin-[a-f0-9]{32}$",
+            "description": "Optional open administrative container identifier returned by bernstein_run."
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "depends_on": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "small",
+              "medium",
+              "large"
+            ]
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "effort": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
       "name": "bernstein_health",
       "description": "Deprecated process-local liveness probe folded into bernstein_status. It returns a constant response without contacting the task server. Host effects: none.",
       "input_schema": {
@@ -591,13 +681,10 @@
     },
     {
       "name": "bernstein_run",
-      "description": "Start an orchestration run. A run does real work and takes minutes to hours; the call returns once the run is queued, not when it finishes. Do not re-issue it while waiting, that starts a second run. Follow the run with bernstein_run_status, passing either the returned task_id or the returned run_id, after waiting the returned poll_after_ms. Pass parent_task_id to create the run as a subtask of an existing task. The queued orchestration writes project state and starts agent work. Host effects: writes files; spawns agent processes; makes network requests.",
+      "description": "Start an orchestration run. A run does real work and takes minutes to hours; the call returns once the run is queued, not when it finishes. Do not re-issue it while waiting, that starts a second run. Follow the run with bernstein_run_status, passing either the returned task_id or the returned run_id, after waiting the returned poll_after_ms. Pass parent_task_id to create the run as a subtask of an existing task. The queued orchestration writes project state and starts agent work. Host effects: writes files; spawns agent processes; makes network requests. Set template=administrative to create an empty audited manual container without a planner or agent processes; goal may be omitted for this template.",
       "input_schema": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "goal"
-        ],
         "properties": {
           "goal": {
             "type": "string",
@@ -643,8 +730,33 @@
             "minLength": 1,
             "maxLength": 256,
             "pattern": "^[A-Za-z0-9_.:-]+$"
+          },
+          "template": {
+            "type": "string",
+            "enum": [
+              "orchestration",
+              "administrative"
+            ],
+            "default": "orchestration"
           }
-        }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "goal"
+            ]
+          },
+          {
+            "required": [
+              "template"
+            ],
+            "properties": {
+              "template": {
+                "const": "administrative"
+              }
+            }
+          }
+        ]
       }
     },
     {
@@ -856,6 +968,32 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 4096
+          }
+        }
+      }
+    },
+    {
+      "name": "bernstein_subscribe",
+      "description": "Wait for one future role task notification over authenticated SSE, then unsubscribe. Host effects: makes network requests.",
+      "input_schema": {
+        "timeoutSeconds": 65,
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "role"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "timeout_seconds": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 60,
+            "default": 30
           }
         }
       }
