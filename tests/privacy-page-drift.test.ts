@@ -12,6 +12,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import ts from 'typescript';
 
 const ROOT = process.cwd();
 const SOURCE_DIRS = ['app', 'components', 'lib', 'public'];
@@ -76,6 +77,43 @@ const cookieAccess: string[] = [];
 const events = new Map<string, string>();
 const eventProps: string[] = [];
 
+/** Parse call arguments so indirect objects cannot bypass the field check. */
+function scanEventCalls(body: string, rel: string): void {
+  const kind = /\.[jt]sx$/.test(rel) ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+  const source = ts.createSourceFile(rel, body, ts.ScriptTarget.Latest, true, kind);
+  function visit(node: ts.Node): void {
+    if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+      const tracker = node.expression.expression;
+      const isUmami = ts.isIdentifier(tracker)
+        ? tracker.text === 'umami'
+        : ts.isPropertyAccessExpression(tracker) && tracker.name.text === 'umami';
+      if (isUmami && node.expression.name.text === 'track') {
+        assert.ok(node.arguments.length >= 1 && node.arguments.length <= 2, `${rel}: unexpected analytics arguments`);
+        const name = resolve(node.arguments[0].getText(source), rel);
+        const data = node.arguments[1];
+        if (data) {
+          assert.ok(ts.isObjectLiteralExpression(data), `${rel}: event data must be an inline object literal so every field can be checked`);
+          for (const prop of data.properties) {
+            assert.ok(
+              ts.isPropertyAssignment(prop) || ts.isShorthandPropertyAssignment(prop),
+              `${rel}: analytics data must use explicit properties, without spreads or methods`,
+            );
+            assert.ok(
+              ts.isIdentifier(prop.name) || ts.isStringLiteral(prop.name),
+              `${rel}: analytics property names must be literal`,
+            );
+            const key = prop.name.text;
+            if (!ALLOWED_EVENT_PROPS.has(key)) eventProps.push(`${rel}: event property ${key}`);
+          }
+        }
+        events.set(name, rel);
+      }
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(source);
+}
+
 for (const [rel, src] of sources) {
   const body = code(src);
   for (const m of body.matchAll(/\b(localStorage|sessionStorage)\s*\??\.\s*(\w+)\s*\(([^,)]*)/g)) {
@@ -94,12 +132,7 @@ for (const [rel, src] of sources) {
     if (m[1]) eventProps.push(`${rel}: data-umami-event${m[1]}`);
     else events.set(resolve(m[2].replace(/^\{|\}$/g, ''), rel), rel);
   }
-  for (const m of body.matchAll(/umami\s*\??\.\s*track\s*\(\s*([^,)]+)\s*(?:,\s*\{([^}]*)\})?/g)) {
-    events.set(resolve(m[1], rel), rel);
-    for (const prop of (m[2] ?? '').split(',').map((p) => p.split(':')[0].trim()).filter(Boolean)) {
-      if (!ALLOWED_EVENT_PROPS.has(prop)) eventProps.push(`${rel}: event property ${prop}`);
-    }
-  }
+  scanEventCalls(body, rel);
 }
 
 const privacy = fs.readFileSync(path.join(ROOT, 'app/privacy/page.tsx'), 'utf8');
@@ -185,4 +218,15 @@ test('browser analytics opt-out and URL handling are described without server gu
   assert.match(privacy, /does not control this server request/);
   assert.match(privacy, /automatically\s+sends its question/);
   assert.match(privacy, /text still being typed is not/);
+});
+
+
+test('event drift scanning rejects data passed through a variable', () => {
+  assert.throws(
+    () => scanEventCalls(
+      "const eventData = { destination, query: window.location.search }; window.umami?.track(OUTBOUND_CLICK_EVENT, eventData);",
+      'event-probe.ts',
+    ),
+    /event data must be an inline object literal/,
+  );
 });
