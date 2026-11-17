@@ -104,6 +104,7 @@ export function Footer() {
             <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a>
             <a href="/privacy">Privacy</a>
             <a href="/terms">Terms</a>
+            <a href="/third-party-notices">Third-party notices</a>
             <a href="/.well-known/security.txt">Security</a>
             <a href="/humans.txt">Humans</a>
           </div>

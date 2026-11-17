@@ -1,4 +1,5 @@
 import { publishedRedirects, publishedSchemaHeaders } from './lib/published-urls.mjs';
+import { preserveElkjsNotices } from './scripts/preserve-elkjs-notices.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -6,6 +7,9 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  compiler: {
+    runAfterProductionCompile: preserveElkjsNotices,
+  },
   env: {
     /* Inlined at build time. Toggling requires a redeploy — that's
        intentional. The `disabled` value falls back to the BM25 panel. */
