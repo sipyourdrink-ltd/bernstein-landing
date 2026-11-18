@@ -57,15 +57,9 @@ const nextConfig = {
         destination: '/#ask',
         permanent: true,
       },
-      /* /blog/v2-0-0-release was an auto-generated changelog-mirror stub
-         that duplicated the hand-written canonical post at
-         /blog/v2-0-release. The stub's slug is derived from the full
-         version "2.0.0" (v2-0-0-release) while the canonical post uses
-         "v2-0-release", so the two never reconciled: the stub 404'd (its
-         MDX failed to compile) yet still appeared in the sitemap + RSS,
-         which the crosspost pipeline retried daily (issue #23). The stub
-         is removed; this 301 carries the already-indexed URL and any
-         cached feed entry to the canonical post. */
+      /* /blog/v2-0-0-release is a removed changelog-mirror stub.
+         Redirect its URL to the canonical release post so existing
+         links and cached feed entries reach the surviving content. */
       {
         source: '/blog/v2-0-0-release',
         destination: '/blog/v2-0-release',
@@ -81,25 +75,23 @@ const nextConfig = {
         destination: '/mcp-server.json',
         permanent: false,
       },
-      /* Edge logs (2026-10-09..2026-11-08) show people typing or clicking
-         these paths and getting a 404: /login 107x, /contact 94x,
-         /register 89x. There are no accounts here, so sign-in and
-         sign-up intent goes to the install page, and contact goes to
-         /about, which carries the mailto. Temporary (307) because they
-         are guesses at intent, not canonical moves. */
+      /* /login, /register and /contact do not exist here but are
+         requested. There are no accounts here, so sign-in and sign-up
+         intent goes to the install page, and contact goes to /about,
+         which carries the mailto. Temporary (307) because they are
+         guesses at intent, not canonical moves. */
       { source: '/login', destination: '/cli-quickstart', permanent: false },
       { source: '/register', destination: '/cli-quickstart', permanent: false },
       { source: '/contact', destination: '/about', permanent: false },
-      /* /blog/orchestrator-vs-desktop-ade was the most peer-referred post
-         in September (a 77k-star GitHub discussion linked it). The post no
-         longer exists and still drew 11 human 404s. The closest surviving
-         post on the same topic takes the link. */
+      /* /blog/orchestrator-vs-desktop-ade no longer exists and still
+         has inbound links. The closest surviving post on the same
+         topic takes the link. */
       {
         source: '/blog/orchestrator-vs-desktop-ade',
         destination: '/blog/orchestrate-the-orchestrators',
         permanent: true,
       },
-      /* Inbound links name the cost page /pricing. */
+      /* Route the alternative /pricing path to the cost page. */
       {
         source: '/pricing',
         destination: '/cost',
@@ -272,16 +264,13 @@ const nextConfig = {
           { key: 'Cache-Control', value: DISCOVERY_CACHE_CONTROL },
         ],
       },
-      /* Discovery surfaces served straight out of `public/`. Next.js
-         stamps `public, max-age=0` on static public files, so every
-         agent/crawler fetch of these three fell through the CDN to the
-         origin — the inverse of the HTML pages they describe, which
-         cache for ten minutes. They only change on deploy, so a
-         one-hour shared TTL is safe; `stale-while-revalidate` keeps the
-         edge warm without letting a release sit unnoticed for longer
-         than the TTL. Capped at one hour on purpose: the agent card and
-         openapi.yaml carry a version and a server URL that must not
-         pin for longer than a deploy cycle. */
+      /* Discovery surfaces are served straight out of `public/`.
+         Override Next.js's default `public, max-age=0` so shared caches
+         can serve these files without fetching the origin each time.
+         They only change on deploy, so a one-hour shared TTL is safe;
+         `stale-while-revalidate` keeps the edge warm. The TTL bounds
+         staleness for the version and server URL in the agent card
+         and openapi.yaml. */
       {
         source: '/manifest.json',
         headers: [
@@ -336,13 +325,10 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'public, s-maxage=86400, stale-while-revalidate=86400' },
         ],
       },
-      /* OPS-2026-05-17 - cache-control for the hot mostly-static surfaces.
-         CF cache hit rate sat at 20.5% (24h) because Next.js standalone
-         did not emit Cache-Control for `/`, `/cost` or
-         `/blog/*`, so every uncached bot/visitor hit re-rendered SSR and
-         was a 504 candidate when the origin was warming. 10-min edge
-         cache + 1-hour stale-while-revalidate keeps the surface warm and
-         insulates origin restarts from immediately surfacing as 5xx. */
+      /* Cache-control for the mostly-static surfaces. An explicit
+         edge TTL avoids unnecessary SSR for `/`, `/cost` and `/blog/*`.
+         Stale-while-revalidate lets the edge serve cached content
+         while the origin warms up or restarts. */
       /* The two negotiable surfaces (`/` and `/blog/:slug`) split their
          Cache-Control on whether the request asked for markdown.
 
