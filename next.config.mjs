@@ -81,6 +81,24 @@ const nextConfig = {
         destination: '/mcp-server.json',
         permanent: false,
       },
+      /* Edge logs (2026-10-09..2026-11-08) show people typing or clicking
+         these paths and getting a 404: /login 107x, /contact 94x,
+         /register 89x. There are no accounts here, so sign-in and
+         sign-up intent goes to the install page, and contact goes to
+         /about, which carries the mailto. Temporary (307) because they
+         are guesses at intent, not canonical moves. */
+      { source: '/login', destination: '/cli-quickstart', permanent: false },
+      { source: '/register', destination: '/cli-quickstart', permanent: false },
+      { source: '/contact', destination: '/about', permanent: false },
+      /* /blog/orchestrator-vs-desktop-ade was the most peer-referred post
+         in September (a 77k-star GitHub discussion linked it). The post no
+         longer exists and still drew 11 human 404s. The closest surviving
+         post on the same topic takes the link. */
+      {
+        source: '/blog/orchestrator-vs-desktop-ade',
+        destination: '/blog/orchestrate-the-orchestrators',
+        permanent: true,
+      },
       /* Inbound links name the cost page /pricing. */
       {
         source: '/pricing',
