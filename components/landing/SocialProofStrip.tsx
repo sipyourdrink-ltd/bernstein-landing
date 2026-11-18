@@ -62,11 +62,6 @@ interface PressMention {
    it. */
 const PRESS_MENTIONS: readonly PressMention[] = [
   {
-    id: 'awesome-python',
-    label: 'vinta/awesome-python',
-    href: 'https://github.com/vinta/awesome-python',
-  },
-  {
     id: 'agent-orchestrators',
     label: 'open-source agent orchestrators',
     href: 'https://www.augmentcode.com/tools/open-source-agent-orchestrators',
