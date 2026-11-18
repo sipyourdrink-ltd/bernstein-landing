@@ -37,12 +37,8 @@ const nextConfig = {
         destination: 'https://docs.bernstein.run/en/latest/:path/',
         permanent: true,
       },
-      /* Singular `/sponsor` 404'd because the live route is `/sponsors`
-         (plural). The CEO conversion plan and the deep-research brief
-         both wrote `/sponsor`, and natural English typing collapses to
-         the singular too. Permanent (308) so Next preserves the method,
-         query string, and fragment — which matters because /cost and
-         the GHS deeplink propagate `?metadata_source=...`. */
+      /* `/sponsor` is a common spelling of the live route `/sponsors`.
+         Permanent (308) so Next preserves the method, query string and fragment. */
       {
         source: '/sponsor',
         destination: '/sponsors',
