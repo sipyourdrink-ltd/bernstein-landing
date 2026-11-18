@@ -264,3 +264,20 @@ test('reports a known sender with options that cannot be checked', () => {
   const changed = checkPublishedPrivacySurfaces(new Map(surfaceFixture).set(filename, original.replace("method: 'POST'", 'method: HTTP_METHOD')));
   assert.ok(changed.some((issue) => issue.startsWith(`${filename}:${line}:`) && /request method or body/.test(issue)), changed.join('\n'));
 });
+
+test('reports input route drift at the source line of a rendered inline script', () => {
+  const filename = 'components/InlineSendFixture.tsx';
+  const original = [
+    'const script = `',
+    "  const endpoint = '/api/notify';",
+    "  fetch(endpoint, { method: 'POST', body: 'example' });",
+    '`;',
+    'export const fixture = <script dangerouslySetInnerHTML={{ __html: script }} />;',
+  ].join('\n');
+  const fixture = new Map(surfaceFixture).set(filename, original);
+  assert.deepEqual(checkPublishedPrivacySurfaces(fixture), []);
+  fixture.set(filename, original.replace('/api/notify', '/api/example'));
+  assert.deepEqual(checkPublishedPrivacySurfaces(fixture), [
+    `${filename}:2: input route /api/example is not documented on /privacy`,
+  ]);
+});

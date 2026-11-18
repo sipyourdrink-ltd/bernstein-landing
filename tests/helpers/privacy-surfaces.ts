@@ -233,33 +233,49 @@ function checkInputRoutes(program: ts.Program, privacy: ts.SourceFile, issues: s
     ['/components/landing/EmailStrip.tsx', newsletter],
   ]);
 
-  function checkRoute(endpoint: string | undefined, source: ts.Node, expected?: string) {
+  function checkRoute(endpoint: string | undefined, where: string, expected?: string) {
     if (endpoint) configured.add(endpoint);
     if (!endpoint || !documented.has(endpoint)) {
-      issues.push(`${location(source)}: input route ${endpoint ?? '(not a static string)'} is not documented on /privacy`);
+      issues.push(`${where}: input route ${endpoint ?? '(not a static string)'} is not documented on /privacy`);
     } else if (expected && endpoint !== expected) {
-      issues.push(`${location(source)}: input route ${endpoint} does not match ${expected} documented for this feature on /privacy`);
+      issues.push(`${where}: input route ${endpoint} does not match ${expected} documented for this feature on /privacy`);
     }
   }
 
   const confirmedSenders = new Set<string>();
-  for (const file of clientSources(program)) {
+  function checkFetchCalls(file: ts.SourceFile, bindings: ts.TypeChecker, locate: typeof location) {
     const known = expectedRoutes.has(file.fileName);
     const calls = [...nodes(file)].filter(ts.isCallExpression).filter(fetchCall);
     for (const call of calls) {
       const [endpoint, options] = call.arguments;
-      const init = options && constantExpression(options, checker);
+      const init = options && constantExpression(options, bindings);
       const method = field(init, 'method');
-      const verb = method && staticString(method, checker)?.toUpperCase();
+      const verb = method && staticString(method, bindings)?.toUpperCase();
       const body = field(init, 'body');
       if (known) confirmedSenders.add(file.fileName);
       if (known && (verb !== 'POST' || !body || !init || !ts.isObjectLiteralExpression(init)
         || init.properties.some(ts.isSpreadAssignment))) {
-        issues.push(`${location(call)}: cannot verify the request method or body for the documented sender`);
+        issues.push(`${locate(call)}: cannot verify the request method or body for the documented sender`);
       }
       if (!known && !body && !/^(?:POST|PUT|PATCH|DELETE)$/.test(verb ?? '')) continue;
-      const route = endpoint && staticString(endpoint, checker);
-      checkRoute(route, endpoint ? constantExpression(endpoint, checker) ?? endpoint : call, expectedRoutes.get(file.fileName));
+      const route = endpoint && staticString(endpoint, bindings);
+      const origin = endpoint && (constantExpression(endpoint, bindings) ?? endpoint);
+      checkRoute(route, locate(origin ?? call), expectedRoutes.get(file.fileName));
+    }
+  }
+  for (const file of clientSources(program)) checkFetchCalls(file, checker, location);
+  for (const file of program.getSourceFiles()) {
+    if (!/^\/(?:app|components)\//.test(file.fileName)) continue;
+    for (const node of nodes(file)) {
+      if (!(ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) || jsxTag(node) !== 'script') continue;
+      const type = attributeValue(jsxAttribute(node, 'type'));
+      if (type && staticString(type, checker) === 'application/ld+json') continue;
+      const script = parseInlineScript(node, checker);
+      if (!script) continue;
+      // An inline script has its own lexical scope. Its rendered offsets still
+      // map to the JSX source or the source of an imported script template.
+      const inline = sourceProgram(new Map([['inline.js', script.source.text]]));
+      checkFetchCalls(inline.getSourceFiles()[0], inline.getTypeChecker(), script.location);
     }
   }
   for (const filename of expectedRoutes.keys()) {
@@ -288,7 +304,7 @@ function checkInputRoutes(program: ts.Program, privacy: ts.SourceFile, issues: s
     const endpoint = pattern.exec(expanded ?? '')?.[1];
     const binding = endpoint && parts.find((span) => staticString(span.expression, checker) === endpoint);
     const origin = binding ? constantExpression(binding.expression, checker) : expression;
-    checkRoute(endpoint, origin ?? expression, expectedReportRoute);
+    checkRoute(endpoint, location(origin ?? expression), expectedReportRoute);
   }
 
   for (const [route, node] of documented) {
