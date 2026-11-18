@@ -71,6 +71,28 @@ test('reports an added storage key at the call site', () => {
   assert.match(issuesFor(changed), /public\/privacy-fixture\.js:5:.*example:preference.*not documented/);
 });
 
+test('resolves immutable property names and nested browser globals', () => {
+  const controls = [
+    "const trackerProperty = 'umami';",
+    "const trackMethod = 'track';",
+    "const storageProperty = 'localStorage';",
+    "const browser = globalThis.window;",
+    "browser[trackerProperty]?.[trackMethod]('outbound-click', { destination: 'example.test' });",
+    "window.document.defaultView[storageProperty].getItem('beta-notice:dismissed');",
+  ].join('\n');
+  const original = fixture.get(fixturePath)! + '\n' + controls;
+  const changed = new Map(fixture).set(fixturePath, original);
+  assert.equal(issuesFor(changed), '');
+  changed.set(fixturePath, original.replace("[trackMethod]('outbound-click'", "[trackMethod]('example-event'"));
+  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:10:.*example-event.*not documented/);
+  changed.set(fixturePath, original.replace(".getItem('beta-notice:dismissed')", ".getItem('example:preference')"));
+  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:11:.*example:preference.*not documented/);
+  changed.set(fixturePath, original.replace("const trackerProperty", "let trackerProperty"));
+  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:10:.*browser property.*immutable const/);
+  changed.set(fixturePath, original + "\nconst cookieProperty = 'cookie';\nwindow.document[cookieProperty];");
+  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:13:.*cookie access/);
+});
+
 test('reports a stale documented key at its privacy entry', () => {
   const changed = replaceFixture("window.localStorage?.setItem(dismissed, '1');", '');
   const line = sources.get(privacyPath)!.split('\n').findIndex((text) => text.includes('data-storage-key>beta-notice:dismissed')) + 1;
@@ -186,6 +208,9 @@ test('reports script, hook, endpoint and service drift at the changed source', (
     ['app/layout.tsx', 'data-before-send={UMAMI_BEFORE_SEND}', 'data-performance="true" data-before-send={UMAMI_BEFORE_SEND}', /analytics measurements/],
     ['lib/analytics/disable.ts', "['q', 'ask']", "['q', 'query']", /query parameters/],
     ['lib/analytics/disable.ts', 'out.url === lastView', 'out.url !== lastView', /duplicate page views/],
+    ['lib/analytics/disable.ts', 'out.url = clean(out.url)', 'clean(out.url)', /strip query parameters/],
+    ['lib/analytics/disable.ts', 'return out;', 'return payload;', /return the cleaned payload/],
+    ['lib/analytics/disable.ts', 'return x.toString();', 'return u;', /return the cleaned address/],
     ['components/docs-bot/useSseStream.ts', "'/api/ask'", "'/api/questions'", /\/api\/questions.*not documented/],
     ['components/landing/EmailCapture.tsx', "'/api/notify'", "'/api/ask'", /does not match \/api\/notify/],
     ['next.config.mjs', "'/api/csp-report'", "'/api/report'", /\/api\/report.*not documented/],
@@ -199,4 +224,43 @@ test('reports script, hook, endpoint and service drift at the changed source', (
     const issues = checkPublishedPrivacySurfaces(changed);
     assert.ok(issues.some((issue) => issue.startsWith(`${filename}:${line}:`) && diagnostic.test(issue)), issues.join('\n'));
   }
+});
+
+test('reports deduplication moved before URL cleaning', () => {
+  const filename = 'lib/analytics/disable.ts';
+  const original = sources.get(filename)!;
+  const lines = original.split('\n');
+  const urlLine = lines.findIndex((line) => line.includes('if (out.url) out.url'));
+  assert.ok(urlLine >= 0);
+  const cleaning = lines.splice(urlLine, 2);
+  const returnLine = lines.findIndex((line) => line.includes('return out;'));
+  assert.ok(returnLine > urlLine);
+  lines.splice(returnLine, 0, ...cleaning);
+  const issues = checkPublishedPrivacySurfaces(new Map(surfaceFixture).set(filename, lines.join('\n')));
+  assert.ok(issues.some((issue) => issue.startsWith(`${filename}:${urlLine + 1}:`) && /duplicate page views/.test(issue)), issues.join('\n'));
+});
+
+test('checks browser sends in imported client modules and public scripts', () => {
+  const client = 'components/ClientFixture.tsx';
+  const helper = 'lib/client-send-fixture.ts';
+  const script = 'public/send-fixture.js';
+  const fixture = new Map(surfaceFixture)
+    .set(client, "'use client';\nimport { send } from '@/lib/client-send-fixture';\nsend();")
+    .set(helper, "export const send = () => fetch('/api/notify', { method: 'POST', body: 'example' });")
+    .set(script, "fetch('/api/blog/summary', { method: 'POST', body: 'example' });");
+  assert.deepEqual(checkPublishedPrivacySurfaces(fixture), []);
+  fixture.set(helper, fixture.get(helper)!.replace('/api/notify', '/api/example'));
+  fixture.set(script, fixture.get(script)!.replace('/api/blog/summary', '/api/example'));
+  const issues = checkPublishedPrivacySurfaces(fixture);
+  for (const filename of [helper, script]) {
+    assert.ok(issues.some((issue) => issue.startsWith(`${filename}:1:`) && issue.includes('/api/example')), issues.join('\n'));
+  }
+});
+
+test('reports a known sender with options that cannot be checked', () => {
+  const filename = 'components/landing/EmailCapture.tsx';
+  const original = sources.get(filename)!;
+  const line = original.split('\n').findIndex((text) => text.includes("fetch('/api/notify'")) + 1;
+  const changed = checkPublishedPrivacySurfaces(new Map(surfaceFixture).set(filename, original.replace("method: 'POST'", 'method: HTTP_METHOD')));
+  assert.ok(changed.some((issue) => issue.startsWith(`${filename}:${line}:`) && /request method or body/.test(issue)), changed.join('\n'));
 });

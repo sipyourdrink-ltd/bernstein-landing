@@ -5,6 +5,7 @@ const privacyPath = 'app/privacy/page.tsx';
 const storageNames = new Set(['localStorage', 'sessionStorage']);
 const storageMethods = new Set(['getItem', 'setItem', 'removeItem']);
 const browserGlobals = new Set(['window', 'globalThis', 'self']);
+const windowMembers = new Set([...browserGlobals, 'top', 'parent', 'opener']);
 const cookieStoreNames = new Set(['cookieStore']);
 const trackerNames = new Set(['umami']);
 const headerMethods = new Set(['get', 'set', 'append', 'delete', 'has', 'getSetCookie']);
@@ -69,7 +70,9 @@ function importedBinding(symbol: ts.Symbol | undefined, checker: ts.TypeChecker)
 }
 
 function constInitializer(expression: ts.Identifier, checker: ts.TypeChecker): ts.Expression | undefined {
-  const symbol = importedBinding(checker.getSymbolAtLocation(expression), checker);
+  const parent = expression.parent;
+  const symbol = importedBinding(ts.isShorthandPropertyAssignment(parent) && parent.name === expression
+    ? checker.getShorthandAssignmentValueSymbol(parent) : checker.getSymbolAtLocation(expression), checker);
   const declaration = symbol?.valueDeclaration;
   if (!declaration || !ts.isVariableDeclaration(declaration) || !ts.isVariableDeclarationList(declaration.parent)
     || !(declaration.parent.flags & ts.NodeFlags.Const)) return undefined;
@@ -91,10 +94,10 @@ export function staticString(expression: ts.Expression, checker: ts.TypeChecker)
   return stringLiteral(constantExpression(expression, checker));
 }
 
-function access(node: ts.Node): { receiver: ts.Expression; name: string | undefined } | undefined {
+function access(node: ts.Node, checker: ts.TypeChecker): { receiver: ts.Expression; name: string | undefined } | undefined {
   if (ts.isPropertyAccessExpression(node)) return { receiver: node.expression, name: node.name.text };
   if (ts.isElementAccessExpression(node)) {
-    return { receiver: node.expression, name: stringLiteral(node.argumentExpression) };
+    return { receiver: node.expression, name: staticString(node.argumentExpression, checker) };
   }
   return undefined;
 }
@@ -116,19 +119,44 @@ function bareReference(node: ts.Node): string | undefined {
   return node.text;
 }
 
+// Resolve ordinary window/document paths and immutable local aliases. An
+// unrelated object's fields are outside the browser-global lookup.
+function browserScope(
+  expression: ts.Expression, checker: ts.TypeChecker, seen = new Set<ts.Expression>(),
+): 'window' | 'document' | undefined {
+  expression = unwrap(expression);
+  if (ts.isIdentifier(expression)) {
+    if (!checker.getSymbolAtLocation(expression)?.declarations?.length) {
+      if (browserGlobals.has(expression.text)) return 'window';
+      return expression.text === 'document' ? 'document' : undefined;
+    }
+    const initializer = constInitializer(expression, checker);
+    if (!initializer || seen.has(initializer)) return undefined;
+    seen.add(initializer);
+    return browserScope(initializer, checker, seen);
+  }
+  const member = access(expression, checker);
+  if (!member?.name) return undefined;
+  const scope = browserScope(member.receiver, checker, seen);
+  if (scope === 'document' && member.name === 'defaultView') return 'window';
+  if (scope === 'window' && member.name === 'document') return 'document';
+  if (scope === 'window' && windowMembers.has(member.name)) return 'window';
+  return undefined;
+}
+
 function globalReference(node: ts.Node, names: ReadonlySet<string>, checker: ts.TypeChecker): string | undefined {
   const bare = bareReference(node);
   if (bare && names.has(bare) && !checker.getSymbolAtLocation(node)) return bare;
-  const member = access(node);
-  if (member?.name && names.has(member.name) && browserGlobals.has(identifier(member.receiver) ?? '')) {
+  const member = access(node, checker);
+  if (member?.name && names.has(member.name) && browserScope(member.receiver, checker) === 'window') {
     return member.name;
   }
   return undefined;
 }
 
-function receiverMethod(reference: ts.Node): { call: ts.CallExpression; name: string } | undefined {
+function receiverMethod(reference: ts.Node, checker: ts.TypeChecker): { call: ts.CallExpression; name: string } | undefined {
   const method = reference.parent;
-  const member = access(method);
+  const member = access(method, checker);
   if (member?.receiver === reference && member.name && ts.isCallExpression(method.parent)
     && method.parent.expression === method) return { call: method.parent, name: member.name };
   return undefined;
@@ -136,8 +164,8 @@ function receiverMethod(reference: ts.Node): { call: ts.CallExpression; name: st
 
 function cookieReference(node: ts.Node, checker: ts.TypeChecker): boolean {
   if (globalReference(node, cookieStoreNames, checker)) return true;
-  const member = access(node);
-  if (member && (member.name === 'cookies' || (member.name === 'cookie' && identifier(member.receiver) === 'document'))) {
+  const member = access(node, checker);
+  if (member && (member.name === 'cookies' || (member.name === 'cookie' && browserScope(member.receiver, checker) === 'document'))) {
     return true;
   }
   if (ts.isCallExpression(node)) {
@@ -147,11 +175,12 @@ function cookieReference(node: ts.Node, checker: ts.TypeChecker): boolean {
     if (symbol?.declarations?.some((declaration) => ts.isImportSpecifier(declaration)
       && (declaration.propertyName ?? declaration.name).text === 'cookies'
       && stringLiteral(declaration.parent.parent.parent.moduleSpecifier) === 'next/headers')) return true;
-    const method = access(callee);
+    const method = access(callee, checker);
     if (!method || !headerMethods.has(method.name ?? '')) return false;
-    const receiverName = identifier(method.receiver) ?? access(method.receiver)?.name;
+    const receiverName = identifier(method.receiver) ?? access(method.receiver, checker)?.name;
+    const header = node.arguments[0];
     return !!receiverName && /headers$/i.test(receiverName)
-      && (method.name === 'getSetCookie' || cookieHeader(stringLiteral(node.arguments[0])));
+      && (method.name === 'getSetCookie' || (header !== undefined && cookieHeader(staticString(header, checker))));
   }
   if (ts.isPropertyAssignment(node)) {
     return cookieHeader(literalProperty(node.name)) && isHeaderInitializer(node.parent);
@@ -220,7 +249,7 @@ function scriptInterpolation(expression: ts.Expression, checker: ts.TypeChecker)
   const literal = staticString(expression, checker);
   if (literal !== undefined) return { text: literal, node: expression };
   if (!ts.isCallExpression(expression) || expression.arguments.length !== 1) return undefined;
-  const member = access(expression.expression);
+  const member = access(expression.expression, checker);
   if (!member || identifier(member.receiver) !== 'JSON' || member.name !== 'stringify') return undefined;
   const argument = unwrap(expression.arguments[0]);
   const value = unwrap(ts.isIdentifier(argument) ? constInitializer(argument, checker) ?? argument : argument);
@@ -317,7 +346,7 @@ export function checkPrivacyDrift(sources: ReadonlyMap<string, string>) {
   }
 
   function checkTracker(node: ts.Node, report: Reporter) {
-    const method = receiverMethod(node);
+    const method = receiverMethod(node, checker);
     if (method?.name !== 'track') {
       report(node, 'use a direct umami.track call so the event and its fields can be checked');
       return;
@@ -361,7 +390,7 @@ export function checkPrivacyDrift(sources: ReadonlyMap<string, string>) {
 
   function checkStorage(node: ts.Node, storage: string, report: Reporter) {
     if (storage === 'sessionStorage') report(node, 'sessionStorage is used, but /privacy says there is no session storage');
-    const method = receiverMethod(node);
+    const method = receiverMethod(node, checker);
     const parent = node.parent;
     // The inline opt-out hook checks that storage exists before reading it.
     if (!method && ts.isBinaryExpression(parent) && parent.left === node
@@ -385,17 +414,28 @@ export function checkPrivacyDrift(sources: ReadonlyMap<string, string>) {
 
   function visit(node: ts.Node, report: Reporter) {
     if (ts.isTypeNode(node) || ts.isInterfaceDeclaration(node) || ts.isImportDeclaration(node)) return;
+    if (ts.isElementAccessExpression(node) && staticString(node.argumentExpression, checker) === undefined
+      && browserScope(node.expression, checker)) {
+      report(node, 'browser property must use a literal or an immutable const with a literal value');
+    }
     const store = globalReference(node, storageNames, checker);
     if (store) checkStorage(node, store, report);
     if (cookieReference(node, checker)) report(node, 'cookie access disagrees with /privacy');
     if (globalReference(node, trackerNames, checker)) checkTracker(node, report);
     if (ts.isBindingElement(node) && ts.isVariableDeclaration(node.parent.parent)) {
-      const name = literalProperty(node.propertyName ?? node.name);
+      const property = node.propertyName ?? node.name;
+      const name = ts.isComputedPropertyName(property) ? staticString(property.expression, checker) : literalProperty(property);
       const initializer = node.parent.parent.initializer;
-      if (initializer && browserGlobals.has(identifier(unwrap(initializer)) ?? '')) {
+      const scope = initializer && browserScope(initializer, checker);
+      if (scope && ts.isComputedPropertyName(property) && name === undefined) {
+        report(node, 'browser property must use a literal or an immutable const with a literal value');
+      }
+      if (scope === 'window') {
         if (name === 'umami') checkTracker(node, report);
         if (name && storageNames.has(name)) checkStorage(node, name, report);
         if (name === 'cookieStore') report(node, 'cookie access disagrees with /privacy');
+      } else if (scope === 'document' && name === 'cookie') {
+        report(node, 'cookie access disagrees with /privacy');
       }
     }
     if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
