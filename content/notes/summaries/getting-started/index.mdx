@@ -44,8 +44,7 @@ summary_modes:
     items:
       - >-
         bernstein auto-detects installed cli agents and requires at least one,
-        such as claude code, on path. 40+ adapters ship in the box,
-        with detection handled at runtime.
+        such as claude code, on path.
       - >-
         goals are decomposed into tasks, each assigned a role and model, then
         executed in isolated worktrees. completed tasks merge through a central
@@ -65,7 +64,7 @@ summary_modes:
 
 ## summary
 
-this is the hands-on quickstart for bernstein: `pip install bernstein`, point it at Claude Code (or any of the 40+ auto-detected adapters), run `bernstein run --goal "<task>"`, and read the TUI that shows task status, agent count, and a live cost ticker. goals get decomposed into tasks, each task gets a role and a model, agents spawn into isolated worktrees, and completed work merges back through the queue. failed tasks roll back into `.sdd/runtime/dlq.jsonl`. the post also shows the `bernstein cost` output and explains YAML plan files for multi-stage projects.
+this is the hands-on quickstart for bernstein: `pip install bernstein`, point it at Claude Code (or another installed CLI agent that Bernstein detects), run `bernstein run --goal "<task>"`, and read the TUI that shows task status, agent count, and a live cost ticker. goals get decomposed into tasks, each task gets a role and a model, agents spawn into isolated worktrees, and completed work merges back through the queue. failed tasks roll back into `.sdd/runtime/dlq.jsonl`. the post also shows the `bernstein cost` output and explains YAML plan files for multi-stage projects.
 
 ## key takeaways
 

@@ -110,7 +110,7 @@ export async function buildLlmsTxt(): Promise<string> {
 
   return `# Bernstein
 
-> Bernstein is the open-source governance layer for AI agents, with a deterministic scheduler driving CLI coding agents (Claude Code, Codex, Gemini CLI, and 40+ more). Scheduling is plain Python - no LLM in the coordination loop - so runs are reproducible end to end. Every task runs in its own git worktree behind lint/type/test gates. An always-on lineage spine and replay journal record what happened; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Cluster mode and an air-gap install profile included. Apache-2.0. Status: beta, solo-maintained - pin the version you depend on. Built by Alex Chernysh.
+> Bernstein is the open-source governance layer for AI agents, with a deterministic scheduler driving CLI coding agents (Claude Code, Codex, Gemini CLI, and others). Scheduling is plain Python - no LLM in the coordination loop - so runs are reproducible end to end. Every task runs in its own git worktree behind lint/type/test gates. An always-on lineage spine and replay journal record what happened; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Cluster mode and an air-gap install profile included. Apache-2.0. Status: beta, solo-maintained - pin the version you depend on. Built by Alex Chernysh.
 
 ## What you get
 

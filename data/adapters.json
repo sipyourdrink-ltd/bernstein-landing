@@ -64,7 +64,7 @@
       "mcpSupport": false,
       "auditChain": false,
       "homepage": "https://aider.chat",
-      "summary": "Aider is the original open-source coding agent. Talks to ~50 LLM providers via LiteLLM, commits each change to git automatically, ships a repo-map for context. Apache-2.0, 30k+ stars.",
+      "summary": "Aider is the original open-source coding agent. Talks to ~50 LLM providers via LiteLLM, commits each change to git automatically, ships a repo-map for context. Apache-2.0.",
       "whenToChoose": "If you already use Aider and like its `/add`, `/run`, `/test` muscle memory - Bernstein doesn't replace any of that. Aider is also the right tool when MCP is overkill: many tasks are one repo, one agent, one provider, and Aider's surface is smaller and faster than anything wrapping it.",
       "whenToChooseBernstein": "When you want Aider's reliability AND parallelism. Bernstein spawns 3-8 Aiders in separate worktrees against the same goal, each scoped to a different sub-task, and reconciles the diffs. The audit chain on top of Aider's per-change commits is also a regulatory differentiator the bare CLI doesn't have.",
       "ready": true

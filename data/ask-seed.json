@@ -7,7 +7,7 @@
     {
       "slug": "what-is-bernstein",
       "q": "what is bernstein",
-      "a": "bernstein is the open-source governance layer for ai agents: a deterministic python scheduler for cli coding agents. it decomposes a goal into tasks, picks a model and a cli agent (claude code, codex, gemini cli, aider, plus 40+ more adapters), isolates each task in a git worktree, runs lint, type-check and tests (plus an optional security scan and cross-model review), and merges only the worktrees that pass. the scheduler itself is deterministic python, not an llm, so scheduling and routing spend zero model tokens. state lives in .sdd/ on disk; there is no server to provision. apache 2.0, python 3.12+, install with pipx install bernstein. source: https://github.com/sipyourdrink-ltd/bernstein.",
+      "a": "bernstein is the open-source governance layer for ai agents: a deterministic python scheduler for cli coding agents. it decomposes a goal into tasks, picks a model and a cli agent (claude code, codex, gemini cli, aider, and others), isolates each task in a git worktree, runs lint, type-check and tests (plus an optional security scan and cross-model review), and merges only the worktrees that pass. the scheduler itself is deterministic python, not an llm, so scheduling and routing spend zero model tokens. state lives in .sdd/ on disk; there is no server to provision. apache 2.0, python 3.12+, install with pipx install bernstein. source: https://github.com/sipyourdrink-ltd/bernstein.",
       "tags": [
         "intro",
         "what-is"
@@ -35,7 +35,7 @@
     {
       "slug": "bernstein-vs-openai-agents-sdk",
       "q": "bernstein vs openai agents sdk",
-      "a": "openai agents sdk is a runtime for tool-calling agents: handoffs, guardrails, traces. it is openai-first (native on the responses api) but not openai-only - other providers work through chat completions. bernstein is the open-source governance layer for ai agents; it ships an openai-agents adapter so you get the sdk runtime as one of 40+ agents under a deterministic scheduler. bernstein adds worktree isolation, quality gates, multi-provider routing, mcp server mode, and an hmac audit chain. you can also pin one task to openai agents sdk and another to claude code in the same plan. pick openai agents sdk alone for openai-only python apps. pick bernstein when you need parallel agents across providers, ci-style merges, or compliance-grade audit. matrix at https://bernstein.run/vs/openai-agents-sdk.",
+      "a": "openai agents sdk is a runtime for tool-calling agents: handoffs, guardrails, traces. it is openai-first (native on the responses api) but not openai-only - other providers work through chat completions. bernstein is the open-source governance layer for ai agents; it ships an openai-agents adapter so you get the sdk runtime alongside other coding agents under a deterministic scheduler. bernstein adds worktree isolation, quality gates, multi-provider routing, mcp server mode, and an hmac audit chain. you can also pin one task to openai agents sdk and another to claude code in the same plan. pick openai agents sdk alone for openai-only python apps. pick bernstein when you need parallel agents across providers, ci-style merges, or compliance-grade audit. matrix at https://bernstein.run/vs/openai-agents-sdk.",
       "tags": [
         "compare",
         "openai-agents-sdk"
@@ -245,7 +245,7 @@
     {
       "slug": "does-bernstein-support-local-models",
       "q": "does bernstein support local models",
-      "a": "yes. the ollama adapter targets the ollama daemon (or any openai-compatible local endpoint), so you can route every task through a locally hosted model with zero outbound api calls. mix local and cloud in the same plan: cheap, low-stakes tasks on a local llama or qwen, harder tasks on a paid model. select it with bernstein run --cli ollama --model <model>. ollama adapter source: src/bernstein/adapters/ollama.py. the clm adapter (sovereign llm gateway) is the production-grade variant for teams running mtls-fronted internal endpoints.",
+      "a": "yes. the ollama adapter targets the ollama daemon (or any openai-compatible local endpoint), so you can route every task through a locally hosted model with zero outbound api calls. mix local and cloud in the same plan: cheap, low-stakes tasks on a local llama or qwen, harder tasks on a paid model. select it with bernstein run --cli ollama --model <model>. ollama adapter source: src/bernstein/adapters/ollama.py. the clm adapter (sovereign llm gateway) supports teams running mtls-fronted internal endpoints.",
       "tags": [
         "local",
         "ollama",

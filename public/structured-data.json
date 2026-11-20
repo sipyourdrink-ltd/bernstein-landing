@@ -5,7 +5,7 @@
       "@type": "SoftwareApplication",
       "@id": "https://bernstein.run/#software",
       "name": "Bernstein",
-      "description": "Bernstein is the open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, and 40+ more). Scheduling is plain Python - no LLM in the coordination loop - so runs are reproducible end to end. Every task runs in its own git worktree behind lint/type/test gates. An always-on lineage spine and replay journal record what happened; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Air-gap install profile included. Apache-2.0.",
+      "description": "Bernstein is the open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, and others). Scheduling is plain Python - no LLM in the coordination loop - so runs are reproducible end to end. Every task runs in its own git worktree behind lint/type/test gates. An always-on lineage spine and replay journal record what happened; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Air-gap install profile included. Apache-2.0.",
       "url": "https://bernstein.run",
       "applicationCategory": "DeveloperApplication",
       "applicationSubCategory": "AI Agent Governance",
@@ -39,7 +39,7 @@
       "softwareRequirements": "Python 3.12+, Git",
       "featureList": [
         "Deterministic scheduling (no LLM in the coordination loop)",
-        "40+ CLI agent adapters (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, etc.)",
+        "55 selectable CLI agent adapter names",
         "Always-on lineage spine and replay journal",
         "Per-task git worktree isolation",
         "Air-gap install profile",
@@ -92,7 +92,7 @@
       "@id": "https://bernstein.run/#website",
       "url": "https://bernstein.run",
       "name": "Bernstein",
-      "description": "The open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, +40 more). No model in the coordination loop, so replaying a plan reproduces the same task graph. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy.",
+      "description": "The open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, and others). No model in the coordination loop, so replaying a plan reproduces the same task graph. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy.",
       "publisher": {
         "@id": "https://bernstein.run/#org"
       }
@@ -118,7 +118,7 @@
           "name": "What is Bernstein?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Bernstein is the open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI and 40+ more), run in parallel on your codebase. It decomposes goals into tasks, assigns each to an agent in its own git worktree, and verifies results through lint, type, and test gates before merging. The scheduler is plain Python with no model in the coordination loop, so replaying a plan reproduces the same task graph."
+            "text": "Bernstein is the open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI and others), run in parallel on your codebase. It decomposes goals into tasks, assigns each to an agent in its own git worktree, and verifies results through lint, type, and test gates before merging. The scheduler is plain Python with no model in the coordination loop, so replaying a plan reproduces the same task graph."
           }
         },
         {
@@ -134,7 +134,7 @@
           "name": "What AI coding agents does Bernstein support?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Bernstein ships 40+ CLI agent adapters including Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral Vibe, Autohand, Forge, Hermes, OpenHands, Open Interpreter, gptme, Plandex, AIChat, Letta Code, and a generic adapter for wrapping any CLI tool."
+            "text": "Bernstein offers 55 selectable CLI agent adapter names for tools including Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral Vibe, Autohand, Forge, Hermes, OpenHands, Open Interpreter, gptme, Plandex, AIChat, and Letta Code. A generic adapter can wrap any CLI tool."
           }
         },
         {
