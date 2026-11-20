@@ -86,7 +86,7 @@ export function GET() {
     'Location: Haifa, Israel',
     '',
     '/* THANKS */',
-    'Bernstein orchestrates: Claude Code, Codex CLI, Gemini CLI, and 40+ more agents',
+    'Bernstein orchestrates: Claude Code, Codex CLI, Gemini CLI, and other CLI coding agents',
     '',
     '/* SITE */',
     'Standards: HTML5, CSS3, TypeScript',

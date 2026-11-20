@@ -291,8 +291,8 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
         <p className="v2-rc-label">today</p>
         <div className="v2-mini-stats" role="list">
           <div className="v2-ms" role="listitem">
-            <div className="v2-ms-n">50+</div>
-            <div className="v2-ms-l">cli adapters</div>
+            <div className="v2-ms-n">55</div>
+            <div className="v2-ms-l">selectable CLI agent adapter names</div>
           </div>
           <a
             className="v2-ms v2-ms-link"

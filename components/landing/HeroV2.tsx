@@ -157,9 +157,8 @@ export async function HeroV2({
                 <span className="pulse" aria-hidden="true" />
                 {versionTag} shipping
               </span>
-              {/* Keep the public adapter claim approximate, matching the rail. */}
               <span className="v2-meta">
-                50+ cli adapters · apache 2.0 · on-prem
+                cli coding-agent adapters · apache 2.0 · on-prem
               </span>
             </div>
 

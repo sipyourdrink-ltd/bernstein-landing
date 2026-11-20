@@ -39,7 +39,7 @@ Primary-use-cases: Parallel feature work across many CLI agents, reproducible un
 Install-command: pipx install bernstein
 Supported-agents: Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, OpenHands, Open Interpreter, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Kimchi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral, Muse Code, Plandex, Junie, gptme, Letta Code, Devin terminal, Amazon Q Developer, CLM, agy, aichat, Pydantic AI, Antigravity, Python runtime, Computer use, Autohand, Forge, Hermes, Generic
 Delegated-orchestrators: Composio (@aoagents/ao), Ralphex (umputun/ralphex)
-Total-adapters: 50+
+Selectable-CLI-agent-adapter-names: 55
 Agent-plugin-manifests: plugin.json and mcp.json at the repository root (Agent Plugins v1.0.0 schema)
 Cloud-execution: Cloudflare Workers, Workflows (experimental, self-deployed)
 MCP-transport: HTTP remote transport for cloud-based MCP servers
