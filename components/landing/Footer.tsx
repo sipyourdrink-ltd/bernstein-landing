@@ -10,7 +10,7 @@ export function Footer() {
       <div className="footer-inner">
         <div className="footer-brand">
           <span className="footer-logo">bernstein<span>.run</span></span>
-          <p className="footer-tagline">The open-source governance layer for AI agents, verifiable offline</p>
+          <p className="footer-tagline">An open-source governance layer for AI agents, verifiable offline</p>
         </div>
         <div className="footer-links">
           <div className="footer-col">

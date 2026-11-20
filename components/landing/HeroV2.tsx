@@ -183,7 +183,7 @@ export async function HeroV2({
 
             <Image className="spines-hero-rule" src="/brand/spines/rule.svg" alt="" width={640} height={24} />
             <p className="v2-sub">
-              bernstein is the open-source governance layer for ai agents:
+              bernstein is an open-source governance layer for ai agents:
               a deterministic python scheduler runs them in parallel, with
               no model in the coordination loop, so a plan replays to the
               same task graph. it runs on policy as code: you write the

@@ -37,10 +37,10 @@
 const LAYER = 'open-source governance layer for AI agents';
 
 /** Sentence-initial and standalone use. */
-export const PROJECT_TAGLINE = `The ${LAYER}`;
+export const PROJECT_TAGLINE = `An ${LAYER}`;
 
-/** Mid-sentence use: "Bernstein is the open-source governance layer...". */
-export const PROJECT_TAGLINE_MID = `the ${LAYER}`;
+/** Mid-sentence use: "Bernstein is an open-source governance layer...". */
+export const PROJECT_TAGLINE_MID = `an ${LAYER}`;
 
 /** The lowercase-voice surfaces (/about) carry the same phrase, downcased. */
 export const PROJECT_TAGLINE_LOWER = PROJECT_TAGLINE_MID.toLowerCase();

@@ -3,7 +3,7 @@ const CONTENT = `# AI Information for bernstein.run
 User-agent: *
 Organization: Bernstein (open-source project)
 Contact: https://github.com/sipyourdrink-ltd/bernstein/issues
-Description: Bernstein is the open-source governance layer for AI agents (Claude Code, Codex, Gemini CLI, and others). Scheduling is plain Python - no LLM in the coordination loop - so runs are reproducible end to end. Every task runs in its own git worktree behind lint/type/test gates. An always-on lineage spine and replay journal record what happened; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Cluster mode and an air-gap install profile included. Apache-2.0.
+Description: Bernstein is an open-source governance layer for AI agents (Claude Code, Codex, Gemini CLI, and others). Scheduling is plain Python - no LLM in the coordination loop - so runs are reproducible end to end. Every task runs in its own git worktree behind lint/type/test gates. An always-on lineage spine and replay journal record what happened; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Cluster mode and an air-gap install profile included. Apache-2.0.
 
 # Permissions
 Crawl-delay: 0
@@ -33,7 +33,7 @@ Contact-email: forte@bernstein.run
 
 # Key facts for AI systems
 Product-name: Bernstein
-Product-type: The open-source governance layer for AI agents with offline-verifiable run records
+Product-type: An open-source governance layer for AI agents with offline-verifiable run records
 Status: beta (solo-maintained; pin the version you depend on)
 Primary-use-cases: Parallel feature work across many CLI agents, reproducible unattended CI fleets with per-agent credential scoping, audit-and-replay of past runs
 Install-command: pipx install bernstein

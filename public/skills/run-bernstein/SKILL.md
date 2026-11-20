@@ -5,7 +5,7 @@ description: Install Bernstein locally and drive an orchestration run — parall
 
 # Run Bernstein
 
-Bernstein is the open-source governance layer for AI agents; CLI coding agents work out of the box
+Bernstein is an open-source governance layer for AI agents; CLI coding agents work out of the box
 (Claude Code, Codex, Gemini CLI, and others). There is no hosted
 instance: the orchestrator runs on the machine where it is installed.
 This skill covers getting from nothing to a supervised run.

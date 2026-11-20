@@ -22,7 +22,7 @@ export const ORGANIZATION_JSON_LD: JsonLdData = {
   name: SITE_NAME,
   alternateName: [PROJECT_ALTERNATE_NAME],
   description:
-    'The open-source governance layer for AI agents. Coordinates Claude Code, Codex, Gemini CLI, and other CLI coding agents under a plain-Python scheduler with no model in the coordination loop, git worktree isolation, quality gates, MCP server mode, A2A protocol, an always-on lineage spine and replay journal, and an opt-in HMAC-chained audit log a reviewer checks offline.',
+    'An open-source governance layer for AI agents. Coordinates Claude Code, Codex, Gemini CLI, and other CLI coding agents under a plain-Python scheduler with no model in the coordination loop, git worktree isolation, quality gates, MCP server mode, A2A protocol, an always-on lineage spine and replay journal, and an opt-in HMAC-chained audit log a reviewer checks offline.',
   url: SITE_URL,
   contactPoint: {
     '@type': 'ContactPoint',
