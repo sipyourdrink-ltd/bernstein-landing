@@ -1,10 +1,10 @@
 # Bernstein
 
-> The open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, +40 more). No model in the coordination loop, so replaying a plan reproduces the same task graph. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy.
+> The open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, and others). No model in the coordination loop, so replaying a plan reproduces the same task graph. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy.
 
 ## What This Is
 
-Bernstein is the open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, and 40+ more). Scheduling is plain Python - no LLM in the coordination loop - so runs are reproducible end to end. It decomposes goals into tasks, assigns them to agents with appropriate models and roles, runs every task in its own git worktree behind lint/type/test gates, and merges verified results. An always-on lineage spine and replay journal record what happened; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with.
+Bernstein is the open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, and others). Scheduling is plain Python - no LLM in the coordination loop - so runs are reproducible end to end. It decomposes goals into tasks, assigns them to agents with appropriate models and roles, runs every task in its own git worktree behind lint/type/test gates, and merges verified results. An always-on lineage spine and replay journal record what happened; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with.
 
 ## How To Use
 
@@ -43,7 +43,7 @@ Bernstein exposes an MCP server (`bernstein mcp`, stdio or HTTP transport). Tool
 - Status: beta - solo-maintained, under active development; pin the version you depend on
 - License: Apache 2.0
 - Language: Python 3.12+
-- Adapters: 40+ CLI agent adapters (Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, GitHub Copilot, Droid, Crush, Auggie, Cline, and more)
+- Adapters: 55 selectable CLI agent adapter names for tools including Claude Code, Codex, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, GitHub Copilot, Droid, Crush, Auggie, Cline, and more
 - Cloud: Cloudflare Workers with Workflows, R2, D1, Vectorize (experimental, self-deployed)
 - State: File-based (.sdd/), not in-memory
 - Orchestrator: Deterministic Python, zero LLM tokens on scheduling

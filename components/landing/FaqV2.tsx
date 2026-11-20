@@ -60,7 +60,7 @@ const QAS: Qa[] = [
     a: (
       <>
         claude code can spawn sub-agents on its own; bernstein does the same
-        thing across 40+ cli agents at once and verifies their
+        thing across multiple cli agents at once and verifies their
         output against your tests instead of trusting it. claude code is the
         most common primary backend inside bernstein - using one does not
         exclude the other.

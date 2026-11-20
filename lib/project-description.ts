@@ -113,7 +113,7 @@ export const PROJECT_ONE_LINER = 'Govern any agent workload. Any model. One comm
  * out-of-the-box path, and dropping them to make room for the broader
  * framing would trade one inaccuracy for another.
  */
-export const PROJECT_OVERVIEW = `${PROJECT_NAME} is ${PROJECT_TAGLINE_MID}. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, and 40+ more); the same layer governs any agent workload you point it at. It decomposes goals into tasks, assigns them to the most appropriate agents and models, isolates work in git worktrees, verifies results through quality gates, and merges verified output.`;
+export const PROJECT_OVERVIEW = `${PROJECT_NAME} is ${PROJECT_TAGLINE_MID}. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, and others); the same layer governs any agent workload you point it at. It decomposes goals into tasks, assigns them to the most appropriate agents and models, isolates work in git worktrees, verifies results through quality gates, and merges verified output.`;
 
 /** `Person` JSON-LD on /about. Lowercase to match that page's voice. */
 export const PROJECT_MAINTAINER_DESCRIPTION = `solo maintainer of bernstein, ${PROJECT_TAGLINE_LOWER}. deterministic python scheduler, cli coding agents out of the box. apache 2.0, self-bootstrapped, no vc funding.`;

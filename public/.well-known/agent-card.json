@@ -1,6 +1,6 @@
 {
   "name": "Bernstein",
-  "description": "The open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, +40 more). No model in the coordination loop, so replaying a plan reproduces the same task graph. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy.",
+  "description": "The open-source governance layer for AI agents. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, and others). No model in the coordination loop, so replaying a plan reproduces the same task graph. Signed lineage plus an opt-in HMAC audit chain a reviewer checks offline, without rerunning it. Cluster mode, air-gap deploy.",
   "url": "https://bernstein.run/api/a2a",
   "preferredTransport": "JSONRPC",
   "supportedInterfaces": [
@@ -46,7 +46,7 @@
     {
       "id": "orchestrate",
       "name": "Multi-Agent Orchestration",
-      "description": "Orchestrate 40+ CLI coding agents (Claude Code, Codex, Gemini CLI, Aider, and more) against one goal in parallel. Decomposes into tasks, assigns roles, isolates each task in its own git worktree, and gates every merge on lint, types, and tests. Scheduling is plain Python with no LLM in the coordination loop, so a run is reproducible end to end. A lineage spine and replay journal are always on; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with.",
+      "description": "Orchestrate CLI coding agents (Claude Code, Codex, Gemini CLI, Aider, and more) against one goal in parallel. Decomposes into tasks, assigns roles, isolates each task in its own git worktree, and gates every merge on lint, types, and tests. Scheduling is plain Python with no LLM in the coordination loop, so a run is reproducible end to end. A lineage spine and replay journal are always on; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with.",
       "tags": [
         "orchestration",
         "multi-agent",

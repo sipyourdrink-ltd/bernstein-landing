@@ -1,8 +1,3 @@
-/**
- * Generated catalogues retain the resolved count.
- * Public marketing copy uses the approximate "50+" claim instead.
- * Keep both contracts in sync without changing the generated data.
- */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -31,27 +26,19 @@ test('data/adapter-count.json holds a plausible count', async () => {
   );
 });
 
-test('/ai.txt Total-adapters uses the approximate public claim', async () => {
+test('/ai.txt identifies what the public count measures', async () => {
   const body = await GET().text();
-  assert.ok(
-    body.includes('Total-adapters: 50+'),
-    '/ai.txt must advertise Total-adapters: 50+',
-  );
+  assert.match(body, /^Selectable-CLI-agent-adapter-names: 55$/m);
 });
 
-test('the CLI catalogue blurb matches the resolved count', async () => {
-  const count = await expectedCount();
+test('the CLI catalogues describe the selectable names', async () => {
   for (const file of ['data/cli.json', 'data/cli-seed.json']) {
     const raw = await fs.readFile(path.join(root, file), 'utf8');
-    const m = raw.match(
-      /Deterministic Python scheduler for CLI coding agents — (\d+) adapters/,
-    );
-    assert.ok(m, `${file} must carry the adapter-count blurb`);
-    assert.equal(Number(m![1]), count, `${file} states ${m![1]}, expected ${count}`);
+    assert.match(JSON.parse(raw).root.description, /55 selectable CLI agent adapter names/, file);
   }
 });
 
-test('the repo README uses the approximate public claim', async () => {
+test('the repo README describes the selectable names', async () => {
   const raw = await fs.readFile(path.join(root, 'README.md'), 'utf8');
-  assert.match(raw, /50\+ adapters ship with/, 'README.md must advertise 50+ adapters');
+  assert.match(raw, /55 selectable CLI agent adapter names/);
 });

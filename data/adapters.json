@@ -64,7 +64,7 @@
       "mcpSupport": false,
       "auditChain": false,
       "homepage": "https://aider.chat",
-      "summary": "Aider is the original open-source coding agent. Talks to ~50 LLM providers via LiteLLM, commits each change to git automatically, ships a repo-map for context. Apache-2.0, 30k+ stars.",
+      "summary": "Aider is the original open-source coding agent. Talks to ~50 LLM providers via LiteLLM, commits each change to git automatically, ships a repo-map for context. Apache-2.0.",
       "whenToChoose": "If you already use Aider and like its `/add`, `/run`, `/test` muscle memory - Bernstein doesn't replace any of that. Aider is also the right tool when MCP is overkill: many tasks are one repo, one agent, one provider, and Aider's surface is smaller and faster than anything wrapping it.",
       "whenToChooseBernstein": "When you want Aider's reliability AND parallelism. Bernstein spawns 3-8 Aiders in separate worktrees against the same goal, each scoped to a different sub-task, and reconciles the diffs. The audit chain on top of Aider's per-change commits is also a regulatory differentiator the bare CLI doesn't have.",
       "ready": true
@@ -194,8 +194,8 @@
       "auditChain": false,
       "homepage": "https://docs.anthropic.com/en/docs/claude-code",
       "summary": "Claude Code is Anthropic's official terminal-native coding agent. It runs as a single Node binary, supports MCP, and ships per-project skills. Designed for one developer driving one repo at a time.",
-      "whenToChoose": "If your work fits one focused thread per session, Claude Code alone is faster than wrapping it in an orchestrator. The CLI is mature, the cache-control story is best-in-class, and the Claude Pro/Max subscription is a fixed-cost option Bernstein cannot replicate.",
-      "whenToChooseBernstein": "If you want to run Claude Code alongside Codex, Cursor, or Aider on the same goal - Bernstein splits the goal into parallel tasks and routes each to the cheapest agent whose recent pass rate is above threshold. Claude Code is then ONE adapter among 42, not the only seat at the table.",
+      "whenToChoose": "If your work fits one focused thread per session, Claude Code alone is faster than wrapping it in an orchestrator. The CLI is mature, and the Claude Pro/Max subscription is a fixed-cost option Bernstein cannot replicate.",
+      "whenToChooseBernstein": "If you want to run Claude Code alongside Codex, Cursor, or Aider on the same goal - Bernstein splits the goal into parallel tasks and routes each to the cheapest agent whose recent pass rate is above threshold.",
       "ready": true
     },
     {

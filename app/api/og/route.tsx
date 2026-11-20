@@ -1,6 +1,5 @@
 import { ImageResponse } from '@vercel/og';
 import type { NextRequest } from 'next/server';
-import adapterCount from '@/data/adapter-count.json';
 import { PROJECT_TAGLINE, PROJECT_ONE_LINER } from '@/lib/project-description';
 import { MARK_PATH, MARK_VIEWBOX } from '@/lib/brand';
 import { renderableOgText } from '@/lib/og-text';
@@ -48,12 +47,8 @@ function loadFont(): Promise<ArrayBuffer> {
 const OG_CACHE_CONTROL =
   'public, no-transform, max-age=3600, s-maxage=86400, stale-while-revalidate=86400';
 
-// Live-fetch GitHub stargazer count once an hour at the edge so the
-// OG image badge does not drift. Falls back to a static floor when
-// the API is unavailable. revalidate:3600 keeps cost trivial - one
-// upstream call per cache region per hour.
-async function fetchLiveStats(): Promise<{ stars: number; adapters: number }> {
-  const FALLBACK = { stars: 693, adapters: adapterCount.count };
+// Cache GitHub's count for an hour and omit the badge if it is unavailable.
+async function fetchStars(): Promise<number | null> {
   try {
     const r = await fetch(
       'https://api.github.com/repos/sipyourdrink-ltd/bernstein',
@@ -62,21 +57,15 @@ async function fetchLiveStats(): Promise<{ stars: number; adapters: number }> {
         headers: { 'User-Agent': 'bernstein.run-og/1.0' },
       } as RequestInit,
     );
-    if (!r.ok) return FALLBACK;
-    const d = (await r.json()) as { stargazers_count?: number };
-    const stars =
-      typeof d.stargazers_count === 'number' && d.stargazers_count > 0
-        ? d.stargazers_count
-        : FALLBACK.stars;
-    return { stars, adapters: FALLBACK.adapters };
+    if (!r.ok) return null;
+    const { stargazers_count: stars } = (await r.json()) as { stargazers_count?: unknown };
+    return typeof stars === 'number' && Number.isInteger(stars) && stars > 0 ? stars : null;
   } catch {
-    return FALLBACK;
+    return null;
   }
 }
 
-// Round stars DOWN to the nearest 50 / 100 / 500 milestone so the
-// badge reads "390+" rather than "394" - looks intentional + ages
-// gracefully between deploys.
+// Round the live count down to a milestone for the badge.
 function formatStarsBadge(n: number): string {
   if (n >= 1000) return `${Math.floor(n / 100) * 100}+`;
   if (n >= 250) return `${Math.floor(n / 50) * 50}+`;
@@ -95,9 +84,8 @@ export async function GET(request: NextRequest) {
   const raw = searchParams.get('title') ?? '';
   const title = renderableOgText(raw.slice(0, 200)) || 'Bernstein';
   const isDefault = !searchParams.get('title');
-  const [stats, font] = await Promise.all([fetchLiveStats(), loadFont()]);
-  const starsLabel = `${formatStarsBadge(stats.stars)} stars`;
-  const adaptersLabel = '50+ adapters';
+  const [stars, font] = await Promise.all([fetchStars(), loadFont()]);
+  const adaptersLabel = 'CLI coding-agent adapters';
 
   return new ImageResponse(
     (
@@ -157,28 +145,30 @@ export async function GET(request: NextRequest) {
 
           {/* Social proof pills */}
           <div style={{ display: 'flex', gap: '12px' }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 14px',
-                borderRadius: '20px',
-                background: '#1A1A15',
-                border: '1px solid #33332B',
-                fontSize: 14,
-                color: '#F2EFE6',
-              }}
-            >
-              {/* Inline SVG, not a U+2605 glyph: the bundled font has no star. */}
-              <svg width="14" height="14" viewBox="0 0 24 24">
-                <path
-                  d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                  fill="#F5A524"
-                />
-              </svg>
-              {starsLabel}
-            </div>
+            {stars !== null && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 14px',
+                  borderRadius: '20px',
+                  background: '#1A1A15',
+                  border: '1px solid #33332B',
+                  fontSize: 14,
+                  color: '#F2EFE6',
+                }}
+              >
+                {/* Inline SVG, not a U+2605 glyph: the bundled font has no star. */}
+                <svg width="14" height="14" viewBox="0 0 24 24">
+                  <path
+                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                    fill="#F5A524"
+                  />
+                </svg>
+                {`${formatStarsBadge(stars)} stars`}
+              </div>
+            )}
             <div
               style={{
                 display: 'flex',

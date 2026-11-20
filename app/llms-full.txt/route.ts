@@ -13,7 +13,7 @@ import { PROJECT_ONE_LINER, PROJECT_OVERVIEW } from '@/lib/project-description';
 const BASE_CONTENT = `# Bernstein - Complete Technical Reference
 
 > The open-source governance layer for AI agents (Claude Code, Codex, Gemini
-> CLI, +40 more). No model in the coordination loop, so replaying a plan
+> CLI, and others). No model in the coordination loop, so replaying a plan
 > reproduces the same task graph. Signed lineage plus an opt-in
 > HMAC audit chain a reviewer checks offline, without rerunning it. Cluster
 > mode, air-gap deploy.
@@ -23,7 +23,7 @@ const BASE_CONTENT = `# Bernstein - Complete Technical Reference
 
 ${PROJECT_OVERVIEW}
 
-State lives in \`.sdd/\` - no server to provision. Per-agent credential scoping keeps each agent's keys out of the others' environments. The 40+ adapter spread means it runs on whichever CLI agent you already trust (Claude Code, Codex, Gemini CLI, Aider, and more). A lineage spine and replay journal are always on, so any run can be reconstructed step by step; enable the HMAC-chained audit log and every step becomes a signed record a reviewer who did not execute the run can check offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Cluster mode and an air-gap install profile are included.
+State lives in \`.sdd/\` - no server to provision. Per-agent credential scoping keeps each agent's keys out of the others' environments. Bernstein offers 55 selectable CLI agent adapter names for tools such as Claude Code, Codex, Gemini CLI, and Aider. A lineage spine and replay journal are always on, so any run can be reconstructed step by step; enable the HMAC-chained audit log and every step becomes a signed record a reviewer who did not execute the run can check offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Cluster mode and an air-gap install profile are included.
 
 The orchestrator itself is deterministic Python code - no LLM tokens are spent on coordination, scheduling, or task management. LLMs are only used by the agents themselves to write code.
 
@@ -100,7 +100,7 @@ bernstein run plans/my-project.yaml
 
 3. **Short-lived agents**: Agents handle 1-3 tasks each, then exit. No long-running agent processes. Fresh context per task prevents hallucination drift.
 
-4. **Agent-agnostic**: Works with any CLI coding agent. Currently ships 40+ adapters. Adding a new agent requires implementing a simple adapter interface.
+4. **Agent-agnostic**: Works with any CLI coding agent. Offers 55 selectable CLI agent adapter names. Adding a new agent requires implementing a simple adapter interface.
 
 5. **Model-per-task routing**: Routing defaults to a static cascade by task complexity; an optional LinUCB contextual bandit router (\`--routing bandit\`) can learn which model works best for each task type and complexity level. Measure yours with bernstein cost.
 
@@ -213,7 +213,7 @@ The system is organized into sub-packages under \`src/bernstein/core/\`:
 
 ---
 
-## Supported Agents (40+ Adapters)
+## Supported Agents (55 selectable CLI agent adapter names)
 
 | Agent | Description | Models |
 |-------|-------------|--------|
@@ -595,13 +595,13 @@ Bernstein has an experimental Cloudflare integration that you deploy to your own
 ## FAQ
 
 ### What is Bernstein?
-Bernstein is the open-source governance layer for AI agents (Claude Code, Codex, Gemini CLI and 40+ more) that runs them in parallel on your codebase. It decomposes goals into tasks, assigns each to an agent in its own git worktree, and verifies results through lint, type, and test gates before merging. The scheduler is plain Python with no model in the coordination loop, so replaying a plan reproduces the same task graph.
+Bernstein is the open-source governance layer for AI agents (Claude Code, Codex, Gemini CLI and others) that runs them in parallel on your codebase. It decomposes goals into tasks, assigns each to an agent in its own git worktree, and verifies results through lint, type, and test gates before merging. The scheduler is plain Python with no model in the coordination loop, so replaying a plan reproduces the same task graph.
 
 ### How does it differ from an LLM-driven orchestrator?
 The orchestrator is deterministic Python code - no model tokens are spent on coordination, and the same plan replays to the same task graph. It drives real CLI coding agents rather than API-only models, and each one gets a git worktree, quality gates, and cost tracking without extra wiring.
 
 ### What agents does Bernstein support?
-Bernstein ships 40+ adapters for popular coding agents including Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Ollama, GitHub Copilot, Droid, Crush, and more. It also has a generic adapter for wrapping any CLI tool.
+Bernstein offers 55 selectable CLI agent adapter names for tools including Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Ollama, GitHub Copilot, Droid, Crush, and more. It also has a generic adapter for wrapping any CLI tool.
 
 ### How does task routing work?
 By default Bernstein uses a static routing cascade. Simple tasks go to cheaper models (Haiku, Flash), complex architecture tasks go to expensive models (Opus). An optional LinUCB contextual bandit router, enabled with \`--routing bandit\`, learns which model works best for each task type and complexity. Measure yours with bernstein cost.

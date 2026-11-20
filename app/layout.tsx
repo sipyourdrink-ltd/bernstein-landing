@@ -33,7 +33,7 @@ const SITE_URL = "https://bernstein.run";
    Twitter card. Kept as a single const so the three can never drift
    apart again - they had, and each carried a different agent count. */
 const SITE_DESCRIPTION =
-  "The open-source governance layer for AI agents. Policy as code for approvals and records, enforced around Claude Code, Codex, Gemini CLI and 40+ more.";
+  "The open-source governance layer for AI agents. Policy as code for approvals and records, enforced around Claude Code, Codex, Gemini CLI and others.";
 
 export const viewport: Viewport = {
   /* Cream paper background - matches --bg-paper. Hex fallback for browsers
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
         url: "/brand/spines/social-light.png",
         width: 1280,
         height: 640,
-        alt: "Bernstein - the open-source governance layer for AI agents: Claude Code, Codex, Gemini CLI, and 40+ more, with runs a reviewer can verify offline",
+        alt: "Bernstein - the open-source governance layer for AI agents: Claude Code, Codex, Gemini CLI, and others, with runs a reviewer can verify offline",
       },
     ],
   },

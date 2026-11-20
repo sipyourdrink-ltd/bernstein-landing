@@ -112,7 +112,7 @@ export function buildPositioningParagraph(e: CompareEntry, builtOn: string): str
     );
   }
   parts.push(
-    `Bernstein routes tasks to ${e.displayName} when its pass rate on similar work clears the configured threshold, otherwise the deterministic Python scheduler picks a different adapter from the 40+ adapter catalog.`,
+    `Bernstein routes tasks to ${e.displayName} when its pass rate on similar work clears the configured threshold, otherwise the deterministic Python scheduler picks a different adapter from the catalog.`,
   );
   return parts.join(' ');
 }
@@ -138,7 +138,7 @@ export function buildFacts(e: CompareEntry, builtOn: string): Fact[] {
   /* Fact 1: the adapter exists in the bernstein registry. Always true,
      always sourced from the source file in the master branch. */
   facts.push({
-    claim: `Bernstein ships a ${e.displayName} adapter at ${e.sourceFile} that wraps the upstream CLI as one of 42 routable agents.`,
+    claim: `Bernstein ships a ${e.displayName} adapter at ${e.sourceFile} that wraps the upstream CLI.`,
     sourceUrl: e.sourceFileUrl,
     sourceLabel: 'bernstein adapter source',
     asOf: builtOn,

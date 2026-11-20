@@ -3,7 +3,7 @@ const CONTENT = `# AI Information for bernstein.run
 User-agent: *
 Organization: Bernstein (open-source project)
 Contact: https://github.com/sipyourdrink-ltd/bernstein/issues
-Description: Bernstein is the open-source governance layer for AI agents (Claude Code, Codex, Gemini CLI, and 40+ more). Scheduling is plain Python - no LLM in the coordination loop - so runs are reproducible end to end. Every task runs in its own git worktree behind lint/type/test gates. An always-on lineage spine and replay journal record what happened; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Cluster mode and an air-gap install profile included. Apache-2.0.
+Description: Bernstein is the open-source governance layer for AI agents (Claude Code, Codex, Gemini CLI, and others). Scheduling is plain Python - no LLM in the coordination loop - so runs are reproducible end to end. Every task runs in its own git worktree behind lint/type/test gates. An always-on lineage spine and replay journal record what happened; an opt-in HMAC-chained audit log and signed receipts let a reviewer who did not execute the run check it offline, without rerunning it. Signature and hash-chain checks read the on-disk records alone; the HMAC leg needs the key the chain was written with. Cluster mode and an air-gap install profile included. Apache-2.0.
 
 # Permissions
 Crawl-delay: 0
@@ -39,7 +39,7 @@ Primary-use-cases: Parallel feature work across many CLI agents, reproducible un
 Install-command: pipx install bernstein
 Supported-agents: Claude Code, Codex CLI, Gemini CLI, OpenAI Agents SDK, Cursor, Aider, Amp, Kiro, Kilo, Qwen, Goose, Ollama, Cody, Continue, OpenCode, OpenHands, Open Interpreter, IaC, GitHub Copilot, Droid (Factory AI), Crush (Charm), Auggie (Augment), Kimi, Kimchi, Rovo Dev (Atlassian), Cline, Codebuff, Pi, Mistral, Muse Code, Plandex, Junie, gptme, Letta Code, Devin terminal, Amazon Q Developer, CLM, agy, aichat, Pydantic AI, Antigravity, Python runtime, Computer use, Autohand, Forge, Hermes, Generic
 Delegated-orchestrators: Composio (@aoagents/ao), Ralphex (umputun/ralphex)
-Total-adapters: 50+
+Selectable-CLI-agent-adapter-names: 55
 Agent-plugin-manifests: plugin.json and mcp.json at the repository root (Agent Plugins v1.0.0 schema)
 Cloud-execution: Cloudflare Workers, Workflows (experimental, self-deployed)
 MCP-transport: HTTP remote transport for cloud-based MCP servers

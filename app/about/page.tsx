@@ -139,8 +139,8 @@ export default function AboutPage() {
             <h2>what qualifies the voice</h2>
             <p>
               concrete signals rather than years-of-experience filler.
-              bernstein ships 50+ cli adapters (claude code, codex, cursor,
-              aider, gemini, openai agents sdk, and the rest - see{' '}
+              bernstein offers 55 selectable cli agent adapter names (for tools including
+              claude code, codex, cursor, aider, gemini, and openai agents sdk - see{' '}
               <a href="/vs">/vs</a> for the comparison index), an
               hmac-signed audit log, sigstore-style lineage records per
               artefact, a contextual-bandit router for cheapest-passing

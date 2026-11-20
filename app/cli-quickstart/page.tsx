@@ -201,7 +201,7 @@ bernstein init`}</code>
             <p>
               Open <code>bernstein.yaml</code> and edit the keys.{' '}
               The seed file sets <code>goal</code>, <code>cli</code> (one of the
-              40+ adapter names, or <code>auto</code>), <code>model</code>,{' '}
+              55 selectable CLI agent adapter names, or <code>auto</code>), <code>model</code>,{' '}
               <code>team</code> (<code>auto</code> or a list of role names),{' '}
               <code>max_agents</code>, and <code>budget</code>. A minimal
               config looks like this:
