@@ -59,7 +59,7 @@ async function fetchStars(): Promise<number | null> {
     );
     if (!r.ok) return null;
     const { stargazers_count: stars } = (await r.json()) as { stargazers_count?: unknown };
-    return typeof stars === 'number' && Number.isInteger(stars) && stars >= 0 ? stars : null;
+    return typeof stars === 'number' && Number.isInteger(stars) && stars > 0 ? stars : null;
   } catch {
     return null;
   }
