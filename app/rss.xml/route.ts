@@ -176,7 +176,7 @@ function buildFeedXml(posts: PostIndex[], buildStamp: string | null): string {
     '  <channel>',
     `    <title>${asCdata('Bernstein Blog')}</title>`,
     `    <link>${escapeXml(`${SITE_URL}/blog`)}</link>`,
-    `    <description>${asCdata('Engineering deep-dives, community spotlights, and updates from the Bernstein project - the open-source governance layer for AI agents.')}</description>`,
+    `    <description>${asCdata('Engineering deep-dives, community spotlights, and updates from the Bernstein project - an open-source governance layer for AI agents.')}</description>`,
     '    <language>en-us</language>',
     `    <copyright>${asCdata(copyright)}</copyright>`,
     `    <managingEditor>${escapeXml(EDITOR)}</managingEditor>`,

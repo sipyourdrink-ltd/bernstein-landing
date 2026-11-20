@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Bernstein Task Server
   description: >
-    Bernstein REST API - the open-source governance layer for AI agents, one git worktree per task.
+    Bernstein REST API - an open-source governance layer for AI agents, one git worktree per task.
 
 
     ## Authentication

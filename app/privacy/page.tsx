@@ -30,7 +30,7 @@ export default function PrivacyPage() {
           <div className="prose">
             <h2>Who runs this site</h2>
             <p>
-              bernstein.run is the project site for Bernstein, the
+              bernstein.run is the project site for Bernstein, an
               open-source governance layer for AI agents. It is run by Alex
               Chernysh, an individual, in Haifa, Israel. Sip Your Drink is the
               studio name of Alex Chernysh. It is not a registered company.

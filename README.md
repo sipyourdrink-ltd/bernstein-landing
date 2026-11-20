@@ -18,7 +18,7 @@
 
 This repository is the website, not the software it describes.
 
-[Bernstein](https://github.com/sipyourdrink-ltd/bernstein) is the open-source
+[Bernstein](https://github.com/sipyourdrink-ltd/bernstein) is an open-source
 governance layer for AI agents: a deterministic scheduler with no model in the
 coordination loop, running agents in parallel, gating what they produce, and
 recording every step so a run can be verified afterwards, offline, from the

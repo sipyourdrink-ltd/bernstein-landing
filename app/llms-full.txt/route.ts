@@ -12,7 +12,7 @@ import { PROJECT_ONE_LINER, PROJECT_OVERVIEW } from '@/lib/project-description';
    /q/<slug> pages. */
 const BASE_CONTENT = `# Bernstein - Complete Technical Reference
 
-> The open-source governance layer for AI agents (Claude Code, Codex, Gemini
+> An open-source governance layer for AI agents (Claude Code, Codex, Gemini
 > CLI, and others). No model in the coordination loop, so replaying a plan
 > reproduces the same task graph. Signed lineage plus an opt-in
 > HMAC audit chain a reviewer checks offline, without rerunning it. Cluster
@@ -595,7 +595,7 @@ Bernstein has an experimental Cloudflare integration that you deploy to your own
 ## FAQ
 
 ### What is Bernstein?
-Bernstein is the open-source governance layer for AI agents (Claude Code, Codex, Gemini CLI and others) that runs them in parallel on your codebase. It decomposes goals into tasks, assigns each to an agent in its own git worktree, and verifies results through lint, type, and test gates before merging. The scheduler is plain Python with no model in the coordination loop, so replaying a plan reproduces the same task graph.
+Bernstein is an open-source governance layer for AI agents (Claude Code, Codex, Gemini CLI and others) that runs them in parallel on your codebase. It decomposes goals into tasks, assigns each to an agent in its own git worktree, and verifies results through lint, type, and test gates before merging. The scheduler is plain Python with no model in the coordination loop, so replaying a plan reproduces the same task graph.
 
 ### How does it differ from an LLM-driven orchestrator?
 The orchestrator is deterministic Python code - no model tokens are spent on coordination, and the same plan replays to the same task graph. It drives real CLI coding agents rather than API-only models, and each one gets a git worktree, quality gates, and cost tracking without extra wiring.
