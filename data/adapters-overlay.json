@@ -13,7 +13,7 @@
       "homepage": "https://docs.anthropic.com/en/docs/claude-code",
       "summary": "Claude Code is Anthropic's official terminal-native coding agent. It runs as a single Node binary, supports MCP, and ships per-project skills. Designed for one developer driving one repo at a time.",
       "whenToChoose": "If your work fits one focused thread per session, Claude Code alone is faster than wrapping it in an orchestrator. The CLI is mature, and the Claude Pro/Max subscription is a fixed-cost option Bernstein cannot replicate.",
-      "whenToChooseBernstein": "If you want to run Claude Code alongside Codex, Cursor, or Aider on the same goal - Bernstein splits the goal into parallel tasks and routes each to the cheapest agent whose recent pass rate is above threshold. Claude Code is then ONE adapter among 42, not the only seat at the table."
+      "whenToChooseBernstein": "If you want to run Claude Code alongside Codex, Cursor, or Aider on the same goal - Bernstein splits the goal into parallel tasks and routes each to the cheapest agent whose recent pass rate is above threshold."
     },
     "codex": {
       "install": "npm i -g @openai/codex  (or brew install --cask codex)",
