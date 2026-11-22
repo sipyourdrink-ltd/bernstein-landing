@@ -71,7 +71,7 @@ export function Nav() {
             Verify
           </a>
           <a
-            href="https://github.com/sipyourdrink-ltd/bernstein/tree/main/docs"
+            href="https://docs.bernstein.run/"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -117,7 +117,7 @@ export function Nav() {
               Verify
             </a>
             <a
-              href="https://github.com/sipyourdrink-ltd/bernstein/tree/main/docs"
+              href="https://docs.bernstein.run/"
               target="_blank"
               rel="noopener noreferrer"
             >
