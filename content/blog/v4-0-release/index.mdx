@@ -1,0 +1,21 @@
+---
+title: "Bernstein 4.0.0"
+description: "Several changes in this release are about things that used to pass quietly and now don't."
+date: "2026-11-22"
+---
+
+Bernstein 4.0.0 is out. It is an open-source governance layer for AI agents (Apache-2.0).
+
+Several changes in this release are about things that used to pass quietly and now don't.
+
+A failed workflow node now stops every later layer, including independent branches. Before, those were still dispatched and wrote success checkpoints. A detached SSH task that exits nonzero now fails the run instead of being recorded as completed.
+
+With `--strict`, `bernstein govern audit` exits 1 when a check fails or crashes and 2 when nothing failed but a check could not be measured; a usage error also exits 2.
+
+When an orchestrated run closes normally, the final delegation digest is sealed with an HMAC under the install audit key, so a deleted tail of the chain fails verification. A replay of an earlier authentic snapshot does not, and the notes say so.
+
+Three people made their first contribution this time. Thank you.
+
+The notes also list what is partial in 4.0.0 and the known limitations. Worth reading first.
+
+[https://github.com/sipyourdrink-ltd/bernstein/releases/tag/v4.0.0](https://github.com/sipyourdrink-ltd/bernstein/releases/tag/v4.0.0)

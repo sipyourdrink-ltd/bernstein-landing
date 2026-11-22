@@ -57,6 +57,7 @@ clusters:
     # Version notes and the community spotlight (release-adjacent).
     fallback: agents
     posts:
+      - v4-0-release
       - v3-14-159-pi
       - v3-x-recap
       - output-economy-and-agent-lifecycle
