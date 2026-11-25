@@ -1,39 +1,43 @@
 /**
- * FeaturedPosts - "from the blog" strip on the home page.
- *
- * Why this exists
- * ---------------
- * The pre-2026-05-13 home rendered zero links to any individual
- * `/blog/<slug>` URL. Every blog post was a PageRank island while
- * `/` was racking up 287 impressions in the trailing 7 days alone.
- * Ticket: `.sdd/backlog/open/2026-05-12-action-001-home-internal-link-graph-rebuild.md`.
+ * FeaturedPosts - compact 3-card "from the blog" triptych on the home page.
  *
  * Placement
  * ---------
- * Mounted *after* the install-snippet-bearing hero so mobile LCP isn't
- * pushed below the fold. The hero's RightRail promotes ABOVE the bot
- * column on phones, so the install snippet stays the first big block;
- * this strip lands further down the scroll.
+ * Mounted *after* the install-snippet-bearing hero and PipelineRailMini so
+ * mobile LCP isn't pushed below the fold.
  *
- * Styling
- * -------
- * Reuses `BlogCard` from the blog index. No new CSS file - the
- * `.blog-card` / `.blog-card--featured` rules in `styles/ux-blog.css`
- * already drive these cards on `/blog`, so they paint identically here.
+ * Layout & density
+ * ----------------
+ * Previously rendered inside `.v2-evidence` (`1fr 1fr`), which stacked three
+ * full-size `BlogCard` banners vertically in the right half (~1,600 px tall)
+ * beside an empty left column. Now uses `.v2-blog-strip`: a compact single-row
+ * header above a 3-column horizontal grid (`.v2-blog-grid`) on desktop and
+ * compact thumbnail-left horizontal rows on mobile, with descriptions clamped
+ * to two lines and tag clouds omitted (tags live on `/blog`).
  *
- * Curation
- * --------
- * Posts are pulled via `getFeaturedPosts()` in `lib/mdx.ts` (frontmatter
- * flag `featured: true`). Picked by hand on purpose: an automated
- * "latest 3" would push the next monthly recap ahead of a post that
- * stays useful for years.
- *
- * The heading counts `posts.length` rather than spelling a number out,
- * so flagging a fourth post cannot leave the heading saying "three".
+ * Curation & hard cap
+ * -------------------
+ * Posts are pulled via `getFeaturedPosts()` in `lib/mdx.ts` (`featured: true`)
+ * and hard-capped here with `.slice(0, 3)` so flagging a new post before
+ * unflagging an old one can never spill a fourth card onto the home page.
  */
 
+import Image from 'next/image';
+import Link from 'next/link';
 import type { PostIndex } from '@/lib/mdx';
-import { BlogCard } from '@/components/blog/BlogCard';
+
+export const MAX_FEATURED_POSTS = 3;
+
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+}
 
 interface FeaturedPostsProps {
   /** Curated featured posts, newest first. Empty array → section
@@ -42,31 +46,59 @@ interface FeaturedPostsProps {
 }
 
 export function FeaturedPosts({ posts }: FeaturedPostsProps) {
-  if (posts.length === 0) return null;
+  const items = posts.slice(0, MAX_FEATURED_POSTS);
+  if (items.length === 0) return null;
   return (
     <section
-      className="v2-section"
+      className="v2-section v2-blog-strip"
       id="from-the-blog"
       aria-labelledby="from-the-blog-heading"
     >
-      <div className="v2-evidence">
-        <header>
+      <div className="v2-blog-head">
+        <div className="v2-blog-head-copy">
           <p className="v2-kicker">from the blog</p>
           <h2 id="from-the-blog-heading">
-            {posts.length} {posts.length === 1 ? 'piece' : 'pieces'},{' '}
+            {items.length} {items.length === 1 ? 'piece' : 'pieces'},{' '}
             <em>hand-picked</em>.
           </h2>
-          <p>
-            field notes from the orchestra pit: what 4.0 tightened, what an
-            untrusted ninety-minute run proves, and how deterministic replay and
-            evidence bundles came together.
+          <p className="v2-blog-sub">
+            what 4.0 tightened, what an untrusted ninety-minute run proves, and
+            how deterministic replay and evidence bundles came together.
           </p>
-        </header>
-        <div className="blog-list-items">
-          {posts.map((post) => (
-            <BlogCard key={post.slug} post={post} />
-          ))}
         </div>
+        <Link href="/blog" className="v2-blog-all">
+          Read all field notes <span aria-hidden="true">→</span>
+        </Link>
+      </div>
+      <div className="v2-blog-grid">
+        {items.map((post) => (
+          <Link
+            key={post.slug}
+            href={`/blog/${post.slug}`}
+            className="v2-blog-pick"
+          >
+            {post.fm.cover && post.fm.coverAlt && (
+              <Image
+                className="v2-blog-pick-cover"
+                src={post.fm.cover}
+                alt=""
+                width={1200}
+                height={630}
+                unoptimized
+                loading="lazy"
+              />
+            )}
+            <div className="v2-blog-pick-body">
+              <div className="v2-blog-pick-meta">
+                <time dateTime={post.fm.date}>{formatDate(post.fm.date)}</time>
+                <span aria-hidden="true">·</span>
+                <span>{post.readingMinutes} min read</span>
+              </div>
+              <h3 className="v2-blog-pick-title">{post.fm.title}</h3>
+              <p className="v2-blog-pick-desc">{post.fm.description}</p>
+            </div>
+          </Link>
+        ))}
       </div>
     </section>
   );
