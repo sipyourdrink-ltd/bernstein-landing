@@ -57,9 +57,9 @@ export function FeaturedPosts({ posts }: FeaturedPostsProps) {
             <em>hand-picked</em>.
           </h2>
           <p>
-            field notes from the orchestra pit: what the newest
-            release fixed and what it did not, what running this in the cloud
-            looks like, and how it started.
+            field notes from the orchestra pit: what 4.0 tightened, what an
+            untrusted ninety-minute run proves, and how deterministic replay and
+            evidence bundles came together.
           </p>
         </header>
         <div className="blog-list-items">
