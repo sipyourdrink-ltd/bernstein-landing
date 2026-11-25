@@ -111,11 +111,23 @@ test('v4-0-release has a 1200x630 PNG cover and links to releases/latest', () =>
   assert.equal(png.readUInt32BE(16), 1200);
   assert.equal(png.readUInt32BE(20), 630);
 
+  const hrefs = Array.from(
+    content.matchAll(/\]\((https:\/\/[^)\s]+)\)/g),
+    (m) => new URL(m[1]),
+  );
   assert.ok(
-    content.includes('https://github.com/sipyourdrink-ltd/bernstein/releases/latest'),
+    hrefs.some(
+      (u) =>
+        u.hostname === 'github.com' &&
+        u.pathname === '/sipyourdrink-ltd/bernstein/releases/latest',
+    ),
     'v4-0-release must direct readers to releases/latest for installs/upgrades',
   );
   assert.ok(
-    content.includes('https://github.com/sipyourdrink-ltd/bernstein/releases/tag/v4.0.0'),
+    hrefs.some(
+      (u) =>
+        u.hostname === 'github.com' &&
+        u.pathname === '/sipyourdrink-ltd/bernstein/releases/tag/v4.0.0',
+    ),
   );
 });
