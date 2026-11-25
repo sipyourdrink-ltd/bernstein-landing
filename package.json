@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@react-email/components": "^1.0.12",
-    "@react-email/render": "2.2.0",
+    "@react-email/render": "2.3.1",
     "@vercel/og": "^1.0.3",
     "gray-matter": "^4.0.3",
     "mermaid": "^12.3.0",
