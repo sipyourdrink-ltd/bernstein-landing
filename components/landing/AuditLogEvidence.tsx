@@ -33,6 +33,72 @@
  * under this title would attribute output to a command that never prints it.
  */
 
+const AUDIT_EVENTS = [
+  {
+    time: '17:42:01',
+    event: 'manager.plan',
+    statusClass: 'c-ok',
+    hash: 'cb84a1…',
+    detail: '13 tasks · est $4.20',
+  },
+  {
+    time: '17:42:18',
+    event: 'scheduler.spawn',
+    statusClass: 'c-ok',
+    hash: '3e09f7…',
+    detail: 't-001 → backend (sonnet)',
+  },
+  {
+    time: '17:42:18',
+    event: 'scheduler.spawn',
+    statusClass: 'c-ok',
+    hash: '81c2dd…',
+    detail: 't-002 → backend (sonnet)',
+  },
+  {
+    time: '17:42:19',
+    event: 'scheduler.spawn',
+    statusClass: 'c-ok',
+    hash: 'b50af8…',
+    detail: 't-003 → qa      (opus)',
+  },
+  {
+    time: '17:55:11',
+    event: 'janitor.verify',
+    statusClass: 'c-ok',
+    hash: 'd014a3…',
+    detail: 't-005 docs · pytest 84/84 · ruff 0',
+  },
+  {
+    time: '17:55:14',
+    event: 'manager.merge',
+    statusClass: 'c-ok',
+    hash: 'ee7c12…',
+    detail: 't-005 → main · 4 files · clean',
+  },
+  {
+    time: '18:02:14',
+    event: 'janitor.fail',
+    statusClass: 'c-bad',
+    hash: '9aa10b…',
+    detail: 't-003 qa · pytest collect err · 3/3 retries',
+  },
+  {
+    time: '18:02:30',
+    event: 'scheduler.route',
+    statusClass: 'c-warn',
+    hash: '71b4cc…',
+    detail: 't-003 opus → sonnet · awaiting op',
+  },
+  {
+    time: '18:09:14',
+    event: 'scheduler.pause',
+    statusClass: 'c-warn',
+    hash: '4d2e09…',
+    detail: 'conflict · t-001 ↔ t-007 · src/auth/refresh.py',
+  },
+] as const;
+
 export function AuditLogEvidence() {
   return (
     <section
@@ -78,21 +144,34 @@ export function AuditLogEvidence() {
             semantic information that isn't already in the heading + lede.
             Sighted users see a real audit-log printout; screen readers
             get the role="img" + aria-label above. */}
-        <pre aria-hidden="true">
-          <span className="c-mute"># reading .sdd/audit/2026-07-24.jsonl · 412 entries · 18m04s span</span>
-          {'\n\n'}
-          <span className="c-acc">17:42:01</span>{'  '}<span className="c-ok">manager.plan</span>     <span className="c-hash">cb84a1…</span>  13 tasks · est $4.20{'\n'}
-          <span className="c-acc">17:42:18</span>{'  '}<span className="c-ok">scheduler.spawn</span>  <span className="c-hash">3e09f7…</span>  t-001 → backend (sonnet){'\n'}
-          <span className="c-acc">17:42:18</span>{'  '}<span className="c-ok">scheduler.spawn</span>  <span className="c-hash">81c2dd…</span>  t-002 → backend (sonnet){'\n'}
-          <span className="c-acc">17:42:19</span>{'  '}<span className="c-ok">scheduler.spawn</span>  <span className="c-hash">b50af8…</span>  t-003 → qa      (opus){'\n'}
-          <span className="c-acc">17:55:11</span>{'  '}<span className="c-ok">janitor.verify</span>   <span className="c-hash">d014a3…</span>  t-005 docs · pytest 84/84 · ruff 0{'\n'}
-          <span className="c-acc">17:55:14</span>{'  '}<span className="c-ok">manager.merge</span>    <span className="c-hash">ee7c12…</span>  t-005 → main · 4 files · clean{'\n'}
-          <span className="c-acc">18:02:14</span>{'  '}<span className="c-bad">janitor.fail</span>     <span className="c-hash">9aa10b…</span>  t-003 qa · pytest collect err · 3/3 retries{'\n'}
-          <span className="c-acc">18:02:30</span>{'  '}<span className="c-warn">scheduler.route</span>  <span className="c-hash">71b4cc…</span>  t-003 opus → sonnet · awaiting op{'\n'}
-          <span className="c-acc">18:09:14</span>{'  '}<span className="c-warn">scheduler.pause</span>  <span className="c-hash">4d2e09…</span>  conflict · t-001 ↔ t-007 · src/auth/refresh.py{'\n\n'}
-          <span className="c-mute">verify chain      </span><span className="c-ok">ok ✓</span>  <span className="c-mute">412/412 entries · last hash 4d2e09cb…</span>{'\n'}
-          <span className="c-mute">hmac key          </span><span className="c-acc">~/.local/state/bernstein/audit.key</span>
-        </pre>
+        <div className="v2-term-body" aria-hidden="true">
+          <div className="v2-term-comment c-mute">
+            # reading .sdd/audit/2026-07-24.jsonl · 412 entries · 18m04s span
+          </div>
+          <div className="v2-term-rows">
+            {AUDIT_EVENTS.map((row, idx) => (
+              <div className="v2-term-row" key={`${row.time}-${row.hash}-${idx}`}>
+                <span className="c-acc">{row.time}</span>
+                <span className={row.statusClass}>{row.event}</span>
+                <span className="c-hash">{row.hash}</span>
+                <span className="v2-term-detail">{row.detail}</span>
+              </div>
+            ))}
+          </div>
+          <div className="v2-term-footer">
+            <div className="v2-term-meta">
+              <span className="c-mute">verify chain</span>
+              <span className="v2-term-meta-val">
+                <span className="c-ok">ok ✓</span>{'  '}
+                <span className="c-mute">412/412 entries · last hash 4d2e09cb…</span>
+              </span>
+            </div>
+            <div className="v2-term-meta">
+              <span className="c-mute">hmac key</span>
+              <span className="v2-term-meta-val c-acc">~/.local/state/bernstein/audit.key</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
