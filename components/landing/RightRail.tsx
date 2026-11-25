@@ -397,6 +397,41 @@ export function RightRail({ closedPrs, contributors }: RightRailProps) {
             </dd>
           </div>
           <div className="v2-row">
+            <dt className="v2-k">extends</dt>
+            <dd className="v2-v">
+              with{' '}
+              <a
+                href={withUtm(
+                  'https://github.com/sipyourdrink-ltd/bernstein-addons/tree/main/plugins/org-kit',
+                  {
+                    source: 'bernstein.run',
+                    medium: 'outbound-link',
+                    campaign: 'hero-rail-org-kit',
+                  },
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                org-kit
+              </a>{' '}
+              <em>(roles · SOPs · workflows)</em> &amp;{' '}
+              <a
+                href={withUtm(
+                  'https://github.com/sipyourdrink-ltd/bernstein-addons',
+                  {
+                    source: 'bernstein.run',
+                    medium: 'outbound-link',
+                    campaign: 'hero-rail-plugins',
+                  },
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                plugins
+              </a>
+            </dd>
+          </div>
+          <div className="v2-row">
             <dt className="v2-k">runs on</dt>
             <dd className="v2-v">your laptop, on-prem, air-gapped</dd>
           </div>

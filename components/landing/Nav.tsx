@@ -6,8 +6,8 @@ import { withUtm } from '@/lib/utm';
 import Image from 'next/image';
 import { formatStars } from '@/lib/format-stars';
 
-/* Primary nav is one entry point per job: Install, Verify, Docs, Ask, plus
-   GitHub. Everything else (how it works, cost, blog, the code-map
+/* Primary nav is one entry point per job: Install, Verify, Plugins, Docs,
+   Ask, plus GitHub. Everything else (how it works, cost, blog, the code-map
    shortcuts, the LinkedIn profile) lives in the footer or inline in page
    copy instead - see Footer.tsx. There is no on-page scroll-spy anymore:
    none of the five entries point at a same-page anchor, so the previous
@@ -71,6 +71,17 @@ export function Nav() {
             Verify
           </a>
           <a
+            href={withUtm('https://github.com/sipyourdrink-ltd/bernstein-addons', {
+              source: 'bernstein.run',
+              medium: 'outbound-link',
+              campaign: 'nav-mobile-plugins',
+            })}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Plugins
+          </a>
+          <a
             href="https://docs.bernstein.run/"
             target="_blank"
             rel="noopener noreferrer"
@@ -115,6 +126,17 @@ export function Nav() {
               aria-label="Verify a run receipt"
             >
               Verify
+            </a>
+            <a
+              href={withUtm('https://github.com/sipyourdrink-ltd/bernstein-addons', {
+                source: 'bernstein.run',
+                medium: 'outbound-link',
+                campaign: 'nav-desktop-plugins',
+              })}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Plugins
             </a>
             <a
               href="https://docs.bernstein.run/"
