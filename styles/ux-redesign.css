@@ -536,12 +536,15 @@
 }
 .v2-evidence {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 64px;
+  /* Prose paragraphs cap at 460px; give the wider share to the terminal so
+     the 82ch audit-log rows fit on one aligned line at 1280px and 1440px
+     without an unused left-column gutter or a horizontal scrollbar. */
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 56px;
   align-items: start;
-  /* Same min-width:0 reasoning as .v2-term — without it, a wide
-     <pre> in the right cell drags the whole section past viewport
-     width and the page (not the terminal) scrolls horizontally. */
+  /* Same min-width:0 reasoning as .v2-term — without it, content in the
+     right cell can drag the whole section past viewport width and the
+     page scrolls horizontally. */
   min-width: 0;
 }
 .v2-evidence > * { min-width: 0; }
@@ -723,26 +726,21 @@
 }
 
 
-/* Terminal — dark warm surface with traffic-light chrome */
+/* Terminal — dark warm surface with responsive tabular rows */
 .v2-term {
   background: var(--term-bg);
   color: var(--term-ink);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-3);
   font-family: var(--font-mono);
-  /* Dropped from 12.5px → 11px so the longest mock log row
-     ("scheduler.pause … conflict · t-001 ↔ t-007 · src/auth/refresh.py")
-     fits inside the terminal at the typical right-cell width without
-     a horizontal scrollbar. If a future log row is longer than this,
-     prefer trimming the row over shrinking type any further. */
   font-size: var(--text-xs);
   line-height: 1.65;
+  font-variant-numeric: tabular-nums;
   overflow: hidden;
+  container-type: inline-size;
   /* Grid items default to min-width:auto, which is the children's
-     min-content width — for a fixed-width <pre>, that's the longest
-     log line. min-width:0 lets the cell shrink so the inner pre can
-     show its own horizontal scrollbar instead of pushing the whole
-     section past 100vw and producing a body scrollbar. */
+     min-content width. min-width:0 lets the cell shrink cleanly to the
+     assigned track instead of pushing the section past 100vw. */
   min-width: 0;
   max-width: 100%;
 }
@@ -750,7 +748,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 11px 14px;
+  padding: 11px 18px;
   background: var(--term-bg);
   border-bottom: 1px solid var(--term-rule);
 }
@@ -758,25 +756,106 @@
   color: var(--term-ink-soft);
   font-size: var(--text-xs);
   letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
 }
-.v2-term pre {
-  padding: 18px 20px 22px;
+.v2-term-body {
+  padding: 18px 18px 20px;
   margin: 0;
-  /* `pre` (no wrap) keeps column alignment, but at 11px the longest
-     row fits — so overflow-x stays as a safety net for unusually wide
-     content rather than the everyday scrollbar it used to be. */
-  white-space: pre;
-  overflow-x: auto;
   background: transparent;
   color: inherit;
+  min-width: 0;
 }
-.v2-term pre code { background: transparent; }
+.v2-term-comment {
+  margin-bottom: 1.65em;
+  overflow-wrap: break-word;
+}
+.v2-term-rows {
+  display: flex;
+  flex-direction: column;
+}
+.v2-term-row {
+  display: grid;
+  grid-template-columns: 8ch 15ch 7ch minmax(0, 1fr);
+  column-gap: 2ch;
+  align-items: baseline;
+  min-width: 0;
+}
+.v2-term-detail {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.v2-term-footer {
+  margin-top: 1.65em;
+}
+.v2-term-meta {
+  display: grid;
+  grid-template-columns: 16ch minmax(0, 1fr);
+  column-gap: 2ch;
+  align-items: baseline;
+  min-width: 0;
+}
+.v2-term-meta-val {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
 .v2-term .c-ok    { color: var(--term-ok); }
 .v2-term .c-warn  { color: var(--term-warn); }
 .v2-term .c-bad   { color: var(--term-bad); }
 .v2-term .c-acc   { color: var(--term-acc); }
 .v2-term .c-mute  { color: var(--term-ink-soft); }
 .v2-term .c-hash  { color: var(--term-ink-soft); }
+
+/* When the terminal container is narrower than an unbroken 82ch line
+   (mobile widths like 375px, or 901–1220px 2-col splits), wrap each log
+   entry into two aligned rows: timestamp + event + hash on line 1,
+   detail indented under the event column below. Zero horizontal scroll. */
+@container (max-width: 649px) {
+  .v2-term-chrome { padding: 10px 14px; }
+  .v2-term-body { padding: 14px 14px 16px; }
+  .v2-term-comment { margin-bottom: 14px; line-height: 1.5; }
+  .v2-term-rows { gap: 6px; }
+  .v2-term-row {
+    grid-template-columns: 8ch 15ch minmax(0, 1fr);
+    column-gap: 1ch;
+    line-height: 1.45;
+  }
+  .v2-term-detail {
+    grid-column: 1 / -1;
+    padding-left: 9ch;
+    white-space: normal;
+  }
+  .v2-term-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .v2-term-meta {
+    grid-template-columns: 12ch minmax(0, 1fr);
+    column-gap: 2ch;
+    line-height: 1.45;
+  }
+}
+
+@container (max-width: 480px) {
+  .v2-term-meta {
+    grid-template-columns: 1fr;
+  }
+  .v2-term-meta-val {
+    padding-left: 2ch;
+  }
+}
+
+@container (max-width: 420px) {
+  .v2-term-body {
+    font-size: var(--text-code);
+  }
+  .v2-term-detail {
+    padding-left: 2ch;
+  }
+}
 
 /* ---------------------------------------------------------------------------
    6. COMPARE STRIP — dense table.
@@ -1060,7 +1139,6 @@
   }
   .v2-evidence { grid-template-columns: 1fr; gap: 28px; }
   .v2-evidence p { font-size: var(--text-sm); }
-  .v2-term pre { padding: 12px; overflow-x: auto; }
 
   .v2-compare {
     grid-template-columns: 1fr;
@@ -1085,6 +1163,7 @@
     padding: calc(var(--header-h) + 40px) 28px 24px;
   }
   .v2-section { padding: 64px 28px; }
+  .v2-evidence { gap: 40px; }
   .v2-rail { padding: 28px 28px; }
   .v2-email { padding: 48px 28px; }
 }
