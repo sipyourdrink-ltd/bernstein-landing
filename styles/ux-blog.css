@@ -524,6 +524,30 @@
 .prose figure {
   margin: var(--space-6) 0;
 }
+
+.prose .callout {
+  margin: var(--space-5) 0;
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-paper-2);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+.prose .callout p:last-child {
+  margin-bottom: 0;
+}
+.prose .callout-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: var(--space-2);
+}
 .prose figcaption {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
