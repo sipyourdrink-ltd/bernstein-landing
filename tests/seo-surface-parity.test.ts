@@ -187,9 +187,14 @@ test('all 9 .md-backed child routes emit <link rel="alternate" type="text/markdo
 
 test('/spec/agent-failure-taxonomy/v0.1 emits DefinedTermSet and normative NIST/ISO citations, and /spec-driven emits citations', () => {
   const taxonomySrc = read('app/spec/agent-failure-taxonomy/v0.1/page.tsx');
+  const taxonomyLines = taxonomySrc.split('\n').map((line) => line.trim());
   assert.match(taxonomySrc, /\bdefinedTermSetLD\b/);
-  assert.match(taxonomySrc, /https:\/\/www\.nist\.gov\/itl\/ai-risk-management-framework/);
-  assert.match(taxonomySrc, /https:\/\/www\.iso\.org\/standard\/81230\.html/);
+  assert.ok(
+    taxonomyLines.some((line) => line === "url: 'https://www.nist.gov/itl/ai-risk-management-framework',"),
+  );
+  assert.ok(
+    taxonomyLines.some((line) => line === "url: 'https://www.iso.org/standard/81230.html',"),
+  );
   assert.match(taxonomySrc, /\bcitation:\s*\[/);
 
   const specDrivenSrc = read('app/spec-driven/page.tsx');

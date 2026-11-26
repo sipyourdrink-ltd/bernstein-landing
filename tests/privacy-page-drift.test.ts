@@ -251,8 +251,8 @@ test('reports script, hook, endpoint and service drift at the changed source', (
     ['components/docs-bot/useSseStream.ts', "'/api/ask'", "'/api/questions'", /\/api\/questions.*not documented/],
     ['components/landing/EmailCapture.tsx', "'/api/notify'", "'/api/ask'", /does not match \/api\/notify/],
     ['next.config.mjs', "'/api/csp-report'", "'/api/report'", /\/api\/report.*not documented/],
-    ['next.config.mjs', "'https://analytics.bernstein.run',\n    ].join(' ');", "'https://analytics.bernstein.run',\n      'https://app.kit.com',\n    ].join(' ');", /app\.kit\.com.*not documented/],
-    ['next.config.mjs', "form-action 'self';", "form-action 'self' https://app.kit.com;", /form-action.*app\.kit\.com/],
+    ['next.config.mjs', "'https://analytics.bernstein.run',\n    ].join(' ');", "'https://analytics.bernstein.run',\n      'https://app.kit.com',\n    ].join(' ');", /CSP scriptSrc origin .* is not documented/],
+    ['next.config.mjs', "form-action 'self';", "form-action 'self' https://app.kit.com;", /CSP form-action external origin .* is not allowed/],
     ['app/humans.txt/route.ts', 'Email: Resend', 'Email: Example Mail', /Example Mail.*not named/],
     ['app/humans.txt/route.ts', 'CDN: Cloudflare', 'CDN: Resend', /Resend.*not named as the CDN/],
   ] as const) {

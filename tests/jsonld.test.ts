@@ -364,7 +364,7 @@ test('personLD and author nodes share the canonical Person @id across the graph'
     'personLD on /about must use canonical https://alexchernysh.com/#person so Knowledge Graph merges founder/author/bio',
   );
   const sameAs = bio.sameAs as string[];
-  assert.ok(sameAs.includes('https://bernstein.run/about'));
+  assert.ok(Array.isArray(sameAs) && sameAs.some((entry) => entry === 'https://bernstein.run/about'));
   assert.ok(sameAs.includes('https://bsky.app/profile/alex-chernysh.bsky.social'));
   assertNoUndefinedLeak(bio);
 
