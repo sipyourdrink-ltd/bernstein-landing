@@ -81,6 +81,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical: url },
     openGraph: {
       type: 'article',
+      siteName: SITE_NAME,
       title,
       description: desc,
       url,
@@ -90,6 +91,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: `/api/og?title=${encodeURIComponent(item.q)}`,
           width: 1200,
           height: 630,
+          alt: item.q,
         },
       ],
     },
@@ -141,7 +143,11 @@ export default async function QPage({ params }: Props) {
   const qaJsonLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'QAPage',
+    '@id': `${url}#qapage`,
+    url,
     inLanguage: 'en',
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+    publisher: { '@id': `${SITE_URL}/#organization` },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     mainEntity: {
       '@type': 'Question',
@@ -149,12 +155,19 @@ export default async function QPage({ params }: Props) {
       url,
       text: item.q,
       answerCount: 1,
+      author: {
+        '@type': 'Organization',
+        '@id': `${SITE_URL}/#organization`,
+        name: SITE_NAME,
+        url: SITE_URL,
+      },
       acceptedAnswer: {
         '@type': 'Answer',
         text: item.a,
         url,
         author: {
           '@type': 'Organization',
+          '@id': `${SITE_URL}/#organization`,
           name: SITE_NAME,
           url: SITE_URL,
         },

@@ -68,6 +68,8 @@ export const SOFTWARE_APPLICATION_JSON_LD: JsonLdData = {
       'https://alexchernysh.com',
       'https://github.com/chernistry',
       'https://x.com/alex_chernysh',
+      'https://mastodon.social/@alexchernysh',
+      'https://bsky.app/profile/alex-chernysh.bsky.social',
     ],
   },
   publisher: { '@id': `${SITE_URL}/#organization` },

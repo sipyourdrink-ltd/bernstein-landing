@@ -27,6 +27,7 @@ import type { Metadata } from 'next';
 import { Nav } from '@/components/landing/Nav';
 import { Footer } from '@/components/landing/Footer';
 import { BackToTop } from '@/components/landing/BackToTop';
+import { StaticPageBreadcrumb } from '@/components/seo/BreadcrumbListJsonLd';
 import { SITE_URL, AUTHOR, SITE_NAME } from '@/lib/seo';
 
 export const dynamic = 'force-static';
@@ -40,17 +41,27 @@ const REPO_URL = 'https://github.com/sipyourdrink-ltd/bernstein';
 const DOCS_URL = 'https://docs.bernstein.run/';
 
 export const metadata: Metadata = {
-  title: PAGE_TITLE,
+  title: { absolute: PAGE_TITLE },
   description: PAGE_DESC,
-  authors: [{ name: AUTHOR }],
+  authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: 'article',
+    siteName: SITE_NAME,
     title: PAGE_TITLE,
     description: PAGE_DESC,
     url: PAGE_URL,
+    publishedTime: PAGE_DATE,
+    modifiedTime: PAGE_DATE,
     authors: [AUTHOR],
-    images: [{ url: `/api/og?title=${encodeURIComponent(PAGE_TITLE)}`, width: 1200, height: 630 }],
+    images: [
+      {
+        url: `/api/og?title=${encodeURIComponent(PAGE_TITLE)}`,
+        width: 1200,
+        height: 630,
+        alt: PAGE_TITLE,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -286,19 +297,22 @@ export default function SpecDrivenPage() {
       </div>
       <Footer />
       <BackToTop />
+      <StaticPageBreadcrumb name="Spec-driven development" slug="/spec-driven" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'TechArticle',
-            '@id': PAGE_URL,
+            '@id': `${PAGE_URL}#techarticle`,
             headline: PAGE_TITLE,
             description: PAGE_DESC,
             datePublished: PAGE_DATE,
             dateModified: PAGE_DATE,
             inLanguage: 'en',
             url: PAGE_URL,
+            image: `${SITE_URL}/api/og?title=${encodeURIComponent(PAGE_TITLE)}`,
+            isPartOf: { '@id': `${SITE_URL}/#website` },
             articleSection: 'Tutorial',
             proficiencyLevel: 'Intermediate',
             dependencies:
@@ -310,12 +324,14 @@ export default function SpecDrivenPage() {
             },
             author: {
               '@type': 'Person',
+              '@id': 'https://alexchernysh.com/#person',
               name: AUTHOR,
               url: 'https://alexchernysh.com',
               sameAs: ['https://alexchernysh.com', 'https://github.com/chernistry'],
             },
             publisher: {
               '@type': 'Organization',
+              '@id': `${SITE_URL}/#organization`,
               name: SITE_NAME,
               url: SITE_URL,
               logo: { '@type': 'ImageObject', url: `${SITE_URL}/favicon.svg` },

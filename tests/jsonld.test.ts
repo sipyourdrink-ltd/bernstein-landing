@@ -23,8 +23,10 @@ import {
   datasetLD,
   howToLD,
   organizationLD,
+  personLD,
   softwareApplicationLD,
   techArticleLD,
+  webApplicationLD,
 } from '../lib/jsonld.ts';
 
 function assertNoUndefinedLeak(obj: unknown, path = '$') {
@@ -344,5 +346,57 @@ test('breadcrumbLD numbers items + requires at least one crumb', () => {
   const items = node.itemListElement as Array<Record<string, unknown>>;
   assert.equal(items[0].position, 1);
   assert.equal(items[1].position, 2);
+  assertNoUndefinedLeak(node);
+});
+
+test('personLD and author nodes share the canonical Person @id across the graph', () => {
+  const bio = personLD({
+    url: 'https://bernstein.run/about',
+    description: 'solo maintainer of bernstein',
+    jobTitle: 'maintainer, bernstein',
+  });
+  assert.equal(bio['@type'], 'Person');
+  assert.equal(
+    bio['@id'],
+    'https://alexchernysh.com/#person',
+    'personLD on /about must use canonical https://alexchernysh.com/#person so Knowledge Graph merges founder/author/bio',
+  );
+  const sameAs = bio.sameAs as string[];
+  assert.ok(sameAs.includes('https://bernstein.run/about'));
+  assert.ok(sameAs.includes('https://bsky.app/profile/alex-chernysh.bsky.social'));
+  assertNoUndefinedLeak(bio);
+
+  const article = articleLD({
+    url: 'https://bernstein.run/blog/post',
+    headline: 'Post',
+    description: 'Desc',
+    datePublished: '2026-05-09',
+  });
+  const author = article.author as Record<string, unknown>;
+  assert.equal(
+    author['@id'],
+    'https://alexchernysh.com/#person',
+    'PERSON_AUTHOR_NODE must carry canonical Person @id',
+  );
+});
+
+test('webApplicationLD emits a valid free WebApplication linked to Organization + Person @ids', () => {
+  const node = webApplicationLD({
+    name: 'Bernstein Cost Calculator',
+    url: 'https://bernstein.run/cost',
+    description: 'Interactive LLM token-bill routing calculator.',
+  });
+  assert.equal(node['@context'], 'https://schema.org');
+  assert.equal(node['@type'], 'WebApplication');
+  assert.equal(node['@id'], 'https://bernstein.run/cost#webapp');
+  assert.equal(node.applicationCategory, 'DeveloperApplication');
+  assert.equal(node.isAccessibleForFree, true);
+  const offers = node.offers as Record<string, unknown>;
+  assert.equal(offers.price, '0');
+  assert.equal(offers.priceCurrency, 'USD');
+  const publisher = node.publisher as Record<string, unknown>;
+  assert.equal(publisher['@id'], 'https://bernstein.run/#organization');
+  const author = node.author as Record<string, unknown>;
+  assert.equal(author['@id'], 'https://alexchernysh.com/#person');
   assertNoUndefinedLeak(node);
 });

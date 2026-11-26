@@ -104,6 +104,7 @@ const WEBSITE_JSON_LD = {
      site-wide layout instead of redefining it. Graph edge keeps the KG
      consolidated. */
   publisher: { '@id': 'https://bernstein.run/#organization' },
+  about: { '@id': 'https://bernstein.run/#software' },
   /* SearchAction surfaces the Google sitelinks search box. It points
      at the homepage question box (`?q=` prefills and submits it) so
      engines get a real query interface; the Search Console
@@ -121,38 +122,60 @@ const WEBSITE_JSON_LD = {
 const SITELINKS_JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
+  '@id': 'https://bernstein.run/#navigation',
   itemListElement: [
     {
       '@type': 'SiteNavigationElement',
       position: 1,
+      name: 'CLI Quickstart',
+      description: 'Install pipx, initialize bernstein.yaml, and run a goal in 5 minutes',
+      url: 'https://bernstein.run/cli-quickstart',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 2,
       name: 'Blog',
       description: 'Engineering deep-dives, tutorials, and project updates',
       url: 'https://bernstein.run/blog',
     },
     {
       '@type': 'SiteNavigationElement',
-      position: 2,
+      position: 3,
+      name: 'Canonical Answers',
+      description: 'Short, citable answers on scheduling, worktree isolation, and audit logs',
+      url: 'https://bernstein.run/q',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 4,
+      name: 'Cost Calculator',
+      description: 'Estimate monthly token-bill routing bands across models',
+      url: 'https://bernstein.run/cost',
+    },
+    {
+      '@type': 'SiteNavigationElement',
+      position: 5,
       name: 'Documentation',
       description: 'Installation, configuration, adapter guide, and API reference',
       url: 'https://docs.bernstein.run/',
     },
     {
       '@type': 'SiteNavigationElement',
-      position: 3,
-      name: 'Getting Started',
-      description: 'Your first multi-agent run in 5 minutes',
-      url: 'https://bernstein.run/blog/getting-started',
+      position: 6,
+      name: 'About',
+      description: 'Maintainer bio, sourcing standards, and bias disclosure',
+      url: 'https://bernstein.run/about',
     },
     {
       '@type': 'SiteNavigationElement',
-      position: 4,
+      position: 7,
       name: 'GitHub',
       description: 'Source code, issues, and community contributions',
       url: 'https://github.com/sipyourdrink-ltd/bernstein',
     },
     {
       '@type': 'SiteNavigationElement',
-      position: 5,
+      position: 8,
       name: 'PyPI',
       description: 'Python package. Install with pipx install bernstein.',
       url: 'https://pypi.org/project/bernstein/',

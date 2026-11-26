@@ -14,7 +14,10 @@ import { Nav } from '@/components/landing/Nav';
 import { Footer } from '@/components/landing/Footer';
 import { BackToTop } from '@/components/landing/BackToTop';
 import { AgentMdBench } from '@/components/tools/AgentMdBench';
-import { SITE_URL, AUTHOR } from '@/lib/seo';
+import { BreadcrumbListJsonLd } from '@/components/seo/BreadcrumbListJsonLd';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { webApplicationLD } from '@/lib/jsonld';
+import { SITE_URL, SITE_NAME, AUTHOR } from '@/lib/seo';
 import { withUtm } from '@/lib/utm';
 
 const PAGE_TITLE = 'agent-md-bench - AGENTS.md / CLAUDE.md linter';
@@ -28,14 +31,22 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: PAGE_TITLE,
   description: PAGE_DESC,
-  authors: [{ name: AUTHOR }],
+  authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: 'website',
+    siteName: SITE_NAME,
     title: PAGE_TITLE,
     description: PAGE_DESC,
     url: PAGE_URL,
-    images: [{ url: `/api/og?title=${encodeURIComponent('agent-md-bench')}`, width: 1200, height: 630 }],
+    images: [
+      {
+        url: `/api/og?title=${encodeURIComponent('agent-md-bench')}`,
+        width: 1200,
+        height: 630,
+        alt: PAGE_TITLE,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -122,6 +133,19 @@ export default function AgentMdBenchPage() {
       </main>
       <Footer />
       <BackToTop />
+      <BreadcrumbListJsonLd
+        items={[
+          { name: 'Home', url: SITE_URL },
+          { name: 'agent-md-bench', url: PAGE_URL },
+        ]}
+      />
+      <JsonLd
+        data={webApplicationLD({
+          name: 'agent-md-bench',
+          url: PAGE_URL,
+          description: PAGE_DESC,
+        })}
+      />
     </>
   );
 }

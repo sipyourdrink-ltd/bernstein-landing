@@ -28,13 +28,14 @@ import { Footer } from '@/components/landing/Footer';
 import { StaffDivider } from '@/components/landing/StaffDivider';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { StaticPageBreadcrumb } from '@/components/seo/BreadcrumbListJsonLd';
-import { SITE_URL, AUTHOR } from '@/lib/seo';
+import { SITE_URL, SITE_NAME, AUTHOR } from '@/lib/seo';
 import { getAllSeedItems, type AskSeedItem } from '@/lib/ask-seed';
 
 export const dynamic = 'force-static';
 export const revalidate = false;
 
 const PAGE_TITLE = 'canonical answers';
+const SOCIAL_TITLE = 'bernstein canonical answers';
 const PAGE_DESC =
   'short, citable answers to the questions people and machine readers ask about bernstein - what it is, how the audit chain works, how agents run in parallel.';
 const PAGE_URL = `${SITE_URL}/q`;
@@ -42,13 +43,28 @@ const PAGE_URL = `${SITE_URL}/q`;
 export const metadata: Metadata = {
   title: PAGE_TITLE,
   description: PAGE_DESC,
-  authors: [{ name: AUTHOR }],
+  authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: 'website',
-    title: PAGE_TITLE,
+    siteName: SITE_NAME,
+    title: SOCIAL_TITLE,
     description: PAGE_DESC,
     url: PAGE_URL,
+    images: [
+      {
+        url: `/api/og?title=${encodeURIComponent(SOCIAL_TITLE)}`,
+        width: 1200,
+        height: 630,
+        alt: SOCIAL_TITLE,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: SOCIAL_TITLE,
+    description: PAGE_DESC,
+    images: [`/api/og?title=${encodeURIComponent(SOCIAL_TITLE)}`],
   },
   robots: { index: true, follow: true },
 };
@@ -106,12 +122,17 @@ export default async function QIndexPage() {
   const collectionJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
+    '@id': `${PAGE_URL}#collection`,
     name: PAGE_TITLE,
     description: PAGE_DESC,
+    inLanguage: 'en',
     url: PAGE_URL,
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+    publisher: { '@id': `${SITE_URL}/#organization` },
     mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
     hasPart: items.map((it) => ({
       '@type': 'QAPage',
+      '@id': `${SITE_URL}/q/${it.slug}#qapage`,
       url: `${SITE_URL}/q/${it.slug}`,
       name: it.q,
     })),

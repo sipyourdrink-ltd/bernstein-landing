@@ -25,9 +25,13 @@ import type { Metadata } from 'next';
 import { Nav } from '@/components/landing/Nav';
 import { Footer } from '@/components/landing/Footer';
 import { BackToTop } from '@/components/landing/BackToTop';
+import { StaticPageBreadcrumb } from '@/components/seo/BreadcrumbListJsonLd';
 import { SITE_URL, AUTHOR, SITE_NAME } from '@/lib/seo';
 
 const PAGE_TITLE = 'cli quickstart';
+const SOCIAL_TITLE = 'bernstein cli quickstart';
+const PAGE_PUBLISHED = '2026-05-14';
+const PAGE_MODIFIED = '2026-09-18';
 const PAGE_DESC =
   'Five-minute walkthrough of the Bernstein CLI: install, init, configure agents in bernstein.yaml, run a goal, and inspect the run status.';
 const PAGE_URL = `${SITE_URL}/cli-quickstart`;
@@ -40,22 +44,31 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: PAGE_TITLE,
   description: PAGE_DESC,
-  authors: [{ name: AUTHOR }],
+  authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
   alternates: { canonical: PAGE_URL },
   openGraph: {
     type: 'article',
-    title: PAGE_TITLE,
+    siteName: SITE_NAME,
+    title: SOCIAL_TITLE,
     description: PAGE_DESC,
     url: PAGE_URL,
+    publishedTime: PAGE_PUBLISHED,
+    modifiedTime: PAGE_MODIFIED,
+    authors: [AUTHOR],
     images: [
-      { url: `/api/og?title=${encodeURIComponent(PAGE_TITLE)}`, width: 1200, height: 630 },
+      {
+        url: `/api/og?title=${encodeURIComponent(SOCIAL_TITLE)}`,
+        width: 1200,
+        height: 630,
+        alt: `${SOCIAL_TITLE} - install, init, and first run`,
+      },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: PAGE_TITLE,
+    title: SOCIAL_TITLE,
     description: PAGE_DESC,
-    images: [`/api/og?title=${encodeURIComponent(PAGE_TITLE)}`],
+    images: [`/api/og?title=${encodeURIComponent(SOCIAL_TITLE)}`],
   },
 };
 
@@ -68,13 +81,17 @@ export const metadata: Metadata = {
 const TECH_ARTICLE_JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'TechArticle',
-  '@id': PAGE_URL,
+  '@id': `${PAGE_URL}#techarticle`,
   headline: 'Get started with the Bernstein CLI',
   description:
     'Install Bernstein, initialise a project, configure CLI coding agents, run your first goal, and inspect the run status from the terminal.',
+  datePublished: PAGE_PUBLISHED,
+  dateModified: PAGE_MODIFIED,
   inLanguage: 'en',
   url: PAGE_URL,
+  image: `${SITE_URL}/api/og?title=${encodeURIComponent(SOCIAL_TITLE)}`,
   mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+  isPartOf: { '@id': `${SITE_URL}/#website` },
   articleSection: 'Tutorial',
   proficiencyLevel: 'Beginner',
   dependencies:
@@ -85,12 +102,14 @@ const TECH_ARTICLE_JSON_LD = {
   },
   publisher: {
     '@type': 'Organization',
+    '@id': `${SITE_URL}/#organization`,
     name: SITE_NAME,
     url: SITE_URL,
     logo: { '@type': 'ImageObject', url: `${SITE_URL}/favicon.svg` },
   },
   author: {
     '@type': 'Person',
+    '@id': 'https://alexchernysh.com/#person',
     name: AUTHOR,
     url: 'https://alexchernysh.com',
   },
@@ -412,6 +431,7 @@ bernstein stop          # graceful shutdown of the running orchestra`}</code>
       </main>
       <Footer />
       <BackToTop />
+      <StaticPageBreadcrumb name="CLI quickstart" slug="/cli-quickstart" />
       <script
         id="techarticle-jsonld"
         type="application/ld+json"

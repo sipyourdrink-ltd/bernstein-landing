@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getAllPosts } from '@/lib/mdx';
-import { buildBlogIndexJsonLd, SITE_URL } from '@/lib/seo';
+import { buildBlogIndexJsonLd, SITE_URL, SITE_NAME, AUTHOR } from '@/lib/seo';
 import { fetchLatestBernsteinVersion } from '@/lib/bernstein-version';
 import { BlogIndexBreadcrumb } from '@/components/seo/BreadcrumbListJsonLd';
 import { Nav } from '@/components/landing/Nav';
@@ -9,15 +9,37 @@ import { StaffDivider } from '@/components/landing/StaffDivider';
 import { BlogCard } from '@/components/blog/BlogCard';
 import { BlogList } from '@/components/blog/BlogList';
 
+const PAGE_URL = `${SITE_URL}/blog`;
+const PAGE_TITLE = 'Blog';
+const SOCIAL_TITLE = 'Bernstein Blog';
+const PAGE_DESC =
+  'Engineering deep-dives, community spotlights, and updates from the Bernstein project.';
+
 export const metadata: Metadata = {
-  title: 'Blog',
-  description: 'Engineering deep-dives, community spotlights, and updates from the Bernstein project.',
-  alternates: { canonical: `${SITE_URL}/blog` },
+  title: PAGE_TITLE,
+  description: PAGE_DESC,
+  authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
+  alternates: { canonical: PAGE_URL },
   openGraph: {
-    title: 'Bernstein Blog',
-    description: 'Engineering deep-dives, community spotlights, and updates from the Bernstein project.',
-    url: `${SITE_URL}/blog`,
+    siteName: SITE_NAME,
+    title: SOCIAL_TITLE,
+    description: PAGE_DESC,
+    url: PAGE_URL,
     type: 'website',
+    images: [
+      {
+        url: `/api/og?title=${encodeURIComponent(SOCIAL_TITLE)}`,
+        width: 1200,
+        height: 630,
+        alt: `${SOCIAL_TITLE} - engineering deep-dives and project updates`,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: SOCIAL_TITLE,
+    description: PAGE_DESC,
+    images: [`/api/og?title=${encodeURIComponent(SOCIAL_TITLE)}`],
   },
 };
 
