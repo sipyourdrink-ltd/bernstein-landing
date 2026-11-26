@@ -81,3 +81,11 @@ test('the tracker still follows the exclusion script', () => {
       'opt-out hook may not exist when the tracker boots',
   );
 });
+
+test('the tracker pins bernstein.run only, honours DNT, and excludes URL hashes', () => {
+  assert.match(layout, /data-domains="bernstein\.run"/);
+  assert.doesNotMatch(layout, /data-domains="[^"]*getbernstein\.com/);
+  assert.match(layout, /data-do-not-track="true"/);
+  assert.match(layout, /data-exclude-hash="true"/);
+  assert.match(layout, /data-before-send=\{UMAMI_BEFORE_SEND\}/);
+});

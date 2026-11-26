@@ -170,7 +170,6 @@ const nextConfig = {
     const connectSrc = [
       "'self'",
       ...(isDev ? ['ws://localhost:*', 'ws://127.0.0.1:*'] : []),
-      'https://app.kit.com',
       'https://analytics.bernstein.run',
     ].join(' ');
 
@@ -182,7 +181,7 @@ const nextConfig = {
       { key: 'Reporting-Endpoints', value: reportingEndpoints },
       {
         key: 'Content-Security-Policy',
-        value: `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src ${connectSrc}; frame-src 'none'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://app.kit.com; report-uri ${cspReportPath}; report-to csp-endpoint;`,
+        value: `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src ${connectSrc}; frame-src 'none'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; report-uri ${cspReportPath}; report-to csp-endpoint;`,
       },
       {
         key: 'X-Robots-Tag',

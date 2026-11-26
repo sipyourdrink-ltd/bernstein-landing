@@ -4,7 +4,7 @@ import { Footer } from '@/components/landing/Footer';
 import { StaticPageBreadcrumb } from '@/components/seo/BreadcrumbListJsonLd';
 
 const SITE_URL = 'https://bernstein.run';
-const LAST_UPDATED = '2026-11-17';
+const LAST_UPDATED = '2026-11-26';
 
 export const metadata: Metadata = {
   title: 'Privacy',
@@ -38,19 +38,21 @@ export default function PrivacyPage() {
               <a href="mailto:forte@bernstein.run">forte@bernstein.run</a>.
             </p>
 
-            <h2>Cookies</h2>
+            <h2>Cookies and fonts</h2>
             <p>
               The code of this site sets no cookies and reads none. The
               analytics script is loaded from a separate service; this
               statement covers the site&rsquo;s own code, not cookies that
-              external services may set.
+              external services may set. Page fonts are self-hosted on this
+              domain, so loading a page makes no font requests to external
+              font services.
             </p>
 
             <h2>Storage in your browser</h2>
             <p>
               The site&rsquo;s own code keeps these entries in your
-              browser&rsquo;s local storage. They stay on your device; the site does not send them
-              anywhere.
+              browser&rsquo;s local storage. They stay on your device; the site
+              does not send them anywhere.
             </p>
             <ul>
               <li>
@@ -59,9 +61,11 @@ export default function PrivacyPage() {
                 page, so the notice stays closed.
               </li>
               <li>
-                <code data-storage-key>umami:disabled</code> is only read by
-                the site, never written. Set it yourself to turn analytics off, as described
-                below.
+                <code data-storage-key>umami:disabled</code> and{' '}
+                <code data-storage-key>umami.disabled</code> are only read by
+                the site, never written. Set either entry to <code>true</code>{' '}
+                or <code>1</code> yourself to turn browser analytics off, as
+                described below.
               </li>
             </ul>
             <p>The site&rsquo;s own code uses no session storage.</p>
@@ -73,19 +77,42 @@ export default function PrivacyPage() {
               <a href="https://analytics.bernstein.run" rel="noopener">
                 analytics.bernstein.run
               </a>
-              {' '}when an analytics website ID is configured. It is set up
-              for page views and one custom browser event:{' '}
-              <code>outbound-click</code>, for clicks on links to other sites.
-              The event&rsquo;s only custom property is <code>destination</code>,
-              the host name of the site the link points to (for example{' '}
-              <code>github.com</code>), without the link&rsquo;s path or query.
+              {' '}when an analytics website ID is configured. Its script tag
+              restricts browser collection to{' '}
+              <code data-tracker-domain>bernstein.run</code>, enables{' '}
+              <code data-tracker-setting>data-do-not-track</code>, and excludes
+              URL fragments via{' '}
+              <code data-tracker-setting>data-exclude-hash</code>. It is set up
+              for page views and two custom browser events:
             </p>
+            <ul>
+              <li data-browser-event>
+                <code>outbound-click</code>, for clicks on links to other
+                sites. The event&rsquo;s only custom property is{' '}
+                <code>destination</code>, the bare host name of the site the
+                link points to (for example <code>github.com</code>), without
+                the link&rsquo;s path, query or fragment.
+              </li>
+              <li data-browser-event>
+                <code>install-snippet-copy</code>, when you press an install
+                command copy button on the site. The event&rsquo;s only custom
+                property is <code>method</code>, naming which command slot was
+                copied (<code>pipx</code>, <code>brew</code>, <code>uv</code>,{' '}
+                <code>docker</code> or <code>init</code>), never clipboard text.
+              </li>
+            </ul>
             <p>
-              Before the browser tracker sends a request, the site&rsquo;s
-              hook removes the <code>q</code> and <code>ask</code> query
-              parameters from the page and referrer addresses. It drops a
-              page view when its cleaned address matches the previous one.
-              Other URL parameters are not removed by that hook.
+              Before the browser tracker sends a request, the site&rsquo;s hook
+              strips any URL fragment and keeps only the{' '}
+              <code>utm_source</code>, <code>utm_medium</code>,{' '}
+              <code>utm_campaign</code>, <code>utm_content</code> and{' '}
+              <code>utm_term</code> query parameters on the page and referrer
+              addresses. Every other query parameter (including assistant
+              questions, tokens and ad-click identifiers) is removed before
+              sending, and the hook drops a page view when its cleaned address
+              matches the previous one. Some outbound project links append
+              static UTM parameters naming the page section on bernstein.run,
+              with no visitor identifier.
             </p>
             <p>
               Like any web request, a browser request to the analytics server
@@ -108,20 +135,26 @@ export default function PrivacyPage() {
 
             <h2>Turning analytics off</h2>
             <p>
-              Open your browser&rsquo;s developer console on this site and
-              run{' '}
+              The site&rsquo;s browser hook automatically drops every browser
+              analytics request when your browser sends Global Privacy Control
+              or Do Not Track. You can also open your browser&rsquo;s developer
+              console on this site and run{' '}
               <code>localStorage.setItem(&apos;umami:disabled&apos;, &apos;true&apos;)</code>
+              {' '}or{' '}
+              <code>localStorage.setItem(&apos;umami.disabled&apos;, &apos;1&apos;)</code>
               . The site&rsquo;s browser hook then drops tracker requests,
-              including page views and outbound clicks. This does not stop
-              the docs assistant&rsquo;s server analytics. To turn browser
-              analytics back on, run{' '}
-              <code>localStorage.removeItem(&apos;umami:disabled&apos;)</code>.
+              including page views, outbound clicks and install-copy events.
+              This does not stop the docs assistant&rsquo;s server analytics.
+              To turn browser analytics back on, run{' '}
+              <code>localStorage.removeItem(&apos;umami:disabled&apos;)</code>
+              {' '}and{' '}
+              <code>localStorage.removeItem(&apos;umami.disabled&apos;)</code>.
               Blocking <code>analytics.bernstein.run</code> in your browser
               blocks browser requests to that host; it does not block
               requests made by the site&rsquo;s server.
             </p>
 
-            <h2>The docs assistant</h2>
+            <h2>The docs assistant and client-side tools</h2>
             <p>
               When you ask the docs assistant a question, your browser sends
               the question to <code>/api/ask</code> on this site, together
@@ -150,11 +183,16 @@ export default function PrivacyPage() {
               shared or sent to the site when loaded, even though the browser
               analytics hook removes those parameters from its own requests.
             </p>
-
             <p>
               The blog&rsquo;s summary buttons send the article slug and
               summary mode to <code>/api/blog/summary</code>. They do not send
               a free-text question.
+            </p>
+            <p>
+              The interactive calculators and linters on <code>/cost</code> and{' '}
+              <code>/tools/agent-md-bench</code> run inside your browser; the
+              spend figures you enter and the context files you paste or drop
+              there are not sent to this site&rsquo;s server or to analytics.
             </p>
 
             <h2>The e-mail form</h2>
@@ -193,12 +231,17 @@ export default function PrivacyPage() {
               <li>
                 <strong>Cloudflare</strong> and <strong>Netcup</strong> are
                 named in the site&rsquo;s service information as its CDN and
-                hosting providers. This code does not establish their request
-                logging or cookie behaviour.
+                hosting providers. Cloudflare sits in front of every public
+                request and may attach edge headers such as Network Error
+                Logging; this repository&rsquo;s code does not load Cloudflare
+                browser analytics or challenge widgets, and does not establish
+                provider request logging or cookie behaviour.
               </li>
               <li>
                 <strong>GitHub</strong>: when the site shows sponsor avatars,
-                your browser loads those images from GitHub.
+                your browser loads those images from GitHub. Server-side
+                star, release and contributor counts are fetched and cached by
+                the server without forwarding visitor IP addresses.
               </li>
               <li>
                 <strong>Resend</strong> stores newsletter addresses and sends

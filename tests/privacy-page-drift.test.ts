@@ -8,6 +8,7 @@ import { checkPublishedPrivacySurfaces } from './helpers/privacy-surfaces.ts';
 
 const privacyPath = 'app/privacy/page.tsx';
 const eventPath = 'lib/analytics/outbound.ts';
+const installEventPath = 'lib/analytics/events.ts';
 const fixturePath = 'public/privacy-fixture.js';
 const sourceExtension = /\.[cm]?[jt]sx?$/;
 
@@ -29,18 +30,24 @@ test('public storage and browser events match the published privacy page', () =>
   assert.deepEqual(result.issues, []);
   assert.ok(result.storageKeys.has('beta-notice:dismissed'));
   assert.ok(result.storageKeys.has('umami:disabled'));
+  assert.ok(result.storageKeys.has('umami.disabled'));
   assert.ok(result.events.get('outbound-click')?.has('destination'));
+  assert.ok(result.events.get('install-snippet-copy')?.has('method'));
 });
 
 const fixture = new Map([
   [privacyPath, sources.get(privacyPath)!],
   [eventPath, sources.get(eventPath)!],
+  ...(sources.has(installEventPath) ? [[installEventPath, sources.get(installEventPath)!] as const] : []),
   [fixturePath, [
     "import { OUTBOUND_CLICK_EVENT as outboundClick } from '../lib/analytics/outbound';",
+    "import { INSTALL_COPY_EVENT as installCopy } from '../lib/analytics/events';",
     "const dismissed = 'beta-notice:dismissed';",
     "window.localStorage?.setItem(dismissed, '1');",
     "localStorage.getItem('umami:disabled');",
+    "localStorage.getItem('umami.disabled');",
     "window.umami?.track(outboundClick, { destination: 'example.test' });",
+    "window.umami?.track(installCopy, { method: 'pipx' });",
   ].join('\n')],
 ]);
 
@@ -65,10 +72,20 @@ test('recognizes literal and imported immutable events, ignoring prose and comme
 
 test('reports an added storage key at the call site', () => {
   const changed = replaceFixture(
-    "localStorage.getItem('umami:disabled');",
-    "localStorage.getItem('umami:disabled');\nwindow.localStorage.setItem('example:preference', '1');",
+    "localStorage.getItem('umami.disabled');",
+    "localStorage.getItem('umami.disabled');\nwindow.localStorage.setItem('example:preference', '1');",
   );
-  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:5:.*example:preference.*not documented/);
+  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:7:.*example:preference.*not documented/);
+});
+
+test('reports writing to either read-only opt-out key', () => {
+  for (const key of ['umami:disabled', 'umami.disabled']) {
+    const changed = new Map(fixture).set(
+      fixturePath,
+      fixture.get(fixturePath)! + `\nwindow.localStorage.setItem('${key}', '1');`,
+    );
+    assert.match(issuesFor(changed), /public\/privacy-fixture\.js:9:.*read-only/);
+  }
 });
 
 test('resolves immutable property names and nested browser globals', () => {
@@ -84,13 +101,13 @@ test('resolves immutable property names and nested browser globals', () => {
   const changed = new Map(fixture).set(fixturePath, original);
   assert.equal(issuesFor(changed), '');
   changed.set(fixturePath, original.replace("[trackMethod]('outbound-click'", "[trackMethod]('example-event'"));
-  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:10:.*example-event.*not documented/);
+  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:13:.*example-event.*not documented/);
   changed.set(fixturePath, original.replace(".getItem('beta-notice:dismissed')", ".getItem('example:preference')"));
-  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:11:.*example:preference.*not documented/);
+  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:14:.*example:preference.*not documented/);
   changed.set(fixturePath, original.replace("const trackerProperty", "let trackerProperty"));
-  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:10:.*browser property.*immutable const/);
+  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:13:.*browser property.*immutable const/);
   changed.set(fixturePath, original + "\nconst cookieProperty = 'cookie';\nwindow.document[cookieProperty];");
-  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:13:.*cookie access/);
+  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:16:.*cookie access/);
 });
 
 test('reports a stale documented key at its privacy entry', () => {
@@ -112,32 +129,40 @@ test('reports session storage and cookies in ordinary runtime forms', () => {
     "new Response(null, { headers: [['Set-Cookie', 'example=1']] });",
   ].join('\n'));
   const issues = issuesFor(changed);
-  assert.match(issues, /public\/privacy-fixture\.js:6:.*sessionStorage/);
-  for (const line of [7, 8, 10, 11, 12]) {
+  assert.match(issues, /public\/privacy-fixture\.js:9:.*sessionStorage/);
+  for (const line of [10, 11, 13, 14, 15]) {
     assert.match(issues, new RegExp('public/privacy-fixture\\.js:' + line + ':.*cookie', 'i'));
   }
 });
 
 test('reports an added event and an added event field with their source lines', () => {
-  const name = replaceFixture('track(outboundClick,', "track('example-event',");
-  assert.match(issuesFor(name), /public\/privacy-fixture\.js:5:.*example-event.*not documented/);
+  const name = replaceFixture(
+    'track(outboundClick,',
+    "track(outboundClick, { destination: 'example.test' });\nwindow.umami?.track('example-event',",
+  );
+  assert.match(issuesFor(name), /public\/privacy-fixture\.js:8:.*example-event.*not documented/);
   const field = replaceFixture(
     "{ destination: 'example.test' }",
     "{ destination: 'example.test',\n  format: 'text' }",
   );
-  assert.match(issuesFor(field), /public\/privacy-fixture\.js:6:.*format.*not documented/);
+  assert.match(issuesFor(field), /public\/privacy-fixture\.js:8:.*format.*not documented/);
+});
+
+test('reports a stale documented event when removed from browser source', () => {
+  const withoutInstall = replaceFixture("window.umami?.track(installCopy, { method: 'pipx' });", '');
+  assert.match(issuesFor(withoutInstall), /app\/privacy\/page\.tsx:\d+: documented browser event install-snippet-copy is unused/);
 });
 
 test('rejects both a mutable exported event and a shadowing mutable event', () => {
   const changed = new Map(fixture).set(eventPath, sources.get(eventPath)!
     .replace('export const OUTBOUND_CLICK_EVENT', 'export let OUTBOUND_CLICK_EVENT'));
-  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:5:.*immutable const/);
+  assert.match(issuesFor(changed), /public\/privacy-fixture\.js:7:.*immutable const/);
   const shadowed = replaceFixture(
     'window.umami?.track(outboundClick,',
     "function onClick() {\n  let outboundClick = 'outbound-click';\n  window.umami?.track(outboundClick,",
   );
   const closed = new Map(shadowed).set(fixturePath, shadowed.get(fixturePath)! + '\n}');
-  assert.match(issuesFor(closed), /public\/privacy-fixture\.js:7:.*immutable const/);
+  assert.match(issuesFor(closed), /public\/privacy-fixture\.js:9:.*immutable const/);
 });
 
 test('reports runtime uses in the tracker type and opt-out source files', () => {
@@ -164,7 +189,7 @@ test('rejects unsupported ordinary tracker calls and data with a diagnostic', ()
   ] as const) {
     const changed = new Map(fixture).set(fixturePath, fixture.get(fixturePath)! + '\n' + code);
     const issues = issuesFor(changed);
-    assert.match(issues, /public\/privacy-fixture\.js:6:/, code);
+    assert.match(issues, /public\/privacy-fixture\.js:9:/, code);
     assert.match(issues, diagnostic, code);
   }
 });
@@ -204,9 +229,14 @@ const surfaceFixture = new Map(surfaceFiles.map((filename) => [filename, sources
 test('reports script, hook, endpoint and service drift at the changed source', () => {
   for (const [filename, before, after, diagnostic] of [
     ['app/layout.tsx', 'https://analytics.bernstein.run/script.js', 'https://analytics.example.test/script.js', /host.*analytics\.example\.test/],
+    ['app/layout.tsx', 'data-domains="bernstein.run"', 'data-domains="bernstein.run,localhost"', /data-domains/],
+    ['app/layout.tsx', 'data-do-not-track="true"', 'data-do-not-track="false"', /data-do-not-track/],
+    ['app/layout.tsx', 'data-exclude-hash="true"', 'data-exclude-hash="false"', /data-exclude-hash/],
     ['app/layout.tsx', 'data-before-send={UMAMI_BEFORE_SEND}', "data-before-send='anotherHook'", /before-send/],
     ['app/layout.tsx', 'data-before-send={UMAMI_BEFORE_SEND}', 'data-performance="true" data-before-send={UMAMI_BEFORE_SEND}', /analytics measurements/],
-    ['lib/analytics/disable.ts', "['q', 'ask']", "['q', 'query']", /query parameters/],
+    ['lib/analytics/disable.ts', "[\n  'utm_source',", "[\n  'q',", /allowed query parameters/],
+    ['lib/analytics/disable.ts', "x.hash = '';", "x.hash = x.hash;", /strip the hash/],
+    ['lib/analytics/disable.ts', 'window.navigator.globalPrivacyControl === true', 'window.navigator.globalPrivacyControl === false', /GPC, DNT/],
     ['lib/analytics/disable.ts', 'out.url === lastView', 'out.url !== lastView', /duplicate page views/],
     ['lib/analytics/disable.ts', 'out.url = clean(out.url)', 'clean(out.url)', /strip query parameters/],
     ['lib/analytics/disable.ts', 'return out;', 'return payload;', /return the cleaned payload/],
@@ -214,6 +244,8 @@ test('reports script, hook, endpoint and service drift at the changed source', (
     ['components/docs-bot/useSseStream.ts', "'/api/ask'", "'/api/questions'", /\/api\/questions.*not documented/],
     ['components/landing/EmailCapture.tsx', "'/api/notify'", "'/api/ask'", /does not match \/api\/notify/],
     ['next.config.mjs', "'/api/csp-report'", "'/api/report'", /\/api\/report.*not documented/],
+    ['next.config.mjs', "'https://analytics.bernstein.run',\n    ].join(' ');", "'https://analytics.bernstein.run',\n      'https://app.kit.com',\n    ].join(' ');", /app\.kit\.com.*not documented/],
+    ['next.config.mjs', "form-action 'self';", "form-action 'self' https://app.kit.com;", /form-action.*app\.kit\.com/],
     ['app/humans.txt/route.ts', 'Email: Resend', 'Email: Example Mail', /Example Mail.*not named/],
     ['app/humans.txt/route.ts', 'CDN: Cloudflare', 'CDN: Resend', /Resend.*not named as the CDN/],
   ] as const) {
@@ -222,7 +254,10 @@ test('reports script, hook, endpoint and service drift at the changed source', (
     const line = original.slice(0, original.indexOf(before)).split('\n').length;
     const changed = new Map(surfaceFixture).set(filename, original.replace(before, after));
     const issues = checkPublishedPrivacySurfaces(changed);
-    assert.ok(issues.some((issue) => issue.startsWith(`${filename}:${line}:`) && diagnostic.test(issue)), issues.join('\n'));
+    assert.ok(
+      issues.some((issue) => issue.startsWith(`${filename}:`) && Number.parseInt(issue.split(':')[1]!, 10) >= line && diagnostic.test(issue)),
+      `${filename} (${before} -> ${after}) line=${line}:\n${issues.join('\n')}`,
+    );
   }
 });
 

@@ -32,9 +32,16 @@ test('the directives that carry the rest of the posture are still there', () => 
     "frame-src 'none'",
     "object-src 'none'",
     "base-uri 'self'",
+    "form-action 'self';",
     'report-uri',
     'report-to csp-endpoint',
   ]) {
     assert.ok(cspLine!.includes(directive), `CSP lost: ${directive}`)
   }
+})
+
+test('CSP excludes retired ConvertKit origin and keeps connect-src/script-src tight', () => {
+  assert.ok(!config.includes('app.kit.com'), 'next.config.mjs still allows legacy https://app.kit.com in CSP')
+  assert.match(config, /const scriptSrc = \[\s*"'self'",\s*"'unsafe-inline'",\s*\.\.\.\(isDev \? \["'unsafe-eval'"\] : \[\]\),\s*'https:\/\/analytics\.bernstein\.run',\s*\]/m)
+  assert.match(config, /const connectSrc = \[\s*"'self'",\s*\.\.\.\(isDev \? \['ws:\/\/localhost:\*', 'ws:\/\/127\.0\.0\.1:\*'\] : \[\]\),\s*'https:\/\/analytics\.bernstein\.run',\s*\]/m)
 })
