@@ -1,13 +1,8 @@
 /**
  * The markdown view of a page: what `/api/_markdown` serves once
- * middleware has decided a request asked for markdown, plus the shared
- * `enrichLlmsTxt` projection used by both `/llms.txt` and `Accept: text/markdown` on `/`.
- *
- * Caching: markdown responses carry `Cache-Control: no-store`, `Vary: Accept`,
- * `Content-Signal: search=yes, ai-input=yes, ai-train=yes`, and `X-Markdown-Tokens`
- * (2026 Markdown-for-Agents convention) so shared caches that ignore `Vary` can
- * never replay a markdown body to a browser while agents get explicit usage
- * permissions and context-budget estimates up front.
+ * middleware has decided a request asked for markdown (either via
+ * `Accept: text/markdown` negotiation or via an explicit `/*.md` URL twin),
+ * plus the shared `enrichLlmsTxt` projection used by `/llms.txt`, `/`, and `/index.md`.
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -16,7 +11,9 @@ import { getAllSeedItems, getSeedItem } from './ask-seed.ts';
 import {
   CANONICAL_PUBLIC_ORIGIN,
   markdownTargetFor,
-  type NegotiableStaticPage,
+  markdownTwinTargetFor,
+  type MarkdownTarget,
+  type StaticMarkdownPage,
 } from './markdown-negotiation.ts';
 
 const BLOG_DIR = path.resolve(process.cwd(), 'content', 'blog');
@@ -32,27 +29,44 @@ function estimateMarkdownTokens(body: string): number {
   return Math.max(1, Math.ceil(Buffer.byteLength(body, 'utf8') / 4));
 }
 
-function markdown(body: string, status = 200): Response {
+function markdown(
+  body: string,
+  status = 200,
+  extraHeaders?: Readonly<Record<string, string>>,
+): Response {
   return new Response(body, {
     status,
     headers: {
       ...MARKDOWN_HEADERS,
       'X-Markdown-Tokens': String(estimateMarkdownTokens(body)),
+      ...extraHeaders,
     },
   });
 }
 
 /**
- * Idempotently enrich `buildLlmsTxt()` output with canonical site pages
- * and machine-discovery surfaces that were added after the base template,
- * while strictly preserving the single-occurrence absolute URL invariant
- * (safe even if `lib/seo.ts` independently adds any of these entries).
+ * Idempotently enrich `buildLlmsTxt()` output with canonical site pages,
+ * explicit `.md` twin entry points (for Claude `web_fetch` prior-URL
+ * validation), `/llms-ctx.txt`, and `.well-known` discovery manifests,
+ * strictly preserving the single-occurrence absolute URL invariant.
  */
 export function enrichLlmsTxt(raw: string): string {
   const sitePageEntries: ReadonlyArray<{ url: string; line: string }> = [
     {
       url: `${CANONICAL_PUBLIC_ORIGIN}/q`,
       line: `- [Canonical answers](${CANONICAL_PUBLIC_ORIGIN}/q): Index of short, citable Q&A pages covering architecture, parallel agents, sandboxes, and offline audit verification`,
+    },
+    {
+      url: `${CANONICAL_PUBLIC_ORIGIN}/q.md`,
+      line: `- [Canonical answers (Markdown twin)](${CANONICAL_PUBLIC_ORIGIN}/q.md): Direct Markdown index of all \`/q/<slug>.md\` canonical answers`,
+    },
+    {
+      url: `${CANONICAL_PUBLIC_ORIGIN}/cli-quickstart.md`,
+      line: `- [CLI quickstart (Markdown twin)](${CANONICAL_PUBLIC_ORIGIN}/cli-quickstart.md): Five-minute install, config, run, and offline receipt verification walkthrough in plain Markdown`,
+    },
+    {
+      url: `${CANONICAL_PUBLIC_ORIGIN}/cost.md`,
+      line: `- [Cost methodology (Markdown twin)](${CANONICAL_PUBLIC_ORIGIN}/cost.md): Cheapest-passing-test routing heuristic and model-price table methodology in plain Markdown`,
     },
     {
       url: `${CANONICAL_PUBLIC_ORIGIN}/spec-driven`,
@@ -63,12 +77,28 @@ export function enrichLlmsTxt(raw: string): string {
       line: `- [Agent Failure Taxonomy v0.1](${CANONICAL_PUBLIC_ORIGIN}/spec/agent-failure-taxonomy/v0.1): Eight-category closed-set failure vocabulary mapped to NIST AI RMF 1.0 and ISO/IEC 42001`,
     },
     {
+      url: `${CANONICAL_PUBLIC_ORIGIN}/spec/agent-failure-taxonomy/v0.1.md`,
+      line: `- [Agent Failure Taxonomy v0.1 (Markdown twin)](${CANONICAL_PUBLIC_ORIGIN}/spec/agent-failure-taxonomy/v0.1.md): Full taxonomy table and schema fields in plain Markdown`,
+    },
+    {
       url: `${CANONICAL_PUBLIC_ORIGIN}/about`,
       line: `- [About & sourcing](${CANONICAL_PUBLIC_ORIGIN}/about): Maintainer identity, how comparison and benchmark claims are sourced, and bias disclosure`,
     },
   ];
 
   const resourceEntries: ReadonlyArray<{ url: string; line: string }> = [
+    {
+      url: `${CANONICAL_PUBLIC_ORIGIN}/llms-ctx.txt`,
+      line: `- [Compact LLM Context](${CANONICAL_PUBLIC_ORIGIN}/llms-ctx.txt): Token-budgeted (< 18 KB) single-pass technical summary of Bernstein 4.0.2, MCP endpoints, and \`.md\` twin URLs`,
+    },
+    {
+      url: `${CANONICAL_PUBLIC_ORIGIN}/.well-known/mcp.json`,
+      line: `- [MCP Server Card (SEP-1649)](${CANONICAL_PUBLIC_ORIGIN}/.well-known/mcp.json): Pre-connection MCP discovery card pointing at \`https://mcp.bernstein.run/mcp\` and local \`bernstein mcp\``,
+    },
+    {
+      url: `${CANONICAL_PUBLIC_ORIGIN}/.well-known/ai-catalog.json`,
+      line: `- [AI Catalog (SEP-2127)](${CANONICAL_PUBLIC_ORIGIN}/.well-known/ai-catalog.json): Machine-readable AI capability catalog indexing this domain's MCP server cards`,
+    },
     {
       url: `${CANONICAL_PUBLIC_ORIGIN}/.well-known/api-catalog`,
       line: `- [API Catalog (RFC 9727)](${CANONICAL_PUBLIC_ORIGIN}/.well-known/api-catalog): RFC 9264 linkset indexing every endpoint and discovery document served by this origin`,
@@ -117,23 +147,25 @@ export function isPublished(source: string): boolean {
   return !/^draft:\s*true\s*$/m.test(match[1]!);
 }
 
-async function blogPostMarkdown(slug: string): Promise<Response> {
+async function blogPostBody(slug: string): Promise<{ body: string; status: 200 | 404 }> {
   const file = path.resolve(BLOG_DIR, slug, 'index.mdx');
-  if (path.dirname(path.dirname(file)) !== BLOG_DIR) return markdown('# Not found\n', 404);
+  if (path.dirname(path.dirname(file)) !== BLOG_DIR) {
+    return { body: '# Not found\n', status: 404 };
+  }
 
   let source: string;
   try {
     source = await fs.readFile(file, 'utf8');
   } catch {
-    return markdown('# Not found\n', 404);
+    return { body: '# Not found\n', status: 404 };
   }
 
-  if (!isPublished(source)) return markdown('# Not found\n', 404);
+  if (!isPublished(source)) return { body: '# Not found\n', status: 404 };
 
-  return markdown(source);
+  return { body: source, status: 200 };
 }
 
-async function qaIndexMarkdown(): Promise<Response> {
+async function qaIndexBody(): Promise<{ body: string; status: 200 }> {
   const items = await getAllSeedItems();
   const groups = new Map<string, typeof items>();
   for (const item of items) {
@@ -145,7 +177,10 @@ async function qaIndexMarkdown(): Promise<Response> {
 
   const sections = [...groups.entries()].map(([tag, groupItems]) => {
     const entries = groupItems
-      .map((it) => `- [${it.q}](${CANONICAL_PUBLIC_ORIGIN}/q/${it.slug})`)
+      .map(
+        (it) =>
+          `- [${it.q}](${CANONICAL_PUBLIC_ORIGIN}/q/${it.slug}) ([.md](${CANONICAL_PUBLIC_ORIGIN}/q/${it.slug}.md))`,
+      )
       .join('\n');
     return `## ${tag} (${groupItems.length})\n\n${entries}`;
   });
@@ -154,19 +189,20 @@ async function qaIndexMarkdown(): Promise<Response> {
     '# Canonical Answers - Bernstein',
     '',
     `Canonical URL: ${CANONICAL_PUBLIC_ORIGIN}/q`,
+    `Markdown URL: ${CANONICAL_PUBLIC_ORIGIN}/q.md`,
     '',
-    `${items.length} short, citable answers on Bernstein architecture, CLI usage, parallel git worktree agents, sandboxes, and offline audit verification. Negotiate \`Accept: text/markdown\` on any \`/q/<slug>\` URL for the standalone answer.`,
+    `${items.length} short, citable answers on Bernstein architecture, CLI usage, parallel git worktree agents, sandboxes, and offline audit verification. Fetch any \`/q/<slug>.md\` URL directly or negotiate \`Accept: text/markdown\` on \`/q/<slug>\`.`,
     '',
     ...sections,
     '',
   ].join('\n');
 
-  return markdown(body);
+  return { body, status: 200 };
 }
 
-async function qaItemMarkdown(slug: string): Promise<Response> {
+async function qaItemBody(slug: string): Promise<{ body: string; status: 200 | 404 }> {
   const item = await getSeedItem(slug);
-  if (!item) return markdown('# Not found\n', 404);
+  if (!item) return { body: '# Not found\n', status: 404 };
 
   const related = item.related.map((r) =>
     r.startsWith('/') ? `${CANONICAL_PUBLIC_ORIGIN}${r}` : `${CANONICAL_PUBLIC_ORIGIN}/q/${r}`,
@@ -176,6 +212,7 @@ async function qaItemMarkdown(slug: string): Promise<Response> {
     `# ${item.q}`,
     '',
     `Canonical URL: ${CANONICAL_PUBLIC_ORIGIN}/q/${item.slug}`,
+    `Markdown URL: ${CANONICAL_PUBLIC_ORIGIN}/q/${item.slug}.md`,
     item.tags.length > 0 ? `Tags: ${item.tags.join(', ')}` : null,
     '',
     item.a,
@@ -183,10 +220,10 @@ async function qaItemMarkdown(slug: string): Promise<Response> {
     '',
   ].filter((x): x is string => x !== null);
 
-  return markdown(lines.join('\n'));
+  return { body: lines.join('\n'), status: 200 };
 }
 
-const STATIC_MARKDOWN_PAGES: Readonly<Record<NegotiableStaticPage, string>> = {
+const STATIC_MARKDOWN_PAGES: Readonly<Record<StaticMarkdownPage, string>> = {
   about: `# about bernstein.run
 
 Canonical URL: https://bernstein.run/about
@@ -207,6 +244,20 @@ bernstein is a deterministic python scheduler in front of whichever cli coding a
 ## how content is sourced & bias disclosure
 
 every blog post carries a publish date in frontmatter. comparisons under \`/vs\` cite upstream documentation directly; numbers on \`/benchmarks\` label simulation vs community \`bernstein cost --json\` runs; model prices on \`/cost\` record capture dates. because the author builds bernstein, comparison pages link upstream docs at the top so claims can be audited directly; report inaccuracies at https://github.com/sipyourdrink-ltd/bernstein/issues.
+`,
+  cost: `# cost
+
+Canonical URL: https://bernstein.run/cost
+
+the bernstein router picks the cheapest model that still passes your tests on each task. the interactive calculator on https://bernstein.run/cost lets you enter your monthly claude, codex, or cursor bills and see what the math suggests for your repo. heuristic, not a promise.
+
+## how the band is computed
+
+- **routable fraction (40-80% heuristic):** fraction of tasks bernstein can route from a flagship tier to a cheaper tier without failing lint, type-check, or test gates. on repos with flaky tests, cheaper models fail gates and fall back to the premium model, pushing savings toward zero; on repos with tight tests and mechanical refactors, savings skew higher.
+- **per-task cost spread (~75% blended saving on routable tasks):** flagship and cheap-tier models typically sit one to two orders of magnitude apart on input pricing per 1m tokens. on a $600/month combined claude + codex + cursor bill, that heuristic suggests roughly $180-360/month shifted as a band rather than a single point estimate.
+- **static cascade vs contextual bandit:** bernstein defaults to a deterministic static routing cascade over task complexity, scope, and role. passing \`--routing bandit\` enables a linucb contextual bandit (\`src/bernstein/core/routing/bandit_router.py\`) whose reward weights gate pass rate against normalised token cost.
+- **auditable price sources:** model prices on \`/cost\` refresh every six hours from the openrouter catalogue (with a dated committed fallback) and link directly to https://claude.com/pricing, https://platform.openai.com/docs/pricing, https://ai.google.dev/gemini-api/docs/pricing, and https://openrouter.ai/models.
+- **real repo measurement:** install with \`pipx install bernstein\` and run \`bernstein cost\` after a run to read actual per-model and per-task spend from \`.sdd/metrics/\` on disk.
 `,
   'cli-quickstart': `# cli quickstart
 
@@ -352,23 +403,46 @@ const defaultSiteIndex: SiteIndexBuilder = async () => {
   return enrichLlmsTxt(await buildLlmsTxt());
 };
 
+async function resolveTargetBody(
+  target: MarkdownTarget,
+  buildSiteIndex: SiteIndexBuilder,
+): Promise<{ body: string; status: 200 | 404 }> {
+  switch (target.kind) {
+    case 'site-index':
+      return { body: await buildSiteIndex(), status: 200 };
+    case 'blog-post':
+      return blogPostBody(target.slug);
+    case 'qa-index':
+      return qaIndexBody();
+    case 'qa-item':
+      return qaItemBody(target.slug);
+    case 'static-page':
+      return { body: STATIC_MARKDOWN_PAGES[target.page], status: 200 };
+  }
+}
+
 export async function serveMarkdown(
   requestedPath: string,
   buildSiteIndex: SiteIndexBuilder = defaultSiteIndex,
 ): Promise<Response> {
+  const twin = markdownTwinTargetFor(requestedPath);
+  if (twin) {
+    if (!twin.target || !twin.canonicalPath) {
+      return markdown('# Not found\n', 404, { 'X-Robots-Tag': 'noindex' });
+    }
+    const rendered = await resolveTargetBody(twin.target, buildSiteIndex);
+    if (rendered.status === 404) {
+      return markdown(rendered.body, 404, { 'X-Robots-Tag': 'noindex' });
+    }
+    return markdown(rendered.body, 200, {
+      'X-Robots-Tag': 'noindex, follow',
+      Link: `<${CANONICAL_PUBLIC_ORIGIN}${twin.canonicalPath}>; rel="canonical"`,
+    });
+  }
+
   const target = markdownTargetFor(requestedPath);
   if (!target) return markdown('# Not found\n', 404);
 
-  switch (target.kind) {
-    case 'site-index':
-      return markdown(await buildSiteIndex());
-    case 'blog-post':
-      return blogPostMarkdown(target.slug);
-    case 'qa-index':
-      return qaIndexMarkdown();
-    case 'qa-item':
-      return qaItemMarkdown(target.slug);
-    case 'static-page':
-      return markdown(STATIC_MARKDOWN_PAGES[target.page]);
-  }
+  const rendered = await resolveTargetBody(target, buildSiteIndex);
+  return markdown(rendered.body, rendered.status);
 }

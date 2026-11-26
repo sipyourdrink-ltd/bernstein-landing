@@ -59,6 +59,7 @@ test('/ai.txt Permissions block lists stable canonical URLs only', async () => {
      reconsiders before shipping. */
   const expectedAllows = [
     '/llms.txt',
+    '/llms-ctx.txt',
     '/llms-full.txt',
     '/ai.txt',
     '/agents.txt',
@@ -66,6 +67,8 @@ test('/ai.txt Permissions block lists stable canonical URLs only', async () => {
     '/sitemap.xml',
     '/auth.md',
     '/.well-known/api-catalog',
+    '/.well-known/ai-catalog.json',
+    '/.well-known/mcp.json',
     '/.well-known/skills.json',
     '/.well-known/agent-skills/index.json',
     '/.well-known/http-message-signatures-directory',

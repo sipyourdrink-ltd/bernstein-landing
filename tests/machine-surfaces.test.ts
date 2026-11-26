@@ -230,6 +230,9 @@ test('the non-capability endpoint is catalogued but not offered as a skill', () 
 test('every path the shared module declares resolves to something in the repo', () => {
   const declared = allDeclaredPaths();
   for (const required of [
+    '/llms-ctx.txt',
+    '/.well-known/mcp.json',
+    '/.well-known/ai-catalog.json',
     '/.well-known/agent-skills/index.json',
     '/agents.txt',
     '/mcp-server.json',

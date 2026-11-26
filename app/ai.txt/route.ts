@@ -8,6 +8,7 @@ Description: Bernstein is an open-source governance layer for AI agents (Claude 
 # Permissions
 Crawl-delay: 0
 Allow: /llms.txt
+Allow: /llms-ctx.txt
 Allow: /llms-full.txt
 Allow: /ai.txt
 Allow: /agents.txt
@@ -19,6 +20,8 @@ Allow: /mcp-server.json
 Allow: /agents.json
 Allow: /AGENTS.md
 Allow: /.well-known/api-catalog
+Allow: /.well-known/ai-catalog.json
+Allow: /.well-known/mcp.json
 Allow: /.well-known/skills.json
 Allow: /.well-known/agent-skills/index.json
 Allow: /.well-known/agent-card.json

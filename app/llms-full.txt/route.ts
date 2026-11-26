@@ -679,6 +679,9 @@ Bernstein publishes a closed-set eight-category vocabulary for classifying faile
 - Documentation: https://docs.bernstein.run/
 - Issues: https://github.com/sipyourdrink-ltd/bernstein/issues
 - API Catalog (RFC 9727): https://bernstein.run/.well-known/api-catalog
+- AI Catalog (SEP-2127): https://bernstein.run/.well-known/ai-catalog.json
+- MCP Server Card (SEP-1649): https://bernstein.run/.well-known/mcp.json
+- Compact LLM Context: https://bernstein.run/llms-ctx.txt
 - Host Skills Index: https://bernstein.run/.well-known/skills.json
 - Agent Skills Discovery Index: https://bernstein.run/.well-known/agent-skills/index.json
 - Authentication Policy: https://bernstein.run/auth.md

@@ -109,6 +109,14 @@ export const DISCOVERY_DOCUMENTS: readonly DiscoveryDocument[] = [
     title: 'Machine-readable index of the callable endpoints this origin serves.',
   },
   {
+    path: '/.well-known/mcp.json',
+    label: 'MCP card (v1)',
+    rel: 'service-desc',
+    type: 'application/json',
+    title:
+      'SEP-1649 MCP Server Card advertising the anonymous remote Streamable HTTP verifier and local stdio server.',
+  },
+  {
     path: '/.well-known/agent-skills/index.json',
     label: 'Agent skills',
     rel: 'service-desc',
@@ -135,6 +143,13 @@ export const DISCOVERY_DOCUMENTS: readonly DiscoveryDocument[] = [
     rel: 'service-doc',
     type: 'text/plain',
     title: 'llms.txt index: what this project is, and the canonical entry points.',
+  },
+  {
+    path: '/llms-ctx.txt',
+    label: 'LLMs context',
+    rel: 'service-doc',
+    type: 'text/plain',
+    title: 'Compact single-pass technical context (< 18 KB) and .md twin index for language models.',
   },
   {
     path: '/llms-full.txt',
@@ -178,6 +193,13 @@ export const DISCOVERY_DOCUMENTS: readonly DiscoveryDocument[] = [
     rel: 'service-meta',
     type: 'application/json',
     title: 'A2A agent card for the Bernstein orchestrator.',
+  },
+  {
+    path: '/.well-known/ai-catalog.json',
+    label: 'AI catalog',
+    rel: 'service-meta',
+    type: 'application/ai-catalog+json',
+    title: 'SEP-2127 AI Catalog indexing the MCP server cards served by this origin.',
   },
   {
     path: '/.well-known/mcp/server-card.json',

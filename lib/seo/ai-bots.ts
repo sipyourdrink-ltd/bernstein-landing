@@ -33,6 +33,7 @@ export const AI_BOTS: readonly string[] = [
   // Google / Apple / Meta
   'Google-Extended',
   'Google-CloudVertexBot',
+  'Gemini-Deep-Research',
   'Googlebot',
   'Applebot',
   'Applebot-Extended',
@@ -53,6 +54,7 @@ export const AI_BOTS: readonly string[] = [
   'Diffbot',
   'Timpibot',
   'MistralAI-User',
+  'MistralAI-Bot',
   'Kagibot',
   'AI2Bot',
   'Ai2Bot-Dolma',

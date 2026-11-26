@@ -29,7 +29,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { markdownTargetFor, prefersMarkdown } from '../lib/markdown-negotiation.ts';
+import {
+  markdownTargetFor,
+  markdownTwinPathFor,
+  markdownTwinTargetFor,
+  prefersMarkdown,
+} from '../lib/markdown-negotiation.ts';
 import { isPublished, serveMarkdown } from '../lib/markdown-view.ts';
 
 const BLOG_DIR = path.resolve(process.cwd(), 'content', 'blog');
@@ -87,13 +92,16 @@ function matchesAcceptHeader(conditions: RouteCondition[] | undefined): boolean 
 
 /* ---------- who gets markdown ---------- */
 
-test('a client that names markdown and outranks html gets it', () => {
+test('a client that names markdown at >= html quality gets markdown (including Claude Code / Copilot equal q=1)', () => {
   for (const accept of [
     'text/markdown',
+    'text/markdown, text/html, */*',
+    'text/markdown, text/html',
     'text/markdown, text/html;q=0.9',
     'text/markdown;q=1.0, text/html;q=0.1',
     'text/x-markdown',
     'application/json;q=0.2, text/markdown;q=0.8',
+    'text/markdown;q=0.8, */*;q=0.8',
     'TEXT/MARKDOWN',
     'text/markdown; charset=utf-8',
   ]) {
@@ -115,12 +123,13 @@ test('a real browser never negotiates into markdown', () => {
   }
 });
 
-test('markdown must outrank html, not merely appear alongside it', () => {
+test('markdown weighted below html or q=0 stays HTML', () => {
   for (const accept of [
-    'text/markdown, text/html',
-    'text/html, text/markdown',
+    'text/html, text/markdown;q=0.9',
     'text/markdown;q=0.5, text/html;q=0.9',
     'text/markdown;q=0.8, */*',
+    'text/markdown;q=0',
+    'text/markdown;q=0, text/html;q=0.9',
     'text/html',
     '*/*',
     'application/json',
@@ -388,6 +397,65 @@ test('every negotiated 200 response carries Content-Signal and X-Markdown-Tokens
 
   const missingQ = await callMarkdownRoute('/q/no-such-question-slug');
   assert.equal(missingQ.status, 404);
+});
+
+test('explicit /*.md URL twins serve markdown unconditionally with X-Robots-Tag: noindex, follow and canonical Link, leaving /auth.md and /AGENTS.md untouched', async () => {
+  assert.equal(markdownTwinTargetFor('/auth.md'), null, '/auth.md has its own route');
+  assert.equal(markdownTwinTargetFor('/AGENTS.md'), null, '/AGENTS.md is a public file');
+  assert.equal(
+    markdownTwinTargetFor('/spec/agent-failure-taxonomy/CHANGELOG.md'),
+    null,
+    'CHANGELOG.md in public/ must not be intercepted',
+  );
+
+  const expectedPairs: ReadonlyArray<[string, string, string]> = [
+    ['/index.md', '/', '# stub site index'],
+    ['/about.md', '/about', '# about bernstein.run'],
+    ['/cli-quickstart.md', '/cli-quickstart', '# cli quickstart'],
+    ['/cost.md', '/cost', '# cost'],
+    ['/spec-driven.md', '/spec-driven', '# Spec-driven development with Bernstein'],
+    [
+      '/spec/agent-failure-taxonomy/v0.1.md',
+      '/spec/agent-failure-taxonomy/v0.1',
+      '# CLI Coding Agent Failure Taxonomy v0.1',
+    ],
+    ['/tools/agent-md-bench.md', '/tools/agent-md-bench', '# agent-md-bench'],
+    ['/q.md', '/q', '# Canonical Answers'],
+    ['/q/what-is-bernstein.md', '/q/what-is-bernstein', '# what is bernstein'],
+    [`/blog/${PUBLISHED_SLUG}.md`, `/blog/${PUBLISHED_SLUG}`, '---'],
+  ];
+
+  for (const [mdPath, htmlPath, snippet] of expectedPairs) {
+    assert.equal(markdownTwinPathFor(htmlPath), mdPath, `HTML path ${htmlPath} must map to ${mdPath}`);
+    const twin = markdownTwinTargetFor(mdPath);
+    assert.ok(twin?.target, `${mdPath} must resolve as a valid .md twin`);
+    assert.equal(twin.canonicalPath, htmlPath);
+
+    const res = await callMarkdownRoute(mdPath);
+    assert.equal(res.status, 200, `${mdPath} must return 200`);
+    assert.match(res.headers.get('content-type') ?? '', /text\/markdown/);
+    assert.equal(res.headers.get('x-robots-tag'), 'noindex, follow', `${mdPath} must be noindex, follow`);
+    assert.equal(
+      res.headers.get('link'),
+      `<https://bernstein.run${htmlPath}>; rel="canonical"`,
+      `${mdPath} must point canonical Link at ${htmlPath}`,
+    );
+    const text = await res.text();
+    assert.ok(text.includes(snippet), `${mdPath} missing "${snippet}"`);
+  }
+
+  /* /cost.md voice & honesty invariants: suggests + heuristic mandatory, no em/en dashes */
+  const costBody = await (await callMarkdownRoute('/cost.md')).text();
+  assert.match(costBody, /\bsuggests\b/i, '/cost.md must include "suggests"');
+  assert.match(costBody, /\bheuristic\b/i, '/cost.md must include "heuristic"');
+  assert.ok(!/[\u2013\u2014\u2015]/.test(costBody), '/cost.md must not use en/em dashes');
+
+  /* Unknown or malformed .md slugs return 404 with X-Robots-Tag: noindex */
+  for (const badMd of ['/blog/no-such-post.md', '/q/no-such-question.md', '/blog/UPPER.md', '/q/..%2fsecret.md']) {
+    const res = await callMarkdownRoute(badMd);
+    assert.equal(res.status, 404, `${badMd} must 404`);
+    assert.equal(res.headers.get('x-robots-tag'), 'noindex', `${badMd} 404 must carry X-Robots-Tag: noindex`);
+  }
 });
 
 test('no negotiable route overlaps an unguarded shared-cache rule in next.config.mjs', async () => {

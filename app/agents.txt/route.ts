@@ -29,9 +29,12 @@ Tags: ${PROJECT_TAGS.join(', ')}
 
 # Machine-readable surfaces on this host
 API-catalog: https://bernstein.run/.well-known/api-catalog
+AI-catalog (SEP-2127): https://bernstein.run/.well-known/ai-catalog.json
+MCP-card (SEP-1649): https://bernstein.run/.well-known/mcp.json
 Skills-index: https://bernstein.run/.well-known/skills.json
 Agent-skills: https://bernstein.run/.well-known/agent-skills/index.json
 LLM-summary: https://bernstein.run/llms.txt
+LLM-compact-context: https://bernstein.run/llms-ctx.txt
 LLM-full-reference: https://bernstein.run/llms-full.txt
 AI-descriptor: https://bernstein.run/ai.txt
 Authentication: https://bernstein.run/auth.md

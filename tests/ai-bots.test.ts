@@ -13,8 +13,8 @@ import { AI_BOTS } from '../lib/seo/ai-bots.ts';
 
 test('AI_BOTS contains the full 2026 robots.txt allow-list with no duplicates', () => {
   assert.ok(
-    AI_BOTS.length >= 50,
-    `expected at least 50 named crawlers in 2026 allow-list, got ${AI_BOTS.length}`,
+    AI_BOTS.length >= 52,
+    `expected at least 52 named crawlers in 2026 allow-list, got ${AI_BOTS.length}`,
   );
   assert.equal(new Set(AI_BOTS).size, AI_BOTS.length, 'AI_BOTS must not contain duplicate tokens');
   for (const bot of AI_BOTS) {
@@ -26,10 +26,14 @@ test('AI_BOTS contains the full 2026 robots.txt allow-list with no duplicates', 
     'OAI-SearchBot',
     'ClaudeBot',
     'Claude-SearchBot',
+    'Claude-User',
     'Google-Extended',
     'Google-CloudVertexBot',
+    'Gemini-Deep-Research',
     'PerplexityBot',
     'Perplexity-User',
+    'MistralAI-User',
+    'MistralAI-Bot',
     'Ai2Bot-Dolma',
     'ExaBot',
     'ExaSearchBot',
