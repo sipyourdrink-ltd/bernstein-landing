@@ -10,8 +10,8 @@ summary_modes:
     title: "bernstein 1.0: deterministic orchestrator for CLI coding agents"
     items:
       - "Plain-Python tick scheduler with no LLM in the scheduling loop; only goal decomposition calls a model."
-      - "One git worktree per agent so parallel sessions never collide on file paths; merge queue lands what passes quality gates."
-    whyItMatters: "It treats multi-agent work as scheduling, not prompting, which is the gap most agent frameworks leave open."
+      - "One git worktree per agent so parallel agents do not conflict during execution; merge queue lands what passes quality gates."
+    whyItMatters: "It schedules multi-agent work with plain Python and per-agent worktrees instead of prompting agents to coordinate."
   takeaways:
     title: "What bernstein 1.0 actually ships"
     items:

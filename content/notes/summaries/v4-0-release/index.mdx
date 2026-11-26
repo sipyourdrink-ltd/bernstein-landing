@@ -13,7 +13,7 @@ summary_modes:
       - "bernstein govern audit --strict distinguishes failed checks (exit 1) from unmeasurable checks or usage errors (exit 2), and normal run closure HMAC-seals the final delegation digest."
     whyItMatters: "Failures and truncated delegation chains stop passing quietly, while patch releases (4.0.1, 4.0.2, and later) carry follow-up fixes on top of 4.0.0."
   takeaways:
-    title: "Four silent-pass gaps closed in Bernstein 4.0.0"
+    title: "Failures and truncated chains no longer pass quietly in Bernstein 4.0.0"
     items:
       - "Install or upgrade from releases/latest (pipx install bernstein, pipx upgrade bernstein, or uv tool install bernstein) rather than pinning 4.0.0, because 4.0.1, 4.0.2, and later carry security and reliability fixes."
       - "Failed workflow nodes stop all subsequent layers, including independent branches that previously still dispatched and wrote success checkpoints; detached SSH tasks exiting nonzero now fail the run."
@@ -43,4 +43,4 @@ Bernstein 4.0.0 (Apache-2.0) focuses on conditions that previously passed quietl
 
 ## when to read this
 
-for operators upgrading to the 4.x line who need the exact breaking failure semantics, strict audit exit codes, and documented verification limits before reading the full 4.0.0 milestone notes.
+for operators upgrading to the 4.x line who need the failure semantics, strict audit exit codes, and documented verification limits before reading the full 4.0.0 milestone notes.
