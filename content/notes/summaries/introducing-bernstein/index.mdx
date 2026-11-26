@@ -23,10 +23,10 @@ summary_modes:
   technical:
     title: "bernstein 1.0 design: worktree isolation, deterministic ticks, file-based state"
     items:
-      - "The scheduler is a plain-Python loop that ticks at a fixed cadence, dispatches tasks to short-lived agent processes (one to three tasks each to avoid token rot), and collects results into a merge queue; no LLM decides what runs next."
-      - "Each agent gets its own git worktree, so two agents editing the same path are physically isolated until merge time; the merge queue applies what passes quality gates and rolls back what does not."
-      - "State persistence is .sdd/ files (YAML and JSON), with no Redis or database hop; the entire system can be inspected by reading the directory, which keeps debugging boring and the audit trail HMAC-chained."
-      - "The adapters share one base class, so new CLIs (Claude Code, Codex, Gemini CLI, Aider, Amp, Qwen, Roo Code) plug in at roughly 100 lines each; the cost tracker meters every dispatch against a per-repo cap."
+      - "The scheduler is a plain-Python tick-based loop that dispatches tasks to short-lived agent processes (one to three tasks each to avoid token rot) and collects results into a merge queue; no LLM decides what runs next."
+      - "Each agent gets its own git worktree, so two agents editing the same path are isolated until merge time; the merge queue lands what passes quality gates and rolls back what does not."
+      - "State persistence is .sdd/ files (YAML and JSON), with no Redis or database; the directory can be inspected with cat, grep, and git, alongside an HMAC-signed audit log."
+      - "Seven adapters ship at launch (Claude Code, Codex, Gemini CLI, Aider, Amp, Qwen, Roo Code) plus a generic terminal wrapper, with new adapters landing in roughly 100 lines of Python; 1.0 also includes cost tracking, a task store with retry and dead-letter queue, a task server on port 8052, and a TUI."
     whyItMatters: "Each design choice is one less reason for an operator to hit a black box; the orchestrator is observable by the same tools that observe a normal codebase."
 ---
 

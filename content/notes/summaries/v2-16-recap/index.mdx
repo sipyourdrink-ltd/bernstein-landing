@@ -1,0 +1,46 @@
+---
+title: "bernstein 2.16: the output-economy suite, and a Windows adapter path that finally holds"
+description: "The 2.4 through 2.16 arc: run-level cost budgets with Brier-scored forecasts, hardened HMAC audit chains, and a 2.16.1 Windows .cmd/.bat adapter shim fix."
+date: "2026-07-06"
+url: "https://bernstein.run/blog/v2-16-recap"
+tags: ["summary", "multi-agent orchestration", "release", "cost control", "output economy", "deterministic replay", "audit log", "Windows", "adapters"]
+source_post: "v2-16-recap"
+summary_modes:
+  quick:
+    title: "bernstein 2.4 to 2.16: attributed spend budgets, closed audit gaps, and Windows shims"
+    items:
+      - "The 2.16 output-economy suite adds --max-cost-usd run budgets, per-task/step/adapter/model attribution in bernstein cost, and Brier-scored spend forecasts."
+      - "Deterministic replay is hash-checked across runs with closed HMAC audit-chain gaps, and 2.16.1 fixes Windows .cmd/.bat adapter shims by resolving absolute paths and routing through the command interpreter."
+    whyItMatters: "Spend stops arriving as an unattributed invoice total, audit coverage becomes continuous, and the standard Windows install path works without manual workarounds."
+  takeaways:
+    title: "Three themes across the 2.4 through 2.16.1 cycle"
+    items:
+      - "--max-cost-usd caps reported spend at the run level, bernstein cost (and bernstein cost --by profile) attributes charges by task, step, adapter, and model, and the cost guard Brier-scores pre-step forecasts against actuals."
+      - "The model-free coordinator schedules byte-identical task graphs for identical seed, plan, and state (checked by hash), while HMAC-chained entries now cover previously missed transitions and merges."
+      - "bernstein compliance pack emits a signed bundle verified by the standalone bernstein-verify wheel (only cryptography and click as dependencies, tested to ensure import bernstein raises ModuleNotFoundError)."
+      - "2.16.1 resolves adapter binaries to absolute paths before spawn, routes .cmd/.bat shims through the Windows command interpreter, and passes PATHEXT to the worker environment; 2.x configs and plans upgrade unchanged."
+    whyItMatters: "Existing 2.x plans keep running unchanged while cost caps, continuous audit verification, and Windows npm-shim adapters work out of the box."
+  technical:
+    title: "bernstein 2.16 internals: output economy, hash-verified replay, standalone verifier, Windows spawn"
+    items:
+      - "Output-economy controls read adapter-reported usage rather than acting as a pricing oracle: --max-cost-usd bounds total run spend, charges are logged against task, step, adapter, and model for bernstein cost and bernstein cost --by profile, and pre-step forecasts are logged beside actuals for Brier scoring."
+      - "Determinism is tested as a hash-equality property across two runs from the same seed, plan, and state with no model in the coordinator loop; every scheduling decision, task transition, and artefact edit now lands inside one continuous HMAC-chained audit log."
+      - "bernstein compliance pack generates a signed bundle checked independently by bernstein-verify, whose venv depends only on cryptography and click and asserts import bernstein raises ModuleNotFoundError; the post notes this is a verifiable artefact rather than an external regulatory audit."
+      - "On Windows, bare argv[0] spawns skip PATHEXT extension resolution and broke npm-installed .cmd/.bat shims (such as Codex via nvm-windows). 2.16.1 resolves the adapter binary to its absolute path before spawn, invokes resolved .cmd/.bat shims through the command interpreter with PATHEXT forwarded, and leaves real executables and POSIX spawns unchanged."
+    whyItMatters: "Each change targets a concrete operational failure surface: unattributed spend, audit-chain blind spots, and silent spawn failures on Windows."
+---
+
+## summary
+
+Twelve point releases from 2.4 through 2.16 (plus the 2.16.1 Windows fix) focus on three areas. The output-economy suite introduces run-level `--max-cost-usd` budgets, line-item attribution in `bernstein cost` (and `bernstein cost --by profile`), and Brier-scored pre-step spend forecasts based on adapter-reported usage. Deterministic, auditable orchestration closes prior HMAC audit-chain gaps, verifies hash-identical task graphs across matching inputs, and pairs `bernstein compliance pack` with the standalone `bernstein-verify` wheel (`cryptography` and `click` only, asserting `import bernstein` raises `ModuleNotFoundError`). Finally, 2.16.1 fixes Windows `.cmd` and `.bat` adapter shims by resolving absolute binary paths before spawning, routing shims through the command interpreter, and passing `PATHEXT` through the worker environment.
+
+## key takeaways
+
+- `--max-cost-usd` caps reported spend per run; `bernstein cost` and `bernstein cost --by profile` attribute charges to task, step, adapter, and model; pre-step forecasts are Brier-scored against actuals.
+- two runs with the same seed, plan, and state are compared by hash, and HMAC audit-chain coverage gaps across state transitions and merges are closed.
+- `bernstein-verify` checks signed `bernstein compliance pack` bundles independently of `bernstein` (verifiable artefact, not an external regulatory audit).
+- upgrading with `pipx install --upgrade bernstein` (or `pip install --upgrade bernstein`) keeps existing 2.x configs and plans (`bernstein run`, `bernstein conduct`, `bernstein live`, `bernstein gui serve`) unchanged while fixing Windows `.cmd`/`.bat` shims.
+
+## when to read this
+
+for operators running 2.x plans who want run-level cost attribution, end-to-end audit chain verification, or reliable Windows adapter execution for npm-installed CLIs.
