@@ -302,13 +302,21 @@ Trigger self-evolution: Bernstein plans and executes improvements to itself.
 Show cost breakdown per agent, per model, per task.
 
 ### \`bernstein demo --flask-todo\`
-Zero-config demo run (\`bernstein quickstart\` is a deprecated alias, removed in 4.0.0).
+Zero-config demo run (\`bernstein quickstart\` was removed in 4.0.0; use \`bernstein demo\`).
 
 ### \`bernstein init [--wizard]\`
-Initialize a project (\`.sdd/\` + \`bernstein.yaml\`); \`--wizard\` runs the interactive setup (\`bernstein init-wizard\` is a deprecated alias, removed in 4.0.0).
+Initialize a project (\`.sdd/\` + \`bernstein.yaml\`); \`--wizard\` runs the interactive setup (\`bernstein init-wizard\` was removed in 4.0.0).
 
-### Verification & replay
+### \`bernstein doctor\`
+Run workspace, adapter, environment, and endpoint readiness checks before starting a run.
 
+### \`bernstein live\` / \`bernstein gui serve\`
+Attach the terminal Textual TUI (\`bernstein live\`) or start the local web dashboard (\`bernstein gui serve\`) to inspect running tasks, logs, and audit state.
+
+### Verification, governance & replay
+
+- \`bernstein verify receipt RECEIPT.json [--public-key KEY.pub.pem]\` / \`bernstein verify run RUN_ID\` - verify a signed run or task receipt offline; pinning \`--public-key\` verifies Ed25519 provenance in addition to payload integrity.
+- \`bernstein govern audit [--strict]\` - run governance and policy conformance checks across the workspace; in 4.0.0+ \`--strict\` exits 0 when all checks pass, 1 on a check failure, and 2 when a check could not be measured or on usage error.
 - \`bernstein replay RUN_ID [--verify | --from-step N]\` - replay a past run step-by-step from its journal; \`--verify\` recomputes the journal's Merkle head and reports the first divergent step, \`--from-step N\` rebuilds deterministic state to step N.
 - \`bernstein fork --run ID --from-step N\` - rewind a run to journal step N and branch a new run from its content-addressed worktree snapshot.
 - \`bernstein audit verify\` / \`bernstein audit diagnose RUN_ID --signal S\` - verify audit-log integrity; \`diagnose\` names the first faulty step of a run and writes a signed diagnosis receipt that \`audit diagnose verify\` re-derives offline.
@@ -319,9 +327,9 @@ Initialize a project (\`.sdd/\` + \`bernstein.yaml\`); \`--wizard\` runs the int
 ### Analysis & evaluation
 
 - \`bernstein plan compile SPEC\` - compile a requirements document into a gated task graph with requirement-hash lineage.
-- \`bernstein impact api|deps|blast\` - change-impact analysis: breaking-API changes, affected call sites, blast radius (\`dep-impact\` and \`blast-radius\` are deprecated aliases, removed in 4.0.0).
-- \`bernstein eval\` - evaluation pipelines: golden suite, SWE-bench, ProgramBench; \`--reliability K\` emits a signed pass^k reliability receipt (\`bernstein benchmark\` is a deprecated alias, removed in 4.0.0).
-- \`bernstein report postmortem|incident|commits\` - failed-task postmortems, incident reports, per-run git diff stats (\`postmortem\`, \`incident\`, \`commit-stats\` are deprecated aliases, removed in 4.0.0).
+- \`bernstein impact api|deps|blast\` - change-impact analysis: breaking-API changes, affected call sites, blast radius (\`dep-impact\` and \`blast-radius\` aliases were removed in 4.0.0).
+- \`bernstein eval\` - evaluation pipelines: golden suite, SWE-bench, ProgramBench; \`--reliability K\` emits a signed pass^k reliability receipt (\`bernstein benchmark\` was removed in 4.0.0).
+- \`bernstein report postmortem|incident|commits\` - failed-task postmortems, incident reports, per-run git diff stats (top-level \`postmortem\`, \`incident\`, \`commit-stats\` aliases were removed in 4.0.0).
 
 ### Operator commands
 
@@ -638,13 +646,42 @@ Bernstein ships its role guidance (backend, frontend, QA, security, DevOps, arch
 
 ---
 
+## Specifications
+
+### CLI Coding Agent Failure Taxonomy v0.1 (CC BY 4.0)
+
+Bernstein publishes a closed-set eight-category vocabulary for classifying failed or degraded CLI coding agent tasks, cross-referenced to **NIST AI RMF 1.0** trust characteristics and **ISO/IEC 42001** governance controls (canonical URL and JSON Schema listed under Links below). Classifiers assign the highest-priority matching category:
+
+1. \`test_regression\` (critical; NIST: validity, robustness; ISO 42001: A.6.2.5) - previously-green tests fail after the agent run.
+2. \`timeout\` (high; NIST: validity, robustness; ISO 42001: A.6.2.7) - wall-clock or turn-count budget reached before completion signals satisfied.
+3. \`scope_creep\` (high; NIST: validity, security; ISO 42001: A.7.2) - diff touches paths outside the declared \`owned_files\` set.
+4. \`conflict\` (high; NIST: robustness; ISO 42001: A.6.2.8) - merge or apply step fails due to an overlapping concurrent agent edit.
+5. \`hallucination\` (high; NIST: validity, security; ISO 42001: A.6.2.9) - uncompilable code or references to non-existent APIs, files, or symbols.
+6. \`orientation_miss\` (medium; NIST: validity; ISO 42001: A.6.2.4) - over half of turns spent in exploration before producing any artefact.
+7. \`incomplete\` (medium; NIST: validity; ISO 42001: A.6.2.6) - agent stopped voluntarily with required completion signals missing.
+8. \`context_miss\` (medium; NIST: validity; ISO 42001: A.5.2) - agent lacked contextual documentation or misread the brief.
+
+---
+
 ## Links
 
 - Website: https://bernstein.run
+- Canonical Q&A Index: https://bernstein.run/q
+- CLI Quickstart: https://bernstein.run/cli-quickstart
+- Spec-Driven Walkthrough: https://bernstein.run/spec-driven
+- Agent Failure Taxonomy v0.1: https://bernstein.run/spec/agent-failure-taxonomy/v0.1
+- Agent Failure Taxonomy JSON Schema: https://bernstein.run/spec/agent-failure-taxonomy/v0.1.json
+- Agent Instruction Linter (agent-md-bench): https://bernstein.run/tools/agent-md-bench
+- Cost Calculator: https://bernstein.run/cost
+- About & Sourcing Disclosure: https://bernstein.run/about
 - GitHub: https://github.com/sipyourdrink-ltd/bernstein
 - PyPI: https://pypi.org/project/bernstein/
 - Documentation: https://docs.bernstein.run/
 - Issues: https://github.com/sipyourdrink-ltd/bernstein/issues
+- API Catalog (RFC 9727): https://bernstein.run/.well-known/api-catalog
+- Host Skills Index: https://bernstein.run/.well-known/skills.json
+- Agent Skills Discovery Index: https://bernstein.run/.well-known/agent-skills/index.json
+- Authentication Policy: https://bernstein.run/auth.md
 - Agent Card (A2A): https://bernstein.run/.well-known/agent-card.json
 - MCP Server Card: https://bernstein.run/.well-known/mcp/server-card.json
 - MCP (remote, read-only): https://mcp.bernstein.run/mcp - verify run receipts, list presets and adapters

@@ -109,6 +109,27 @@ export const DISCOVERY_DOCUMENTS: readonly DiscoveryDocument[] = [
     title: 'Machine-readable index of the callable endpoints this origin serves.',
   },
   {
+    path: '/.well-known/agent-skills/index.json',
+    label: 'Agent skills',
+    rel: 'service-desc',
+    type: 'application/json',
+    title: 'Agent Skills v0.2.0 discovery index with SHA-256 digests for hosted SKILL.md artefacts.',
+  },
+  {
+    path: '/mcp-server.json',
+    label: 'MCP tools spec',
+    rel: 'service-desc',
+    type: 'application/json',
+    title: 'Full MCP tool schemas for the locally-installed Bernstein MCP server.',
+  },
+  {
+    path: '/spec/agent-failure-taxonomy/v0.1.json',
+    label: 'Failure schema',
+    rel: 'service-desc',
+    type: 'application/schema+json',
+    title: 'JSON Schema for CLI Coding Agent Failure Taxonomy v0.1 records.',
+  },
+  {
     path: '/llms.txt',
     label: 'LLMs index',
     rel: 'service-doc',
@@ -143,6 +164,13 @@ export const DISCOVERY_DOCUMENTS: readonly DiscoveryDocument[] = [
     rel: 'service-meta',
     type: 'text/plain',
     title: 'Crawl permissions, licence, and key facts for AI systems.',
+  },
+  {
+    path: '/agents.txt',
+    label: 'Agent descriptor',
+    rel: 'service-meta',
+    type: 'text/plain',
+    title: 'Plaintext project descriptor and pointers to machine-readable surfaces on this host.',
   },
   {
     path: '/.well-known/agent-card.json',

@@ -32,6 +32,7 @@ export const AI_BOTS: readonly string[] = [
   'Anthropic-ai',
   // Google / Apple / Meta
   'Google-Extended',
+  'Google-CloudVertexBot',
   'Googlebot',
   'Applebot',
   'Applebot-Extended',
@@ -54,8 +55,12 @@ export const AI_BOTS: readonly string[] = [
   'MistralAI-User',
   'Kagibot',
   'AI2Bot',
+  'Ai2Bot-Dolma',
   'GrokBot',
   'DeepSeekBot',
+  'ExaBot',
+  'ExaSearchBot',
+  'PhindBot',
   // Tier-2 search engines. IndexNow protocol participants
   // (Bing/Yandex/Naver/Seznam/Yep) plus the four free-tier crawlers
   // worth indexing (Mojeek, Marginalia, DuckDuckBot, Brave). Listing

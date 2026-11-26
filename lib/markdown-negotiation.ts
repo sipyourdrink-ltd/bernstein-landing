@@ -1,5 +1,5 @@
 /**
- * Accept-header negotiation for the markdown views of this site.
+ * Accept-header negotiation and edge-safe AIO discovery header builders.
  *
  * A client that says it wants markdown gets markdown; everything else
  * gets the page. "Says it wants markdown" is deliberately narrow: the
@@ -20,22 +20,15 @@
  * runtime. It must stay free of `node:` imports and of anything that
  * touches the filesystem - the route handler does that part.
  */
+import { AI_BOTS } from './seo/ai-bots.ts';
 
 /**
  * Request header carrying the originally-requested path from middleware
  * to the markdown route.
- *
- * It has to be a header rather than a query parameter on the rewrite
- * target, because a handler reached through a rewrite sees the original
- * request URL and never the rewritten one.
- *
- * The route does not trust it. A client can set this header on a direct
- * hit to /api/_markdown, since middleware does not run on /api paths -
- * so the value is validated by `markdownTargetFor` like any other
- * input, and the most a forged value can produce is the markdown of a
- * published post, which is already public at its own URL.
  */
 export const MARKDOWN_PATH_HEADER = 'x-markdown-path';
+
+export const CANONICAL_PUBLIC_ORIGIN = 'https://bernstein.run';
 
 /** Media types that mean "markdown" for our purposes. */
 const MARKDOWN_TYPES = new Set(['text/markdown', 'text/x-markdown']);
@@ -43,24 +36,38 @@ const MARKDOWN_TYPES = new Set(['text/markdown', 'text/x-markdown']);
 /** Cheap reject before parsing. Runs on every request. */
 const MENTIONS_MARKDOWN = /markdown/i;
 
-/** Slug shape for a blog post. Matches lib/mdx's kebab-case directories. */
+/** Slug shape for a blog post or canonical Q&A slug. */
 const SLUG = /^[a-z0-9][a-z0-9-]*$/;
+
+/** Static pages with canonical markdown views and no unguarded edge TTL in next.config.mjs. */
+export type NegotiableStaticPage =
+  | 'about'
+  | 'cli-quickstart'
+  | 'spec-driven'
+  | 'agent-failure-taxonomy-v0.1'
+  | 'agent-md-bench';
+
+const STATIC_PAGE_TARGETS: Readonly<Record<string, NegotiableStaticPage>> = {
+  '/about': 'about',
+  '/cli-quickstart': 'cli-quickstart',
+  '/spec-driven': 'spec-driven',
+  '/spec/agent-failure-taxonomy/v0.1': 'agent-failure-taxonomy-v0.1',
+  '/tools/agent-md-bench': 'agent-md-bench',
+};
 
 /** The path shapes that have a markdown view. */
 export type MarkdownTarget =
   | { kind: 'site-index' }
-  | { kind: 'blog-post'; slug: string };
+  | { kind: 'blog-post'; slug: string }
+  | { kind: 'qa-index' }
+  | { kind: 'qa-item'; slug: string }
+  | { kind: 'static-page'; page: NegotiableStaticPage };
 
 interface MediaRange {
   type: string;
   q: number;
 }
 
-/**
- * Parse an Accept header into media ranges with their quality values.
- * Malformed parameters are ignored rather than throwing: a header we
- * cannot read is a header that does not ask for markdown.
- */
 function parseAccept(header: string): MediaRange[] {
   const ranges: MediaRange[] = [];
   for (const part of header.split(',')) {
@@ -73,7 +80,6 @@ function parseAccept(header: string): MediaRange[] {
       const [rawKey, rawValue] = param.split('=');
       if (rawKey?.trim().toLowerCase() !== 'q') continue;
       const parsed = Number.parseFloat(rawValue ?? '');
-      /* An unreadable or out-of-range q is treated as the default. */
       if (Number.isFinite(parsed) && parsed >= 0 && parsed <= 1) q = parsed;
     }
     ranges.push({ type, q });
@@ -81,11 +87,6 @@ function parseAccept(header: string): MediaRange[] {
   return ranges;
 }
 
-/**
- * Best quality value for an exactly-named type. A wildcard range does
- * not count: it says the client will take anything, not that it is
- * asking for this.
- */
 function exactQuality(ranges: MediaRange[], types: ReadonlySet<string>): number {
   let best = 0;
   for (const range of ranges) {
@@ -94,13 +95,6 @@ function exactQuality(ranges: MediaRange[], types: ReadonlySet<string>): number 
   return best;
 }
 
-/**
- * Best quality value for HTML, wildcard ranges included. They count on
- * this side: a client offering a catch-all at q=0.8 genuinely will
- * accept HTML, and scoring that as zero would let a bare
- * markdown-plus-wildcard header negotiate into markdown on the
- * strength of the wildcard alone.
- */
 function htmlQuality(ranges: MediaRange[]): number {
   let best = 0;
   for (const range of ranges) {
@@ -120,30 +114,128 @@ export function prefersMarkdown(accept: string | null | undefined): boolean {
   return markdown > htmlQuality(ranges);
 }
 
+function parseSafeSlug(rawSegment: string): string | null {
+  let slug: string;
+  try {
+    slug = decodeURIComponent(rawSegment);
+  } catch {
+    return null;
+  }
+  return SLUG.test(slug) ? slug : null;
+}
+
 /**
  * Which markdown view a path maps to, or null when the path has none.
  *
- * Only two shapes have one: the site index and a blog post. Anything
- * else - /cost, /vs/aider, a nested path under /blog - is not
- * negotiable and is left alone, because there is no markdown source
- * for it and synthesising one would mean inventing content.
+ * Routes with unguarded shared-cache `s-maxage` rules in next.config.mjs
+ * (`/blog`, `/cost`, `/vs/*`, `/docs/cli*`) deliberately return null so
+ * a CDN that ignores `Vary: Accept` can never cache a markdown body for
+ * browsers.
  */
 export function markdownTargetFor(pathname: string): MarkdownTarget | null {
   if (pathname === '/') return { kind: 'site-index' };
 
+  const normalized = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+  if (normalized === '/q') return { kind: 'qa-index' };
+
+  const staticPage = STATIC_PAGE_TARGETS[normalized];
+  if (staticPage) return { kind: 'static-page', page: staticPage };
+
   const blog = /^\/blog\/([^/]+)\/?$/.exec(pathname);
-  if (!blog) return null;
-
-  /* Decode before validating so a percent-encoded traversal ("%2e%2e")
-     is rejected by the slug pattern rather than sailing through it. A
-     malformed escape sequence throws; that is a reject, not a crash. */
-  let slug: string;
-  try {
-    slug = decodeURIComponent(blog[1]!);
-  } catch {
-    return null;
+  if (blog) {
+    const slug = parseSafeSlug(blog[1]!);
+    return slug ? { kind: 'blog-post', slug } : null;
   }
-  if (!SLUG.test(slug)) return null;
 
-  return { kind: 'blog-post', slug };
+  const qa = /^\/q\/([^/]+)\/?$/.exec(pathname);
+  if (qa) {
+    const slug = parseSafeSlug(qa[1]!);
+    return slug ? { kind: 'qa-item', slug } : null;
+  }
+
+  return null;
+}
+
+/**
+ * Resolve the public origin used in RFC 8288 Link headers.
+ *
+ * Inside Next.js standalone Docker (`HOSTNAME=0.0.0.0`, `PORT=3000`),
+ * `request.nextUrl.origin` resolves to `https://0.0.0.0:3000`, which
+ * previously leaked unreachable bind addresses to AI crawlers on live
+ * bernstein.run. Any missing or loopback/bind-all origin falls back to
+ * the canonical public origin.
+ */
+const INTERNAL_HOST_ORIGIN = /^https?:\/\/(0\.0\.0\.0|127\.0\.0\.1|localhost|\[::1\])(?::\d+)?\/?$/i;
+
+export function resolvePublicOrigin(candidate?: string | null): string {
+  const trimmed = candidate?.trim().replace(/\/+$/, '') ?? '';
+  if (!trimmed || INTERNAL_HOST_ORIGIN.test(trimmed)) {
+    return CANONICAL_PUBLIC_ORIGIN;
+  }
+  return trimmed;
+}
+
+/**
+ * RFC 8288 Link header advertising the RFC 9727 API catalog, llms.txt
+ * indices, and A2A / MCP capability cards on the canonical public origin.
+ */
+export function buildAiDiscoveryLinkHeader(publicOrigin = CANONICAL_PUBLIC_ORIGIN): string {
+  const origin = resolvePublicOrigin(publicOrigin);
+  return [
+    `<${origin}/.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"`,
+    `<${origin}/llms.txt>; rel="ai-content"; type="text/plain"`,
+    `<${origin}/llms-full.txt>; rel="ai-content-full"; type="text/plain"`,
+    `<${origin}/.well-known/agent-card.json>; rel="agent-card"; type="application/json"`,
+    `<${origin}/.well-known/mcp/server-card.json>; rel="mcp-server"; type="application/json"`,
+  ].join(', ');
+}
+
+/**
+ * Machine-discovery surfaces that must carry `X-Robots-Tag: noindex, follow`
+ * so search engines crawl outbound links inside them without indexing raw
+ * plaintext/JSON descriptors as SERP results.
+ */
+const DISCOVERY_PATHS = new Set([
+  '/llms.txt',
+  '/llms-full.txt',
+  '/robots.txt',
+  '/ai.txt',
+  '/agents.txt',
+  '/humans.txt',
+  '/agents.json',
+  '/auth.md',
+  '/AGENTS.md',
+  '/openapi.yaml',
+  '/mcp-server.json',
+  '/mcp-catalog.json',
+  '/structured-data.json',
+]);
+
+export function isDiscoveryPath(pathname: string): boolean {
+  if (DISCOVERY_PATHS.has(pathname)) return true;
+  return pathname.startsWith('/.well-known/');
+}
+
+export function buildPageResponseHeaders(params: {
+  pathname: string;
+  userAgent: string;
+  publicOrigin?: string | null;
+}): Record<string, string> {
+  const { pathname, userAgent, publicOrigin } = params;
+  const headers: Record<string, string> = {};
+
+  headers['X-Robots-Tag'] = isDiscoveryPath(pathname)
+    ? 'noindex, follow'
+    : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+
+  if (markdownTargetFor(pathname) !== null) {
+    headers['Vary'] = 'Accept';
+  }
+
+  if (AI_BOTS.some((bot) => userAgent.includes(bot))) {
+    headers['X-AI-Content-Available'] = 'true';
+    headers['Link'] = buildAiDiscoveryLinkHeader(resolvePublicOrigin(publicOrigin));
+  }
+
+  return headers;
 }
