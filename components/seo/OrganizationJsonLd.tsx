@@ -58,6 +58,8 @@ export const ORGANIZATION_JSON_LD: JsonLdData = {
       'https://alexchernysh.com',
       'https://github.com/chernistry',
       'https://x.com/alex_chernysh',
+      'https://mastodon.social/@alexchernysh',
+      'https://bsky.app/profile/alex-chernysh.bsky.social',
     ],
   },
   foundingDate: '2025-09',

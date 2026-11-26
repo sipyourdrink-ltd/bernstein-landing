@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getAllPosts, getPost, getSlugs, type PostIndex } from '@/lib/mdx';
-import { SITE_URL, AUTHOR } from '@/lib/seo';
+import { SITE_URL, SITE_NAME, AUTHOR } from '@/lib/seo';
 import { blogCoverSocialAlt } from '@/lib/blog-covers';
 import { BlogPostingJsonLd } from '@/components/seo/BlogPostingJsonLd';
 import { BlogHowToJsonLd } from '@/components/seo/BlogHowToJsonLd';
@@ -99,19 +99,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     url: post.fm.cover ?? `/api/og?title=${encodeURIComponent(post.fm.title)}`,
     width: 1200,
     height: 630,
-    ...(post.fm.coverAlt ? { alt: blogCoverSocialAlt(post.fm.title, post.fm.coverAlt) } : {}),
+    alt: post.fm.coverAlt
+      ? blogCoverSocialAlt(post.fm.title, post.fm.coverAlt)
+      : post.fm.title,
   };
   return {
     title: metaTitle,
     description: metaDescription,
-    authors: [{ name: AUTHOR }],
-    alternates: { canonical: `${SITE_URL}/blog/${slug}` },
+    authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
+    alternates: {
+      canonical: `${SITE_URL}/blog/${slug}`,
+      types: {
+        'application/rss+xml': [{ url: '/rss.xml', title: 'Bernstein Blog' }],
+        'text/markdown': `${SITE_URL}/blog/${slug}.md`,
+      },
+    },
     openGraph: {
       type: 'article',
+      siteName: SITE_NAME,
       title: ogTitle,
       description: metaDescription,
       url: `${SITE_URL}/blog/${slug}`,
       publishedTime: post.fm.date,
+      modifiedTime: post.fm.dateModified ?? post.fm.date,
       authors: [AUTHOR],
       images: [socialImage],
     },
@@ -127,6 +137,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
          even before they finish their own extraction pass. */
       'article:author': AUTHOR,
       'article:published_time': post.fm.date,
+      'article:modified_time': post.fm.dateModified ?? post.fm.date,
       ...(post.fm.tags && post.fm.tags.length > 0
         ? { 'article:tag': post.fm.tags.join(',') }
         : {}),
@@ -236,9 +247,13 @@ export default async function BlogPost({ params }: Props) {
                     day: 'numeric',
                   })}
                 </time>
-                <meta itemProp="dateModified" content={post.fm.date} />
+                <meta itemProp="dateModified" content={post.fm.dateModified ?? post.fm.date} />
                 <span aria-hidden="true">·</span>
                 <span>{post.readingMinutes} min read</span>
+                <span aria-hidden="true">·</span>
+                <a href={`/blog/${slug}.md`} type="text/markdown">
+                  markdown (.md)
+                </a>
                 <PageSeal />
               </p>
             </header>

@@ -21,7 +21,7 @@ import { Footer } from '@/components/landing/Footer';
 import { StaticPageBreadcrumb } from '@/components/seo/BreadcrumbListJsonLd';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { personLD } from '@/lib/jsonld';
-import { SITE_URL, AUTHOR } from '@/lib/seo';
+import { SITE_URL, SITE_NAME, AUTHOR } from '@/lib/seo';
 import {
   PROJECT_MAINTAINER_DESCRIPTION,
   PROJECT_TAGLINE_LOWER,
@@ -30,29 +30,39 @@ import {
 const LAST_UPDATED = '2026-05-21';
 const PAGE_URL = `${SITE_URL}/about`;
 const PAGE_TITLE = 'about';
+const SOCIAL_TITLE = 'about bernstein.run';
 const PAGE_DESC =
   'who runs bernstein.run, why the project exists, and how blog posts and comparison claims are sourced. solo-maintained, apache 2.0, bias disclosure included.';
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
   description: PAGE_DESC,
-  authors: [{ name: AUTHOR }],
-  alternates: { canonical: PAGE_URL },
+  authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
+  alternates: {
+    canonical: PAGE_URL,
+    types: { 'text/markdown': `${SITE_URL}/about.md` },
+  },
   robots: { index: true, follow: true },
   openGraph: {
     type: 'profile',
-    title: PAGE_TITLE,
+    siteName: SITE_NAME,
+    title: SOCIAL_TITLE,
     description: PAGE_DESC,
     url: PAGE_URL,
     images: [
-      { url: `/api/og?title=${encodeURIComponent(PAGE_TITLE)}`, width: 1200, height: 630 },
+      {
+        url: `/api/og?title=${encodeURIComponent(SOCIAL_TITLE)}`,
+        width: 1200,
+        height: 630,
+        alt: `${SOCIAL_TITLE} - maintainer bio and sourcing policy`,
+      },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: PAGE_TITLE,
+    title: SOCIAL_TITLE,
     description: PAGE_DESC,
-    images: [`/api/og?title=${encodeURIComponent(PAGE_TITLE)}`],
+    images: [`/api/og?title=${encodeURIComponent(SOCIAL_TITLE)}`],
   },
 };
 
@@ -71,6 +81,10 @@ export default function AboutPage() {
               <span>By {AUTHOR}</span>
               <span aria-hidden="true"> &middot; </span>
               <time dateTime={LAST_UPDATED}>updated {LAST_UPDATED}</time>
+              <span aria-hidden="true"> &middot; </span>
+              <a href="/about.md" type="text/markdown">
+                markdown (.md)
+              </a>
             </p>
           </header>
 
@@ -92,11 +106,11 @@ export default function AboutPage() {
                 alex chernysh
               </a>{' '}
               as a solo project, self-bootstrapped, no investor money. the
-              site, the python package on{' '}
+              site, the python 3.12+ package on{' '}
               <a href="https://pypi.org/project/bernstein/" rel="noopener">
                 pypi
               </a>
-              , the npm wrapper, and the docs all ship under apache 2.0.
+              {' '}(with local file-based <code>.sdd/</code> state), the npm wrapper, and the docs all ship under apache 2.0.
               public profiles:{' '}
               <a
                 href="https://github.com/chernistry"

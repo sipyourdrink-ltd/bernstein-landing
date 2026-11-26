@@ -396,3 +396,51 @@ test('postLastMod falls back to buildAt only when frontmatter is unparseable', a
   );
   assert.equal(result, FIXTURE_BUILD_AT);
 });
+
+test('sitemap includes /about and /spec/agent-failure-taxonomy/v0.1 with authored dates synced to page constants', async () => {
+  const aboutSrc = await readFile(path.join(repoRoot, 'app', 'about', 'page.tsx'), 'utf8');
+  const specSrc = await readFile(
+    path.join(repoRoot, 'app', 'spec', 'agent-failure-taxonomy', 'v0.1', 'page.tsx'),
+    'utf8',
+  );
+  const aboutDate = aboutSrc.match(/const\s+LAST_UPDATED\s*=\s*'(\d{4}-\d{2}-\d{2})'/)?.[1];
+  const specDate = specSrc.match(/const\s+SPEC_DATE\s*=\s*'(\d{4}-\d{2}-\d{2})'/)?.[1];
+  assert.ok(aboutDate, 'expected LAST_UPDATED in app/about/page.tsx');
+  assert.ok(specDate, 'expected SPEC_DATE in app/spec/agent-failure-taxonomy/v0.1/page.tsx');
+
+  const urls = await buildSitemapUrls({
+    posts: [],
+    seedItems: [],
+    readyAdapters: [],
+    compareEntries: [],
+    lastModFromSource: fixtureLastModResolver(),
+    buildAt: FIXTURE_BUILD_AT,
+  });
+
+  const aboutEntry = urls.find((u) => u.loc === 'https://bernstein.run/about');
+  const specEntry = urls.find(
+    (u) => u.loc === 'https://bernstein.run/spec/agent-failure-taxonomy/v0.1',
+  );
+  assert.ok(aboutEntry, '/about must be listed in sitemap.xml');
+  assert.ok(specEntry, '/spec/agent-failure-taxonomy/v0.1 must be listed in sitemap.xml');
+  assert.equal(aboutEntry!.lastmod, aboutDate);
+  assert.equal(specEntry!.lastmod, specDate);
+});
+
+test('seedUpdated overrides filesystem mtime for /q and /q/<slug> so container builds keep authored date', async () => {
+  const urls = await buildSitemapUrls({
+    posts: [],
+    seedItems: [{ slug: 'what-is-bernstein' }],
+    seedUpdated: '2026-08-01',
+    readyAdapters: [],
+    compareEntries: [],
+    lastModFromSource: async () => '2026-11-26',
+    buildAt: '2026-11-26',
+  });
+
+  const qIndex = urls.find((u) => u.loc === 'https://bernstein.run/q');
+  const qLeaf = urls.find((u) => u.loc === 'https://bernstein.run/q/what-is-bernstein');
+  assert.ok(qIndex && qLeaf);
+  assert.equal(qIndex!.lastmod, '2026-08-01');
+  assert.equal(qLeaf!.lastmod, '2026-08-01');
+});

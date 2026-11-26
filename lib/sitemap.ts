@@ -22,6 +22,11 @@
  */
 
 export const SITEMAP_SITE_URL = 'https://bernstein.run';
+/* Synced against app/about/page.tsx (LAST_UPDATED) and
+   app/spec/agent-failure-taxonomy/v0.1/page.tsx (SPEC_DATE); verified
+   by tests/sitemap-lastmod.test.ts so authored dates cannot drift. */
+export const ABOUT_LAST_MOD = '2026-05-21';
+export const FAILURE_TAXONOMY_V01_LAST_MOD = '2026-05-19';
 
 export type SitemapPost = {
   slug: string;
@@ -69,6 +74,10 @@ export type SitemapUrl = {
 export type SitemapInputs = {
   posts: SitemapPost[];
   seedItems: SitemapSeedItem[];
+  /* Optional authored `updated` date from data/ask-seed.json. Preserves
+     accurate /q and /q/<slug> lastmod even in container builds where
+     filesystem mtimes equal the image build day. */
+  seedUpdated?: string;
   readyAdapters: SitemapAdapterRef[];
   compareEntries: SitemapCompareEntry[];
   lastModFromSource: LastModResolver;
@@ -149,6 +158,7 @@ export async function buildSitemapUrls(
   const {
     posts,
     seedItems,
+    seedUpdated,
     readyAdapters,
     compareEntries,
     lastModFromSource,
@@ -188,6 +198,12 @@ export async function buildSitemapUrls(
     lastModFromSource(['app/spec-driven/page.tsx']),
   ]);
 
+  const parsedSeedUpdated = seedUpdated ? new Date(seedUpdated) : null;
+  const resolvedQLastMod =
+    parsedSeedUpdated && !Number.isNaN(parsedSeedUpdated.getTime())
+      ? toW3CDate(parsedSeedUpdated)
+      : qLastMod;
+
   const urls: SitemapUrl[] = [
     {
       loc: SITEMAP_SITE_URL,
@@ -208,6 +224,12 @@ export async function buildSitemapUrls(
        crawlers reach them via well-known path conventions, not the
        sitemap. */
     {
+      loc: `${SITEMAP_SITE_URL}/about`,
+      lastmod: ABOUT_LAST_MOD,
+      changefreq: 'monthly',
+      priority: 0.6,
+    },
+    {
       loc: `${SITEMAP_SITE_URL}/cli-quickstart`,
       lastmod: cliQuickstartLastMod,
       changefreq: 'monthly',
@@ -216,6 +238,12 @@ export async function buildSitemapUrls(
     {
       loc: `${SITEMAP_SITE_URL}/spec-driven`,
       lastmod: specDrivenLastMod,
+      changefreq: 'monthly',
+      priority: 0.7,
+    },
+    {
+      loc: `${SITEMAP_SITE_URL}/spec/agent-failure-taxonomy/v0.1`,
+      lastmod: FAILURE_TAXONOMY_V01_LAST_MOD,
       changefreq: 'monthly',
       priority: 0.7,
     },
@@ -239,7 +267,7 @@ export async function buildSitemapUrls(
     },
     {
       loc: `${SITEMAP_SITE_URL}/q`,
-      lastmod: qLastMod,
+      lastmod: resolvedQLastMod,
       changefreq: 'weekly',
       priority: 0.6,
     },
@@ -248,7 +276,7 @@ export async function buildSitemapUrls(
   for (const item of seedItems) {
     urls.push({
       loc: `${SITEMAP_SITE_URL}/q/${item.slug}`,
-      lastmod: qLastMod,
+      lastmod: resolvedQLastMod,
       changefreq: 'monthly',
       priority: 0.5,
     });

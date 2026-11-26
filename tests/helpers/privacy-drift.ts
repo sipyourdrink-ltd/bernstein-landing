@@ -8,6 +8,7 @@ const browserGlobals = new Set(['window', 'globalThis', 'self']);
 const windowMembers = new Set([...browserGlobals, 'top', 'parent', 'opener']);
 const cookieStoreNames = new Set(['cookieStore']);
 const trackerNames = new Set(['umami']);
+const readOnlyOptOutKeys = new Set(['umami:disabled', 'umami.disabled']);
 const headerMethods = new Set(['get', 'set', 'append', 'delete', 'has', 'getSetCookie']);
 const eventAttribute = 'data-umami-event';
 
@@ -318,9 +319,20 @@ export function checkPrivacyDrift(sources: ReadonlyMap<string, string>) {
     .map((node) => [jsxText(node), node]));
   const paragraphs = [...nodes(privacy)].filter((node): node is ts.JsxElement =>
     ts.isJsxElement(node) && jsxTag(node) === 'p');
-  const analytics = paragraphs.find((node) => jsxText(node).includes('one custom browser event'));
-  const [eventName, eventField] = analytics ? codeEntries(analytics).keys() : [];
-  if (!eventName || !eventField) issues.push(`${location(analytics ?? privacy)}: missing documented browser event name or field`);
+  const eventItems = [...nodes(privacy)].filter((node): node is ts.JsxElement =>
+    ts.isJsxElement(node) && jsxTag(node) === 'li' && !!jsxAttribute(node.openingElement, 'data-browser-event'));
+  const documentedEvents = new Map<string, { field: string; node: ts.JsxElement }>();
+  if (!eventItems.length) {
+    issues.push(`${location(privacy)}: missing documented browser events`);
+  }
+  for (const item of eventItems) {
+    const [eventName, eventField] = codeEntries(item).keys();
+    if (!eventName || !eventField) {
+      issues.push(`${location(item)}: missing documented browser event name or field`);
+    } else {
+      documentedEvents.set(eventName, { field: eventField, node: item });
+    }
+  }
   for (const [topic, wording] of [['session storage', 'uses no session storage'], ['cookies', 'sets no cookies and reads none']]) {
     if (paragraphs.some((node) => jsxText(node).includes(wording))) continue;
     const near = paragraphs.find((node) => jsxText(node).includes(topic));
@@ -336,12 +348,16 @@ export function checkPrivacyDrift(sources: ReadonlyMap<string, string>) {
       return;
     }
     events.set(event, new Set([...(events.get(event) ?? []), ...fields.keys()]));
-    if (event !== eventName) report(name, `event ${event} is not documented on /privacy`);
-    if (event === eventName && eventField && !fields.has(eventField)) {
-      report(name, `event ${event} is missing documented field ${eventField}`);
+    const documented = documentedEvents.get(event);
+    if (!documented) {
+      report(name, `event ${event} is not documented on /privacy`);
+      return;
+    }
+    if (!fields.has(documented.field)) {
+      report(name, `event ${event} is missing documented field ${documented.field}`);
     }
     for (const [field, node] of fields) {
-      if (field !== eventField) report(node, `event field ${field} is not documented on /privacy`);
+      if (field !== documented.field) report(node, `event field ${field} is not documented on /privacy`);
     }
   }
 
@@ -407,7 +423,7 @@ export function checkPrivacyDrift(sources: ReadonlyMap<string, string>) {
     }
     storageKeys.add(key);
     if (!documentedKeys.has(key)) report(argument, `storage key ${key} is not documented on /privacy`);
-    if (key === 'umami:disabled' && method.name !== 'getItem') {
+    if (readOnlyOptOutKeys.has(key) && method.name !== 'getItem') {
       report(node, '/privacy describes the browser opt-out key as read-only to site code');
     }
   }
@@ -456,6 +472,9 @@ export function checkPrivacyDrift(sources: ReadonlyMap<string, string>) {
   }
   for (const [key, node] of documentedKeys) {
     if (!storageKeys.has(key)) issues.push(`${location(node)}: documented storage key ${key} is unused`);
+  }
+  for (const [event, info] of documentedEvents) {
+    if (!events.has(event)) issues.push(`${location(info.node)}: documented browser event ${event} is unused`);
   }
   return { issues, storageKeys, events };
 }

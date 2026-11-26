@@ -27,6 +27,7 @@ import type { Metadata } from 'next';
 import { Nav } from '@/components/landing/Nav';
 import { Footer } from '@/components/landing/Footer';
 import { BackToTop } from '@/components/landing/BackToTop';
+import { StaticPageBreadcrumb } from '@/components/seo/BreadcrumbListJsonLd';
 import { SITE_URL, AUTHOR, SITE_NAME } from '@/lib/seo';
 
 export const dynamic = 'force-static';
@@ -40,17 +41,30 @@ const REPO_URL = 'https://github.com/sipyourdrink-ltd/bernstein';
 const DOCS_URL = 'https://docs.bernstein.run/';
 
 export const metadata: Metadata = {
-  title: PAGE_TITLE,
+  title: { absolute: PAGE_TITLE },
   description: PAGE_DESC,
-  authors: [{ name: AUTHOR }],
-  alternates: { canonical: PAGE_URL },
+  authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
+  alternates: {
+    canonical: PAGE_URL,
+    types: { 'text/markdown': `${SITE_URL}/spec-driven.md` },
+  },
   openGraph: {
     type: 'article',
+    siteName: SITE_NAME,
     title: PAGE_TITLE,
     description: PAGE_DESC,
     url: PAGE_URL,
+    publishedTime: PAGE_DATE,
+    modifiedTime: PAGE_DATE,
     authors: [AUTHOR],
-    images: [{ url: `/api/og?title=${encodeURIComponent(PAGE_TITLE)}`, width: 1200, height: 630 }],
+    images: [
+      {
+        url: `/api/og?title=${encodeURIComponent(PAGE_TITLE)}`,
+        width: 1200,
+        height: 630,
+        alt: PAGE_TITLE,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -175,6 +189,10 @@ export default function SpecDrivenPage() {
                 <a href={DOCS_URL}>Full docs</a>
                 <span aria-hidden="true">&middot;</span>
                 <a href="/#how">How it works</a>
+                <span aria-hidden="true">&middot;</span>
+                <a href="/spec-driven.md" type="text/markdown">
+                  markdown (.md)
+                </a>
               </p>
             </header>
 
@@ -182,9 +200,11 @@ export default function SpecDrivenPage() {
               <section style={sectionStyle}>
                 <h2>Why this page exists</h2>
                 <p>
-                  The runtime surface - goal in, verified pull request out - is
-                  covered on the{' '}
-                  <a href="/#how">home page</a>. What that summary skips is the
+                  Bernstein (Python 3.12+, Apache 2.0) separates multi-agent
+                  planning from execution across 55 selectable CLI coding-agent
+                  adapters. The runtime surface - goal in, verified pull request
+                  out - is covered on the{' '}
+                  <a href="/#how">home page</a>; what that summary skips is the
                   loop a human actually drives <em>before</em> any agent spawns:
                   you state intent, you read the decomposed plan, and only then
                   do you let the scheduler execute it. This page walks those five
@@ -273,6 +293,13 @@ export default function SpecDrivenPage() {
                     <a href={REPO_URL}>Source on GitHub</a> - the deterministic
                     planner and the gate pipeline are open.
                   </li>
+                  <li>
+                    <a href="/spec/agent-failure-taxonomy/v0.1">
+                      CLI Coding Agent Failure Taxonomy v0.1
+                    </a>{' '}
+                    - closed-set failure categories mapped to NIST AI RMF and
+                    ISO/IEC 42001.
+                  </li>
                 </ul>
               </section>
             </div>
@@ -286,19 +313,22 @@ export default function SpecDrivenPage() {
       </div>
       <Footer />
       <BackToTop />
+      <StaticPageBreadcrumb name="Spec-driven development" slug="/spec-driven" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'TechArticle',
-            '@id': PAGE_URL,
+            '@id': `${PAGE_URL}#techarticle`,
             headline: PAGE_TITLE,
             description: PAGE_DESC,
             datePublished: PAGE_DATE,
             dateModified: PAGE_DATE,
             inLanguage: 'en',
             url: PAGE_URL,
+            image: `${SITE_URL}/api/og?title=${encodeURIComponent(PAGE_TITLE)}`,
+            isPartOf: { '@id': `${SITE_URL}/#website` },
             articleSection: 'Tutorial',
             proficiencyLevel: 'Intermediate',
             dependencies:
@@ -310,17 +340,36 @@ export default function SpecDrivenPage() {
             },
             author: {
               '@type': 'Person',
+              '@id': 'https://alexchernysh.com/#person',
               name: AUTHOR,
               url: 'https://alexchernysh.com',
               sameAs: ['https://alexchernysh.com', 'https://github.com/chernistry'],
             },
             publisher: {
               '@type': 'Organization',
+              '@id': `${SITE_URL}/#organization`,
               name: SITE_NAME,
               url: SITE_URL,
               logo: { '@type': 'ImageObject', url: `${SITE_URL}/favicon.svg` },
             },
             mainEntityOfPage: { '@type': 'WebPage', '@id': PAGE_URL },
+            citation: [
+              {
+                '@type': 'TechArticle',
+                name: 'Bernstein Documentation',
+                url: DOCS_URL,
+              },
+              {
+                '@type': 'SoftwareSourceCode',
+                name: 'Bernstein Repository',
+                url: REPO_URL,
+              },
+              {
+                '@type': 'TechArticle',
+                name: 'CLI Coding Agent Failure Taxonomy v0.1',
+                url: `${SITE_URL}/spec/agent-failure-taxonomy/v0.1`,
+              },
+            ],
           }),
         }}
       />

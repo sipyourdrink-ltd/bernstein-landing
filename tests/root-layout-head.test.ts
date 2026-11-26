@@ -60,6 +60,8 @@ test('the tags that moved are still emitted', () => {
   for (const [what, pattern] of [
     ['the analytics preconnect', /rel="preconnect"[\s\S]{0,120}?analytics\.bernstein\.run/],
     ['the rel=me identity links', /rel="me"/],
+    ['the llms.txt describedby link', /rel="describedby"[\s\S]{0,120}?href="\/llms\.txt"/],
+    ['the llms-ctx.txt alternate', /rel="alternate"[\s\S]{0,160}?href="\/llms-ctx\.txt"/],
     ['the llms-full.txt alternate', /href="\/llms-full\.txt"/],
     ['the operator-exclusion inline script', /OPERATOR_EXCLUDE_INLINE_SCRIPT/],
     ['the analytics tracker', /analytics\.bernstein\.run\/script\.js/],
@@ -80,4 +82,12 @@ test('the tracker still follows the exclusion script', () => {
     'the deferred tracker is now emitted before the exclusion script, so the ' +
       'opt-out hook may not exist when the tracker boots',
   );
+});
+
+test('the tracker pins bernstein.run only, honours DNT, and excludes URL hashes', () => {
+  assert.match(layout, /data-domains="bernstein\.run"/);
+  assert.doesNotMatch(layout, /data-domains="[^"]*getbernstein\.com/);
+  assert.match(layout, /data-do-not-track="true"/);
+  assert.match(layout, /data-exclude-hash="true"/);
+  assert.match(layout, /data-before-send=\{UMAMI_BEFORE_SEND\}/);
 });

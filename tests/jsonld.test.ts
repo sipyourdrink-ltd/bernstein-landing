@@ -21,10 +21,14 @@ import {
   breadcrumbLD,
   comparisonLD,
   datasetLD,
+  definedTermSetLD,
   howToLD,
   organizationLD,
+  personLD,
   softwareApplicationLD,
+  softwareSourceCodeLD,
   techArticleLD,
+  webApplicationLD,
 } from '../lib/jsonld.ts';
 
 function assertNoUndefinedLeak(obj: unknown, path = '$') {
@@ -344,5 +348,131 @@ test('breadcrumbLD numbers items + requires at least one crumb', () => {
   const items = node.itemListElement as Array<Record<string, unknown>>;
   assert.equal(items[0].position, 1);
   assert.equal(items[1].position, 2);
+  assertNoUndefinedLeak(node);
+});
+
+test('personLD and author nodes share the canonical Person @id across the graph', () => {
+  const bio = personLD({
+    url: 'https://bernstein.run/about',
+    description: 'solo maintainer of bernstein',
+    jobTitle: 'maintainer, bernstein',
+  });
+  assert.equal(bio['@type'], 'Person');
+  assert.equal(
+    bio['@id'],
+    'https://alexchernysh.com/#person',
+    'personLD on /about must use canonical https://alexchernysh.com/#person so Knowledge Graph merges founder/author/bio',
+  );
+  const sameAs = bio.sameAs as string[];
+  assert.ok(sameAs.includes('https://bernstein.run/about'));
+  assert.ok(sameAs.includes('https://bsky.app/profile/alex-chernysh.bsky.social'));
+  assertNoUndefinedLeak(bio);
+
+  const article = articleLD({
+    url: 'https://bernstein.run/blog/post',
+    headline: 'Post',
+    description: 'Desc',
+    datePublished: '2026-05-09',
+  });
+  const author = article.author as Record<string, unknown>;
+  assert.equal(
+    author['@id'],
+    'https://alexchernysh.com/#person',
+    'PERSON_AUTHOR_NODE must carry canonical Person @id',
+  );
+});
+
+test('webApplicationLD emits a valid free WebApplication linked to Organization + Person @ids', () => {
+  const node = webApplicationLD({
+    name: 'Bernstein Cost Calculator',
+    url: 'https://bernstein.run/cost',
+    description: 'Interactive LLM token-bill routing calculator.',
+  });
+  assert.equal(node['@context'], 'https://schema.org');
+  assert.equal(node['@type'], 'WebApplication');
+  assert.equal(node['@id'], 'https://bernstein.run/cost#webapp');
+  assert.equal(node.applicationCategory, 'DeveloperApplication');
+  assert.equal(node.isAccessibleForFree, true);
+  const offers = node.offers as Record<string, unknown>;
+  assert.equal(offers.price, '0');
+  assert.equal(offers.priceCurrency, 'USD');
+  const publisher = node.publisher as Record<string, unknown>;
+  assert.equal(publisher['@id'], 'https://bernstein.run/#organization');
+  const author = node.author as Record<string, unknown>;
+  assert.equal(author['@id'], 'https://alexchernysh.com/#person');
+  assertNoUndefinedLeak(node);
+});
+
+test('definedTermSetLD emits DefinedTermSet with DefinedTerm children linked to Organization @id', () => {
+  const node = definedTermSetLD(
+    [
+      {
+        termCode: 'test_regression',
+        name: 'Test regression',
+        description: 'Previously-green tests fail after the agent run.',
+      },
+      {
+        termCode: 'scope_creep',
+        name: 'Scope creep',
+        description: 'Agent modified files outside its declared owned_files set.',
+      },
+    ],
+    {
+      url: 'https://bernstein.run/spec/agent-failure-taxonomy/v0.1',
+      name: 'CLI Coding Agent Failure Taxonomy v0.1',
+      description: 'Closed-set vocabulary for classifying agent task outcomes.',
+    },
+  );
+  assert.equal(node['@context'], 'https://schema.org');
+  assert.equal(node['@type'], 'DefinedTermSet');
+  assert.equal(
+    node['@id'],
+    'https://bernstein.run/spec/agent-failure-taxonomy/v0.1#taxonomy',
+  );
+  assert.equal(
+    (node.publisher as Record<string, unknown>)['@id'],
+    'https://bernstein.run/#organization',
+  );
+  const terms = node.hasDefinedTerm as Array<Record<string, unknown>>;
+  assert.equal(terms.length, 2);
+  assert.equal(terms[0]['@type'], 'DefinedTerm');
+  assert.equal(terms[0].termCode, 'test_regression');
+  assert.equal(
+    terms[0].inDefinedTermSet,
+    'https://bernstein.run/spec/agent-failure-taxonomy/v0.1#taxonomy',
+  );
+  assertNoUndefinedLeak(node);
+});
+
+test('softwareSourceCodeLD emits SoftwareSourceCode linked to #software, #person, and #organization', () => {
+  const node = softwareSourceCodeLD({
+    name: 'Bernstein',
+    url: 'https://bernstein.run',
+    description: 'An open-source governance layer for AI agents.',
+    codeRepository: 'https://github.com/sipyourdrink-ltd/bernstein',
+    programmingLanguage: 'Python',
+    runtimePlatform: 'Python 3.12+',
+    license: 'https://www.apache.org/licenses/LICENSE-2.0',
+    version: '4.0.2',
+  });
+  assert.equal(node['@context'], 'https://schema.org');
+  assert.equal(node['@type'], 'SoftwareSourceCode');
+  assert.equal(node['@id'], 'https://bernstein.run/#source-code');
+  assert.equal(
+    (node.targetProduct as Record<string, unknown>)['@id'],
+    'https://bernstein.run/#software',
+  );
+  assert.equal(
+    (node.author as Record<string, unknown>)['@id'],
+    'https://alexchernysh.com/#person',
+  );
+  assert.equal(
+    (node.maintainer as Record<string, unknown>)['@id'],
+    'https://alexchernysh.com/#person',
+  );
+  assert.equal(
+    (node.publisher as Record<string, unknown>)['@id'],
+    'https://bernstein.run/#organization',
+  );
   assertNoUndefinedLeak(node);
 });

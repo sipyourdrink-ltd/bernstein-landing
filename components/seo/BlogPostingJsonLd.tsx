@@ -54,6 +54,7 @@ export function BlogPostingJsonLd({
       },
     },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    isPartOf: { '@type': 'Blog', '@id': `${SITE_URL}/blog#blog`, name: `${SITE_NAME} Blog`, url: `${SITE_URL}/blog` },
     url,
     image: `${SITE_URL}${fm.cover ?? `/api/og?title=${encodeURIComponent(fm.title)}`}`,
     timeRequired: `PT${readingMinutes}M`,

@@ -36,17 +36,37 @@ type InlineScript = NonNullable<ReturnType<typeof parseInlineScript>>;
 
 function checkCleaner(script: InlineScript, callback: ts.FunctionExpression | ts.ArrowFunction, issues: string[]) {
   const containingBlock = callback.parent.parent.parent;
+  const optedOutFn = ts.isBlock(containingBlock)
+    ? containingBlock.statements.find(
+        (node): node is ts.FunctionDeclaration => ts.isFunctionDeclaration(node) && node.name?.text === 'optedOut',
+      )
+    : undefined;
+  if (!optedOutFn || !/^functionoptedOut\(v\)\{returnv===(['"])true\1\|\|v===(['"])1\2;\}$/.test(compact(optedOutFn))) {
+    issues.push(`${script.location(optedOutFn ?? callback)}: opt-out helper must accept both 'true' and '1'`);
+  }
   const cleaner = ts.isBlock(containingBlock) && containingBlock.statements.find(
     (node): node is ts.FunctionDeclaration => ts.isFunctionDeclaration(node) && node.name?.text === 'clean');
   const attempt = cleaner ? cleaner.body?.statements[0] : undefined;
   const steps = attempt && ts.isTryStatement(attempt) ? attempt.tryBlock.statements : [];
-  const [address, strip, returned] = steps;
+  const [address, filterParams, stripHash, returned] = steps;
   const parsed = address && ts.isVariableStatement(address) ? address.declarationList.declarations[0] : undefined;
-  if (steps.length !== 3 || parsed?.name.getText() !== 'x' || compact(parsed.initializer) !== 'newURL(u,window.location.href)'
-    || !strip || !ts.isExpressionStatement(strip)
-    || compact(strip.expression) !== 'strip.forEach(function(k){x.searchParams.delete(k);})'
+  if (steps.length !== 4 || parsed?.name.getText() !== 'x' || compact(parsed.initializer) !== 'newURL(u,window.location.href)'
+    || !filterParams || !ts.isExpressionStatement(filterParams)
+    || compact(filterParams.expression) !== 'Array.from(x.searchParams.keys()).forEach(function(k){if(allow.indexOf(k)===-1)x.searchParams.delete(k);})'
+    || !stripHash || !ts.isExpressionStatement(stripHash)
+    || !/^x\.hash=(['"])\1$/.test(compact(stripHash.expression))
     || !returned || !ts.isReturnStatement(returned) || compact(returned.expression) !== 'x.toString()') {
-    issues.push(`${script.location(returned ?? callback)}: the URL cleaner must strip the documented parameters and return the cleaned address`);
+    issues.push(`${script.location(returned ?? callback)}: the URL cleaner must keep only documented UTM parameters, strip the hash, and return the cleaned address`);
+  }
+  const refCleaner = ts.isBlock(containingBlock)
+    ? containingBlock.statements.find(
+        (node): node is ts.FunctionDeclaration => ts.isFunctionDeclaration(node) && node.name?.text === 'cleanRef',
+      )
+    : undefined;
+  const expectedRefCleaner =
+    "functioncleanRef(r){if(!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(r))return'';try{varx=newURL(r);if(x.protocol!=='https:'&&x.protocol!=='http:')return'';returnclean(x.toString());}catch(_){return'';}}";
+  if (!refCleaner || compact(refCleaner).replace(/"/g, "'") !== expectedRefCleaner) {
+    issues.push(`${script.location(refCleaner ?? callback)}: the referrer cleaner must require an explicit http(s) scheme before cleaning`);
   }
 }
 
@@ -66,15 +86,20 @@ function checkCallbackFlow(script: InlineScript, callback: ts.FunctionExpression
     issues.push(`${script.location(returned ?? callback)}: the hook must return the cleaned payload`);
   }
   const guards = flow.filter(ts.isIfStatement);
-  const cleaned = ['url', 'referrer'].map((field) => {
-    const member = `out.${field}`;
+  const cleaned = (
+    [
+      ['url', 'clean'],
+      ['referrer', 'cleanRef'],
+    ] as const
+  ).map(([fieldName, fnName]) => {
+    const member = `out.${fieldName}`;
     const guard = guards.find((node) => compact(node.expression) === member);
     const branch = guard?.thenStatement;
     const steps = branch && ts.isBlock(branch) ? branch.statements : branch ? [branch] : [];
     const assignment = steps[0];
     if (steps.length !== 1 || !assignment || !ts.isExpressionStatement(assignment)
-      || compact(assignment.expression) !== `${member}=clean(${member})`) {
-      issues.push(`${script.location(assignment ?? guard ?? callback)}: the hook must strip query parameters from the ${field} on the returned payload`);
+      || compact(assignment.expression) !== `${member}=${fnName}(${member})`) {
+      issues.push(`${script.location(assignment ?? guard ?? callback)}: the hook must strip query parameters from the ${fieldName} on the returned payload`);
       return undefined;
     }
     return guard;
@@ -98,31 +123,35 @@ function checkHook(
 ) {
   const scriptNodes = [...nodes(script.source)];
   const parameters = scriptNodes.find((node): node is ts.VariableDeclaration =>
-    ts.isVariableDeclaration(node) && node.name.getText() === 'strip');
+    ts.isVariableDeclaration(node) && node.name.getText() === 'allow');
   const queryList = parameters?.initializer;
   const paragraphs = [...nodes(privacy)].filter((node): node is ts.JsxElement =>
     ts.isJsxElement(node) && jsxTag(node) === 'p');
-  const hookDoc = paragraphs.find((node) => jsxText(node).includes('hook removes the'));
+  const hookDoc = paragraphs.find((node) => jsxText(node).includes('keeps only the'));
   const documented = hookDoc ? [...codeEntries(hookDoc).keys()].sort() : [];
-  const stripped = queryList && ts.isArrayLiteralExpression(queryList)
+  const allowed = queryList && ts.isArrayLiteralExpression(queryList)
     ? queryList.elements.map((node) => ts.isStringLiteralLike(node) ? node.text : undefined).sort() : [];
-  if (documented.length !== 2 || JSON.stringify(stripped) !== JSON.stringify(documented)) {
-    issues.push(`${script.location(queryList ?? callback)}: stripped query parameters disagree with /privacy`);
+  if (documented.length !== 5 || JSON.stringify(allowed) !== JSON.stringify(documented)) {
+    issues.push(`${script.location(queryList ?? callback)}: allowed query parameters disagree with /privacy`);
   }
   checkCleaner(script, callback, issues);
   checkCallbackFlow(script, callback, issues);
   const attempt = ts.isBlock(callback.body) ? callback.body.statements[0] : undefined;
-  const optOut = attempt && ts.isTryStatement(attempt) ? attempt.tryBlock.statements[0] : undefined;
-  if (!attempt || !ts.isTryStatement(attempt) || attempt.tryBlock.statements.length !== 1
+  const [privacySignal, optOut] = attempt && ts.isTryStatement(attempt) ? attempt.tryBlock.statements : [];
+  if (!attempt || !ts.isTryStatement(attempt) || attempt.tryBlock.statements.length !== 2
     || attempt.catchClause?.block.statements.length !== 0 || attempt.finallyBlock
+    || !privacySignal || !ts.isIfStatement(privacySignal)
+    || !/^\(window\.navigator&&\(window\.navigator\.globalPrivacyControl===true\|\|window\.navigator\.doNotTrack===(['"])1\1\)\)\|\|window\.doNotTrack===(['"])1\2$/.test(compact(privacySignal.expression))
+    || privacySignal.elseStatement || !dropsRequest(privacySignal.thenStatement)
     || !optOut || !ts.isIfStatement(optOut)
-    || !/^window\.localStorage&&window\.localStorage\.getItem\((['"])umami:disabled\1\)===(['"])true\2$/.test(compact(optOut.expression))
+    || !/^window\.localStorage&&\(optedOut\(window\.localStorage\.getItem\((['"])umami:disabled\1\)\)\|\|optedOut\(window\.localStorage\.getItem\((['"])umami\.disabled\2\)\)\)$/.test(compact(optOut.expression))
     || optOut.elseStatement || !dropsRequest(optOut.thenStatement)) {
-    issues.push(`${script.location(optOut ?? attempt ?? callback)}: opt-out must drop requests when the documented flag is true`);
+    issues.push(`${script.location(optOut ?? privacySignal ?? attempt ?? callback)}: opt-out must drop requests on GPC, DNT, or either documented opt-out storage flag`);
   }
   const optOutCode = codeEntries(privacy);
   for (const command of [
     'localStorage.setItem(&apos;umami:disabled&apos;, &apos;true&apos;)',
+    'localStorage.setItem(&apos;umami.disabled&apos;, &apos;1&apos;)',
     'localStorage.removeItem(&apos;umami:disabled&apos;)',
   ]) {
     if (!optOutCode.has(command)) issues.push(`${location(privacy)}: missing browser opt-out instruction ${command}`);
@@ -133,8 +162,12 @@ function checkHook(
   const pageText = paragraphs.map(jsxText).join(' ');
   for (const wording of [
     'The browser opt-out below does not control this server request',
+    'Global Privacy Control',
+    'Do Not Track',
     'text still being typed is not',
     'automatically sends its question',
+    '/llms-ctx.txt',
+    '/*.md',
   ]) {
     if (!pageText.includes(wording)) issues.push(`${location(privacy)}: missing privacy wording “${wording}”`);
   }
@@ -160,6 +193,34 @@ function checkTrackerSettings(program: ts.Program, privacy: ts.SourceFile, issue
     return jsxText(link) === host && href && staticString(href, checker) === `https://${host}`;
   })) {
     issues.push(`${location(src ?? tracker)}: analytics script host ${host ?? '(unknown)'} disagrees with /privacy`);
+  }
+  const domainsAttr = jsxAttribute(tracker, 'data-domains');
+  const domainsVal = domainsAttr && attributeValue(domainsAttr);
+  const configuredDomains = (domainsVal ? staticString(domainsVal, checker) ?? '' : '')
+    .split(',')
+    .map((d) => d.trim())
+    .filter(Boolean)
+    .sort();
+  const documentedDomains = [...nodes(privacy)]
+    .filter((node): node is ts.JsxElement =>
+      ts.isJsxElement(node) && jsxTag(node) === 'code' && !!jsxAttribute(node.openingElement, 'data-tracker-domain'))
+    .map((node) => jsxText(node))
+    .sort();
+  if (!configuredDomains.length || JSON.stringify(configuredDomains) !== JSON.stringify(documentedDomains)) {
+    issues.push(`${location(domainsAttr ?? tracker)}: tracker data-domains disagrees with /privacy`);
+  }
+  const documentedSettings = new Set(
+    [...nodes(privacy)]
+      .filter((node): node is ts.JsxElement =>
+        ts.isJsxElement(node) && jsxTag(node) === 'code' && !!jsxAttribute(node.openingElement, 'data-tracker-setting'))
+      .map((node) => jsxText(node)),
+  );
+  for (const requiredSetting of ['data-do-not-track', 'data-exclude-hash']) {
+    const attr = jsxAttribute(tracker, requiredSetting);
+    const val = attr && attributeValue(attr);
+    if (!attr || !val || staticString(val, checker) !== 'true' || !documentedSettings.has(requiredSetting)) {
+      issues.push(`${location(attr ?? tracker)}: tracker privacy setting ${requiredSetting} disagrees with /privacy`);
+    }
   }
   for (const name of ['data-performance', 'data-tag', 'data-auto-track']) {
     const attribute = jsxAttribute(tracker, name);
@@ -331,6 +392,91 @@ function checkHumanServices(program: ts.Program, privacy: ts.SourceFile, issues:
   }
 }
 
+function checkCspOrigins(program: ts.Program, privacy: ts.SourceFile, issues: string[]) {
+  const checker = program.getTypeChecker();
+  const config = program.getSourceFile('/' + configPath);
+  if (!config) {
+    issues.push(`${configPath}:1: missing Next config`);
+    return;
+  }
+  const documentedOrigins = new Set(
+    [...nodes(privacy)]
+      .filter((node): node is ts.JsxElement => ts.isJsxElement(node) && jsxTag(node) === 'a')
+      .map((link) => {
+        const href = attributeValue(jsxAttribute(link.openingElement, 'href'));
+        const val = href && staticString(href, checker);
+        return val && /^https:\/\/[^/?#]+$/.test(val) ? val : undefined;
+      })
+      .filter((val): val is string => val !== undefined),
+  );
+  for (const variableName of ['scriptSrc', 'connectSrc']) {
+    const decl = [...nodes(config)].find(
+      (node): node is ts.VariableDeclaration =>
+        ts.isVariableDeclaration(node) && node.name.getText() === variableName,
+    );
+    if (!decl?.initializer) {
+      issues.push(`${configPath}:1: missing ${variableName} in CSP config`);
+      continue;
+    }
+    for (const lit of [...nodes(decl.initializer)].filter(ts.isStringLiteralLike)) {
+      for (const match of lit.text.matchAll(/https:\/\/[^\s;'"]+/g)) {
+        const origin = match[0];
+        if (!documentedOrigins.has(origin)) {
+          issues.push(`${location(lit)}: CSP ${variableName} origin ${origin} is not documented on /privacy`);
+        }
+      }
+    }
+  }
+  const headers = [...nodes(config)].filter(ts.isObjectLiteralExpression);
+  const cspHeader = headers.find((node) => field(node, 'key')?.getText().slice(1, -1) === 'Content-Security-Policy');
+  const cspVal = field(cspHeader, 'value');
+  const cspExpr = cspVal && constantExpression(cspVal, checker);
+  if (cspExpr) {
+    for (const lit of [
+      ...(ts.isTemplateExpression(cspExpr)
+        ? [cspExpr.head, ...cspExpr.templateSpans.map((s) => s.literal)]
+        : ts.isStringLiteralLike(cspExpr)
+          ? [cspExpr]
+          : []),
+    ]) {
+      const formActionMatch = /form-action\s+([^;]+)/.exec(lit.text);
+      if (!formActionMatch) continue;
+      for (const match of formActionMatch[1]!.matchAll(/https:\/\/[^\s;'"]+/g)) {
+        issues.push(`${location(lit)}: CSP form-action external origin ${match[0]} is not allowed without an external form on /privacy`);
+      }
+    }
+  }
+}
+
+function checkClosedEventEnums(program: ts.Program, privacy: ts.SourceFile, issues: string[]) {
+  const checker = program.getTypeChecker();
+  const eventsFile = program.getSourceFile('/lib/analytics/events.ts');
+  if (!eventsFile) return;
+  const eventItems = [...nodes(privacy)].filter(
+    (node): node is ts.JsxElement =>
+      ts.isJsxElement(node) && jsxTag(node) === 'li' && !!jsxAttribute(node.openingElement, 'data-browser-event'),
+  );
+  for (const [constName, eventName] of [
+    ['INSTALL_COPY_METHODS', 'install-snippet-copy'],
+    ['AI_REFERRER_HOSTS', 'ai-referral'],
+  ] as const) {
+    const decl = [...nodes(eventsFile)].find(
+      (node): node is ts.VariableDeclaration =>
+        ts.isVariableDeclaration(node) && node.name.getText() === constName,
+    );
+    const expr = decl?.initializer && constantExpression(decl.initializer, checker);
+    const codeValues =
+      expr && ts.isArrayLiteralExpression(expr)
+        ? expr.elements.map((el) => staticString(el, checker)).filter((v): v is string => v !== undefined).sort()
+        : [];
+    const item = eventItems.find((li) => [...codeEntries(li).keys()][0] === eventName);
+    const docValues = item ? [...codeEntries(item).keys()].slice(2).sort() : [];
+    if (!codeValues.length || JSON.stringify(codeValues) !== JSON.stringify(docValues)) {
+      issues.push(`${location(decl ?? eventsFile)}: ${constName} enum values disagree with ${eventName} on /privacy`);
+    }
+  }
+}
+
 // Only locally shipped configuration is checked. The remote tracker and
 // host-supplied input handlers are outside this source review.
 export function checkPublishedPrivacySurfaces(sources: ReadonlyMap<string, string>): string[] {
@@ -339,7 +485,9 @@ export function checkPublishedPrivacySurfaces(sources: ReadonlyMap<string, strin
   if (!privacy) return [`${privacyPath}:1: missing privacy page`];
   const issues: string[] = [];
   checkTrackerSettings(program, privacy, issues);
+  checkClosedEventEnums(program, privacy, issues);
   checkInputRoutes(program, privacy, issues);
+  checkCspOrigins(program, privacy, issues);
   checkHumanServices(program, privacy, issues);
   return issues;
 }
