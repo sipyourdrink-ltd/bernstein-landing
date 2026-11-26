@@ -12,12 +12,12 @@
  *      `localStorage["umami:disabled"]` or Umami's standard
  *      `localStorage["umami.disabled"]` is `"true"` or `"1"`. Read on
  *      every call so toggling takes effect without a reload.
- *   2. Strict UTM allowlist + fragment scrub. Removes `#` fragments and
- *      every query parameter except the five standard `utm_*` campaign
- *      keys from both `url` and `referrer` (keeping DocsBot `q`/`ask`,
- *      tokens, emails, and ad-click identifiers out of analytics URLs),
- *      then drops duplicate consecutive page views for the same cleaned
- *      address.
+ *   2. Strict UTM allowlist, fragment scrub, and referrer scheme guard.
+ *      Removes `#` fragments and every query parameter except the five
+ *      standard `utm_*` campaign keys from `url` and `referrer`, clears
+ *      any `referrer` lacking a valid `http:`/`https:` scheme rather
+ *      than resolving it relative to `bernstein.run`, and drops
+ *      duplicate consecutive page views for the same cleaned address.
  *
  * Keep the string short and self-contained - no imports, no comments
  * inside it. Browser global and storage access are wrapped in try/catch
@@ -55,6 +55,14 @@ export const OPERATOR_EXCLUDE_INLINE_SCRIPT = `(() => {
       return x.toString();
     } catch (_) { return u; }
   }
+  function cleanRef(r) {
+    if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(r)) return '';
+    try {
+      var x = new URL(r);
+      if (x.protocol !== 'https:' && x.protocol !== 'http:') return '';
+      return clean(x.toString());
+    } catch (_) { return ''; }
+  }
   window.${UMAMI_BEFORE_SEND} = function (type, payload) {
     try {
       if (
@@ -75,7 +83,7 @@ export const OPERATOR_EXCLUDE_INLINE_SCRIPT = `(() => {
     if (!payload || typeof payload !== 'object') return payload;
     var out = Object.assign({}, payload);
     if (out.url) out.url = clean(out.url);
-    if (out.referrer) out.referrer = clean(out.referrer);
+    if (out.referrer) out.referrer = cleanRef(out.referrer);
     if (type === 'event' && !out.name) {
       if (out.url === lastView) return null;
       lastView = out.url;

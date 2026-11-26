@@ -58,6 +58,16 @@ function checkCleaner(script: InlineScript, callback: ts.FunctionExpression | ts
     || !returned || !ts.isReturnStatement(returned) || compact(returned.expression) !== 'x.toString()') {
     issues.push(`${script.location(returned ?? callback)}: the URL cleaner must keep only documented UTM parameters, strip the hash, and return the cleaned address`);
   }
+  const refCleaner = ts.isBlock(containingBlock)
+    ? containingBlock.statements.find(
+        (node): node is ts.FunctionDeclaration => ts.isFunctionDeclaration(node) && node.name?.text === 'cleanRef',
+      )
+    : undefined;
+  const expectedRefCleaner =
+    "functioncleanRef(r){if(!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(r))return'';try{varx=newURL(r);if(x.protocol!=='https:'&&x.protocol!=='http:')return'';returnclean(x.toString());}catch(_){return'';}}";
+  if (!refCleaner || compact(refCleaner).replace(/"/g, "'") !== expectedRefCleaner) {
+    issues.push(`${script.location(refCleaner ?? callback)}: the referrer cleaner must require an explicit http(s) scheme before cleaning`);
+  }
 }
 
 function checkCallbackFlow(script: InlineScript, callback: ts.FunctionExpression | ts.ArrowFunction, issues: string[]) {
@@ -76,15 +86,20 @@ function checkCallbackFlow(script: InlineScript, callback: ts.FunctionExpression
     issues.push(`${script.location(returned ?? callback)}: the hook must return the cleaned payload`);
   }
   const guards = flow.filter(ts.isIfStatement);
-  const cleaned = ['url', 'referrer'].map((field) => {
-    const member = `out.${field}`;
+  const cleaned = (
+    [
+      ['url', 'clean'],
+      ['referrer', 'cleanRef'],
+    ] as const
+  ).map(([fieldName, fnName]) => {
+    const member = `out.${fieldName}`;
     const guard = guards.find((node) => compact(node.expression) === member);
     const branch = guard?.thenStatement;
     const steps = branch && ts.isBlock(branch) ? branch.statements : branch ? [branch] : [];
     const assignment = steps[0];
     if (steps.length !== 1 || !assignment || !ts.isExpressionStatement(assignment)
-      || compact(assignment.expression) !== `${member}=clean(${member})`) {
-      issues.push(`${script.location(assignment ?? guard ?? callback)}: the hook must strip query parameters from the ${field} on the returned payload`);
+      || compact(assignment.expression) !== `${member}=${fnName}(${member})`) {
+      issues.push(`${script.location(assignment ?? guard ?? callback)}: the hook must strip query parameters from the ${fieldName} on the returned payload`);
       return undefined;
     }
     return guard;
@@ -151,6 +166,8 @@ function checkHook(
     'Do Not Track',
     'text still being typed is not',
     'automatically sends its question',
+    '/llms-ctx.txt',
+    '/*.md',
   ]) {
     if (!pageText.includes(wording)) issues.push(`${location(privacy)}: missing privacy wording “${wording}”`);
   }
@@ -431,6 +448,35 @@ function checkCspOrigins(program: ts.Program, privacy: ts.SourceFile, issues: st
   }
 }
 
+function checkClosedEventEnums(program: ts.Program, privacy: ts.SourceFile, issues: string[]) {
+  const checker = program.getTypeChecker();
+  const eventsFile = program.getSourceFile('/lib/analytics/events.ts');
+  if (!eventsFile) return;
+  const eventItems = [...nodes(privacy)].filter(
+    (node): node is ts.JsxElement =>
+      ts.isJsxElement(node) && jsxTag(node) === 'li' && !!jsxAttribute(node.openingElement, 'data-browser-event'),
+  );
+  for (const [constName, eventName] of [
+    ['INSTALL_COPY_METHODS', 'install-snippet-copy'],
+    ['AI_REFERRER_HOSTS', 'ai-referral'],
+  ] as const) {
+    const decl = [...nodes(eventsFile)].find(
+      (node): node is ts.VariableDeclaration =>
+        ts.isVariableDeclaration(node) && node.name.getText() === constName,
+    );
+    const expr = decl?.initializer && constantExpression(decl.initializer, checker);
+    const codeValues =
+      expr && ts.isArrayLiteralExpression(expr)
+        ? expr.elements.map((el) => staticString(el, checker)).filter((v): v is string => v !== undefined).sort()
+        : [];
+    const item = eventItems.find((li) => [...codeEntries(li).keys()][0] === eventName);
+    const docValues = item ? [...codeEntries(item).keys()].slice(2).sort() : [];
+    if (!codeValues.length || JSON.stringify(codeValues) !== JSON.stringify(docValues)) {
+      issues.push(`${location(decl ?? eventsFile)}: ${constName} enum values disagree with ${eventName} on /privacy`);
+    }
+  }
+}
+
 // Only locally shipped configuration is checked. The remote tracker and
 // host-supplied input handlers are outside this source review.
 export function checkPublishedPrivacySurfaces(sources: ReadonlyMap<string, string>): string[] {
@@ -439,6 +485,7 @@ export function checkPublishedPrivacySurfaces(sources: ReadonlyMap<string, strin
   if (!privacy) return [`${privacyPath}:1: missing privacy page`];
   const issues: string[] = [];
   checkTrackerSettings(program, privacy, issues);
+  checkClosedEventEnums(program, privacy, issues);
   checkInputRoutes(program, privacy, issues);
   checkCspOrigins(program, privacy, issues);
   checkHumanServices(program, privacy, issues);

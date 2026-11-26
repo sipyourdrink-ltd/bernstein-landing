@@ -229,6 +229,14 @@ const nextConfig = {
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
       },
       {
+        source: '/llms-ctx.txt',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
+      },
+      {
+        source: '/spec/agent-failure-taxonomy/v0.1.json',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
+      },
+      {
         source: '/ai.txt',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
       },
@@ -242,14 +250,6 @@ const nextConfig = {
       },
       {
         source: '/agents.json',
-        headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
-      },
-      /* /auth.md states what credentials this host wants (none) and
-         where the OpenAPI document's server actually is. Same
-         discipline as the rest of this list: it exists to be fetched by
-         an agent that already found openapi.yaml, not to rank. */
-      {
-        source: '/auth.md',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
       },
       {
@@ -358,6 +358,12 @@ const nextConfig = {
       },
       {
         source: '/cost',
+        has: [{ type: 'header', key: 'accept', value: MARKDOWN_ACCEPT }],
+        headers: NEGOTIATED_MARKDOWN_HEADERS,
+      },
+      {
+        source: '/cost',
+        missing: [{ type: 'header', key: 'accept', value: MARKDOWN_ACCEPT }],
         headers: [
           { key: 'Cache-Control', value: 'public, s-maxage=600, stale-while-revalidate=3600' },
         ],
@@ -379,6 +385,33 @@ const nextConfig = {
         missing: [{ type: 'header', key: 'accept', value: MARKDOWN_ACCEPT }],
         headers: [
           { key: 'Cache-Control', value: 'public, s-maxage=600, stale-while-revalidate=3600' },
+        ],
+      },
+      /* Explicit `/*.md` page twins must never duplicate HTML in search
+         indexes or inherit `/blog/:slug`'s shared HTML cache TTL (`:slug`
+         also matches `foo.md`). Placed after `/blog/:slug` so `no-store`
+         and `noindex, follow` win on every `.md` twin, followed by the
+         two static discovery `.md` documents which keep their shared
+         discovery TTL. */
+      {
+        source: '/:path*.md',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, follow' },
+          { key: 'Cache-Control', value: 'no-store' },
+        ],
+      },
+      {
+        source: '/auth.md',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, follow' },
+          { key: 'Cache-Control', value: DISCOVERY_CACHE_CONTROL },
+        ],
+      },
+      {
+        source: '/AGENTS.md',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, follow' },
+          { key: 'Cache-Control', value: DISCOVERY_CACHE_CONTROL },
         ],
       },
     ];

@@ -5,7 +5,13 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 
-import { INSTALL_COPY_EVENT, installCopyMethod } from '../lib/analytics/events.ts';
+import {
+  AI_REFERRAL_EVENT,
+  AI_REFERRER_HOSTS,
+  INSTALL_COPY_EVENT,
+  aiReferralSource,
+  installCopyMethod,
+} from '../lib/analytics/events.ts';
 import { OUTBOUND_CLICK_EVENT, outboundDestination } from '../lib/analytics/outbound.ts';
 import {
   ALLOWED_URL_PARAMS,
@@ -53,6 +59,47 @@ test('the install copy event matches the Umami goal name and maps only known slo
     closest: () => null,
   };
   assert.equal(installCopyMethod(unrelatedButton), null);
+});
+
+test('aiReferralSource matches only the 14 closed-enum AI assistant hosts from referrer or utm_source', () => {
+  assert.equal(AI_REFERRAL_EVENT, 'ai-referral');
+  assert.deepEqual(AI_REFERRER_HOSTS, [
+    'claude.ai',
+    'chatgpt.com',
+    'perplexity.ai',
+    'gemini.google.com',
+    'copilot.microsoft.com',
+    'meta.ai',
+    'grok.com',
+    'x.ai',
+    'kagi.com',
+    'phind.com',
+    'you.com',
+    'chat.mistral.ai',
+    'chat.deepseek.com',
+    'poe.com',
+  ]);
+
+  for (const host of AI_REFERRER_HOSTS) {
+    assert.equal(aiReferralSource(`https://${host}/c/123?q=secret#msg`, ''), host);
+    assert.equal(aiReferralSource('', `?utm_source=${host}&utm_medium=referral`), host);
+  }
+  assert.equal(aiReferralSource('https://www.perplexity.ai/search/abc', ''), 'perplexity.ai');
+  assert.equal(aiReferralSource('', '?utm_source=WWW.CLAUDE.AI'), 'claude.ai');
+
+  /* Non-AI referrers, scheme-less strings, and non-AI utm_source values return null */
+  for (const [ref, search] of [
+    ['', ''],
+    ['https://www.google.com/search?q=bernstein', ''],
+    ['https://github.com/sipyourdrink-ltd/bernstein', ''],
+    ['https://bernstein.run/blog', ''],
+    ['claude.ai/chat/123', ''],
+    ['javascript:alert(1)', ''],
+    ['', '?utm_source=hn&utm_medium=referral'],
+    ['', '?utm_source=getbernstein&utm_medium=email'],
+  ] as const) {
+    assert.equal(aiReferralSource(ref, search), null, `expected null for ref=${ref} search=${search}`);
+  }
 });
 
 test('a link to another host records the bare host name only', () => {
@@ -180,4 +227,15 @@ test('strips every non-UTM query parameter and URL hash while preserving the 5 U
     data: { destination: 'github.com' },
   }) as { url: string };
   assert.equal(click.url, 'https://bernstein.run/');
+
+  /* Scheme-less, relative, non-http, or malformed referrers resolve to '' rather than bernstein.run */
+  for (const badRef of ['claude.ai/chat', '/blog?q=secret', 'javascript:alert(1)', 'https://[::1']) {
+    const cleaned = hook('event', {
+      url: 'https://bernstein.run/',
+      referrer: badRef,
+      name: 'ai-referral',
+      data: { source: 'claude.ai' },
+    }) as { referrer: string };
+    assert.equal(cleaned.referrer, '', `expected empty referrer for "${badRef}"`);
+  }
 });

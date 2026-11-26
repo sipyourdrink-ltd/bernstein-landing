@@ -165,7 +165,20 @@ export default function RootLayout({
               shipped a second rss+xml declaration for the same feed with a
               different href form, which readers and link-graph parsers
               counted as two feeds. */}
-        {/* AIO: extended LLM reference alongside the primary llms.txt alternate */}
+        {/* AIO / llmstxt.org v2: describedby pointer to /llms.txt plus
+              compact (/llms-ctx.txt) and extended (/llms-full.txt)
+              LLM context alternates. Hoisted into <head> by React. */}
+        <link
+          rel="describedby"
+          type="text/plain"
+          href="/llms.txt"
+        />
+        <link
+          rel="alternate"
+          type="text/plain"
+          href="/llms-ctx.txt"
+          title="Bernstein Compact LLM Context"
+        />
         <link
           rel="alternate"
           type="text/markdown"

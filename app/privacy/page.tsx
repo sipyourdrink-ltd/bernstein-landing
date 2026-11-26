@@ -47,6 +47,14 @@ export default function PrivacyPage() {
               domain, so loading a page makes no font requests to external
               font services.
             </p>
+            <p>
+              Public machine-readable discovery files and plain-markdown page
+              routes (<code>/llms.txt</code>, <code>/llms-ctx.txt</code>,{' '}
+              <code>/llms-full.txt</code>, <code>{'/.well-known/*'}</code> and{' '}
+              <code>{'/*.md'}</code>) are read-only responses that set no
+              cookies, store nothing in browsers, and load no browser analytics
+              script.
+            </p>
 
             <h2>Storage in your browser</h2>
             <p>
@@ -83,7 +91,7 @@ export default function PrivacyPage() {
               <code data-tracker-setting>data-do-not-track</code>, and excludes
               URL fragments via{' '}
               <code data-tracker-setting>data-exclude-hash</code>. It is set up
-              for page views and two custom browser events:
+              for page views and three custom browser events:
             </p>
             <ul>
               <li data-browser-event>
@@ -100,6 +108,20 @@ export default function PrivacyPage() {
                 copied (<code>pipx</code>, <code>brew</code>, <code>uv</code>,{' '}
                 <code>docker</code> or <code>init</code>), never clipboard text.
               </li>
+              <li data-browser-event>
+                <code>ai-referral</code>, sent at most once on page load when
+                the referring page host or inbound UTM source parameter matches
+                a fixed allowlist of AI assistant services. The event&rsquo;s
+                only custom property is <code>source</code>, set to one of{' '}
+                <code>claude.ai</code>, <code>chatgpt.com</code>,{' '}
+                <code>perplexity.ai</code>, <code>gemini.google.com</code>,{' '}
+                <code>copilot.microsoft.com</code>, <code>meta.ai</code>,{' '}
+                <code>grok.com</code>, <code>x.ai</code>, <code>kagi.com</code>
+                , <code>phind.com</code>, <code>you.com</code>,{' '}
+                <code>chat.mistral.ai</code>, <code>chat.deepseek.com</code> or{' '}
+                <code>poe.com</code>, with no path, query text, cookie or
+                browser storage.
+              </li>
             </ul>
             <p>
               Before the browser tracker sends a request, the site&rsquo;s hook
@@ -107,12 +129,14 @@ export default function PrivacyPage() {
               <code>utm_source</code>, <code>utm_medium</code>,{' '}
               <code>utm_campaign</code>, <code>utm_content</code> and{' '}
               <code>utm_term</code> query parameters on the page and referrer
-              addresses. Every other query parameter (including assistant
-              questions, tokens and ad-click identifiers) is removed before
-              sending, and the hook drops a page view when its cleaned address
-              matches the previous one. Some outbound project links append
-              static UTM parameters naming the page section on bernstein.run,
-              with no visitor identifier.
+              addresses. Referrer values without an explicit HTTP or HTTPS
+              scheme are cleared rather than resolved against this site, every
+              other query parameter (including assistant questions, tokens and
+              ad-click identifiers) is removed before sending, and the hook
+              drops a page view when its cleaned address matches the previous
+              one. Some outbound project links append static UTM parameters
+              naming the page section on bernstein.run, with no visitor
+              identifier.
             </p>
             <p>
               Like any web request, a browser request to the analytics server
@@ -143,9 +167,10 @@ export default function PrivacyPage() {
               {' '}or{' '}
               <code>localStorage.setItem(&apos;umami.disabled&apos;, &apos;1&apos;)</code>
               . The site&rsquo;s browser hook then drops tracker requests,
-              including page views, outbound clicks and install-copy events.
-              This does not stop the docs assistant&rsquo;s server analytics.
-              To turn browser analytics back on, run{' '}
+              including page views, outbound clicks, install-copy events and
+              AI-referral events. This does not stop the docs
+              assistant&rsquo;s server analytics. To turn browser analytics
+              back on, run{' '}
               <code>localStorage.removeItem(&apos;umami:disabled&apos;)</code>
               {' '}and{' '}
               <code>localStorage.removeItem(&apos;umami.disabled&apos;)</code>.
