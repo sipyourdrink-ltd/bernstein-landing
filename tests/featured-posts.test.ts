@@ -153,3 +153,16 @@ test('v4-0-release has a 1200x630 PNG cover and links to releases/latest', () =>
     ),
   );
 });
+
+test('bernstein-org-kit has a 1200x630 PNG cover', () => {
+  const raw = readFileSync('content/blog/bernstein-org-kit/index.mdx', 'utf8');
+  const { data } = matter(raw);
+
+  assert.equal(data.cover, '/blog/covers/21-org-kit.png');
+  assert.ok(typeof data.coverAlt === 'string' && data.coverAlt.trim().length > 10);
+
+  const png = readFileSync(`public${data.cover}`);
+  assert.equal(png.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
+  assert.equal(png.readUInt32BE(16), 1200);
+  assert.equal(png.readUInt32BE(20), 630);
+});
