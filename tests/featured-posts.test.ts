@@ -69,7 +69,7 @@ test('exactly three blog posts are flagged featured: true', () => {
   assert.equal(featured.length, 3);
   assert.deepEqual(
     featured.map((p) => p.slug),
-    ['bernstein-org-kit', 'v4-0-release', 'autofix-daemon'],
+    ['bernstein-org-kit', 'v4-0-release', 'introducing-bernstein'],
   );
 });
 
