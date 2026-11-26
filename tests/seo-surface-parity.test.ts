@@ -118,3 +118,120 @@ test('app/blog/[slug]/page.tsx propagates post.fm.dateModified to OpenGraph, art
   assert.match(src, /'article:modified_time':\s*post\.fm\.dateModified\s*\?\?\s*post\.fm\.date/);
   assert.match(src, /itemProp="dateModified"\s+content=\{post\.fm\.dateModified\s*\?\?\s*post\.fm\.date\}/);
 });
+
+const MD_TWIN_ROUTES: Array<{ file: string; expectedTwinPattern: RegExp; visibleLinkPattern: RegExp }> = [
+  {
+    file: 'app/about/page.tsx',
+    expectedTwinPattern: /['"]text\/markdown['"]\s*:\s*`\$\{SITE_URL\}\/about\.md`/,
+    visibleLinkPattern: /href="\/about\.md"\s+type="text\/markdown"/,
+  },
+  {
+    file: 'app/cost/page.tsx',
+    expectedTwinPattern: /['"]text\/markdown['"]\s*:\s*`\$\{SITE_URL\}\/cost\.md`/,
+    visibleLinkPattern: /href="\/cost\.md"\s+type="text\/markdown"/,
+  },
+  {
+    file: 'app/cli-quickstart/page.tsx',
+    expectedTwinPattern: /['"]text\/markdown['"]\s*:\s*`\$\{SITE_URL\}\/cli-quickstart\.md`/,
+    visibleLinkPattern: /href="\/cli-quickstart\.md"\s+type="text\/markdown"/,
+  },
+  {
+    file: 'app/spec-driven/page.tsx',
+    expectedTwinPattern: /['"]text\/markdown['"]\s*:\s*`\$\{SITE_URL\}\/spec-driven\.md`/,
+    visibleLinkPattern: /href="\/spec-driven\.md"\s+type="text\/markdown"/,
+  },
+  {
+    file: 'app/spec/agent-failure-taxonomy/v0.1/page.tsx',
+    expectedTwinPattern:
+      /['"]text\/markdown['"]\s*:\s*`\$\{SITE_URL\}\/spec\/agent-failure-taxonomy\/v0\.1\.md`/,
+    visibleLinkPattern:
+      /href="\/spec\/agent-failure-taxonomy\/v0\.1\.md"\s+type="text\/markdown"/,
+  },
+  {
+    file: 'app/tools/agent-md-bench/page.tsx',
+    expectedTwinPattern: /['"]text\/markdown['"]\s*:\s*`\$\{SITE_URL\}\/tools\/agent-md-bench\.md`/,
+    visibleLinkPattern: /href="\/tools\/agent-md-bench\.md"\s+type="text\/markdown"/,
+  },
+  {
+    file: 'app/q/page.tsx',
+    expectedTwinPattern: /['"]text\/markdown['"]\s*:\s*`\$\{SITE_URL\}\/q\.md`/,
+    visibleLinkPattern: /href="\/q\.md"\s+type="text\/markdown"/,
+  },
+  {
+    file: 'app/q/[slug]/page.tsx',
+    expectedTwinPattern: /['"]text\/markdown['"]\s*:\s*`\$\{url\}\.md`/,
+    visibleLinkPattern: /href=\{`\/q\/\$\{item\.slug\}\.md`\}\s+type="text\/markdown"/,
+  },
+  {
+    file: 'app/blog/[slug]/page.tsx',
+    expectedTwinPattern: /['"]text\/markdown['"]\s*:\s*`\$\{SITE_URL\}\/blog\/\$\{slug\}\.md`/,
+    visibleLinkPattern: /href=\{`\/blog\/\$\{slug\}\.md`\}\s+type="text\/markdown"/,
+  },
+];
+
+test('all 9 .md-backed child routes emit <link rel="alternate" type="text/markdown"> AND a visible markdown (.md) anchor', () => {
+  for (const { file, expectedTwinPattern, visibleLinkPattern } of MD_TWIN_ROUTES) {
+    const src = read(file);
+    assert.match(
+      src,
+      expectedTwinPattern,
+      `${file} must declare metadata.alternates.types["text/markdown"] pointing to its .md twin`,
+    );
+    assert.match(
+      src,
+      visibleLinkPattern,
+      `${file} must render a visible <a ... type="text/markdown">markdown (.md)</a> link for Claude web_fetch prior-URL discovery`,
+    );
+  }
+});
+
+test('/spec/agent-failure-taxonomy/v0.1 emits DefinedTermSet and normative NIST/ISO citations, and /spec-driven emits citations', () => {
+  const taxonomySrc = read('app/spec/agent-failure-taxonomy/v0.1/page.tsx');
+  assert.match(taxonomySrc, /\bdefinedTermSetLD\b/);
+  assert.match(taxonomySrc, /https:\/\/www\.nist\.gov\/itl\/ai-risk-management-framework/);
+  assert.match(taxonomySrc, /https:\/\/www\.iso\.org\/standard\/81230\.html/);
+  assert.match(taxonomySrc, /\bcitation:\s*\[/);
+
+  const specDrivenSrc = read('app/spec-driven/page.tsx');
+  assert.match(specDrivenSrc, /\bcitation:\s*\[/);
+});
+
+test('SoftwareApplicationJsonLd emits SoftwareSourceCode alongside SoftwareApplication without literal semver', () => {
+  const src = read('components/seo/SoftwareApplicationJsonLd.tsx');
+  assert.match(src, /\bsoftwareSourceCodeLD\b|'@type':\s*'SoftwareSourceCode'/);
+  assert.match(src, /#source-code/);
+  assert.match(src, /targetProduct:\s*\{\s*'@id':\s*`\$\{SITE_URL\}\/#software`\s*\}/);
+});
+
+test('/q/[slug] wires ask-seed updated date into QAPage JSON-LD and visible <time>', () => {
+  const src = read('app/q/[slug]/page.tsx');
+  assert.match(src, /ask-seed\.json/);
+  assert.match(src, /dateModified:\s*seedUpdated/);
+  assert.match(src, /dateCreated:\s*seedUpdated/);
+  assert.match(src, /<time\s+dateTime=\{seedUpdated\}>updated \{seedUpdated\}<\/time>/);
+});
+
+test('answer-first lead passages on /about, /cli-quickstart, /spec-driven, and /tools/agent-md-bench name bernstein and concrete technical units', () => {
+  const aboutSrc = read('app/about/page.tsx');
+  assert.match(aboutSrc, /python 3\.12\+/i);
+  assert.match(aboutSrc, /\.sdd\//);
+
+  const cliqsSrc = read('app/cli-quickstart/page.tsx');
+  const cliqsLede = cliqsSrc.match(/<p className="cost-page-lede">([\s\S]*?)<\/p>/)?.[1] ?? '';
+  assert.match(cliqsLede, /Bernstein/);
+  assert.match(cliqsLede, /Python 3\.12\+/);
+  assert.match(cliqsLede, /Apache 2\.0/);
+  assert.match(cliqsLede, /55/);
+
+  const specDrivenSrc = read('app/spec-driven/page.tsx');
+  const specWhy = specDrivenSrc.match(/<h2>Why this page exists<\/h2>\s*<p>([\s\S]*?)<\/p>/)?.[1] ?? '';
+  assert.match(specWhy, /Bernstein/);
+  assert.match(specWhy, /Python 3\.12\+/);
+  assert.match(specWhy, /55/);
+
+  const benchSrc = read('app/tools/agent-md-bench/page.tsx');
+  const benchLede = benchSrc.match(/<p className="cost-page-lede">([\s\S]*?)<\/p>/)?.[1] ?? '';
+  assert.match(benchLede, /agent-md-bench/);
+  assert.match(benchLede, /bernstein/i);
+  assert.match(benchLede, /55/);
+});

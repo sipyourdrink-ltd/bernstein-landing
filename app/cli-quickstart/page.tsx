@@ -45,7 +45,10 @@ export const metadata: Metadata = {
   title: PAGE_TITLE,
   description: PAGE_DESC,
   authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
-  alternates: { canonical: PAGE_URL },
+  alternates: {
+    canonical: PAGE_URL,
+    types: { 'text/markdown': `${SITE_URL}/cli-quickstart.md` },
+  },
   openGraph: {
     type: 'article',
     siteName: SITE_NAME,
@@ -146,13 +149,19 @@ export default function CliQuickstartPage() {
               <a href="/" className="blog-back">
                 &larr; back home
               </a>
+              <span aria-hidden="true"> &middot; </span>
+              <a href="/cli-quickstart.md" type="text/markdown">
+                markdown (.md)
+              </a>
             </p>
             <h1>cli quickstart</h1>
             <p className="cost-page-lede">
-              Five minutes from a clean checkout to a green run.
-              Every command on this page maps to a real click subcommand
-              registered in <code>bernstein.cli.main</code>. If a flag
-              shows up here, it ships in the wheel on PyPI.
+              Bernstein (Python 3.12+, Apache 2.0) goes from a clean checkout to
+              a verified multi-agent run in five minutes: install from PyPI,
+              initialise <code>.sdd/</code> state and <code>bernstein.yaml</code>{' '}
+              across 55 selectable CLI agent adapters, and execute goals behind
+              quality gates. Every command and flag on this page maps to a real
+              click subcommand registered in <code>bernstein.cli.main</code>.
             </p>
           </header>
 

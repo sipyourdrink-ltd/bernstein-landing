@@ -47,7 +47,10 @@ export const metadata: Metadata = {
   title: PAGE_TITLE,
   description: PAGE_DESC,
   authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
-  alternates: { canonical: PAGE_URL },
+  alternates: {
+    canonical: PAGE_URL,
+    types: { 'text/markdown': `${SITE_URL}/cost.md` },
+  },
   openGraph: {
     type: 'website',
     siteName: SITE_NAME,
@@ -101,6 +104,10 @@ export default async function CostPage() {
             <p className="blog-back-link">
               <a href="/" className="blog-back">
                 &larr; back home
+              </a>
+              <span aria-hidden="true"> &middot; </span>
+              <a href="/cost.md" type="text/markdown">
+                markdown (.md)
               </a>
             </p>
             <h1>cost</h1>

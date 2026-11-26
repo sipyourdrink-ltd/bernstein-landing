@@ -530,6 +530,87 @@ export function webApplicationLD(meta: WebApplicationMeta): JsonLdNode {
 }
 
 // ---------------------------------------------------------------------------
+// DefinedTermSet - normative taxonomies (/spec/agent-failure-taxonomy/v0.1)
+// ---------------------------------------------------------------------------
+
+export interface DefinedTermInput {
+  termCode: string;
+  name: string;
+  description: string;
+}
+
+export interface DefinedTermSetMeta {
+  url: string;
+  id?: string;
+  name: string;
+  description: string;
+}
+
+export function definedTermSetLD(
+  terms: DefinedTermInput[],
+  meta: DefinedTermSetMeta,
+): JsonLdNode {
+  const setId = meta.id ?? `${meta.url}#taxonomy`;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTermSet',
+    '@id': setId,
+    name: meta.name,
+    description: meta.description,
+    url: meta.url,
+    inLanguage: 'en',
+    publisher: { '@id': ORGANIZATION_ID },
+    hasDefinedTerm: terms.map((t) => ({
+      '@type': 'DefinedTerm',
+      '@id': `${meta.url}#${t.termCode}`,
+      termCode: t.termCode,
+      name: t.name,
+      description: t.description,
+      inDefinedTermSet: setId,
+    })),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// SoftwareSourceCode - open-source repository entity
+// ---------------------------------------------------------------------------
+
+export interface SoftwareSourceCodeMeta {
+  name: string;
+  url: string;
+  id?: string;
+  description: string;
+  codeRepository: string;
+  programmingLanguage: string;
+  runtimePlatform: string;
+  license: string;
+  version?: string;
+  targetProductId?: string;
+}
+
+export function softwareSourceCodeLD(meta: SoftwareSourceCodeMeta): JsonLdNode {
+  const anchorBase =
+    /^https?:\/\/[^/]+$/.test(meta.url) ? `${meta.url}/` : meta.url;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareSourceCode',
+    '@id': meta.id ?? `${anchorBase}#source-code`,
+    name: meta.name,
+    description: meta.description,
+    url: meta.url,
+    codeRepository: meta.codeRepository,
+    programmingLanguage: meta.programmingLanguage,
+    runtimePlatform: meta.runtimePlatform,
+    license: meta.license,
+    ...(meta.version ? { version: meta.version } : {}),
+    targetProduct: { '@id': meta.targetProductId ?? `${anchorBase}#software` },
+    author: { '@id': PERSON_ID },
+    maintainer: { '@id': PERSON_ID },
+    publisher: { '@id': ORGANIZATION_ID },
+  };
+}
+
+// ---------------------------------------------------------------------------
 // BreadcrumbList - universal nav helper
 // ---------------------------------------------------------------------------
 

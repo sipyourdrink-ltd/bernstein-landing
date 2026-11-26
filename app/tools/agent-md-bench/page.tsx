@@ -32,7 +32,10 @@ export const metadata: Metadata = {
   title: PAGE_TITLE,
   description: PAGE_DESC,
   authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
-  alternates: { canonical: PAGE_URL },
+  alternates: {
+    canonical: PAGE_URL,
+    types: { 'text/markdown': `${SITE_URL}/tools/agent-md-bench.md` },
+  },
   openGraph: {
     type: 'website',
     siteName: SITE_NAME,
@@ -76,10 +79,14 @@ export default function AgentMdBenchPage() {
               <a href="/" className="blog-back">
                 &larr; back home
               </a>
+              <span aria-hidden="true"> &middot; </span>
+              <a href="/tools/agent-md-bench.md" type="text/markdown">
+                markdown (.md)
+              </a>
             </p>
             <h1>agent-md-bench</h1>
             <p className="cost-page-lede">
-              paste your AGENTS.md, CLAUDE.md, .cursorrules or .mdc. the page will count tokens and bytes, show per-agent size budgets, and flag parser quirks across the major CLI coding agents. 100% in the browser. nothing leaves the page.
+              agent-md-bench is bernstein&apos;s client-side linter for AGENTS.md, CLAUDE.md, GEMINI.md, CONVENTIONS.md, .cursorrules, and .mdc files (apache 2.0, derived from bernstein&apos;s 55 cli coding-agent adapters). paste your file to count tokens and bytes, show per-agent size budgets, and flag parser quirks across the major CLI coding agents. 100% in the browser. nothing leaves the page.
             </p>
           </header>
 

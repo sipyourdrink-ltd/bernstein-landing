@@ -44,7 +44,10 @@ export const metadata: Metadata = {
   title: PAGE_TITLE,
   description: PAGE_DESC,
   authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
-  alternates: { canonical: PAGE_URL },
+  alternates: {
+    canonical: PAGE_URL,
+    types: { 'text/markdown': `${SITE_URL}/q.md` },
+  },
   openGraph: {
     type: 'website',
     siteName: SITE_NAME,
@@ -163,7 +166,10 @@ export default async function QIndexPage() {
       <main className="ask-page" aria-labelledby="q-index-heading">
         <header className="ask-header">
           <p className="ask-eyebrow">
-            {items.length} answers · {groups.length} tags
+            {items.length} answers · {groups.length} tags ·{' '}
+            <a href="/q.md" type="text/markdown">
+              markdown (.md)
+            </a>
           </p>
           <h1 id="q-index-heading" className="ask-title">
             {PAGE_TITLE}

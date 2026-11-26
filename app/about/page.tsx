@@ -38,7 +38,10 @@ export const metadata: Metadata = {
   title: PAGE_TITLE,
   description: PAGE_DESC,
   authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
-  alternates: { canonical: PAGE_URL },
+  alternates: {
+    canonical: PAGE_URL,
+    types: { 'text/markdown': `${SITE_URL}/about.md` },
+  },
   robots: { index: true, follow: true },
   openGraph: {
     type: 'profile',
@@ -78,6 +81,10 @@ export default function AboutPage() {
               <span>By {AUTHOR}</span>
               <span aria-hidden="true"> &middot; </span>
               <time dateTime={LAST_UPDATED}>updated {LAST_UPDATED}</time>
+              <span aria-hidden="true"> &middot; </span>
+              <a href="/about.md" type="text/markdown">
+                markdown (.md)
+              </a>
             </p>
           </header>
 
@@ -99,11 +106,11 @@ export default function AboutPage() {
                 alex chernysh
               </a>{' '}
               as a solo project, self-bootstrapped, no investor money. the
-              site, the python package on{' '}
+              site, the python 3.12+ package on{' '}
               <a href="https://pypi.org/project/bernstein/" rel="noopener">
                 pypi
               </a>
-              , the npm wrapper, and the docs all ship under apache 2.0.
+              {' '}(with local file-based <code>.sdd/</code> state), the npm wrapper, and the docs all ship under apache 2.0.
               public profiles:{' '}
               <a
                 href="https://github.com/chernistry"

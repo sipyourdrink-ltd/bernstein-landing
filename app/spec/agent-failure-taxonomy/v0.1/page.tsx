@@ -20,6 +20,8 @@ import { Nav } from '@/components/landing/Nav';
 import { Footer } from '@/components/landing/Footer';
 import { BackToTop } from '@/components/landing/BackToTop';
 import { BreadcrumbListJsonLd } from '@/components/seo/BreadcrumbListJsonLd';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { definedTermSetLD } from '@/lib/jsonld';
 import { SITE_URL, AUTHOR, SITE_NAME } from '@/lib/seo';
 
 export const dynamic = 'force-static';
@@ -37,7 +39,10 @@ export const metadata: Metadata = {
   title: PAGE_TITLE,
   description: PAGE_DESC,
   authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
-  alternates: { canonical: PAGE_URL },
+  alternates: {
+    canonical: PAGE_URL,
+    types: { 'text/markdown': `${SITE_URL}/spec/agent-failure-taxonomy/v0.1.md` },
+  },
   openGraph: {
     type: 'article',
     siteName: SITE_NAME,
@@ -222,6 +227,10 @@ export default function SpecPage() {
                 <a href="https://github.com/sipyourdrink-ltd/bernstein/blob/main/src/bernstein/eval/taxonomy.py">
                   Reference implementation
                 </a>
+                <span aria-hidden="true">&middot;</span>
+                <a href="/spec/agent-failure-taxonomy/v0.1.md" type="text/markdown">
+                  markdown (.md)
+                </a>
               </p>
             </header>
 
@@ -387,7 +396,11 @@ export default function SpecPage() {
               <section style={sectionStyle}>
                 <h2>Cross-reference to NIST AI RMF</h2>
                 <p>
-                  The NIST AI Risk Management Framework defines seven
+                  The{' '}
+                  <a href="https://www.nist.gov/itl/ai-risk-management-framework">
+                    NIST AI Risk Management Framework (AI RMF 1.0)
+                  </a>{' '}
+                  defines seven
                   characteristics of trustworthy AI: valid and reliable, safe,
                   secure and resilient, accountable and transparent, explainable
                   and interpretable, privacy-enhanced, and fair with harmful bias
@@ -414,7 +427,10 @@ export default function SpecPage() {
               <section style={sectionStyle}>
                 <h2>Cross-reference to ISO/IEC 42001</h2>
                 <p>
-                  ISO/IEC 42001 specifies an AI management system. The table in
+                  <a href="https://www.iso.org/standard/81230.html">
+                    ISO/IEC 42001
+                  </a>{' '}
+                  specifies an AI management system. The table in
                   the Categories section names a control area for each category;
                   the names are short paraphrases, not verbatim clause titles,
                   because the underlying standard is not freely redistributable.
@@ -558,6 +574,21 @@ export default function SpecPage() {
           { name: PAGE_TITLE, url: PAGE_URL },
         ]}
       />
+      <JsonLd
+        data={definedTermSetLD(
+          CATEGORIES.map((c) => ({
+            termCode: c.id,
+            name: c.name,
+            description: c.summary,
+          })),
+          {
+            url: PAGE_URL,
+            id: `${PAGE_URL}#taxonomy`,
+            name: PAGE_TITLE,
+            description: PAGE_DESC,
+          },
+        )}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -593,6 +624,18 @@ export default function SpecPage() {
             license: 'https://creativecommons.org/licenses/by/4.0/',
             isPartOf: { '@type': 'CreativeWork', name: 'Bernstein Specifications', url: SITE_URL },
             version: SPEC_VERSION,
+            citation: [
+              {
+                '@type': 'CreativeWork',
+                name: 'NIST AI Risk Management Framework (AI RMF 1.0)',
+                url: 'https://www.nist.gov/itl/ai-risk-management-framework',
+              },
+              {
+                '@type': 'CreativeWork',
+                name: 'ISO/IEC 42001:2023 Artificial intelligence - Management system',
+                url: 'https://www.iso.org/standard/81230.html',
+              },
+            ],
           }),
         }}
       />

@@ -107,7 +107,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: metaTitle,
     description: metaDescription,
     authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
-    alternates: { canonical: `${SITE_URL}/blog/${slug}` },
+    alternates: {
+      canonical: `${SITE_URL}/blog/${slug}`,
+      types: {
+        'application/rss+xml': [{ url: '/rss.xml', title: 'Bernstein Blog' }],
+        'text/markdown': `${SITE_URL}/blog/${slug}.md`,
+      },
+    },
     openGraph: {
       type: 'article',
       siteName: SITE_NAME,
@@ -244,6 +250,10 @@ export default async function BlogPost({ params }: Props) {
                 <meta itemProp="dateModified" content={post.fm.dateModified ?? post.fm.date} />
                 <span aria-hidden="true">·</span>
                 <span>{post.readingMinutes} min read</span>
+                <span aria-hidden="true">·</span>
+                <a href={`/blog/${slug}.md`} type="text/markdown">
+                  markdown (.md)
+                </a>
                 <PageSeal />
               </p>
             </header>
