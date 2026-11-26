@@ -6,11 +6,13 @@
  * locally-installed stdio server (`bernstein mcp`) under `_meta` without
  * bare loopback URLs.
  */
+import { BERNSTEIN_VERSION } from '../../../lib/version.ts';
+
 const SERVER_CARD = {
   $schema: 'https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json',
   name: 'run.bernstein/bernstein',
   title: 'Bernstein MCP Server',
-  version: '4.0.2',
+  version: BERNSTEIN_VERSION,
   description:
     'Open-source AI agent governance, worktree orchestration, and offline receipt verification.',
   websiteUrl: 'https://bernstein.run',

@@ -14,8 +14,9 @@
  *     appearance (such as Claude) can fetch any `.md` twin directly.
  */
 import { PROJECT_ONE_LINER, PROJECT_OVERVIEW } from '../../lib/project-description.ts';
+import { BERNSTEIN_VERSION } from '../../lib/version.ts';
 
-const CONTENT = `# Bernstein - Compact Technical Context (v4.0.2)
+const CONTENT = `# Bernstein - Compact Technical Context (v${BERNSTEIN_VERSION})
 
 > ${PROJECT_ONE_LINER}
 
@@ -23,7 +24,7 @@ ${PROJECT_OVERVIEW}
 
 ## Core Facts
 
-- **Latest release**: \`4.0.2\` (install/upgrade from latest 4.x release; Apache-2.0; Python 3.12+; solo-maintained beta by Alex Chernysh - pin versions in CI)
+- **Latest release**: \`${BERNSTEIN_VERSION}\` (install/upgrade from latest 4.x release; Apache-2.0; Python 3.12+; solo-maintained beta by Alex Chernysh - pin versions in CI)
 - **Install**: \`pipx install bernstein\` (also \`uv tool install bernstein\` or \`pip install bernstein\`)
 - **Workspace state**: On-disk files under \`.sdd/\` (\`.sdd/runtime/\` backlog & WAL, \`.sdd/worktrees/\` isolated per-task git worktrees, \`.sdd/audit/\` daily UTC HMAC-chained JSONL logs, \`.sdd/metrics/\` per-model cost ledger). No database or hosted control-plane server required.
 - **Deterministic coordination**: Plain Python tick loop, task store, dependency graph, and merge queue - zero LLM tokens spent on scheduling. A hand-written \`plan.yaml\` reproduces the same task graph across runs.
@@ -31,7 +32,7 @@ ${PROJECT_OVERVIEW}
 - **Sandboxes & storage**: Default local git worktrees; pluggable \`SandboxBackend\` for Docker, Podman, E2B, Modal, Blaxel, Cloudflare, Daytona, Runloop, Vercel; \`BufferedSink\` artifact storage for local disk, S3, GCS, Azure Blob, Cloudflare R2; \`--profile airgap\` denies outbound network by default.
 - **Provenance & offline verification**: Lineage spine and replay journal are always on. Passing \`--audit\` (or \`BERNSTEIN_AUDIT=1\`) enables the HMAC-chained audit log and signed Ed25519 receipts checkable offline without rerunning tasks.
 
-## Key CLI Commands (Bernstein 4.0.2)
+## Key CLI Commands (Bernstein ${BERNSTEIN_VERSION})
 
 \`\`\`bash
 pipx install bernstein
