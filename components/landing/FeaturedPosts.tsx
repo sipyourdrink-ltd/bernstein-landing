@@ -62,8 +62,7 @@ export function FeaturedPosts({ posts }: FeaturedPostsProps) {
             <em>hand-picked</em>.
           </h2>
           <p className="v2-blog-sub">
-            what 4.0 tightened, what an untrusted ninety-minute run proves, and
-            how deterministic replay and evidence bundles came together.
+            the org-kit plugin, what 4.0 tightened, and the 1.0 launch post.
           </p>
         </div>
         <Link href="/blog" className="v2-blog-all">
@@ -77,7 +76,7 @@ export function FeaturedPosts({ posts }: FeaturedPostsProps) {
             href={`/blog/${post.slug}`}
             className="v2-blog-pick"
           >
-            {post.fm.cover && post.fm.coverAlt && (
+            {post.fm.cover && post.fm.coverAlt ? (
               <Image
                 className="v2-blog-pick-cover"
                 src={post.fm.cover}
@@ -87,6 +86,22 @@ export function FeaturedPosts({ posts }: FeaturedPostsProps) {
                 unoptimized
                 loading="lazy"
               />
+            ) : (
+              <div className="v2-blog-pick-cover v2-blog-pick-plate" aria-hidden="true">
+                <svg
+                  viewBox="0 0 1200 630"
+                  width="1200"
+                  height="630"
+                  preserveAspectRatio="xMidYMid slice"
+                  className="v2-blog-pick-plate-svg"
+                >
+                  <path d="M120 150 H360 L600 315 H1080" />
+                  <path d="M120 260 H360 L600 315 H1080" />
+                  <path d="M120 370 H360 L600 315 H1080" />
+                  <path d="M120 480 H360 L600 315 H1080" />
+                  <circle cx="600" cy="315" r="14" />
+                </svg>
+              </div>
             )}
             <div className="v2-blog-pick-body">
               <div className="v2-blog-pick-meta">

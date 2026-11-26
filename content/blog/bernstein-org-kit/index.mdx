@@ -1,0 +1,111 @@
+---
+title: "bernstein-org-kit 0.2.0: modeling an agentic company"
+cover: "/blog/covers/21-org-kit.png"
+coverAlt: "An org chart of role cards with three approval gates on the lines between them."
+seo_title: "bernstein-org-kit 0.2.0: agentic company kit"
+description: "Starter org kit 0.2.0 for Bernstein: 6 presets, up to 36 roles, 16 SOPs, 20 workflows, SHA-256 acceptance, and eight human approval gates."
+date: "2026-11-25"
+featured: true
+tags:
+  - "multi-agent"
+  - "governance"
+  - "plugins"
+  - "workflows"
+  - "org-kit"
+schemaType: "TechArticle"
+techDependencies:
+  - "Python 3.12 or newer"
+  - "bernstein (CI tests 3.24.1 and 4.0.0)"
+  - "bernstein-role-pack (0.1.0, tag role-pack-v0.1.0)"
+  - "bernstein-org-kit (0.2.0, tag org-kit-v0.2.0, sipyourdrink-ltd/bernstein-addons)"
+---
+
+<Lead>
+Companies keep announcing that they integrated an AI agent, or that every employee now manages five of them. Commendable. We open-sourced our own take on the full-cycle agentic company: `bernstein-org-kit` 0.2.0, a plugin for Bernstein, the open-source governance layer for AI agents (Apache-2.0).
+</Lead>
+
+Now anyone can be a CEO. Most will want a quieter job by lunch.
+
+In release `0.2.0` (`org-kit-v0.2.0`), [`bernstein-org-kit`](https://github.com/sipyourdrink-ltd/bernstein-addons/tree/org-kit-v0.2.0/plugins/org-kit) models thirty-six roles, sixteen SOPs, and twenty workflows in its full preset on top of Bernstein's native CLI agent adapters. Apparently thirty-five roles felt irresponsible.
+
+The catch is dull: a worker's acceptance of its own work is refused, and money or email to a stranger waits for a human. We modeled a whole company and accidentally reinvented accounting.
+
+## What `bernstein-org-kit` 0.2.0 initializes
+
+`bernstein-org-kit` is not an autonomous company runner. By default, `bernstein-org-kit init` scaffolds a governed workspace across 6 presets: `minimal` by default (6 roles and 3 workflows, compiling 7 roles and 7 principals into `.sdd/role-pack/roles.toml` including root `owner`), four domain presets (`secops` with 12 roles and 5 workflows, `product` with 14 roles and 6 workflows, `compliance` with 19 roles and 6 workflows, and `engineering` with 14 roles and 8 workflows), or `--preset full` (36 roles, 16 SOPs, 20 workflows, 32 scenarios, 9 authoring templates, and 6 starter tasks, compiling 37 roles and 37 principals).
+
+Every role carries an explicit charter stating what it owns, what it does not do, its single `reports_to` manager up to the human `owner`, and which human approval gates it may request. The kit's charter (`org/ORG.md`) caps span of control at seven direct reports per manager, and the shipped roles keep to it; the cap is a written rule, not a code check. When `roles.toml` is compiled, every reporting line must reach `owner` with no cycle and no missing manager.
+
+```sh
+python3.12 -m venv .venv
+. .venv/bin/activate
+pip install "bernstein>=4.0.1,<5"
+pip install \
+  "bernstein-role-pack @ git+https://github.com/sipyourdrink-ltd/bernstein-addons@role-pack-v0.1.0#subdirectory=plugins/role-pack" \
+  "bernstein-org-kit @ git+https://github.com/sipyourdrink-ltd/bernstein-addons@org-kit-v0.2.0#subdirectory=plugins/org-kit"
+bernstein-org-kit demo
+```
+
+Notice the tagged git URLs: the packages in `bernstein-addons` are not currently published on PyPI. Once installed, initialize the full starter workspace and validate `.sdd/role-pack/roles.toml`:
+
+```sh
+bernstein-org-kit init my-org --preset full
+cd my-org
+bernstein-role-pack check
+```
+
+## Deterministic workflow compilation
+
+Workflow definitions live as JSON DAGs and compile through a pure-stdlib topological sorter (`bernstein-org-kit workflows compile <name>`) with no model in the planning step.
+
+```sh
+bernstein-org-kit roles
+bernstein-org-kit sops
+bernstein-org-kit scenarios --department security
+bernstein-org-kit workflows show code-review-merge
+bernstein-org-kit workflows compile code-review-merge
+```
+
+Compilation validates node IDs, dependencies (each must exist, with no cycle), timeouts, and role slugs, marks each stage with whether its role is a known role (`role_known`), then emits execution waves with canonical `workflow_sha256`, per-stage `stage_sha256`, and a deterministic `plan_hash`.
+
+## Independent SHA-256 acceptance and fail-closed gates
+
+Under [`bernstein-role-pack`](https://github.com/sipyourdrink-ltd/bernstein-addons/tree/role-pack-v0.1.0/plugins/role-pack), reporting a task complete moves its ledger state to `reported`, not `done`.
+
+- **No self-acceptance:** a principal that reported an artifact cannot accept it (`SelfReview` is refused).
+- **Exact digest binding:** an independent reviewer whose role is permitted to review the producer's role must accept each reported path against its exact SHA-256 (`HashMismatch` is refused, and editing a file after reporting blocks `RolePackAcceptanceGate`).
+- **Unknown-attempt reconciliation:** tasks marked `unknown` block creating a replacement task with the same role and title until reconciled under the original task ID.
+- **Eight human approval gates:** `money`, `external-send`, `public-post`, `deletion`, `credentials`, `legal-commitment`, `production-change`, and `personal-data`. `bernstein-org-kit run` defaults to a dry-run prompt preview and blocks any gated stage unless each required gate is explicitly passed with `--approve-gate <gate>`.
+
+```sh
+# Dry-run preview (default): validates DAG and human gates without spawning an adapter
+bernstein-org-kit run code-review-merge \
+  --stage draft-change \
+  --objective "Implement health endpoint and unit tests" \
+  --adapter claude \
+  --approve-gate production-change \
+  --approve-gate credentials \
+  --approve-gate deletion
+```
+
+Pass `--execute` when you actually want `bernstein-org-kit run` to invoke `adapter.spawn(...)` through Bernstein's registered CLI adapters under your own local installation and provider terms (or `--adapter mock` for offline testing).
+
+## A zero-config offline demo
+
+`bernstein-org-kit demo` runs in a temporary directory with no model, no API keys, and no network access. It boots Bernstein's FastAPI task server in-process with `RolePackPlugin` and `RolePackAcceptanceGate`, proves self-acceptance (`SelfReview`) and a zeroed digest (`HashMismatch`) are both refused, proves independent acceptance with the exact SHA-256 passes the gate, and advances the compiled `code-review-merge` DAG from `draft-change` to `review-correctness`, `review-security`, and `run-tests`.
+
+```sh
+bernstein-org-kit demo
+```
+
+`OrgKitPlugin` is also registered under Bernstein's `bernstein.plugins` entry point. When `org/ORG.md` is present in a workspace, it contributes an `AGENTS.md` governance section for `bernstein agents-md`; without that file it returns nothing, leaving unrelated repositories untouched.
+
+<Callout title="Documented limits">
+`bernstein-org-kit` 0.2.0 and `bernstein-role-pack` 0.1.0 are tested in CI on Python 3.12 against Bernstein `3.24.1` and `4.0.0`. By design, `org-kit` models a team structure and blocks on human gates rather than automating a company unattended. In the underlying `bernstein-role-pack` ledger, principals are caller-supplied names rather than cryptographically authenticated identities, and `ledger.jsonl` is a plain file on disk; hooks fire only for HTTP task routes in a trusted workspace (`bernstein trust --workdir DIR`), and `role_pack_acceptance` is wired through Python `QualityGatesConfig` rather than `bernstein.yaml`.
+</Callout>
+
+## Source and next steps
+
+- **Plugin source and README (`org-kit-v0.2.0`):** [github.com/sipyourdrink-ltd/bernstein-addons/tree/org-kit-v0.2.0/plugins/org-kit](https://github.com/sipyourdrink-ltd/bernstein-addons/tree/org-kit-v0.2.0/plugins/org-kit)
+- **Receipt ledger and acceptance gate (`role-pack-v0.1.0`):** [github.com/sipyourdrink-ltd/bernstein-addons/tree/role-pack-v0.1.0/plugins/role-pack](https://github.com/sipyourdrink-ltd/bernstein-addons/tree/role-pack-v0.1.0/plugins/role-pack)
+- **Core governance engine:** [Bernstein 4.0.0](/blog/v4-0-release) · [releases/latest](https://github.com/sipyourdrink-ltd/bernstein/releases/latest)

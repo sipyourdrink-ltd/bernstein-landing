@@ -47,6 +47,7 @@ clusters:
     # those clusters are too small.
     fallback: release-notes
     posts:
+      - bernstein-org-kit
       - introducing-bernstein
       - getting-started
       - module-decomposition

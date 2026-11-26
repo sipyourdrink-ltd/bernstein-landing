@@ -69,8 +69,30 @@ test('exactly three blog posts are flagged featured: true', () => {
   assert.equal(featured.length, 3);
   assert.deepEqual(
     featured.map((p) => p.slug),
-    ['v4-0-release', 'v3-14-159-pi', 'v3-x-recap'],
+    ['bernstein-org-kit', 'v4-0-release', 'introducing-bernstein'],
   );
+});
+
+test('FeaturedPosts renders an architectural plate when a featured post has no cover', () => {
+  const { FeaturedPosts } = loadComponent('components/landing/FeaturedPosts.tsx');
+  const html = renderToStaticMarkup(
+    React.createElement(FeaturedPosts, {
+      posts: [
+        {
+          slug: 'bernstein-org-kit',
+          readingMinutes: 3,
+          fm: {
+            title: 'bernstein-org-kit: modeling an agentic company',
+            description: 'Starter org kit for Bernstein.',
+            date: '2026-11-25',
+            featured: true,
+          },
+        },
+      ],
+    }),
+  );
+  assert.ok(html.includes('v2-blog-pick-plate'));
+  assert.ok(!html.includes('<img'));
 });
 
 test('FeaturedPosts caps rendered cards at 3 even if passed 4+ posts', () => {
@@ -130,4 +152,17 @@ test('v4-0-release has a 1200x630 PNG cover and links to releases/latest', () =>
         u.pathname === '/sipyourdrink-ltd/bernstein/releases/tag/v4.0.0',
     ),
   );
+});
+
+test('bernstein-org-kit has a 1200x630 PNG cover', () => {
+  const raw = readFileSync('content/blog/bernstein-org-kit/index.mdx', 'utf8');
+  const { data } = matter(raw);
+
+  assert.equal(data.cover, '/blog/covers/21-org-kit.png');
+  assert.ok(typeof data.coverAlt === 'string' && data.coverAlt.trim().length > 10);
+
+  const png = readFileSync(`public${data.cover}`);
+  assert.equal(png.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
+  assert.equal(png.readUInt32BE(16), 1200);
+  assert.equal(png.readUInt32BE(20), 630);
 });
