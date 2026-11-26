@@ -62,7 +62,7 @@ export function FeaturedPosts({ posts }: FeaturedPostsProps) {
             <em>hand-picked</em>.
           </h2>
           <p className="v2-blog-sub">
-            the org-kit plugin, what 4.0 tightened, and a daemon that closes its own pull requests.
+            the org-kit plugin, what 4.0 tightened, and the autofix daemon for red CI on Bernstein-opened pull requests.
           </p>
         </div>
         <Link href="/blog" className="v2-blog-all">
