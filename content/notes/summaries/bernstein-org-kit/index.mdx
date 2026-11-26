@@ -1,0 +1,46 @@
+---
+title: "bernstein-org-kit 0.2.0: modeling an agentic company"
+description: "Starter org kit 0.2.0 for Bernstein: 6 presets, up to 36 roles, 16 SOPs, 20 workflows, SHA-256 acceptance, and eight human approval gates."
+date: "2026-11-25"
+url: "https://bernstein.run/blog/bernstein-org-kit"
+tags: ["summary", "multi-agent", "governance", "plugins", "workflows", "org-kit"]
+source_post: "bernstein-org-kit"
+summary_modes:
+  quick:
+    title: "bernstein-org-kit 0.2.0 scaffolds governed agent roles, DAGs, and human gates"
+    items:
+      - "bernstein-org-kit init scaffolds 6 presets from minimal (6 roles, 3 workflows) up to full (36 roles, 16 SOPs, 20 workflows) on top of Bernstein's CLI agent adapters."
+      - "Workers cannot accept their own output (SelfReview is refused), independent reviewers accept reported files by exact SHA-256, and eight human approval gates block gated stages until passed with --approve-gate."
+    whyItMatters: "It models company structure and fail-closed review rails without turning an agent fleet into an unattended company runner."
+  takeaways:
+    title: "What bernstein-org-kit 0.2.0 enforces and where its limits sit"
+    items:
+      - "Six presets cover minimal (6 roles, 3 workflows), four domain presets (secops 12/5, product 14/6, compliance 19/6, engineering 14/8), and full (36 roles, 16 SOPs, 20 workflows, 32 scenarios, 9 authoring templates, 6 starter tasks)."
+      - "Workflows are JSON DAGs compiled by a pure-stdlib topological sorter (bernstein-org-kit workflows compile) with no model in the planning step, emitting workflow_sha256, stage_sha256, and plan_hash."
+      - "bernstein-role-pack moves reported work to reported rather than done, refuses SelfReview and HashMismatch, blocks replacement tasks while an attempt is marked unknown, and requires explicit --approve-gate flags across eight human approval gates."
+      - "bernstein-org-kit demo runs offline in a temporary directory with no model, API keys, or network access, proving SelfReview and zeroed-digest HashMismatch fail while exact SHA-256 acceptance advances code-review-merge."
+    whyItMatters: "The offline demo exercises self-review refusal, hash mismatch and exact-digest acceptance before any live adapter run with --execute."
+  technical:
+    title: "bernstein-org-kit 0.2.0 internals: presets, DAG hashing, acceptance gate, limits"
+    items:
+      - "Installing bernstein>=4.0.1,<5 alongside tagged git URLs org-kit-v0.2.0 and role-pack-v0.1.0 from sipyourdrink-ltd/bernstein-addons (not currently on PyPI) provides bernstein-org-kit init and bernstein-role-pack check; compiling .sdd/role-pack/roles.toml verifies every role's reports_to chain reaches owner with no cycles or missing managers, while org/ORG.md documents a seven-direct-report span-of-control rule."
+      - "bernstein-org-kit workflows compile validates node IDs, acyclic dependencies, timeouts, and role slugs, tags each stage with role_known, and outputs execution waves with canonical workflow_sha256, stage_sha256, and plan_hash; bernstein-org-kit run defaults to dry-run preview and only calls adapter.spawn(...) when --execute is passed."
+      - "RolePackPlugin and RolePackAcceptanceGate bind each reported path to its exact SHA-256 so post-report edits fail the gate and block replacement tasks with the same role and title while a prior task is unknown; bernstein-org-kit run blocks gated stages across eight human approval gates (money, external-send, public-post, deletion, credentials, legal-commitment, production-change, personal-data) unless each required gate is passed with --approve-gate."
+      - "OrgKitPlugin registers under bernstein.plugins to contribute an AGENTS.md section for bernstein agents-md only when org/ORG.md exists. Documented limits: CI tests Python 3.12 against Bernstein 3.24.1 and 4.0.0, principals are caller-supplied names, ledger.jsonl is a plain disk file, hooks fire only for HTTP task routes in a trusted workspace (bernstein trust --workdir DIR), and role_pack_acceptance is wired through Python QualityGatesConfig rather than bernstein.yaml."
+    whyItMatters: "Separating deterministic DAG compilation and SHA-256 acceptance from adapter execution keeps review gates inspectable and explicit about their trust boundaries."
+---
+
+## summary
+
+`bernstein-org-kit` 0.2.0 (`org-kit-v0.2.0`) is an Apache-2.0 plugin in `sipyourdrink-ltd/bernstein-addons` that scaffolds governed multi-agent workspaces on top of Bernstein. `bernstein-org-kit init` offers 6 presets: `minimal` by default (6 roles, 3 workflows, compiling 7 roles and 7 principals including `owner`), four domain presets (`secops`, `product`, `compliance`, `engineering`), and `--preset full` (36 roles, 16 SOPs, 20 workflows, 32 scenarios, 9 authoring templates, 6 starter tasks, compiling 37 roles and 37 principals). JSON DAG workflows compile deterministically without a model via `bernstein-org-kit workflows compile`, `bernstein-role-pack` 0.1.0 enforces independent SHA-256 acceptance (`SelfReview` and `HashMismatch` refused), and `bernstein-org-kit run` defaults to dry-run preview while gating eight human approval categories until explicitly passed with `--approve-gate`.
+
+## key takeaways
+
+- packages in `bernstein-addons` are installed from tagged git URLs (`role-pack-v0.1.0` and `org-kit-v0.2.0`) alongside `bernstein>=4.0.1,<5`, as they are not currently on PyPI.
+- compiling `.sdd/role-pack/roles.toml` checks that every reporting line reaches `owner` with no cycles or missing managers; `org/ORG.md` states a cap of seven direct reports per manager as a written rule.
+- `bernstein-org-kit demo` runs offline in a temporary directory with no model, API keys, or network access to verify `SelfReview`, `HashMismatch`, exact SHA-256 acceptance, and `code-review-merge` DAG progression.
+- documented limits: principals are caller-supplied names, `ledger.jsonl` is a plain file on disk, hooks fire only for HTTP task routes under `bernstein trust --workdir DIR`, and `role_pack_acceptance` is configured via Python `QualityGatesConfig` rather than `bernstein.yaml`.
+
+## when to read this
+
+for operators modeling role boundaries, approval gates, and independent artifact review across multiple CLI coding agents on Bernstein.

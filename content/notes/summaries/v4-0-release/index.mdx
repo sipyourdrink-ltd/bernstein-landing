@@ -1,0 +1,46 @@
+---
+title: "Bernstein 4.0.0"
+description: "Bernstein 4.0.0 closes silent-pass gaps across workflow layers, detached SSH tasks, strict audit exit codes, and HMAC-sealed delegation digests."
+date: "2026-11-22"
+url: "https://bernstein.run/blog/v4-0-release"
+tags: ["summary", "multi-agent orchestration", "release", "governance", "audit log"]
+source_post: "v4-0-release"
+summary_modes:
+  quick:
+    title: "bernstein 4.0.0 turns silent passes into explicit failures and seals delegation tails"
+    items:
+      - "A failed workflow node now halts every later layer including independent branches, and a detached SSH task with a nonzero exit fails the run instead of recording completion."
+      - "bernstein govern audit --strict distinguishes failed checks (exit 1) from unmeasurable checks or usage errors (exit 2), and normal run closure HMAC-seals the final delegation digest."
+    whyItMatters: "Failures and truncated delegation chains stop passing quietly, while patch releases (4.0.1, 4.0.2, and later) carry follow-up fixes on top of 4.0.0."
+  takeaways:
+    title: "Failures and truncated chains no longer pass quietly in Bernstein 4.0.0"
+    items:
+      - "Install or upgrade from releases/latest (pipx install bernstein, pipx upgrade bernstein, or uv tool install bernstein) rather than pinning 4.0.0, because 4.0.1, 4.0.2, and later carry security and reliability fixes."
+      - "Failed workflow nodes stop all subsequent layers, including independent branches that previously still dispatched and wrote success checkpoints; detached SSH tasks exiting nonzero now fail the run."
+      - "Under --strict, bernstein govern audit exits 1 when a check fails or crashes and exits 2 when nothing failed but a check could not be measured or on a usage error."
+      - "Normal run closure seals the final delegation digest with an HMAC under the install audit key so a deleted chain tail fails verification, though replaying an earlier authentic snapshot still passes."
+    whyItMatters: "Operators get honest failure signals and explicit release-note boundaries on what is still partial in 4.0.0."
+  technical:
+    title: "bernstein 4.0.0 failure semantics, strict audit exit codes, and HMAC tail sealing"
+    items:
+      - "Workflow execution stops every later layer after any node failure, preventing independent branches from continuing dispatch and writing success checkpoints."
+      - "Detached SSH execution checks nonzero exit status and fails the run rather than recording the task as completed."
+      - "bernstein govern audit --strict separates exit code 1 (a check failed or crashed) from exit code 2 (no failure recorded, but a check could not be measured, or a usage error)."
+      - "On normal closure of an orchestrated run, the final delegation digest is sealed with an HMAC under the install audit key to detect tail deletion; the release notes explicitly state that replaying an earlier authentic snapshot does not fail verification, alongside partial features and known limitations."
+    whyItMatters: "Tighter exit semantics and tail sealing remove false-green signals while documenting the replay limitation up front."
+---
+
+## summary
+
+Bernstein 4.0.0 (Apache-2.0) focuses on conditions that previously passed quietly. A failed workflow node now stops every later layer including independent branches instead of letting them dispatch and write success checkpoints, and a detached SSH task exiting nonzero now fails the run instead of recording completion. `bernstein govern audit --strict` exits 1 when a check fails or crashes and 2 when a check could not be measured or on a usage error. Normal run closure seals the final delegation digest with an HMAC under the install audit key so a deleted tail fails verification, while noting that replaying an earlier authentic snapshot does not. Three first-time contributors joined this release, and operators are advised to install or upgrade from `releases/latest` (4.0.1, 4.0.2, and later) rather than pinning 4.0.0.
+
+## key takeaways
+
+- install or upgrade via `pipx install bernstein`, `pipx upgrade bernstein`, or `uv tool install bernstein` from `releases/latest` so patch releases (`4.0.1`, `4.0.2`, and later) are included.
+- failed workflow nodes halt all later layers (including independent branches), and nonzero detached SSH exits fail the run.
+- `bernstein govern audit --strict` returns exit 1 on failed/crashed checks and exit 2 on unmeasurable checks or usage errors.
+- HMAC sealing on normal run closure detects deleted delegation-chain tails, while replaying an earlier authentic snapshot remains an explicitly documented limitation in the 4.0.0 release notes.
+
+## when to read this
+
+for operators upgrading to the 4.x line who need the failure semantics, strict audit exit codes, and documented verification limits before reading the full 4.0.0 milestone notes.
