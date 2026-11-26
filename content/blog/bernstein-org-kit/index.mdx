@@ -30,9 +30,9 @@ The catch is dull: a worker's acceptance of its own work is refused, and money o
 
 ## What `bernstein-org-kit` 0.2.0 initializes
 
-`bernstein-org-kit` is not an autonomous company runner. By default, `bernstein-org-kit init` scaffolds a governed workspace across 6 presets: `minimal` by default (6 roles and 3 workflows, compiling 7 roles and 7 principals into `.sdd/role-pack/roles.toml` including root `owner`), four domain presets (`secops` with 12 roles and 5 workflows, `product` with 14 roles and 6 workflows, `compliance` with 19 roles and 6 workflows, and a 14-role, 8-workflow software delivery preset), or `--preset full` (36 roles, 16 SOPs, 20 workflows, 32 scenarios, 9 authoring templates, and 6 starter tasks, compiling 37 roles and 37 principals).
+`bernstein-org-kit` is not an autonomous company runner. By default, `bernstein-org-kit init` scaffolds a governed workspace across 6 presets: `minimal` by default (6 roles and 3 workflows, compiling 7 roles and 7 principals into `.sdd/role-pack/roles.toml` including root `owner`), four domain presets (`secops` with 12 roles and 5 workflows, `product` with 14 roles and 6 workflows, `compliance` with 19 roles and 6 workflows, and `engineering` with 14 roles and 8 workflows), or `--preset full` (36 roles, 16 SOPs, 20 workflows, 32 scenarios, 9 authoring templates, and 6 starter tasks, compiling 37 roles and 37 principals).
 
-Every role carries an explicit charter stating what it owns, what it does not do, its single `reports_to` manager up to the human `owner`, and which human approval gates it may request. Span of control is capped at seven direct reports per manager and checked when `roles.toml` is compiled.
+Every role carries an explicit charter stating what it owns, what it does not do, its single `reports_to` manager up to the human `owner`, and which human approval gates it may request. The kit's charter (`org/ORG.md`) caps span of control at seven direct reports per manager, and the shipped roles keep to it; the cap is a written rule, not a code check. When `roles.toml` is compiled, every reporting line must reach `owner` with no cycle and no missing manager.
 
 ```sh
 python3.12 -m venv .venv
@@ -64,7 +64,7 @@ bernstein-org-kit workflows show code-review-merge
 bernstein-org-kit workflows compile code-review-merge
 ```
 
-Compilation validates node IDs, dependency acyclicity, timeouts, and known role assignments, then emits execution waves with canonical `workflow_sha256`, per-stage `stage_sha256`, and a deterministic `plan_hash`.
+Compilation validates node IDs, dependencies (each must exist, with no cycle), timeouts, and role slugs, marks each stage with whether its role is a known role (`role_known`), then emits execution waves with canonical `workflow_sha256`, per-stage `stage_sha256`, and a deterministic `plan_hash`.
 
 ## Independent SHA-256 acceptance and fail-closed gates
 
@@ -96,7 +96,7 @@ Pass `--execute` when you actually want `bernstein-org-kit run` to invoke `adapt
 bernstein-org-kit demo
 ```
 
-When `org/ORG.md` is present in a workspace, `OrgKitPlugin` also registers under Bernstein's `bernstein.plugins` entry point to contribute an `AGENTS.md` governance section for `bernstein agents-md`, leaving unrelated repositories untouched.
+`OrgKitPlugin` is also registered under Bernstein's `bernstein.plugins` entry point. When `org/ORG.md` is present in a workspace, it contributes an `AGENTS.md` governance section for `bernstein agents-md`; without that file it returns nothing, leaving unrelated repositories untouched.
 
 <Callout title="Documented limits">
 `bernstein-org-kit` 0.2.0 and `bernstein-role-pack` 0.1.0 are tested in CI on Python 3.12 against Bernstein `3.24.1` and `4.0.0`. By design, `org-kit` models a team structure and blocks on human gates rather than automating a company unattended. In the underlying `bernstein-role-pack` ledger, principals are caller-supplied names rather than cryptographically authenticated identities, and `ledger.jsonl` is a plain file on disk; hooks fire only for HTTP task routes in a trusted workspace (`bernstein trust --workdir DIR`), and `role_pack_acceptance` is wired through Python `QualityGatesConfig` rather than `bernstein.yaml`.
