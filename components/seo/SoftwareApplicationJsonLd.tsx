@@ -1,7 +1,11 @@
 import { JsonLd, type JsonLdData } from './JsonLd';
 import { SITE_URL, AUTHOR } from '@/lib/seo';
+import { softwareSourceCodeLD } from '@/lib/jsonld';
 import versionData from '@/data/bernstein-version.json';
-import { PROJECT_ALTERNATE_NAME } from '@/lib/project-description';
+import {
+  PROJECT_ALTERNATE_NAME,
+  PROJECT_SITE_DESCRIPTION,
+} from '@/lib/project-description';
 
 /**
  * SoftwareApplication JSON-LD for the landing page.
@@ -68,6 +72,8 @@ export const SOFTWARE_APPLICATION_JSON_LD: JsonLdData = {
       'https://alexchernysh.com',
       'https://github.com/chernistry',
       'https://x.com/alex_chernysh',
+      'https://mastodon.social/@alexchernysh',
+      'https://bsky.app/profile/alex-chernysh.bsky.social',
     ],
   },
   publisher: { '@id': `${SITE_URL}/#organization` },
@@ -102,6 +108,26 @@ export const SOFTWARE_APPLICATION_JSON_LD: JsonLdData = {
   ],
 };
 
+export const SOFTWARE_SOURCE_CODE_JSON_LD: JsonLdData = {
+  ...softwareSourceCodeLD({
+    name: 'Bernstein',
+    url: SITE_URL,
+    id: `${SITE_URL}/#source-code`,
+    description: PROJECT_SITE_DESCRIPTION,
+    codeRepository: 'https://github.com/sipyourdrink-ltd/bernstein',
+    programmingLanguage: 'Python',
+    runtimePlatform: 'Python 3.12+',
+    license: 'https://www.apache.org/licenses/LICENSE-2.0',
+    version: versionData.version,
+  }),
+  targetProduct: { '@id': `${SITE_URL}/#software` },
+};
+
 export function SoftwareApplicationJsonLd() {
-  return <JsonLd data={SOFTWARE_APPLICATION_JSON_LD} />;
+  return (
+    <>
+      <JsonLd data={SOFTWARE_APPLICATION_JSON_LD} />
+      <JsonLd data={SOFTWARE_SOURCE_CODE_JSON_LD} />
+    </>
+  );
 }

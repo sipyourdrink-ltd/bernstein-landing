@@ -49,6 +49,11 @@ const RENDERED_VERSION_SURFACES = [
   'components/seo/SoftwareApplicationJsonLd.tsx',
 ];
 
+const ROUTE_VERSION_SURFACES = [
+  'app/.well-known/mcp.json/route.ts',
+  'app/llms-ctx.txt/route.ts',
+];
+
 test('rendered version surfaces import the single generated source, not a literal', () => {
   for (const file of RENDERED_VERSION_SURFACES) {
     const src = read(file);
@@ -61,6 +66,20 @@ test('rendered version surfaces import the single generated source, not a litera
       src,
       /['"]v?\d+\.\d+\.\d+['"]/,
       `${file} contains a literal semver string - it must read the version from data/bernstein-version.json instead`,
+    );
+  }
+
+  for (const file of ROUTE_VERSION_SURFACES) {
+    const src = read(file);
+    assert.match(
+      src,
+      /from ['"][./]+lib\/version\.ts['"]/,
+      `${file} must import BERNSTEIN_VERSION from lib/version.ts rather than hard-coding a version string`,
+    );
+    assert.doesNotMatch(
+      src,
+      /['"`]v?\d+\.\d+\.\d+['"`]/,
+      `${file} contains a literal semver string - it must read BERNSTEIN_VERSION from lib/version.ts instead`,
     );
   }
 });

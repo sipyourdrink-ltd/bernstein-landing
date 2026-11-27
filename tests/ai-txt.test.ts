@@ -12,8 +12,25 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { GET } from '../app/ai.txt/route.ts';
+
+const REPO = process.cwd();
+const APP = path.join(REPO, 'app');
+const PUBLIC = path.join(REPO, 'public');
+
+function resolvesInRepo(urlPath: string): boolean {
+  const clean = urlPath.split(/[?#]/)[0]!;
+  if (clean === '/' || clean === '') {
+    return fs.existsSync(path.join(APP, 'page.tsx'));
+  }
+  const pubFile = path.join(PUBLIC, clean);
+  if (fs.existsSync(pubFile) && fs.statSync(pubFile).isFile()) return true;
+  const appDir = path.join(APP, ...clean.split('/').filter(Boolean));
+  return ['route.ts', 'route.tsx', 'page.tsx'].some((f) => fs.existsSync(path.join(appDir, f)));
+}
 
 async function readBody(): Promise<string> {
   const res = GET();
@@ -42,15 +59,35 @@ test('/ai.txt Permissions block lists stable canonical URLs only', async () => {
      reconsiders before shipping. */
   const expectedAllows = [
     '/llms.txt',
+    '/llms-ctx.txt',
     '/llms-full.txt',
     '/ai.txt',
+    '/agents.txt',
     '/robots.txt',
     '/sitemap.xml',
+    '/auth.md',
+    '/.well-known/api-catalog',
+    '/.well-known/ai-catalog.json',
+    '/.well-known/mcp.json',
+    '/.well-known/skills.json',
+    '/.well-known/agent-skills/index.json',
+    '/.well-known/http-message-signatures-directory',
+    '/mcp-server.json',
+    '/spec/agent-failure-taxonomy/v0.1.json',
   ];
-  for (const path of expectedAllows) {
+  for (const allowedPath of expectedAllows) {
     assert.ok(
-      body.includes(`Allow: ${path}`),
-      `/ai.txt must keep advertising Allow: ${path}`,
+      body.includes(`Allow: ${allowedPath}`),
+      `/ai.txt must advertise Allow: ${allowedPath}`,
     );
   }
+
+  const allowLines = [...body.matchAll(/^Allow:\s*(\S+)\s*$/gm)].map((m) => m[1]!);
+  assert.ok(allowLines.length >= expectedAllows.length);
+  const dead = allowLines.filter((p) => !resolvesInRepo(p));
+  assert.deepEqual(
+    dead,
+    [],
+    `/ai.txt advertises Allow paths that nothing in app/ or public/ serves: ${dead.join(', ')}`,
+  );
 });

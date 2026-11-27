@@ -35,6 +35,14 @@
  *   contract.
  */
 
+export const UTM_PARAM_KEYS = [
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'utm_content',
+  'utm_term',
+] as const;
+
 export interface WithUtmOpts {
   /** ``utm_source`` - origin property, e.g. ``bernstein.run``. */
   source: string;
@@ -78,13 +86,15 @@ export function withUtm(url: string, opts: WithUtmOpts): string {
   ];
 
   for (const [key, val] of desired) {
-    if (!val) continue;
-    /* Idempotency rule: only set the param if it isn't already present.
-       This protects operator-tagged URLs (e.g. SaaSHub's
-       ``utm_source=badge``) from being overwritten by a wrapping
-       ``withUtm`` call further up the render tree. */
-    if (!parsed.searchParams.has(key)) {
-      parsed.searchParams.set(key, val);
+    const cleaned = val?.trim();
+    if (!cleaned) continue;
+    /* Idempotency rule: only set the param if a non-empty value isn't
+       already present. This protects operator-tagged URLs (e.g.
+       SaaSHub's ``utm_source=badge``) from being overwritten by a
+       wrapping ``withUtm`` call further up the render tree while still
+       filling blank ``?utm_source=`` placeholders. */
+    if (!parsed.searchParams.get(key)?.trim()) {
+      parsed.searchParams.set(key, cleaned);
     }
   }
 

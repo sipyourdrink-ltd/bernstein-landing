@@ -33,6 +33,9 @@ import { JsonLd } from '@/components/seo/JsonLd';
 import { BreadcrumbListJsonLd } from '@/components/seo/BreadcrumbListJsonLd';
 import { SITE_URL, SITE_NAME, AUTHOR } from '@/lib/seo';
 import { getAllSeedItems, getSeedItem, type AskSeedItem } from '@/lib/ask-seed';
+import seedManifest from '@/data/ask-seed.json';
+
+const seedUpdated = seedManifest.updated;
 
 export async function generateStaticParams() {
   const items = await getAllSeedItems();
@@ -77,19 +80,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description: desc,
-    authors: [{ name: AUTHOR }],
-    alternates: { canonical: url },
+    authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
+    alternates: {
+      canonical: url,
+      types: { 'text/markdown': `${url}.md` },
+    },
     openGraph: {
       type: 'article',
+      siteName: SITE_NAME,
       title,
       description: desc,
       url,
+      modifiedTime: seedUpdated,
       authors: [AUTHOR],
       images: [
         {
           url: `/api/og?title=${encodeURIComponent(item.q)}`,
           width: 1200,
           height: 630,
+          alt: item.q,
         },
       ],
     },
@@ -141,20 +150,34 @@ export default async function QPage({ params }: Props) {
   const qaJsonLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'QAPage',
+    '@id': `${url}#qapage`,
+    url,
+    dateModified: seedUpdated,
     inLanguage: 'en',
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+    publisher: { '@id': `${SITE_URL}/#organization` },
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     mainEntity: {
       '@type': 'Question',
       name: item.q,
       url,
       text: item.q,
+      dateCreated: seedUpdated,
       answerCount: 1,
+      author: {
+        '@type': 'Organization',
+        '@id': `${SITE_URL}/#organization`,
+        name: SITE_NAME,
+        url: SITE_URL,
+      },
       acceptedAnswer: {
         '@type': 'Answer',
         text: item.a,
         url,
+        dateCreated: seedUpdated,
         author: {
           '@type': 'Organization',
+          '@id': `${SITE_URL}/#organization`,
           name: SITE_NAME,
           url: SITE_URL,
         },
@@ -179,22 +202,36 @@ export default async function QPage({ params }: Props) {
           <p className="ask-faq-answer">{item.a}</p>
         </article>
 
-        {item.tags.length > 0 ? (
-          <p className="ask-meta" style={{ marginTop: '1.5rem' }}>
-            <span className="ask-meta-label">tags</span>
-            {item.tags.map((t, i) => (
-              <span key={t}>
-                <code>{t}</code>
-                {i < item.tags.length - 1 ? (
-                  <span className="ask-meta-sep" aria-hidden>
-                    {' '}
-                    ·{' '}
-                  </span>
-                ) : null}
+        <p className="ask-meta" style={{ marginTop: '1.5rem' }}>
+          {item.tags.length > 0 ? (
+            <>
+              <span className="ask-meta-label">tags</span>
+              {item.tags.map((t, i) => (
+                <span key={t}>
+                  <code>{t}</code>
+                  {i < item.tags.length - 1 ? (
+                    <span className="ask-meta-sep" aria-hidden>
+                      {' '}
+                      ·{' '}
+                    </span>
+                  ) : null}
+                </span>
+              ))}
+              <span className="ask-meta-sep" aria-hidden>
+                {' '}
+                ·{' '}
               </span>
-            ))}
-          </p>
-        ) : null}
+            </>
+          ) : null}
+          <time dateTime={seedUpdated}>updated {seedUpdated}</time>
+          <span className="ask-meta-sep" aria-hidden>
+            {' '}
+            ·{' '}
+          </span>
+          <a href={`/q/${item.slug}.md`} type="text/markdown">
+            markdown (.md)
+          </a>
+        </p>
 
         {relatedItems.length > 0 ? (
           <section

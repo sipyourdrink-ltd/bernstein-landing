@@ -23,7 +23,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { withUtm } from '../lib/utm.ts';
+import { UTM_PARAM_KEYS, withUtm } from '../lib/utm.ts';
+import { ALLOWED_URL_PARAMS } from '../lib/analytics/disable.ts';
 
 const BASE_OPTS = {
   source: 'bernstein.run',
@@ -156,4 +157,29 @@ test('snapshot — footer href with hash + utm round-trip is stable', () => {
     got,
     'https://github.com/sipyourdrink-ltd/bernstein?utm_source=bernstein.run&utm_medium=outbound-link&utm_campaign=hero-rail-featured#mentioned-in',
   );
+});
+
+test('UTM parameter list stays locked in sync with analytics URL allowlist', () => {
+  assert.deepEqual(UTM_PARAM_KEYS, [
+    'utm_source',
+    'utm_medium',
+    'utm_campaign',
+    'utm_content',
+    'utm_term',
+  ]);
+  assert.deepEqual(ALLOWED_URL_PARAMS, UTM_PARAM_KEYS);
+});
+
+test('skips whitespace-only optional fields and fills empty existing UTM params', () => {
+  const got = withUtm('https://github.com/sipyourdrink-ltd/bernstein?utm_source=', {
+    source: 'bernstein.run',
+    medium: 'outbound-link',
+    campaign: 'hero-cta',
+    content: '   ',
+    term: '\t',
+  });
+  const url = new URL(got);
+  assert.equal(url.searchParams.get('utm_source'), 'bernstein.run');
+  assert.equal(url.searchParams.has('utm_content'), false);
+  assert.equal(url.searchParams.has('utm_term'), false);
 });

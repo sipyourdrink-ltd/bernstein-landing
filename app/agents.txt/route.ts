@@ -28,12 +28,21 @@ Category: ${PROJECT_CATEGORIES.join(', ')}
 Tags: ${PROJECT_TAGS.join(', ')}
 
 # Machine-readable surfaces on this host
+API-catalog: https://bernstein.run/.well-known/api-catalog
+AI-catalog (SEP-2127): https://bernstein.run/.well-known/ai-catalog.json
+MCP-card (SEP-1649): https://bernstein.run/.well-known/mcp.json
+Skills-index: https://bernstein.run/.well-known/skills.json
+Agent-skills: https://bernstein.run/.well-known/agent-skills/index.json
 LLM-summary: https://bernstein.run/llms.txt
+LLM-compact-context: https://bernstein.run/llms-ctx.txt
 LLM-full-reference: https://bernstein.run/llms-full.txt
 AI-descriptor: https://bernstein.run/ai.txt
+Authentication: https://bernstein.run/auth.md
 Agent-guide: https://bernstein.run/AGENTS.md
 Agent-card (A2A): https://bernstein.run/.well-known/agent-card.json
 MCP-server-card: https://bernstein.run/.well-known/mcp/server-card.json
+MCP-tools-manifest: https://bernstein.run/mcp-server.json
+Failure-taxonomy-schema: https://bernstein.run/spec/agent-failure-taxonomy/v0.1.json
 OpenAPI: https://bernstein.run/openapi.yaml
 `;
 

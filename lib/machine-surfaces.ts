@@ -109,11 +109,47 @@ export const DISCOVERY_DOCUMENTS: readonly DiscoveryDocument[] = [
     title: 'Machine-readable index of the callable endpoints this origin serves.',
   },
   {
+    path: '/.well-known/mcp.json',
+    label: 'MCP card (v1)',
+    rel: 'service-desc',
+    type: 'application/json',
+    title:
+      'SEP-1649 MCP Server Card advertising the anonymous remote Streamable HTTP verifier and local stdio server.',
+  },
+  {
+    path: '/.well-known/agent-skills/index.json',
+    label: 'Agent skills',
+    rel: 'service-desc',
+    type: 'application/json',
+    title: 'Agent Skills v0.2.0 discovery index with SHA-256 digests for hosted SKILL.md artefacts.',
+  },
+  {
+    path: '/mcp-server.json',
+    label: 'MCP tools spec',
+    rel: 'service-desc',
+    type: 'application/json',
+    title: 'Full MCP tool schemas for the locally-installed Bernstein MCP server.',
+  },
+  {
+    path: '/spec/agent-failure-taxonomy/v0.1.json',
+    label: 'Failure schema',
+    rel: 'service-desc',
+    type: 'application/schema+json',
+    title: 'JSON Schema for CLI Coding Agent Failure Taxonomy v0.1 records.',
+  },
+  {
     path: '/llms.txt',
     label: 'LLMs index',
     rel: 'service-doc',
     type: 'text/plain',
     title: 'llms.txt index: what this project is, and the canonical entry points.',
+  },
+  {
+    path: '/llms-ctx.txt',
+    label: 'LLMs context',
+    rel: 'service-doc',
+    type: 'text/plain',
+    title: 'Compact single-pass technical context (< 18 KB) and .md twin index for language models.',
   },
   {
     path: '/llms-full.txt',
@@ -145,11 +181,25 @@ export const DISCOVERY_DOCUMENTS: readonly DiscoveryDocument[] = [
     title: 'Crawl permissions, licence, and key facts for AI systems.',
   },
   {
+    path: '/agents.txt',
+    label: 'Agent descriptor',
+    rel: 'service-meta',
+    type: 'text/plain',
+    title: 'Plaintext project descriptor and pointers to machine-readable surfaces on this host.',
+  },
+  {
     path: '/.well-known/agent-card.json',
     label: 'A2A agent card',
     rel: 'service-meta',
     type: 'application/json',
     title: 'A2A agent card for the Bernstein orchestrator.',
+  },
+  {
+    path: '/.well-known/ai-catalog.json',
+    label: 'AI catalog',
+    rel: 'service-meta',
+    type: 'application/ai-catalog+json',
+    title: 'SEP-2127 AI Catalog indexing the MCP server cards served by this origin.',
   },
   {
     path: '/.well-known/mcp/server-card.json',

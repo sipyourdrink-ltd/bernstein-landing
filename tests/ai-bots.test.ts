@@ -11,13 +11,36 @@ import assert from 'node:assert/strict';
 
 import { AI_BOTS } from '../lib/seo/ai-bots.ts';
 
-test('AI_BOTS contains the full robots.txt allow-list', () => {
-  /* Sanity check on the list size — robots.txt currently exposes 41
-     named user-agents. If this number changes, update both this
-     assertion and the rendered robots.txt expectation in any
-     downstream snapshot test. */
+test('AI_BOTS contains the full 2026 robots.txt allow-list with no duplicates', () => {
   assert.ok(
-    AI_BOTS.length >= 30,
-    `expected at least 30 named crawlers, got ${AI_BOTS.length}`,
+    AI_BOTS.length >= 52,
+    `expected at least 52 named crawlers in 2026 allow-list, got ${AI_BOTS.length}`,
   );
+  assert.equal(new Set(AI_BOTS).size, AI_BOTS.length, 'AI_BOTS must not contain duplicate tokens');
+  for (const bot of AI_BOTS) {
+    assert.match(bot, /^\S+$/, `crawler token must be non-empty without whitespace: "${bot}"`);
+  }
+
+  for (const required of [
+    'GPTBot',
+    'OAI-SearchBot',
+    'ClaudeBot',
+    'Claude-SearchBot',
+    'Claude-User',
+    'Google-Extended',
+    'Google-CloudVertexBot',
+    'Gemini-Deep-Research',
+    'PerplexityBot',
+    'Perplexity-User',
+    'MistralAI-User',
+    'MistralAI-Bot',
+    'Ai2Bot-Dolma',
+    'ExaBot',
+    'ExaSearchBot',
+    'PhindBot',
+    'DeepSeekBot',
+    'GrokBot',
+  ]) {
+    assert.ok(AI_BOTS.includes(required), `AI_BOTS must include 2026 crawler "${required}"`);
+  }
 });

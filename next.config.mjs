@@ -130,7 +130,7 @@ const nextConfig = {
        token. Deliberately looser than the q-value comparison in
        lib/markdown-negotiation.ts - see the matchers for `/` and
        `/blog/:slug` near the bottom for why the looseness is safe. */
-    const MARKDOWN_ACCEPT = '.*text/(x-)?markdown.*';
+    const MARKDOWN_ACCEPT = '.*[Tt][Ee][Xx][Tt]/([Xx]-)?[Mm][Aa][Rr][Kk][Dd][Oo][Ww][Nn].*';
 
     /* What a markdown-negotiated request gets instead of the page's
        edge TTL. `no-store` keeps a negotiated body out of every shared
@@ -170,7 +170,6 @@ const nextConfig = {
     const connectSrc = [
       "'self'",
       ...(isDev ? ['ws://localhost:*', 'ws://127.0.0.1:*'] : []),
-      'https://app.kit.com',
       'https://analytics.bernstein.run',
     ].join(' ');
 
@@ -182,7 +181,7 @@ const nextConfig = {
       { key: 'Reporting-Endpoints', value: reportingEndpoints },
       {
         key: 'Content-Security-Policy',
-        value: `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src ${connectSrc}; frame-src 'none'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://app.kit.com; report-uri ${cspReportPath}; report-to csp-endpoint;`,
+        value: `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src ${connectSrc}; frame-src 'none'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; report-uri ${cspReportPath}; report-to csp-endpoint;`,
       },
       {
         key: 'X-Robots-Tag',
@@ -230,6 +229,14 @@ const nextConfig = {
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
       },
       {
+        source: '/llms-ctx.txt',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
+      },
+      {
+        source: '/spec/agent-failure-taxonomy/v0.1.json',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
+      },
+      {
         source: '/ai.txt',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
       },
@@ -243,14 +250,6 @@ const nextConfig = {
       },
       {
         source: '/agents.json',
-        headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
-      },
-      /* /auth.md states what credentials this host wants (none) and
-         where the OpenAPI document's server actually is. Same
-         discipline as the rest of this list: it exists to be fetched by
-         an agent that already found openapi.yaml, not to rank. */
-      {
-        source: '/auth.md',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
       },
       {
@@ -338,11 +337,12 @@ const nextConfig = {
          anything but Accept-Encoding, so a cached markdown body would
          then be replayed to the next browser asking for the same URL.
 
-         The match is a substring test on Accept, which is looser than
-         the q-value comparison in lib/markdown-negotiation.ts. The
-         looseness only ever costs a cache entry: a request naming
-         markdown but not outranking html gets HTML with `no-store`,
-         which is uncached but correct. It cannot go the other way, and
+         The match is a case-insensitive substring test on Accept, which is
+         looser than the q-value comparison in lib/markdown-negotiation.ts.
+         The looseness only ever costs a cache entry: a request naming
+         markdown weighted strictly below html gets HTML with `no-store`,
+         which is uncached but correct (equal q=1 ties and higher weights
+         get markdown with `no-store`). It cannot go the other way, and
          that asymmetry is the point. Browsers never send the token, so
          ordinary traffic keeps the ten-minute edge TTL. */
       {
@@ -359,6 +359,12 @@ const nextConfig = {
       },
       {
         source: '/cost',
+        has: [{ type: 'header', key: 'accept', value: MARKDOWN_ACCEPT }],
+        headers: NEGOTIATED_MARKDOWN_HEADERS,
+      },
+      {
+        source: '/cost',
+        missing: [{ type: 'header', key: 'accept', value: MARKDOWN_ACCEPT }],
         headers: [
           { key: 'Cache-Control', value: 'public, s-maxage=600, stale-while-revalidate=3600' },
         ],
@@ -380,6 +386,33 @@ const nextConfig = {
         missing: [{ type: 'header', key: 'accept', value: MARKDOWN_ACCEPT }],
         headers: [
           { key: 'Cache-Control', value: 'public, s-maxage=600, stale-while-revalidate=3600' },
+        ],
+      },
+      /* Explicit `/*.md` page twins must never duplicate HTML in search
+         indexes or inherit `/blog/:slug`'s shared HTML cache TTL (`:slug`
+         also matches `foo.md`). Placed after `/blog/:slug` so `no-store`
+         and `noindex, follow` win on every `.md` twin, followed by the
+         two static discovery `.md` documents which keep their shared
+         discovery TTL. */
+      {
+        source: '/:path*.md',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, follow' },
+          { key: 'Cache-Control', value: 'no-store' },
+        ],
+      },
+      {
+        source: '/auth.md',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, follow' },
+          { key: 'Cache-Control', value: DISCOVERY_CACHE_CONTROL },
+        ],
+      },
+      {
+        source: '/AGENTS.md',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, follow' },
+          { key: 'Cache-Control', value: DISCOVERY_CACHE_CONTROL },
         ],
       },
     ];

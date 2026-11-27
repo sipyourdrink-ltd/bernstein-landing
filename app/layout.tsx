@@ -151,11 +151,9 @@ export default function RootLayout({
             does not own. The inline script stays in <body>, which is where
             it has to run anyway - during parse, before the deferred tracker
             below it. */}
-        {/* Warm DNS + TLS for the self-hosted Umami endpoint and the
-              Cloudflare Insights beacon (injected by CF edge when the
-              project is fronted by their CDN). Preconnecting early shaves
-              ~80-200ms off the first analytics request and unblocks
-              LCP/FCP on cold connections. */}
+        {/* Warm DNS + TLS for the self-hosted Umami endpoint.
+              Preconnecting early shaves ~80-200ms off the first analytics
+              request and unblocks LCP/FCP on cold connections. */}
         <link
           rel="preconnect"
           href="https://analytics.bernstein.run"
@@ -167,7 +165,20 @@ export default function RootLayout({
               shipped a second rss+xml declaration for the same feed with a
               different href form, which readers and link-graph parsers
               counted as two feeds. */}
-        {/* AIO: extended LLM reference alongside the primary llms.txt alternate */}
+        {/* AIO / llmstxt.org v2: describedby pointer to /llms.txt plus
+              compact (/llms-ctx.txt) and extended (/llms-full.txt)
+              LLM context alternates. Hoisted into <head> by React. */}
+        <link
+          rel="describedby"
+          type="text/plain"
+          href="/llms.txt"
+        />
+        <link
+          rel="alternate"
+          type="text/plain"
+          href="/llms-ctx.txt"
+          title="Bernstein Compact LLM Context"
+        />
         <link
           rel="alternate"
           type="text/markdown"
@@ -182,18 +193,17 @@ export default function RootLayout({
         <link rel="me" href="https://alexchernysh.com" />
         <link rel="me" href="https://github.com/chernistry" />
         <link rel="me" href="https://x.com/alex_chernysh" />
-        {/* Analytics before-send hook (opt-out, docs-assistant text) - the tracker
-              below calls before every request. With
-              ``localStorage.setItem('umami:disabled','true')`` set in a
-              browser, the hook returns null and that browser sends
-              nothing. It must parse before the deferred tracker boots. */}
+        {/* Analytics before-send hook (opt-out, GPC/DNT, UTM-only URL scrub) -
+              the tracker below calls it before every request. Setting
+              `umami:disabled` or `umami.disabled` in localStorage (or
+              sending Global Privacy Control / Do Not Track) causes the hook
+              to return null so the browser sends nothing. It must parse
+              before the deferred tracker boots. */}
         <script
-          // eslint-disable-next-line react/no-danger -- inline string is a
-          // hardcoded constant from lib/analytics/disable.ts; not user input.
           dangerouslySetInnerHTML={{ __html: OPERATOR_EXCLUDE_INLINE_SCRIPT }}
         />
-        {/* Umami self-host (analytics.bernstein.run) - page views only,
-              plus the outbound-click event from <OutboundClicks />.
+        {/* Umami self-host (analytics.bernstein.run) - page views plus
+              `outbound-click` and `install-snippet-copy` from <OutboundClicks />.
               Defer-loaded; zero impact on LCP. UUID lives in
               NEXT_PUBLIC_UMAMI_WEBSITE_ID (build-time env var) so a
               registration in the Umami DB is the single source of truth
@@ -201,16 +211,17 @@ export default function RootLayout({
               the env var is unset we skip emitting the tag entirely
               instead of falling back to a hardcoded UUID, so a
               mis-configured staging build can't silently contaminate the
-              production dashboard (BUG-AUDIT 2026-05-09). The
-              `data-domains` allowlist pins this tracker to the bernstein
-              surfaces - events from any other host are dropped client-side
-              so a stolen `script.js` URL can't pollute our pixel stream. */}
+              production dashboard (BUG-AUDIT 2026-05-09). `data-domains`
+              pins collection strictly to `bernstein.run` (redirect-only
+              domains, localhost, previews, and forks are dropped). */}
         {process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ? (
           <script
             defer
             src="https://analytics.bernstein.run/script.js"
             data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
-            data-domains="bernstein.run,www.bernstein.run,getbernstein.com,www.getbernstein.com"
+            data-domains="bernstein.run"
+            data-do-not-track="true"
+            data-exclude-hash="true"
             data-before-send={UMAMI_BEFORE_SEND}
           />
         ) : null}

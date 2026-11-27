@@ -14,7 +14,10 @@ import { Nav } from '@/components/landing/Nav';
 import { Footer } from '@/components/landing/Footer';
 import { BackToTop } from '@/components/landing/BackToTop';
 import { AgentMdBench } from '@/components/tools/AgentMdBench';
-import { SITE_URL, AUTHOR } from '@/lib/seo';
+import { BreadcrumbListJsonLd } from '@/components/seo/BreadcrumbListJsonLd';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { webApplicationLD } from '@/lib/jsonld';
+import { SITE_URL, SITE_NAME, AUTHOR } from '@/lib/seo';
 import { withUtm } from '@/lib/utm';
 
 const PAGE_TITLE = 'agent-md-bench - AGENTS.md / CLAUDE.md linter';
@@ -28,14 +31,25 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: PAGE_TITLE,
   description: PAGE_DESC,
-  authors: [{ name: AUTHOR }],
-  alternates: { canonical: PAGE_URL },
+  authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
+  alternates: {
+    canonical: PAGE_URL,
+    types: { 'text/markdown': `${SITE_URL}/tools/agent-md-bench.md` },
+  },
   openGraph: {
     type: 'website',
+    siteName: SITE_NAME,
     title: PAGE_TITLE,
     description: PAGE_DESC,
     url: PAGE_URL,
-    images: [{ url: `/api/og?title=${encodeURIComponent('agent-md-bench')}`, width: 1200, height: 630 }],
+    images: [
+      {
+        url: `/api/og?title=${encodeURIComponent('agent-md-bench')}`,
+        width: 1200,
+        height: 630,
+        alt: PAGE_TITLE,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -65,10 +79,14 @@ export default function AgentMdBenchPage() {
               <a href="/" className="blog-back">
                 &larr; back home
               </a>
+              <span aria-hidden="true"> &middot; </span>
+              <a href="/tools/agent-md-bench.md" type="text/markdown">
+                markdown (.md)
+              </a>
             </p>
             <h1>agent-md-bench</h1>
             <p className="cost-page-lede">
-              paste your AGENTS.md, CLAUDE.md, .cursorrules or .mdc. the page will count tokens and bytes, show per-agent size budgets, and flag parser quirks across the major CLI coding agents. 100% in the browser. nothing leaves the page.
+              agent-md-bench is bernstein&apos;s client-side linter for AGENTS.md, CLAUDE.md, GEMINI.md, CONVENTIONS.md, .cursorrules, and .mdc files (apache 2.0, derived from bernstein&apos;s 55 cli coding-agent adapters). paste your file to count tokens and bytes, show per-agent size budgets, and flag parser quirks across the major CLI coding agents. 100% in the browser. nothing leaves the page.
             </p>
           </header>
 
@@ -122,6 +140,19 @@ export default function AgentMdBenchPage() {
       </main>
       <Footer />
       <BackToTop />
+      <BreadcrumbListJsonLd
+        items={[
+          { name: 'Home', url: SITE_URL },
+          { name: 'agent-md-bench', url: PAGE_URL },
+        ]}
+      />
+      <JsonLd
+        data={webApplicationLD({
+          name: 'agent-md-bench',
+          url: PAGE_URL,
+          description: PAGE_DESC,
+        })}
+      />
     </>
   );
 }

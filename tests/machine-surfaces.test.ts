@@ -228,7 +228,22 @@ test('the non-capability endpoint is catalogued but not offered as a skill', () 
 /* ---------- 3. resolution ---------- */
 
 test('every path the shared module declares resolves to something in the repo', () => {
-  const unresolved = allDeclaredPaths().filter((p) => resolve(p) === null);
+  const declared = allDeclaredPaths();
+  for (const required of [
+    '/llms-ctx.txt',
+    '/.well-known/mcp.json',
+    '/.well-known/ai-catalog.json',
+    '/.well-known/agent-skills/index.json',
+    '/agents.txt',
+    '/mcp-server.json',
+    '/spec/agent-failure-taxonomy/v0.1.json',
+  ]) {
+    assert.ok(
+      declared.includes(required),
+      `lib/machine-surfaces.ts must include ${required} so api-catalog and robots.txt advertise it`,
+    );
+  }
+  const unresolved = declared.filter((p) => resolve(p) === null);
   assert.deepEqual(
     unresolved,
     [],

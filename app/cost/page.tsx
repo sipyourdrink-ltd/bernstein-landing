@@ -22,11 +22,15 @@ import { Nav } from '@/components/landing/Nav';
 import { Footer } from '@/components/landing/Footer';
 import { BackToTop } from '@/components/landing/BackToTop';
 import { CostCalc } from '@/components/cost/CostCalc';
-import { SITE_URL, AUTHOR } from '@/lib/seo';
+import { StaticPageBreadcrumb } from '@/components/seo/BreadcrumbListJsonLd';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { webApplicationLD } from '@/lib/jsonld';
+import { SITE_URL, SITE_NAME, AUTHOR } from '@/lib/seo';
 import { fetchModelPrices } from '@/lib/model-prices/fetch';
 import { formatUsd, groupByBrand } from '@/lib/model-prices/select';
 
 const PAGE_TITLE = 'cost';
+const SOCIAL_TITLE = 'bernstein cost calculator';
 const PAGE_DESC =
   'token-bill calculator: enter your last month claude / codex / cursor spend and see what cheapest-passing-test routing would shift. heuristic, not a promise.';
 const PAGE_URL = `${SITE_URL}/cost`;
@@ -42,22 +46,31 @@ export const revalidate = 21600;
 export const metadata: Metadata = {
   title: PAGE_TITLE,
   description: PAGE_DESC,
-  authors: [{ name: AUTHOR }],
-  alternates: { canonical: PAGE_URL },
+  authors: [{ name: AUTHOR, url: 'https://alexchernysh.com' }],
+  alternates: {
+    canonical: PAGE_URL,
+    types: { 'text/markdown': `${SITE_URL}/cost.md` },
+  },
   openGraph: {
     type: 'website',
-    title: PAGE_TITLE,
+    siteName: SITE_NAME,
+    title: SOCIAL_TITLE,
     description: PAGE_DESC,
     url: PAGE_URL,
     images: [
-      { url: `/api/og?title=${encodeURIComponent(PAGE_TITLE)}`, width: 1200, height: 630 },
+      {
+        url: `/api/og?title=${encodeURIComponent(SOCIAL_TITLE)}`,
+        width: 1200,
+        height: 630,
+        alt: `${SOCIAL_TITLE} - token-bill routing estimator`,
+      },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: PAGE_TITLE,
+    title: SOCIAL_TITLE,
     description: PAGE_DESC,
-    images: [`/api/og?title=${encodeURIComponent(PAGE_TITLE)}`],
+    images: [`/api/og?title=${encodeURIComponent(SOCIAL_TITLE)}`],
   },
 };
 
@@ -91,6 +104,10 @@ export default async function CostPage() {
             <p className="blog-back-link">
               <a href="/" className="blog-back">
                 &larr; back home
+              </a>
+              <span aria-hidden="true"> &middot; </span>
+              <a href="/cost.md" type="text/markdown">
+                markdown (.md)
               </a>
             </p>
             <h1>cost</h1>
@@ -319,6 +336,14 @@ export default async function CostPage() {
       </main>
       <Footer />
       <BackToTop />
+      <StaticPageBreadcrumb name="Cost calculator" slug="/cost" />
+      <JsonLd
+        data={webApplicationLD({
+          name: 'Bernstein Cost Calculator',
+          url: PAGE_URL,
+          description: PAGE_DESC,
+        })}
+      />
     </>
   );
 }

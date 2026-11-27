@@ -47,6 +47,8 @@
 const SITE_URL = 'https://bernstein.run';
 const SITE_NAME = 'Bernstein';
 const AUTHOR = 'Alex Chernysh';
+export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
+export const PERSON_ID = 'https://alexchernysh.com/#person';
 
 /** Plain JSON-LD object - what we render inside <script type="application/ld+json">. */
 export type JsonLdNode = Record<string, unknown>;
@@ -60,7 +62,7 @@ export type JsonLdNode = Record<string, unknown>;
  *  knowledge graph into two entities and diluted the sameAs cluster. */
 const ORGANIZATION_NODE: JsonLdNode = {
   '@type': 'Organization',
-  '@id': `${SITE_URL}/#organization`,
+  '@id': ORGANIZATION_ID,
   name: SITE_NAME,
   url: SITE_URL,
   logo: { '@type': 'ImageObject', url: `${SITE_URL}/favicon.svg` },
@@ -70,15 +72,18 @@ const ORGANIZATION_NODE: JsonLdNode = {
     'https://github.com/chernistry',
     'https://pypi.org/project/bernstein/',
     'https://www.npmjs.com/package/bernstein-orchestrator',
+    'https://docs.bernstein.run/',
     'https://mastodon.social/@alexchernysh',
     'https://bsky.app/profile/alex-chernysh.bsky.social',
     'https://x.com/alex_chernysh',
+    'https://alexchernysh.com',
   ],
 };
 
 /** Author / Person node. Reused by Article-shaped builders. */
 const PERSON_AUTHOR_NODE: JsonLdNode = {
   '@type': 'Person',
+  '@id': PERSON_ID,
   name: AUTHOR,
   url: 'https://alexchernysh.com',
   sameAs: [
@@ -86,6 +91,7 @@ const PERSON_AUTHOR_NODE: JsonLdNode = {
     'https://github.com/chernistry',
     'https://x.com/alex_chernysh',
     'https://mastodon.social/@alexchernysh',
+    'https://bsky.app/profile/alex-chernysh.bsky.social',
   ],
 };
 
@@ -460,23 +466,147 @@ export interface PersonMeta {
  * solo-maintainer project.
  */
 export function personLD(meta: PersonMeta): JsonLdNode {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
-    '@id': `${meta.url}#person`,
-    name: AUTHOR,
-    description: meta.description,
-    url: meta.url,
-    sameAs: meta.sameAs ?? [
+  const defaultSameAs = Array.from(
+    new Set([
       'https://alexchernysh.com',
       'https://github.com/chernistry',
       'https://x.com/alex_chernysh',
       'https://mastodon.social/@alexchernysh',
+      'https://bsky.app/profile/alex-chernysh.bsky.social',
       SITE_URL,
-    ],
+      meta.url,
+    ]),
+  );
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': PERSON_ID,
+    name: AUTHOR,
+    description: meta.description,
+    url: 'https://alexchernysh.com',
+    sameAs: meta.sameAs ?? defaultSameAs,
     ...(meta.jobTitle ? { jobTitle: meta.jobTitle } : {}),
     worksFor: ORGANIZATION_NODE,
-    mainEntityOfPage: { '@type': 'WebPage', '@id': meta.url },
+    mainEntityOfPage: { '@type': 'ProfilePage', '@id': meta.url },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// WebApplication - browser utilities (/cost, /tools/agent-md-bench)
+// ---------------------------------------------------------------------------
+
+export interface WebApplicationMeta {
+  name: string;
+  url: string;
+  description: string;
+  applicationCategory?: string;
+  operatingSystem?: string;
+  browserRequirements?: string;
+}
+
+export function webApplicationLD(meta: WebApplicationMeta): JsonLdNode {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    '@id': `${meta.url}#webapp`,
+    name: meta.name,
+    description: meta.description,
+    url: meta.url,
+    inLanguage: 'en',
+    applicationCategory: meta.applicationCategory ?? 'DeveloperApplication',
+    operatingSystem: meta.operatingSystem ?? 'Any',
+    browserRequirements: meta.browserRequirements ?? 'Requires JavaScript',
+    isAccessibleForFree: true,
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+    },
+    author: PERSON_AUTHOR_NODE,
+    publisher: ORGANIZATION_NODE,
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// DefinedTermSet - normative taxonomies (/spec/agent-failure-taxonomy/v0.1)
+// ---------------------------------------------------------------------------
+
+export interface DefinedTermInput {
+  termCode: string;
+  name: string;
+  description: string;
+}
+
+export interface DefinedTermSetMeta {
+  url: string;
+  id?: string;
+  name: string;
+  description: string;
+}
+
+export function definedTermSetLD(
+  terms: DefinedTermInput[],
+  meta: DefinedTermSetMeta,
+): JsonLdNode {
+  const setId = meta.id ?? `${meta.url}#taxonomy`;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTermSet',
+    '@id': setId,
+    name: meta.name,
+    description: meta.description,
+    url: meta.url,
+    inLanguage: 'en',
+    publisher: { '@id': ORGANIZATION_ID },
+    hasDefinedTerm: terms.map((t) => ({
+      '@type': 'DefinedTerm',
+      '@id': `${meta.url}#${t.termCode}`,
+      termCode: t.termCode,
+      name: t.name,
+      description: t.description,
+      inDefinedTermSet: setId,
+    })),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// SoftwareSourceCode - open-source repository entity
+// ---------------------------------------------------------------------------
+
+export interface SoftwareSourceCodeMeta {
+  name: string;
+  url: string;
+  id?: string;
+  description: string;
+  codeRepository: string;
+  programmingLanguage: string;
+  runtimePlatform: string;
+  license: string;
+  version?: string;
+  targetProductId?: string;
+}
+
+export function softwareSourceCodeLD(meta: SoftwareSourceCodeMeta): JsonLdNode {
+  const anchorBase =
+    /^https?:\/\/[^/]+$/.test(meta.url) ? `${meta.url}/` : meta.url;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareSourceCode',
+    '@id': meta.id ?? `${anchorBase}#source-code`,
+    name: meta.name,
+    description: meta.description,
+    url: meta.url,
+    codeRepository: meta.codeRepository,
+    programmingLanguage: meta.programmingLanguage,
+    runtimePlatform: meta.runtimePlatform,
+    license: meta.license,
+    ...(meta.version ? { version: meta.version } : {}),
+    targetProduct: { '@id': meta.targetProductId ?? `${anchorBase}#software` },
+    author: { '@id': PERSON_ID },
+    maintainer: { '@id': PERSON_ID },
+    publisher: { '@id': ORGANIZATION_ID },
   };
 }
 

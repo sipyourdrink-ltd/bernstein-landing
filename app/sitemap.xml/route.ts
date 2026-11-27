@@ -133,8 +133,17 @@ async function gatherInputs() {
      regenerates them; this only triggers on a fresh checkout with no
      prebuild yet. */
   let seedItems: SitemapSeedItem[] = [];
+  let seedUpdated: string | undefined;
   try {
     seedItems = (await getAllSeedItems()).map((i) => ({ slug: i.slug }));
+    const rawSeed = await fs.readFile(
+      path.join(process.cwd(), 'data', 'ask-seed.json'),
+      'utf8',
+    );
+    const parsedSeed = JSON.parse(rawSeed) as { updated?: unknown };
+    if (typeof parsedSeed.updated === 'string' && parsedSeed.updated !== '') {
+      seedUpdated = parsedSeed.updated;
+    }
   } catch {
     /* ask-seed.json missing or unparseable; skip the leaf entries. */
   }
@@ -162,6 +171,7 @@ async function gatherInputs() {
   return {
     posts: sitemapPosts,
     seedItems,
+    seedUpdated,
     readyAdapters,
     compareEntries,
     lastModFromSource,
