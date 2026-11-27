@@ -173,3 +173,24 @@ test('buildBlogPostJsonLd and buildBlogIndexJsonLd emit canonical Organization a
   assert.equal((indexLd.author as Record<string, unknown>)['@id'], 'https://alexchernysh.com/#person');
   assert.equal(indexLd.blogPost[0].dateModified, '2026-11-24');
 });
+
+test('buildRssFeedXml degrades cleanly instead of throwing 500 when a post date is malformed', () => {
+  const xml = buildRssFeedXml(
+    [
+      {
+        slug: 'bad-date-post',
+        fm: {
+          title: 'Malformed date post',
+          description: 'Still renders without RangeError.',
+          date: 'not-a-valid-date',
+          dateModified: 'also-invalid',
+        },
+        contentHtml: '<p>Body</p>',
+      },
+    ],
+    'invalid-stamp',
+  );
+  assert.match(xml, /<title><!\[CDATA\[Malformed date post\]\]><\/title>/);
+  assert.doesNotMatch(xml, /<pubDate>Invalid Date<\/pubDate>/);
+  assert.doesNotMatch(xml, /<dcterms:modified>/);
+});

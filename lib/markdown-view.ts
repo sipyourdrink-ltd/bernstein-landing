@@ -12,6 +12,7 @@ import {
   CANONICAL_PUBLIC_ORIGIN,
   markdownTargetFor,
   markdownTwinTargetFor,
+  resolvePublicOrigin,
   type MarkdownTarget,
   type StaticMarkdownPage,
 } from './markdown-negotiation.ts';
@@ -434,9 +435,10 @@ export async function serveMarkdown(
     if (rendered.status === 404) {
       return markdown(rendered.body, 404, { 'X-Robots-Tag': 'noindex' });
     }
+    const origin = resolvePublicOrigin(process.env.BERNSTEIN_PUBLIC_ORIGIN);
     return markdown(rendered.body, 200, {
       'X-Robots-Tag': 'noindex, follow',
-      Link: `<${CANONICAL_PUBLIC_ORIGIN}${twin.canonicalPath}>; rel="canonical"`,
+      Link: `<${origin}${twin.canonicalPath}>; rel="canonical"`,
     });
   }
 

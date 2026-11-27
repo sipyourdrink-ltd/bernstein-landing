@@ -39,6 +39,40 @@ export const ALLOWED_URL_PARAMS = [
   'utm_term',
 ] as const;
 
+function isOptOutValue(v: string | null | undefined): boolean {
+  return v === 'true' || v === '1';
+}
+
+/**
+ * Synchronous client-side opt-out guard called before any `window.umami?.track(...)`
+ * invocation so GPC, DNT, and `localStorage` opt-out flags remain enforced even if
+ * the external tracker script ignores `data-before-send`. Fails closed (`true`)
+ * when browser globals or storage throw (e.g. sandboxed iframe).
+ */
+export function isAnalyticsOptedOut(): boolean {
+  if (typeof window === 'undefined') return true;
+  try {
+    const nav = window.navigator as Navigator & { globalPrivacyControl?: boolean };
+    const win = window as Window & { doNotTrack?: string };
+    if (nav && (nav.globalPrivacyControl === true || nav.doNotTrack === '1')) {
+      return true;
+    }
+    if (win.doNotTrack === '1') {
+      return true;
+    }
+    if (
+      window.localStorage &&
+      (isOptOutValue(window.localStorage.getItem(UMAMI_DISABLED_KEY)) ||
+        isOptOutValue(window.localStorage.getItem(UMAMI_STANDARD_DISABLED_KEY)))
+    ) {
+      return true;
+    }
+    return false;
+  } catch {
+    return true;
+  }
+}
+
 export const OPERATOR_EXCLUDE_INLINE_SCRIPT = `(() => {
   var allow = ${JSON.stringify(ALLOWED_URL_PARAMS)};
   var lastView = null;
@@ -53,7 +87,7 @@ export const OPERATOR_EXCLUDE_INLINE_SCRIPT = `(() => {
       });
       x.hash = '';
       return x.toString();
-    } catch (_) { return u; }
+    } catch (_) { return ''; }
   }
   function cleanRef(r) {
     if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(r)) return '';
@@ -79,7 +113,7 @@ export const OPERATOR_EXCLUDE_INLINE_SCRIPT = `(() => {
       ) {
         return null;
       }
-    } catch (_) { }
+    } catch (_) { return null; }
     if (!payload || typeof payload !== 'object') return payload;
     var out = Object.assign({}, payload);
     if (out.url) out.url = clean(out.url);

@@ -138,15 +138,21 @@ function checkHook(
   checkCallbackFlow(script, callback, issues);
   const attempt = ts.isBlock(callback.body) ? callback.body.statements[0] : undefined;
   const [privacySignal, optOut] = attempt && ts.isTryStatement(attempt) ? attempt.tryBlock.statements : [];
+  const catchFailsClosed = !!attempt && ts.isTryStatement(attempt)
+    && !!attempt.catchClause && attempt.catchClause.block.statements.length === 1
+    && dropsRequest(attempt.catchClause.block);
   if (!attempt || !ts.isTryStatement(attempt) || attempt.tryBlock.statements.length !== 2
-    || attempt.catchClause?.block.statements.length !== 0 || attempt.finallyBlock
+    || !catchFailsClosed || attempt.finallyBlock
     || !privacySignal || !ts.isIfStatement(privacySignal)
     || !/^\(window\.navigator&&\(window\.navigator\.globalPrivacyControl===true\|\|window\.navigator\.doNotTrack===(['"])1\1\)\)\|\|window\.doNotTrack===(['"])1\2$/.test(compact(privacySignal.expression))
     || privacySignal.elseStatement || !dropsRequest(privacySignal.thenStatement)
     || !optOut || !ts.isIfStatement(optOut)
     || !/^window\.localStorage&&\(optedOut\(window\.localStorage\.getItem\((['"])umami:disabled\1\)\)\|\|optedOut\(window\.localStorage\.getItem\((['"])umami\.disabled\2\)\)\)$/.test(compact(optOut.expression))
     || optOut.elseStatement || !dropsRequest(optOut.thenStatement)) {
-    issues.push(`${script.location(optOut ?? privacySignal ?? attempt ?? callback)}: opt-out must drop requests on GPC, DNT, or either documented opt-out storage flag`);
+    const locNode = !catchFailsClosed
+      ? (attempt && ts.isTryStatement(attempt) ? attempt.catchClause ?? attempt : callback)
+      : (optOut ?? privacySignal ?? attempt ?? callback);
+    issues.push(`${script.location(locNode)}: opt-out must drop requests on GPC, DNT, storage error, or either documented opt-out storage flag`);
   }
   const optOutCode = codeEntries(privacy);
   for (const command of [
@@ -164,6 +170,8 @@ function checkHook(
     'The browser opt-out below does not control this server request',
     'Global Privacy Control',
     'Do Not Track',
+    'document title',
+    'screen dimensions',
     'text still being typed is not',
     'automatically sends its question',
     '/llms-ctx.txt',

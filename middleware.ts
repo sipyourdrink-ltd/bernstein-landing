@@ -5,7 +5,6 @@ import {
   markdownTargetFor,
   markdownTwinTargetFor,
   prefersMarkdown,
-  resolvePublicOrigin,
 } from '@/lib/markdown-negotiation';
 
 export function middleware(request: NextRequest) {
@@ -46,7 +45,6 @@ export function middleware(request: NextRequest) {
       });
     }
 
-    const origin = resolvePublicOrigin(process.env.BERNSTEIN_PUBLIC_ORIGIN);
     const headers = new Headers(request.headers);
     headers.set(MARKDOWN_PATH_HEADER, pathname);
 
@@ -55,7 +53,6 @@ export function middleware(request: NextRequest) {
     });
     rewritten.headers.set('Vary', 'Accept');
     rewritten.headers.set('X-Robots-Tag', 'noindex, follow');
-    rewritten.headers.set('Link', `<${origin}${twin.canonicalPath}>; rel="canonical"`);
     return rewritten;
   }
 

@@ -243,6 +243,7 @@ test('reports script, hook, endpoint and service drift at the changed source', (
     ['lib/analytics/disable.ts', "function cleanRef(r) {\n    if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(r)) return '';", "function cleanRef(r) {\n    if (false) return '';", /referrer cleaner/],
     ['lib/analytics/disable.ts', 'out.referrer = cleanRef(out.referrer)', 'out.referrer = clean(out.referrer)', /strip query parameters from the referrer/],
     ['lib/analytics/disable.ts', 'window.navigator.globalPrivacyControl === true', 'window.navigator.globalPrivacyControl === false', /GPC, DNT/],
+    ['lib/analytics/disable.ts', '} catch (_) { return null; }', '} catch (_) { }', /storage error/],
     ['lib/analytics/disable.ts', 'out.url === lastView', 'out.url !== lastView', /duplicate page views/],
     ['lib/analytics/disable.ts', 'out.url = clean(out.url)', 'clean(out.url)', /strip query parameters/],
     ['lib/analytics/disable.ts', 'return out;', 'return payload;', /return the cleaned payload/],

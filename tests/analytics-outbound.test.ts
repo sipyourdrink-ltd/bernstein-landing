@@ -19,6 +19,7 @@ import {
   UMAMI_BEFORE_SEND,
   UMAMI_DISABLED_KEY,
   UMAMI_STANDARD_DISABLED_KEY,
+  isAnalyticsOptedOut,
 } from '../lib/analytics/disable.ts';
 
 test('the event name is outbound-click', () => {
@@ -156,7 +157,7 @@ function runOptOut(flagOrEnv: string | null | HookEnv): (type: string, payload: 
   return hook as (type: string, payload: unknown) => unknown;
 }
 
-test('with any opt-out key or browser privacy signal set the hook drops every request', () => {
+test('with any opt-out key, browser privacy signal, or storage read error the hook drops every request', () => {
   for (const env of [
     { disabled: 'true' },
     { disabled: '1' },
@@ -164,6 +165,7 @@ test('with any opt-out key or browser privacy signal set the hook drops every re
     { standardDisabled: '1' },
     { gpc: true },
     { gpc: true, storageThrows: true },
+    { storageThrows: true },
     { navigatorDnt: '1' },
     { windowDnt: '1' },
   ] satisfies HookEnv[]) {
@@ -171,6 +173,67 @@ test('with any opt-out key or browser privacy signal set the hook drops every re
     assert.equal(hook('event', { url: '/' }), null);
     assert.equal(hook('event', { name: 'outbound-click' }), null);
     assert.equal(hook('event', { name: 'install-snippet-copy' }), null);
+  }
+});
+
+test('isAnalyticsOptedOut guards direct umami.track calls across GPC, DNT, localStorage flags, and storage errors', () => {
+  const prevWindow = (globalThis as Record<string, unknown>).window;
+  try {
+    delete (globalThis as Record<string, unknown>).window;
+    assert.equal(isAnalyticsOptedOut(), true, 'SSR / missing window fails closed');
+
+    const withEnv = (w: Record<string, unknown>) => {
+      (globalThis as Record<string, unknown>).window = w;
+      return isAnalyticsOptedOut();
+    };
+
+    assert.equal(
+      withEnv({ navigator: {}, localStorage: { getItem: () => null } }),
+      false,
+    );
+    assert.equal(
+      withEnv({ navigator: { globalPrivacyControl: true }, localStorage: { getItem: () => null } }),
+      true,
+    );
+    assert.equal(
+      withEnv({ navigator: { doNotTrack: '1' }, localStorage: { getItem: () => null } }),
+      true,
+    );
+    assert.equal(
+      withEnv({ doNotTrack: '1', navigator: {}, localStorage: { getItem: () => null } }),
+      true,
+    );
+    assert.equal(
+      withEnv({
+        navigator: {},
+        localStorage: { getItem: (k: string) => (k === UMAMI_DISABLED_KEY ? 'true' : null) },
+      }),
+      true,
+    );
+    assert.equal(
+      withEnv({
+        navigator: {},
+        localStorage: { getItem: (k: string) => (k === UMAMI_STANDARD_DISABLED_KEY ? '1' : null) },
+      }),
+      true,
+    );
+    assert.equal(
+      withEnv({
+        navigator: {},
+        localStorage: {
+          getItem: () => {
+            throw new Error('SecurityError');
+          },
+        },
+      }),
+      true,
+    );
+  } finally {
+    if (prevWindow === undefined) {
+      delete (globalThis as Record<string, unknown>).window;
+    } else {
+      (globalThis as Record<string, unknown>).window = prevWindow;
+    }
   }
 });
 

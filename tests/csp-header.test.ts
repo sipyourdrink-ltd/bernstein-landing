@@ -130,4 +130,17 @@ test('next.config headers compile via Next loadCustomRoutes and enforce noindex 
     assert.match(h.get('x-robots-tag') ?? '', /^index, follow/, `${htmlPage} must remain index, follow`)
     assert.match(h.get('cache-control') ?? '', /s-maxage=600/, `${htmlPage} must retain browser s-maxage=600`)
   }
+
+  /* Mixed-case markdown Accept headers get no-store + Vary: Accept rather than poisoning browser s-maxage=600 */
+  for (const htmlPage of ['/', '/cost', '/blog/getting-started']) {
+    for (const accept of ['text/markdown', 'Text/Markdown, text/html', 'TEXT/X-MARKDOWN;q=0.9, text/html;q=1']) {
+      const h = effectiveHeaders(htmlPage, accept)
+      assert.equal(
+        h.get('cache-control'),
+        'no-store',
+        `${htmlPage} with Accept "${accept}" must get Cache-Control: no-store`,
+      )
+      assert.equal(h.get('vary'), 'Accept', `${htmlPage} with Accept "${accept}" must set Vary: Accept`)
+    }
+  }
 })

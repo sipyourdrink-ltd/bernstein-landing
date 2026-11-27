@@ -7,6 +7,7 @@ import {
   aiReferralSource,
   installCopyMethod,
 } from '@/lib/analytics/events';
+import { isAnalyticsOptedOut } from '@/lib/analytics/disable';
 import { OUTBOUND_CLICK_EVENT, outboundDestination } from '@/lib/analytics/outbound';
 
 let aiReferralRecorded = false;
@@ -31,6 +32,7 @@ export function OutboundClicks(): null {
         const sendReferral = () => {
           if (aiReferralRecorded) return;
           aiReferralRecorded = true;
+          if (isAnalyticsOptedOut()) return;
           try {
             window.umami?.track(AI_REFERRAL_EVENT, { source });
           } catch {
@@ -55,6 +57,7 @@ export function OutboundClicks(): null {
       if (copyButton) {
         const method = installCopyMethod(copyButton);
         if (method) {
+          if (isAnalyticsOptedOut()) return;
           try {
             window.umami?.track(INSTALL_COPY_EVENT, { method });
           } catch {
@@ -66,7 +69,7 @@ export function OutboundClicks(): null {
       const anchor = target.closest('a[href]');
       if (!(anchor instanceof HTMLAnchorElement)) return;
       const destination = outboundDestination(anchor.href, window.location.hostname);
-      if (!destination) return;
+      if (!destination || isAnalyticsOptedOut()) return;
       try {
         window.umami?.track(OUTBOUND_CLICK_EVENT, { destination });
       } catch {

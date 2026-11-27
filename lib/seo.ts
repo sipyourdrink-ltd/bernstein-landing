@@ -305,9 +305,15 @@ function asCdata(text: string | null | undefined): string {
   return `<![CDATA[${safe}]]>`;
 }
 
-function toRfc822(date: string | Date): string {
+function parseValidDate(date: string | Date | null | undefined): Date | null {
+  if (date == null) return null;
   const d = date instanceof Date ? date : new Date(date);
-  return d.toUTCString();
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function toRfc822(date: string | Date): string | null {
+  const d = parseValidDate(date);
+  return d ? d.toUTCString() : null;
 }
 
 /**
@@ -383,7 +389,8 @@ export async function renderPostMdxToFeedHtml(
 export function buildRssItemXml(post: RssPost): string {
   const url = `${SITE_URL}/blog/${post.slug}`;
   const pubDate = toRfc822(post.fm.date);
-  const modifiedIso = new Date(post.fm.dateModified ?? post.fm.date).toISOString();
+  const modifiedDate = parseValidDate(post.fm.dateModified ?? post.fm.date) ?? parseValidDate(post.fm.date);
+  const modifiedIso = modifiedDate ? modifiedDate.toISOString() : null;
   const tags = post.fm.tags ?? [];
   const mediaUrl = post.fm.cover
     ? `${SITE_URL}${post.fm.cover}`
@@ -399,9 +406,9 @@ export function buildRssItemXml(post: RssPost): string {
     `      <title>${asCdata(post.fm.title)}</title>`,
     `      <link>${escapeRssXml(url)}</link>`,
     `      <guid isPermaLink="true">${escapeRssXml(url)}</guid>`,
-    `      <pubDate>${escapeRssXml(pubDate)}</pubDate>`,
+    pubDate ? `      <pubDate>${escapeRssXml(pubDate)}</pubDate>` : null,
     `      <dc:creator>${asCdata(AUTHOR)}</dc:creator>`,
-    `      <dcterms:modified>${escapeRssXml(modifiedIso)}</dcterms:modified>`,
+    modifiedIso ? `      <dcterms:modified>${escapeRssXml(modifiedIso)}</dcterms:modified>` : null,
     `      <description>${asCdata(post.fm.description)}</description>`,
     `      <content:encoded>${asCdata(bodyHtml)}</content:encoded>`,
     `      <media:content url="${escapeRssXml(mediaUrl)}" medium="image" type="image/png" width="1200" height="630">`,
@@ -418,16 +425,19 @@ export function buildRssItemXml(post: RssPost): string {
 export function buildRssFeedXml(posts: RssPost[], buildStamp: string | null): string {
   const itemsXml = posts.map(buildRssItemXml).join('\n');
 
-  const newestPubIso =
-    posts.length > 0 ? new Date(posts[0].fm.date).toISOString() : null;
+  const newestPubIso = posts
+    .map((p) => parseValidDate(p.fm.date)?.toISOString() ?? null)
+    .filter((v): v is string => v !== null)
+    .sort()
+    .at(-1) ?? null;
   const newestModifiedIso =
     posts
-      .map((p) => new Date(p.fm.dateModified ?? p.fm.date).toISOString())
+      .map((p) => (parseValidDate(p.fm.dateModified ?? p.fm.date) ?? parseValidDate(p.fm.date))?.toISOString() ?? null)
+      .filter((v): v is string => v !== null)
       .sort()
       .at(-1) ?? null;
-  const stampIso = buildStamp
-    ? new Date(`${buildStamp}T00:00:00Z`).toISOString()
-    : null;
+  const stampDate = buildStamp ? parseValidDate(`${buildStamp}T00:00:00Z`) : null;
+  const stampIso = stampDate ? stampDate.toISOString() : null;
   const channelIso =
     [newestPubIso, newestModifiedIso, stampIso]
       .filter((value): value is string => value !== null)

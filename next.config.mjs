@@ -130,7 +130,7 @@ const nextConfig = {
        token. Deliberately looser than the q-value comparison in
        lib/markdown-negotiation.ts - see the matchers for `/` and
        `/blog/:slug` near the bottom for why the looseness is safe. */
-    const MARKDOWN_ACCEPT = '.*text/(x-)?markdown.*';
+    const MARKDOWN_ACCEPT = '.*[Tt][Ee][Xx][Tt]/([Xx]-)?[Mm][Aa][Rr][Kk][Dd][Oo][Ww][Nn].*';
 
     /* What a markdown-negotiated request gets instead of the page's
        edge TTL. `no-store` keeps a negotiated body out of every shared
@@ -337,11 +337,12 @@ const nextConfig = {
          anything but Accept-Encoding, so a cached markdown body would
          then be replayed to the next browser asking for the same URL.
 
-         The match is a substring test on Accept, which is looser than
-         the q-value comparison in lib/markdown-negotiation.ts. The
-         looseness only ever costs a cache entry: a request naming
-         markdown but not outranking html gets HTML with `no-store`,
-         which is uncached but correct. It cannot go the other way, and
+         The match is a case-insensitive substring test on Accept, which is
+         looser than the q-value comparison in lib/markdown-negotiation.ts.
+         The looseness only ever costs a cache entry: a request naming
+         markdown weighted strictly below html gets HTML with `no-store`,
+         which is uncached but correct (equal q=1 ties and higher weights
+         get markdown with `no-store`). It cannot go the other way, and
          that asymmetry is the point. Browsers never send the token, so
          ordinary traffic keeps the ten-minute edge TTL. */
       {

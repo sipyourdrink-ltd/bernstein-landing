@@ -139,11 +139,16 @@ export default function PrivacyPage() {
               identifier.
             </p>
             <p>
-              Like any web request, a browser request to the analytics server
-              exposes your IP address and browser&rsquo;s user agent to that
-              server. Its storage, location lookup, session identification
-              and deletion schedule are not defined by this site&rsquo;s
-              published code; no retention period is confirmed here.
+              Each browser request sent by the Umami tracker includes the
+              configured website identifier, this site&rsquo;s host name, the
+              cleaned page and referrer addresses, the document title, your
+              browser language and screen dimensions, together with any custom
+              event name and property listed above. Like any web request, the
+              request also exposes your IP address and browser&rsquo;s user
+              agent to that server. Its storage, location lookup, session
+              identification and deletion schedule are not defined by this
+              site&rsquo;s published code; no retention period is confirmed
+              here.
             </p>
             <p>
               The docs assistant&rsquo;s server proxy also has a separate
@@ -159,10 +164,11 @@ export default function PrivacyPage() {
 
             <h2>Turning analytics off</h2>
             <p>
-              The site&rsquo;s browser hook automatically drops every browser
-              analytics request when your browser sends Global Privacy Control
-              or Do Not Track. You can also open your browser&rsquo;s developer
-              console on this site and run{' '}
+              The site&rsquo;s browser code and hook automatically drop every
+              browser analytics request when your browser sends Global Privacy
+              Control or Do Not Track, or when browser storage cannot be read.
+              You can also open your browser&rsquo;s developer console on this
+              site and run{' '}
               <code>localStorage.setItem(&apos;umami:disabled&apos;, &apos;true&apos;)</code>
               {' '}or{' '}
               <code>localStorage.setItem(&apos;umami.disabled&apos;, &apos;1&apos;)</code>
